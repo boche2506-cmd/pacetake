@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PACE 派思 - 2.0 手勢盲操賣家後台</title>
+    <style>
+        :root {
+            --brand-blue: #007AFF;
+            --bg-white: #ffffff;
+            --text-dark: #111111;
+            --text-gray: #8E8E93;
+            --bg-light: #F2F2F7;
+            --status-green: #34c759;
+            --status-red: #ff3b30;
+            --status-orange: #ff9500;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #111111; /* 廚房防眩光暗黑模式 */
+            color: #ffffff;
+            margin: 0;
+            padding: 8px;
+            box-sizing: border-box;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .seller-container {
+            width: 100%;
+            max-width: 900px;
+            background: #1C1C1E;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 1. 最上方：巨大營業狀態列 */
+        .top-navbar {
+            display: flex;
+            border-bottom: 2px solid #2C2C2E;
+        }
+        .online-toggle-btn {
+            flex: 3;
+            padding: 22px;
+            font-size: 20px;
+            font-weight: 900;
+            border: none;
+            cursor: pointer;
+            color: white;
+            background-color: var(--status-green);
+            transition: all 0.2s;
+        }
+        .online-toggle-btn.offline { background-color: var(--status-red); }
+        .account-status {
+            flex: 1;
+            background-color: #2C2C2E;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #AEAEB2;
+            border-left: 2px solid #1C1C1E;
+        }
+
+        /* 2. 橫向訂單編號切換列 */
+        .order-tabs-row {
+            display: flex;
+            background-color: #2C2C2E;
+            border-bottom: 2px solid #3A3A3C;
+            overflow-x: auto;
+        }
+        .order-tabs-row::-webkit-scrollbar { display: none; }
+        .jump-to-unfinished {
+            padding: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #3A3A3C;
+            color: white;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .order-tab {
+            flex: 1;
+            padding: 14px 24px;
+            font-size: 15px;
+            font-weight: 700;
+            background-color: transparent;
+            color: #8E8E93;
+            border: none;
+            border-right: 1px solid #3A3A3C;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .order-tab.active {
+            background-color: var(--brand-blue);
+            color: white;
+        }
+
+        /* 3. 主工作區 */
+        .main-workspace {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            position: relative;
+        }
+
+        /* 左側狀態面板（擇一亮燈） */
+        .status-light-panel {
+            width: 145px;
+            border-right: 2px solid #2C2C2E;
+            display: flex;
+            flex-direction: column;
+            background-color: #2C2C2E;
+        }
+        .light-indicator {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid #3A3A3C;
+            font-size: 11px;
+            font-weight: bold;
+            color: #48484A;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .light-indicator strong {
+            font-size: 15px;
+            margin-top: 4px;
+            display: block;
+        }
+        .light-indicator span.countdown {
+            font-size: 12px;
+            color: #ff9500;
+            margin-top: 2px;
+            font-weight: 900;
+        }
+        .light-indicator.active.unpaid { color: #ff453a; background: rgba(255,69,58,0.15); }
+        .light-indicator.active.online-pay { color: #0a84ff; background: rgba(10,132,255,0.15); }
+        .light-indicator.active.paid { color: #30d158; background: rgba(48,209,88,0.15); }
+        .light-indicator.active.reserve { color: #ff9f0a; background: rgba(255,159,10,0.15); }
+        .light-indicator.active.dine-in { color: #bf5af2; background: rgba(191,90,242,0.15); }
+
+        /* 右側：巨型廚房大字明細區 */
+        .details-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .kitchen-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #8E8E93;
+            margin-bottom: 16px;
+        }
+        .kitchen-card-list { flex: 1; }
+        .kitchen-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 2px solid #2C2C2E;
+        }
+        .item-name-box { font-size: 32px; font-weight: 900; color: #ffffff; }
+        .item-qty-badge {
+            font-size: 36px; font-weight: 900; color: var(--brand-blue);
+            background-color: rgba(0,122,255,0.15); padding: 2px 16px; border-radius: 12px;
+        }
+        .item-price { font-size: 20px; color: #8E8E93; font-weight: bold; }
+
+        .kitchen-total-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 3px solid #3A3A3C;
+            padding-top: 16px;
+            margin-top: 20px;
+        }
+        .kitchen-total-amount { font-size: 36px; font-weight: 900; color: #30d158; }
+
+        /* 4. 最下方：操作按鈕 */
+        .bottom-action-panel {
+            padding: 16px 24px;
+            border-top: 2px solid #2C2C2E;
+            background-color: #2C2C2E;
+            text-align: center;
+        }
+        .complete-btn {
+            width: 100%; padding: 18px; font-size: 22px; font-weight: 900;
+            color: white; background-color: var(--brand-blue); border: none; border-radius: 16px; cursor: pointer;
+        }
+        .hint-text { font-size: 13px; color: #8E8E93; margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="seller-container">
+    <div class="top-navbar">
+        <button class="online-toggle-btn" id="onlineBtn" onclick="toggleOnlineStatus()">🟢 店家營業中 (點擊切換打烊)</button>
+        <div class="account-status">PACE 後台</div>
+    </div>
+
+    <div class="order-tabs-row" id="tabsRow">
+        <button class="jump-to-unfinished">未完成<br>看板</button>
+        <button class="order-tab active" id="tab-0" onclick="selectOrder(0)">#023</button>
+        <button class="order-tab" id="tab-1" onclick="selectOrder(1)">#024</button>
+        <button class="order-tab" id="tab-2" onclick="selectOrder(2)">#025</button>
+    </div>
+
+    <!-- 主工作區（手勢感應範圍） -->
+    <div class="main-workspace" id="swipeZone">
+        <div class="status-light-panel">
+            <div class="light-indicator" id="light-unpaid">付款方式<strong id="payMethodText">--</strong></div>
+            <div class="light-indicator" id="light-paid">款項狀態<strong>已付款</strong></div>
+            <div class="light-indicator" id="light-reserve">預約取餐<strong id="reserveTimeText">--</strong><span class="countdown" id="countdownText"></span></div>
+            <div class="light-indicator" id="light-dine-in">用餐方式<strong id="dineInText">--</strong></div>
+        </div>
+
+        <div class="details-panel">
+            <div class="kitchen-title">⚡ 當前準備品項 (LARGE KITCHEN MODE)</div>
+            <div class="kitchen-card-list" id="kitchenList"></div>
+            <div class="kitchen-total-box">
+                <div style="font-size: 18px; color: #8E8E93; font-weight: bold;">總計金額</div>
+                <div class="kitchen-total-amount" id="totalPriceText">$0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-action-panel">
+        <button class="complete-btn" onclick="completeOrder()">確定完成訂單</button>
+        <div class="hint-text">👉 【手勢功能】可在螢幕上向左/向右滑動，盲操切換下一張訂單！</div>
+    </div>
+</div>
+
+<script>
+    const ordersData = [
+        { id: '023', payType: 'cash_unpaid', reserveTime: '12:30', countdownMin: 20, dineType: '外帶自取', items: [{ name: '司機推爆肉糟飯', qty: 2, price: 90 }, { name: '貢丸湯', qty: 1, price: 35 }], total: 125 },
+        { id: '024', payType: 'online_paid', reserveTime: '即時出餐', countdownMin: 0, dineType: '內用 / 05桌', items: [{ name: '經典美式雙層堡', qty: 1, price: 120 }, { name: '黑糖波霸鮮奶茶', qty: 3, price: 180 }], total: 300 },
+        { id: '025', payType: 'cash_paid', reserveTime: '13:00', countdownMin: 50, dineType: '外帶自取', items: [{ name: '超級大披薩', qty: 1, price: 299 }], total: 299 }
+    ];
+
+    let currentOrderIndex = 0;
+
+    function renderOrder(index) {
+        currentOrderIndex = index;
+        const order = ordersData[index];
+        
+        document.querySelectorAll('.order-tab').forEach((tab, idx) => {
+            if(idx === index) tab.classList.add('active');
+            else tab.classList.remove('active');
+        });
+
+        const lightUnpaid = document.getElementById('light-unpaid');
+        const lightPaid = document.getElementById('light-paid');
+        const lightReserve = document.getElementById('light-reserve');
+        const lightDineIn = document.getElementById('light-dine-in');
+        
+        lightUnpaid.className = 'light-indicator'; lightPaid.className = 'light-indicator';
+        lightReserve.className = 'light-indicator'; lightDineIn.className = 'light-indicator';
+        document.getElementById('countdownText').innerText = "";
+
+        if(order.payType === 'cash_unpaid') {
+            lightUnpaid.className = 'light-indicator active unpaid';
+            document.getElementById('payMethodText').innerText = "現金未付";
+        } else if(order.payType === 'online_paid') {
+            lightPaid.className = 'light-indicator active paid';
+            lightUnpaid.className = 'light-indicator active online-pay';
+            document.getElementById('payMethodText').innerText = "線上付款";
+        } else {
+            lightPaid.className = 'light-indicator active paid';
+            document.getElementById('payMethodText').innerText = "現場已付";
+        }
+
+        document.getElementById('reserveTimeText').innerText = order.reserveTime;
+        if(order.countdownMin > 0) {
+            lightReserve.className = 'light-indicator active reserve';
+            document.getElementById('countdownText').innerText = `(剩 ${order.countdownMin} 分)`;
+        }
+
+        document.getElementById('dineInText').innerText = order.dineType;
+        if(order.dineType.includes("內用")) lightDineIn.className = 'light-indicator active dine-in';
+
+        const kitchenList = document.getElementById('kitchenList');
+        kitchenList.innerHTML = "";
+        order.items.forEach(item => {
+            kitchenList.innerHTML += `
+                <div class="kitchen-item-row">
+                    <div class="item-name-box">${item.name}</div>
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <span class="item-price">$${item.price}</span>
+                        <span class="item-qty-badge">x${item.qty}</span>
+                    </div>
+                </div>`;
+        });
+        document.getElementById('totalPriceText').innerText = `$${order.total}`;
+    }
+
+    function selectOrder(idx) { renderOrder(idx); }
+
+    // 💡 左右滑動盲操手勢
+    const swipeZone = document.getElementById('swipeZone');
+    let touchStartX = 0; let touchEndX = 0;
+    swipeZone.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches.screenX; });
+    swipeZone.addEventListener('touchend', (e) => { touchEndX = e.changedTouches.screenX; handleSwipe(); });
+    
+    function handleSwipe() {
+        const dist = touchEndX - touchStartX;
+        if (dist < -80 && currentOrderIndex < ordersData.length - 1) renderOrder(currentOrderIndex + 1);
+        if (dist > 80 && currentOrderIndex > 0) renderOrder(currentOrderIndex - 1);
+    }
+
+    renderOrder(currentOrderIndex);
+
+    function toggleOnlineStatus() {
+        const btn = document.getElementById('onlineBtn');
+        btn.classList.toggle('offline');
+        btn.innerText = btn.classList.contains('offline') ? "🔴 店家打烊中 (買家端已隱藏)" : "🟢 店家營業中 (點擊切換打烊)";
+    }
+
+    function completeOrder() { alert(`單號 #${ordersData[currentOrderIndex].id} 已完成，已秒速通知買家！`); }
+</script>
+</body>
+</html>

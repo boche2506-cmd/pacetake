@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>快拿自取街 pacetake.tw - 手勢盲操接單後台</title>
-    <!-- 精品藍色便當純代碼 SVG Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 100 100'%3E%3Crect x='10' y='30' width='80' height='55' rx='10' fill='%230066FF'/%3E%3Cpath d='M25 30 V15 Q25 10 35 10 H65 Q75 10 75 15 V30' fill='none' stroke='%230066FF' stroke-width='8'/%3E%3Cline x1='10' y1='55' x2='90' y2='55' stroke='%23ffffff' stroke-width='4'/%3E%3C/svg%3E">
+    <!-- 🌟 精品藍色便當純代碼 SVG Favicon（大廠級高度相容優化版，消滅灰白地球） -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d=\"M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30\"%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C/svg%3E">
     <style>
         /* 全局變數與主題防線 (全面對齊系統規範) */
         :root {
@@ -352,16 +352,15 @@
 
             <!-- 右側巨型廚房大字明細與全螢幕手勢工作區 -->
             <main class="gesture-main-board" id="gestureTouchBoard">
-                <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer">
-                    <!-- 商品資料行一 -->
-                    <div class="kitchen-row">
-                        <span class="kitchen-food-name">木盒便當</span>
-                        <span class="kitchen-food-qty">x2</span>
+                <div>
+                    <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer">
+                        <!-- 由 JS 依照訂單自動動態渲染商品、單價與數量 -->
                     </div>
-                    <!-- 商品資料行二 -->
-                    <div class="kitchen-row">
-                        <span class="kitchen-food-name">大雞腿</span>
-                        <span class="kitchen-food-qty">x1</span>
+                    
+                    <!-- 🎯 廚房一秒對帳：巨型實付總金額防線 -->
+                    <div style="margin-top: 24px; padding-top: 16px; border-top: 2px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 16px; font-weight: 800; color: var(--text-muted);">本單實付合計</span>
+                        <span style="font-size: 38px; font-weight: 900; color: var(--brand-blue);" id="kitchenOrderTotal">$0</span>
                     </div>
                 </div>
 
@@ -393,7 +392,7 @@
             element.addEventListener('mousedown', trigger);
         }
 
-        // 🌓 系統全局膚色同步防線 (完美對齊首頁與全房間)
+        // 🌓 系統全局膚色同步防線
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         function initTheme() {
             const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
@@ -419,22 +418,25 @@
             }
         });
 
-        // 🧑‍🍳 廚房假資料庫與狀態資料連動防線
+        // 🧑‍🍳 廚房實戰假資料庫（加入單價與總計防線）
         const ordersDatabase = {
             "023": {
-                items: [ { name: "木盒便當", qty: "x2" }, { name: "大雞腿", qty: "x1" } ],
+                items: [ { name: "木盒便當", price: 120, qty: "x2" }, { name: "大雞腿", price: 65, qty: "x1" } ],
+                total: "$305",
                 pay: { text: "線上已付", cls: "badge-green" },
                 time: "12:30", countdown: "剩 20 分", timeCls: "badge-amber",
                 type: "外帶自取", typeCls: "badge-purple"
             },
             "022": {
-                items: [ { name: "大排骨", qty: "x2" } ],
+                items: [ { name: "大排骨", price: 85, qty: "x2" } ],
+                total: "$170",
                 pay: { text: "現場付現", cls: "badge-red" },
                 time: "12:45", countdown: "剩 35 分", timeCls: "badge-amber",
                 type: "內用/05桌", typeCls: "badge-purple"
             },
             "021": {
-                items: [ { name: "鯖魚便當", qty: "x1" }, { name: "經典手搖", qty: "x1" } ],
+                items: [ { name: "鯖魚便當", price: 95, qty: "x1" }, { name: "經典手搖", price: 40, qty: "x1" } ],
+                total: "$135",
                 pay: { text: "線上已付", cls: "badge-green" },
                 time: "13:00", countdown: "剩 50 分", timeCls: "badge-amber",
                 type: "外帶自取", typeCls: "badge-purple"
@@ -445,6 +447,7 @@
         let currentOrderIndex = 0;
 
         const kitchenBillContainer = document.getElementById('kitchenBillContainer');
+        const kitchenOrderTotal = document.getElementById('kitchenOrderTotal');
         const lightPay = document.getElementById('light_pay');
         const lightTime = document.getElementById('light_time');
         const lightCountdown = document.getElementById('light_countdown');
@@ -464,12 +467,19 @@
             
             lightType.innerText = data.type;
 
+            // 連動更新本單巨型合計金額
+            kitchenOrderTotal.innerText = data.total;
+
+            // 渲染右側三倍巨型大字商品項目（內置單價顯示）
             kitchenBillContainer.innerHTML = '';
             data.items.forEach(item => {
                 const row = document.createElement('div');
                 row.className = 'kitchen-row';
                 row.innerHTML = `
-                    <span class="kitchen-food-name">${item.name}</span>
+                    <div style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+                        <span class="kitchen-food-name">${item.name}</span>
+                        <span style="font-size: 14px; font-weight: 700; color: var(--text-muted);">單價: $${item.price}</span>
+                    </div>
                     <span class="kitchen-food-qty">${item.qty}</span>
                 `;
                 kitchenBillContainer.appendChild(row);
@@ -508,6 +518,9 @@
                 }
             }
         }
+
+        // 初始渲染
+        renderOrder(orderIds[currentOrderIndex]);
 
         // 全局相對路徑跳轉無縫對接
         const navElements = document.querySelectorAll('.nav-fast');

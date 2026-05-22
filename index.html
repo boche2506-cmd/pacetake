@@ -567,8 +567,8 @@
                 Google 一鍵登入
             </button>
 
-            <!-- 2. 完全對稱：電子郵件登入按鈕 -->
-<button id="toggleEmailFormBtn" onclick="const form = document.getElementById('emailFormSection'); form.style.display = form.style.display === 'none' ? 'block' : 'none';" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; margin-top: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                        <!-- 2. 完全對稱：電子郵件登入按鈕 -->
+            <button id="toggleEmailFormBtn" onclick="document.getElementById('googleLoginAction').style.display='none'; this.style.display='none'; document.getElementById('emailFormSection').style.display='block';" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; margin-top: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
                 <!-- 跨平台通用：經典深灰色電子郵件信封圖標 -->
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:12px; flex-shrink: 0;">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -576,7 +576,6 @@
                 </svg>
                 使用電子郵件登入
             </button>
-
 
             <!-- 3. 精修展開表單：點擊上面信封後才會優雅現身 -->
             <div id="emailFormSection" style="display: none; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto;">
@@ -592,7 +591,7 @@
                 <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15); transition: background 0.2s;">電子郵件登入 / 註冊</button>
             </div>
 
-            <span class="modal-close" id="closeLightboxBtn" style="margin-top: 20px; display: inline-block;">暫時返回</span>
+                        <span class="modal-close" id="closeLightboxBtn" onclick="document.getElementById('googleLoginAction').style.display='flex'; document.getElementById('toggleEmailFormBtn').style.display='flex'; document.getElementById('emailFormSection').style.display='none';" style="margin-top: 20px; display: inline-block; cursor: pointer;">暫時返回</span>
 
             </div>
         </div>

@@ -230,6 +230,18 @@
                 alert("QR Code 尚未生成完畢，請稍候再試。");
             }
         }
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const backBtn = document.querySelector('a[href="seller.html"]');
+            if(backBtn) {
+                const fastBack = (e) => {
+                    e.preventDefault();
+                    window.location.href = "seller.html";
+                };
+                backBtn.addEventListener('touchstart', fastBack);
+                backBtn.addEventListener('mousedown', fastBack);
+            }
+        });
     </script>
 </body>
 </html>

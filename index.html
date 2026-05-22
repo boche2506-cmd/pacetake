@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>快拿自取街 pacetake.tw - 店內價預約外帶自取系統</title>
     
-    <!-- Tailwind CSS 官方穩定版防線 -->
-    <script src="https://cloudflare.com"></script>
+    <!-- 終極必勝防線：完美支援 v3 氟碳高級排版、全球 0 延遲加載節點 -->
+    <script src="https://jsdelivr.net"></script>
 
     <!-- FontAwesome 圖標標準防線 -->
     <link rel="stylesheet" href="https://cloudflare.com">
@@ -38,28 +38,23 @@
                 <span class="text-[10px] text-slate-400 font-bold -mt-1">店內價預約外帶自取點單系統</span>
             </div>
             
-            <!-- 右上角 Google 登入微互動一體化區塊 -->
+            <!-- 右上角 Google 登入微互動 -->
             <div class="relative flex items-center">
-                <!-- 預設未登入狀態按鈕 -->
                 <button onclick="simulateGoogleLogin()" id="googleLoginBtn" class="smooth-transition text-xs font-black text-white bg-[#0066FF] hover:bg-[#0052CC] px-4 py-2.5 rounded-xl shadow-md active:scale-95">
                     <i class="fa-brands fa-google mr-1"></i> Google 一鍵登入
                 </button>
 
-                <!-- 模擬登入後的圓形用戶頭像 (初始隱藏) -->
                 <div onclick="toggleDropdown(event)" id="userAvatar" class="w-10 h-10 rounded-full border-2 border-[#0066FF] overflow-hidden cursor-pointer active:scale-95 smooth-transition hidden shadow-md">
                     <img src="https://unsplash.com" alt="用戶頭像" class="w-full h-full object-cover">
                 </div>
 
-                <!-- 整合帳號狀態與傳送門的下拉選單 -->
                 <div class="dropdown-menu" id="avatarDropdown">
-                    <!-- 測試功能按鈕 -->
                     <div onclick="simulateSellerStatus()" class="dropdown-item bg-amber-50 text-amber-700 border-b border-slate-100 cursor-pointer text-center text-[11px]">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> 【測試】解鎖已開店老闆
                     </div>
                     <a href="register.html" id="dropRegisterBtn" class="dropdown-item border-b border-slate-100">
                         <i class="fa-solid fa-store text-slate-400"></i> 💼 商家開店註冊
                     </a>
-                    <!-- 老闆專屬路徑 (初始隱藏，點擊測試按鈕後會解除封印) -->
                     <a href="seller.html" id="dropSellerBtn" class="dropdown-item border-b border-slate-100 hidden">
                         <i class="fa-solid fa-fire-burner text-[#34c759]"></i> 🧑‍🍳 進入接單後台
                     </a>
@@ -78,27 +73,21 @@
     </header>
 
     <main class="max-w-xl mx-auto px-4 mt-6 space-y-6">
-        <!-- 中間：加寬搜尋欄 (完全拔除品項分類鈕，留白感更高級) -->
+        <!-- 中間搜尋欄 -->
         <div class="relative shadow-sm rounded-2xl overflow-hidden border border-slate-200">
             <input type="text" placeholder="搜尋商圈美味小吃、店家名稱..." class="w-full bg-white px-5 py-4 pl-12 text-sm font-bold focus:outline-none focus:bg-white smooth-transition">
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-base"></i>
         </div>
 
-        <!-- 下方：店家精品卡片 (加上 border-slate-200 精緻細邊界防線) -->
+        <!-- 下方店家卡片 -->
         <section class="space-y-4">
-            <!-- 店家 1 -->
             <div class="bg-white rounded-3xl p-4 flex gap-4 border border-slate-200 shadow-sm hover:shadow-md smooth-transition cursor-pointer">
-                <!-- 1:1 圓角正方形店家照片 -->
                 <div class="w-24 h-24 rounded-2xl overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-100">
                     <img src="https://unsplash.com" alt="店家照片" class="w-full h-full object-cover">
                 </div>
-                <!-- 右側垂直疊加三格排版 -->
                 <div class="flex-1 flex flex-col justify-between py-0.5">
-                    <!-- 第一格：店名 -->
                     <h2 class="font-black text-slate-800 text-lg tracking-wide leading-snug">派思絕品精緻便當屋 (總店)</h2>
-                    <!-- 第二格：分類 · GPS距離 -->
                     <p class="text-xs font-bold text-slate-400">精緻便當 · 站前商圈 0.05 km</p>
-                    <!-- 第三格：極簡出餐時間框框 + 精緻線上刷卡灰色高質感邊框標籤 -->
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="bg-slate-100 text-slate-700 text-[10px] font-black px-2 py-1 rounded-md border border-slate-200">
                             <i class="fa-regular fa-clock mr-0.5"></i> 15 分鐘出餐
@@ -112,7 +101,7 @@
         </section>
     </main>
 
-    <!-- 底部：半透明磨砂玻璃懸浮欄 (精簡化，隱藏地推傳送門) -->
+    <!-- 底部懸浮欄 -->
     <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[calc(100%-32px)] max-w-lg bg-white/80 backdrop-blur-lg border border-slate-200/80 rounded-2xl px-5 py-4 flex items-center justify-between shadow-xl z-30">
         <div class="flex items-center gap-3">
             <span class="flex h-2.5 w-2.5 relative">
@@ -128,9 +117,7 @@
     </div>
 
     <script>
-        // 🚀 大廠級「0秒無縫閃轉外掛」與動態選單邏輯
         document.addEventListener('DOMContentLoaded', () => {
-            // 檢查模擬登入記憶防線
             const savedStatus = localStorage.getItem('userStatus');
             if(savedStatus === 'loggedInBuyer') {
                 showLoggedInState(false);
@@ -138,7 +125,6 @@
                 showLoggedInState(true);
             }
 
-            // 0秒超連結預載閃轉
             const fastRedirects = [
                 { id: "dropRegisterBtn", target: "register.html" },
                 { id: "dropSellerBtn", target: "seller.html" },
@@ -171,14 +157,13 @@
 
         function simulateLogout() {
             localStorage.removeItem('userStatus');
-            document.getElementById('googleLoginBtn').classList.remove('hidden');
+            document.getElementById('googleLoginBtn').style.display = 'inline-block';
             document.getElementById('userAvatar').classList.add('hidden');
             document.getElementById('avatarDropdown').classList.remove('active');
             alert("已登出帳號，恢復遊客身份。");
         }
 
         function showLoggedInState(isSeller) {
-            document.getElementById('googleLoginBtn').add('hidden'); // Tailwind V2 隱藏
             document.getElementById('googleLoginBtn').style.display = 'none';
             document.getElementById('userAvatar').classList.remove('hidden');
             

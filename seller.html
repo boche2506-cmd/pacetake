@@ -4,23 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PACE 派思 - 2.1 RWD手勢盲操後台</title>
+    <!-- 純代碼免圖檔便當標誌（Favicon）數位門面 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23007AFF'%3E%3Cpath d='M2 9h20v2H2V9zm1 4h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6zm3-8a3 3 0 0 1 6 0h2a3 3 0 0 1 6 0v2H2V5h1zm3 0a1 1 0 0 0-2 0v2h2V5zm8 0a1 1 0 0 0-2 0v2h2V5z'/%3E%3C/svg%3E">
     <!-- FontAwesome 圖標庫 -->
     <link rel="stylesheet" href="https://cloudflare.com">
-    <!-- 預先載入 manage.html，強行打通秒開防線 -->
+    <!-- 預先載入 manage.html 與 index.html 強行打通秒開防線 -->
     <link rel="prefetch" href="manage.html">
+    <link rel="prefetch" href="index.html">
     <style>
         :root { --brand-blue: #007AFF; --status-green: #34c759; --status-red: #ff3b30; --status-orange: #ff9500; --bg-body: #111111; --bg-card: #1C1C1E; --bg-nav: #2C2C2E; --text-main: #ffffff; --text-sub: #8E8E93; --border-line: #3A3A3C; --light-off: #48484A; }
         body.light-theme { --bg-body: #F2F2F7; --bg-card: #ffffff; --bg-nav: #FAFAFC; --text-main: #111111; --text-sub: #8E8E93; --border-line: #E5E5EA; --light-off: #D1D1D6; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 8px; box-sizing: border-box; height: 100vh; display: flex; justify-content: center; overflow: hidden; -webkit-user-select: none; user-select: none; transition: background-color 0.2s; }
-        .seller-container { width: 100%; max-width: 900px; background: var(--bg-card); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; }
+        .seller-container { width: 100%; max-width: 900px; background: var(--bg-card); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; border: 2px solid var(--border-line); }
         .top-navbar { display: flex; border-bottom: 2px solid var(--border-line); height: 70px; }
-        .online-toggle-btn { flex: 2; padding: 0 20px; font-size: 18px; font-weight: 900; border: none; cursor: pointer; color: white; background-color: var(--status-green); text-align: left; transition: all 0.2s; }
+        .online-toggle-btn { flex: 1.5; padding: 0 20px; font-size: 18px; font-weight: 900; border: none; cursor: pointer; color: white; background-color: var(--status-green); text-align: left; transition: all 0.2s; }
         .online-toggle-btn.offline { background-color: var(--status-red); }
         
-        /* 📱 右側功能區塊與左右對調全新排版 */
-        .nav-right-actions { display: flex; flex: 1.5; border-left: 2px solid var(--border-line); }
-        .theme-toggle-btn { flex: 1; background-color: var(--bg-nav); color: var(--text-main); border: none; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; }
-        .manage-link-btn { flex: 1; background-color: var(--brand-blue); color: white; border: none; border-left: 2px solid var(--border-line); font-size: 14px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; text-decoration: none; transition: background-color 0.1s; }
+        /* 右側功能區塊與左右對調全新排版 */
+        .nav-right-actions { display: flex; flex: 2; border-left: 2px solid var(--border-line); }
+        .home-btn { flex: 1; background-color: var(--bg-nav); color: var(--text-main); border: none; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; text-decoration: none; }
+        .theme-toggle-btn { flex: 1; background-color: var(--bg-nav); color: var(--text-main); border: none; border-left: 2px solid var(--border-line); font-size: 13px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; }
+        .manage-link-btn { flex: 1.2; background-color: var(--brand-blue); color: white; border: none; border-left: 2px solid var(--border-line); font-size: 13px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; text-decoration: none; transition: background-color 0.1s; }
         .manage-link-btn:active { background-color: #0052CC; }
 
         .order-tabs-row { display: flex; background-color: var(--bg-nav); border-bottom: 2px solid var(--border-line); overflow-x: auto; }
@@ -65,14 +69,19 @@
 <body>
 <div class="seller-container">
     <div class="top-navbar">
-        <button class="online-toggle-btn" id="onlineBtn" onclick="toggleOnlineStatus()">🟢 店家營業中 (點擊切換打烊)</button>
+        <button class="online-toggle-btn" id="onlineBtn" onclick="toggleOnlineStatus()">🟢 營業中</button>
         <div class="nav-right-actions">
-            <!-- 🌓 夜間模式移到了左邊 -->
+            <!-- 🏠 補齊返回首頁 -->
+            <a href="index.html" class="home-btn" id="homeBtn">
+                <i class="fa-solid fa-house" style="font-size:16px;"></i>
+                <span>回首頁</span>
+            </a>
+            <!-- 🌓 夜間模式 -->
             <button class="theme-toggle-btn" id="themeBtn" onclick="toggleTheme()">
                 <i class="fa-solid fa-moon" id="themeIcon" style="font-size:16px;"></i>
                 <span id="themeText">夜間模式</span>
             </button>
-            <!-- ⚙️ 菜單管理完美移到最右側，並加入 0 秒強行閃轉事件 -->
+            <!-- ⚙️ 菜單管理（支援0秒無縫閃轉） -->
             <a href="manage.html" class="manage-link-btn" id="manageBtn">
                 <i class="fa-solid fa-gear" style="font-size:16px;"></i>
                 <span>菜單管理</span>
@@ -226,9 +235,9 @@
         const btn = document.getElementById("onlineBtn");
         btn.classList.toggle("offline");
         if(btn.classList.contains("offline")) {
-            btn.innerText = "🔴 店家打烊中 (點擊切換營業)";
+            btn.innerText = "🔴 打烊中";
         } else {
-            btn.innerText = "🟢 店家營業中 (點擊切換打烊)";
+            btn.innerText = "🟢 營業中";
         }
     }
 
@@ -246,12 +255,17 @@
 
     // 🚀 大廠級「0秒無縫閃轉外掛」：手指剛碰到按鈕就強行預先執行跳轉
     const manageBtn = document.getElementById("manageBtn");
-    const fastRedirect = (e) => {
-        e.preventDefault();
-        window.location.href = "manage.html";
+    const homeBtn = document.getElementById("homeBtn");
+
+    const setupFastLink = (btn, url) => {
+        if(!btn) return;
+        const handler = (e) => { e.preventDefault(); window.location.href = url; };
+        btn.addEventListener("touchstart", handler, { passive: false });
+        btn.addEventListener("mousedown", handler);
     };
-    manageBtn.addEventListener("touchstart", fastRedirect, { passive: false });
-    manageBtn.addEventListener("mousedown", fastRedirect);
+    
+    setupFastLink(manageBtn, "manage.html");
+    setupFastLink(homeBtn, "index.html");
 
     // 全螢幕手勢
     let touchStartX = 0;

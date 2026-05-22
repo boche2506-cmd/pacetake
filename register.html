@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>快拿自取街 pacetake.tw - 商家手機開店</title>
-    <!-- 精品藍色便當純代碼 SVG Favicon（大廠級高度相容優化版） -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C/svg%3E">
+    <!-- 🌟 精品藍色便當純代碼 SVG Favicon（全新安全完美版，消滅隱形惡魔） -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E">
     <style>
         /* 全局變數與主題防線 */
         :root {
@@ -16,9 +16,10 @@
             --text-muted: #64748B;
             --brand-blue: #0066FF;
             --brand-red: #EF4444;
+            --brand-green: #10B981;
+            --card-bg: #FFFFFF;
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
             --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
-            --card-bg: #FFFFFF;
         }
 
         [data-theme="dark"] {
@@ -29,9 +30,10 @@
             --text-muted: #A3A3A3;
             --brand-blue: #3B82F6;
             --brand-red: #F87171;
+            --brand-green: #34D399;
+            --card-bg: #1C1C1E;
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
             --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
-            --card-bg: #1C1C1E;
         }
 
         * {
@@ -207,88 +209,70 @@
         .menu-upload-list { display: flex; flex-direction: column; gap: 12px; }
 
         .menu-item-row {
-            display: flex;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 12px;
-            gap: 12px;
-            align-items: center;
-            box-shadow: var(--shadow-sm);
-            animation: fadeIn 0.2s ease;
+            display: flex; background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 14px; padding: 12px; gap: 12px; align-items: center;
+            box-shadow: var(--shadow-sm); animation: fadeIn 0.2s ease;
         }
 
         .img-upload-box {
-            width: 70px;
-            height: 70px;
-            border-radius: 12px;
-            border: 2px dashed var(--border-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            background-color: var(--bg-global);
-            cursor: pointer;
-            color: var(--text-muted);
+            width: 70px; height: 70px; border-radius: 12px; border: 2px dashed var(--border-color);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 18px; background-color: var(--bg-global); cursor: pointer; color: var(--text-muted);
         }
 
         .img-upload-box span { font-size: 10px; margin-top: 2px; }
+
         .item-fields { display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+
         .price-input-wrapper { position: relative; display: flex; align-items: center; }
+
         .price-symbol { position: absolute; left: 12px; font-size: 14px; font-weight: 700; color: var(--text-muted); }
+
         .price-input { padding-left: 26px !important; }
 
         .add-row-btn {
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            color: var(--brand-blue);
-            height: 44px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            background-color: var(--bg-global); border: 1px solid var(--border-color);
+            color: var(--brand-blue); height: 44px; border-radius: 12px; font-size: 14px;
+            font-weight: 700; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 6px; transition: background-color 0.2s;
         }
 
         .footer-action {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            padding: 16px 20px 24px 20px;
-            background-color: var(--bg-container);
-            border-top: 1px solid var(--border-color);
+            position: absolute; bottom: 0; left: 0; right: 0; padding: 16px 20px 24px 20px;
+            background-color: var(--bg-container); border-top: 1px solid var(--border-color);
         }
 
         .submit-btn {
-            background-color: var(--brand-blue);
-            color: white;
-            border: none;
-            width: 100%;
-            height: 52px;
-            border-radius: 26px;
-            font-size: 16px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 4px 14px rgba(0, 102, 255, 0.3);
+            background-color: var(--brand-blue); color: white; border: none; width: 100%;
+            height: 52px; border-radius: 26px; font-size: 16px; font-weight: 800;
+            cursor: pointer; box-shadow: 0 4px 14px rgba(0, 102, 255, 0.3);
         }
 
         .lightbox-modal {
             display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); z-index: 200;
-            justify-content: center; align-items: center; padding: 20px;
+            background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px); z-index: 200; justify-content: center;
+            align-items: center; padding: 20px;
         }
 
         .modal-card {
             background-color: var(--bg-container); border: 1px solid var(--border-color);
-            border-radius: 20px; width: 100%; max-width: 320px; padding: 24px; text-align: center;
+            border-radius: 20px; width: 100%; max-width: 320px; padding: 24px;
+            box-shadow: var(--shadow-md); text-align: center;
         }
 
         .modal-title { font-size: 16px; font-weight: 800; color: var(--brand-red); margin-bottom: 12px; }
+
         .modal-desc { font-size: 13px; color: var(--text-main); line-height: 1.6; margin-bottom: 20px; text-align: left; }
+
         .modal-action-btns { display: flex; gap: 10px; }
-        .modal-action-btns button { flex: 1; height: 40px; border-radius: 10px; font-size: 13px; font-weight: 700; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); }
+
+        .modal-action-btns button {
+            flex: 1; height: 40px; border-radius: 10px; font-size: 13px; font-weight: 700;
+            cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main);
+        }
+
         .modal-action-btns .confirm-btn { background-color: var(--brand-blue); color: white; border: none; }
 
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    </style>

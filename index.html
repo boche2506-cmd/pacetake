@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>快拿自取街 pacetake.tw - 買家首頁</title>
-    <!-- 精品藍色便當純代碼 SVG Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E">
-
+    <!-- 🌟 精品藍色便當純代碼 SVG Favicon（大廠級高度相容優化版） -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C/svg%3E">
     <style>
         /* 全局變數與主題防線 */
         :root {
@@ -42,7 +41,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -56,7 +55,7 @@
             transition: background-color 0.15s ease;
         }
 
-        /* 手機直屏精品大外框與細邊界 */
+        /* 手機精品外框 */
         .phone-wrapper {
             width: 100%;
             max-width: 430px;
@@ -66,12 +65,11 @@
             border-right: 1px solid var(--border-color);
             box-shadow: var(--shadow-md);
             position: relative;
-            padding-bottom: 90px; /* 留給底部懸浮欄 */
+            padding-bottom: 90px;
             display: flex;
             flex-direction: column;
         }
 
-        /* 頂部高級大字留白區 */
         .header {
             padding: 24px 20px 12px 20px;
             display: flex;
@@ -93,7 +91,6 @@
             font-weight: 500;
         }
 
-        /* 右上角一體化控制台 */
         .control-panel {
             display: flex;
             align-items: center;
@@ -129,7 +126,7 @@
         }
 
         .user-avatar-btn {
-            display: none; /* 初始未登入隱藏 */
+            display: none;
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 6px 12px;
@@ -142,7 +139,7 @@
             gap: 4px;
         }
 
-        /* 下拉選單選面 */
+        /* 下拉選單 */
         .dropdown-menu {
             display: none;
             position: absolute;
@@ -215,14 +212,9 @@
             border-color: var(--brand-blue);
         }
 
-        .seller-unlock {
-            display: none; /* 賣家專屬功能初始隱藏 */
-        }
+        .seller-unlock { display: none; }
 
-        /* 中間：加寬搜尋欄 */
-        .search-container {
-            padding: 8px 20px;
-        }
+        .search-container { padding: 8px 20px; }
 
         .search-box {
             display: flex;
@@ -245,39 +237,6 @@
             outline: none;
         }
 
-        /* 橫向滑動圓角分類鈕 */
-        .category-scroll {
-            display: flex;
-            overflow-x: auto;
-            padding: 12px 20px;
-            gap: 8px;
-            scrollbar-width: none;
-        }
-
-        .category-scroll::-webkit-scrollbar {
-            display: none;
-        }
-
-        .cat-btn {
-            flex-shrink: 0;
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .cat-btn.active {
-            background-color: var(--brand-blue);
-            color: #FFFFFF;
-            border-color: var(--brand-blue);
-        }
-
-        /* 下方：店家列表區 */
         .store-list {
             padding: 12px 20px;
             display: flex;
@@ -316,24 +275,9 @@
             flex-grow: 1;
         }
 
-        .store-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .store-meta {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .store-tags {
-            display: flex;
-            gap: 6px;
-            margin-top: 4px;
-            align-items: center;
-        }
+        .store-name { font-size: 16px; font-weight: 700; color: var(--text-main); }
+        .store-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .store-tags { display: flex; gap: 6px; margin-top: 4px; align-items: center; }
 
         .tag-time {
             background-color: rgba(0, 102, 255, 0.08);
@@ -344,385 +288,17 @@
             font-weight: 600;
         }
 
-        .tag-pay {
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 6px;
-        }
+        .tag-pay { border: 1px solid var(--border-color); color: var(--text-muted); font-size: 11px; padding: 2px 6px; border-radius: 6px; }
 
-        /* 底部懸浮欄 */
         .bottom-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 76px;
-            background-color: var(--blur-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            z-index: 90;
+            position: absolute; bottom: 0; left: 0; right: 0; height: 76px;
+            background-color: var(--blur-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 90;
         }
 
-        .status-msg {
-            font-size: 12px;
-            color: var(--text-muted);
-            max-width: 240px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--text-muted);
-            flex-shrink: 0;
-        }
-
-        .status-indicator.active {
-            background-color: var(--brand-green);
-            box-shadow: 0 0 8px var(--brand-green);
-        }
+        .status-msg { font-size: 12px; color: var(--text-muted); max-width: 240px; display: flex; align-items: center; gap: 6px; }
+        .status-indicator { width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-muted); flex-shrink: 0; }
+        .status-indicator.active { background-color: var(--brand-green); box-shadow: 0 0 8px var(--brand-green); }
 
         .cart-status-btn {
-            background-color: var(--brand-blue);
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            text-decoration: none;
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* 半透明燈箱彈窗 */
-        .lightbox-modal {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-card {
-            background-color: var(--bg-container);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 320px;
-            padding: 24px;
-            box-shadow: var(--shadow-md);
-            text-align: center;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .modal-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 10px;
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-main);
-        }
-
-        .modal-btn.google {
-            background-color: #FFFFFF;
-            color: #111111;
-            border-color: #E2E8F0;
-        }
-
-        .modal-btn.phone {
-            background-color: var(--brand-blue);
-            color: white;
-            border: none;
-        }
-
-        .modal-close {
-            font-size: 12px;
-            color: var(--text-muted);
-            cursor: pointer;
-            margin-top: 12px;
-            display: inline-block;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="phone-wrapper">
-        <!-- 頂部大字留白區 -->
-        <header class="header">
-            <div class="brand-title-area">
-                <h1>PACE 派思</h1>
-                <div class="brand-subtitle">店內價預約外帶自取 / 內用點單系統</div>
-            </div>
-            
-            <div class="control-panel">
-                <!-- 膚色切換鈕 -->
-                <button class="theme-toggle" id="themeToggleBtn">🌓</button>
-                
-                <!-- 未登入狀態 -->
-                <button class="login-btn" id="loginTriggerBtn">Google 登入 / 註冊</button>
-                
-                <!-- 登入後狀態 -->
-                <button class="user-avatar-btn" id="avatarMenuBtn">
-                    <span>🧑‍💼 帳號狀態</span>
-                </button>
-                
-                <!-- 下拉選單面板 -->
-                <div class="dropdown-menu" id="userDropdown">
-                    <a href="#" class="nav-fast" data-target="orders">🛒 我的訂單</a>
-                    <a href="#" class="nav-fast" data-target="history">⏳ 歷史訂單</a>
-                    <a href="register.html" class="nav-fast">💼 月費開店</a>
-                    
-                    <!-- 賣家解封路徑區 -->
-                    <div class="seller-unlock" id="sellerMenuBlock">
-                        <div class="menu-divider"></div>
-                        <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
-                        <a href="manage.html" class="nav-fast">⚙️ 後台管理</a>
-                        <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
-                    </div>
-                    
-                    <div class="menu-divider"></div>
-                    <button id="logoutBtn">🚪 登出</button>
-                    
-                    <!-- 身分切換測試面板 -->
-                    <div class="test-panel">
-                        <div class="test-title">身分模擬測試切換：</div>
-                        <div class="test-btns">
-                            <button id="simBuyerBtn" class="active">一般買家</button>
-                            <button id="simSellerBtn">月費賣家</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- 中間搜尋欄 -->
-        <div class="search-container">
-            <div class="search-box">
-                <span>🔍</span>
-                <input type="text" placeholder="搜尋商圈美味小吃、店家名稱...">
-            </div>
-        </div>
-
-        
-
-        <!-- 店家列表 -->
-        <main class="store-list">
-            <!-- 店家 1 -->
-            <a href="store.html" class="store-card nav-fast">
-                <div class="store-img">🍱</div>
-                <div class="store-info">
-                    <div class="store-name">池上木盒便當 - 信義店</div>
-                    <div class="store-meta">便當簡餐 · 📍 0.05 km (最近)</div>
-                    <div class="store-tags">
-                        <span class="tag-time">⏱️ 10-15 分</span>
-                        <span class="tag-pay">💳 支援線上刷卡/LINE Pay</span>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 店家 2 -->
-            <a href="store.html" class="store-card nav-fast">
-                <div class="store-img">🧋</div>
-                <div class="store-info">
-                    <div class="store-name">大苑子茶飲 - 數位站</div>
-                    <div class="store-meta">傳統手搖 · 📍 0.12 km</div>
-                    <div class="store-tags">
-                        <span class="tag-time">⏱️ 5-10 分</span>
-                        <span class="tag-pay">💵 僅限現場付現</span>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 店家 3 -->
-            <a href="store.html" class="store-card nav-fast">
-                <div class="store-img">🍜</div>
-                <div class="store-info">
-                    <div class="store-name">老張牛肉麵 - 通用數位門牌店</div>
-                    <div class="store-meta">經典麵攤 · 📍 0.35 km</div>
-                    <div class="store-tags">
-                        <span class="tag-time">⏱️ 15-20 分</span>
-                        <span class="tag-pay">💳 支援線上刷卡/LINE Pay</span>
-                    </div>
-                </div>
-            </a>
-        </main>
-
-        <!-- 底部懸浮欄 -->
-        <footer class="bottom-bar">
-            <div class="status-msg" id="bottomStatusMsg">
-                <div class="status-indicator" id="statusDot"></div>
-                <span id="statusText">您目前沒有訂單（快去上方搜尋商圈美味小吃吧！）</span>
-            </div>
-            <a href="cart.html" class="cart-status-btn nav-fast">
-                <span>🛒 購物車</span>
-                <span id="cartCount">(0)</span>
-            </a>
-        </footer>
-
-        <!-- Google 登入燈箱彈窗 -->
-        <div class="lightbox-modal" id="loginLightbox">
-            <div class="modal-card">
-                <div class="modal-title">加入快拿自取街</div>
-                <button class="modal-btn google" id="googleLoginAction">
-                    <svg width="16" height="16" viewBox="0 0 24 24" style="margin-right:4px;"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69c-.29 1.5-.14 3.01-1.3 4a7.74 7.74 0 0 1-5.39 2.1c-4.3 0-7.92-3.41-7.92-7.9s3.62-7.9 7.92-7.9c2.01 0 3.84.77 5.24 2.17l3.07-3.07C18.25 1.41 15.32 0 12 0 5.38 0 0 5.38 0 12s5.38 12 12 12c6.88 0 12-4.84 12-12.23 0-.5-.04-1.01-.1-1.5z"/></svg>
-                    Google 一鍵登入
-                </button>
-                <button class="modal-btn phone" id="phoneRegisterAction">平台手機註冊</button>
-                <span class="modal-close" id="closeLightboxBtn">暫時返回</span>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // 🚀 0秒無縫閃轉外掛核心架構
-        function bindFastClick(element, callback) {
-            if (!element) return;
-            let triggered = false;
-            function trigger(e) {
-                if (!triggered) {
-                    triggered = true;
-                    setTimeout(() => { triggered = false; }, 300);
-                    callback(e);
-                }
-                e.preventDefault();
-            }
-            element.addEventListener('touchstart', trigger, { passive: false });
-            element.addEventListener('mousedown', trigger);
-        }
-
-        // 🌓 系統全局膚色防線機制
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        function initTheme() {
-            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        }
-        bindFastClick(themeToggleBtn, () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('pacetake-theme', newTheme);
-        });
-        initTheme();
-
-        // 🧑‍💼 一體化模擬帳號登入系統邏輯
-        const loginTriggerBtn = document.getElementById('loginTriggerBtn');
-        const userAvatarBtn = document.getElementById('avatarMenuBtn');
-        const userDropdown = document.getElementById('userDropdown');
-        const loginLightbox = document.getElementById('loginLightbox');
-        const closeLightboxBtn = document.getElementById('closeLightboxBtn');
-        
-        const googleLoginAction = document.getElementById('googleLoginAction');
-        const phoneRegisterAction = document.getElementById('phoneRegisterAction');
-        const logoutBtn = document.getElementById('logoutBtn');
-        
-        const simBuyerBtn = document.getElementById('simBuyerBtn');
-        const simSellerBtn = document.getElementById('simSellerBtn');
-        const sellerMenuBlock = document.getElementById('sellerMenuBlock');
-        
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
-
-        // 顯示燈箱
-        bindFastClick(loginTriggerBtn, () => { loginLightbox.style.display = 'flex'; });
-        // 關閉燈箱
-        bindFastClick(closeLightboxBtn, () => { loginLightbox.style.display = 'none'; });
-
-        // 模擬成功登入
-        function handleLoginSuccess() {
-            loginLightbox.style.display = 'none';
-            loginTriggerBtn.style.display = 'none';
-            userAvatarBtn.style.display = 'flex';
-            // 登入後模擬有單狀態
-            statusDot.classList.add('active');
-            statusText.innerText = "您的訂單 #023 製作中...";
-        }
-
-        bindFastClick(googleLoginAction, handleLoginSuccess);
-        bindFastClick(phoneRegisterAction, handleLoginSuccess);
-
-        // 登出
-        bindFastClick(logoutBtn, () => {
-            userDropdown.style.display = 'none';
-            userAvatarBtn.style.display = 'none';
-            loginTriggerBtn.style.display = 'block';
-            statusDot.classList.remove('active');
-            statusText.innerText = "您目前沒有訂單（快去上方搜尋商圈美味小吃吧！）";
-        });
-
-        // 展開選單
-        bindFastClick(userAvatarBtn, (e) => {
-            e.stopPropagation();
-            const isOpen = userDropdown.style.display === 'block';
-            userDropdown.style.display = isOpen ? 'none' : 'block';
-        });
-
-        document.addEventListener('mousedown', (e) => {
-            if (!userDropdown.contains(e.target) && e.target !== userAvatarBtn) {
-                userDropdown.style.display = 'none';
-            }
-        });
-
-        // 身分測試切換面板功能
-        bindFastClick(simBuyerBtn, () => {
-            simBuyerBtn.classList.add('active');
-            simSellerBtn.classList.remove('active');
-            sellerMenuBlock.style.display = 'none';
-        });
-
-        bindFastClick(simSellerBtn, () => {
-            simSellerBtn.classList.add('active');
-            simBuyerBtn.classList.remove('active');
-            sellerMenuBlock.style.display = 'block';
-        });
-
-       
-
-        // 全局相對路徑跳轉無縫對接
-        const navElements = document.querySelectorAll('.nav-fast');
-        navElements.forEach(elem => {
-            bindFastClick(elem, () => {
-                const dest = elem.getAttribute('href');
-                if (dest && dest !== '#') {
-                    window.location.href = dest;
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+            background-color: var(--brand-blue); color: white; border: none; padding: 10px 16px; border-radius: 20px;

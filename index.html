@@ -609,28 +609,8 @@
         </div>
     </div>
 
-        <!-- 引入 Firebase 9+ 大廠級官方模組模組 (不依賴本地檔案，安全穩定) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-
-        // 🧠 1. 硬核注入你開通的真實 Firebase 雲端大腦金鑰
-        const firebaseConfig = {
-            apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
-            authDomain: "pacetake-c6e1e.firebaseapp.com",
-            projectId: "pacetake-c6e1e",
-            storageBucket: "pacetake-c6e1e.firebasestorage.app",
-            messagingSenderId: "1052980235056",
-            appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
-            measurementId: "G-888XL8JTHW"
-        };
-
-        // 初始化 Firebase 與 Auth 驗證系統防線
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
-        // 🚀 2. 0秒無縫閃轉外掛與觸控手勢防線核心架構
+    <script>
+        // 🚀 0秒無縫閃轉外掛核心架構
         function bindFastClick(element, callback) {
             if (!element) return;
             let triggered = false;
@@ -646,7 +626,7 @@
             element.addEventListener('mousedown', trigger);
         }
 
-        // 🌓 系統最高膚色指揮官防線邏輯
+        // 🌓 系統全局膚色防線機制
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         function initTheme() {
             const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
@@ -660,62 +640,52 @@
         });
         initTheme();
 
-        // 🪪 3. 獲取前端畫面的所有控制台元素
+        // 🧑‍💼 一體化模擬帳號登入系統邏輯
         const loginTriggerBtn = document.getElementById('loginTriggerBtn');
         const userAvatarBtn = document.getElementById('avatarMenuBtn');
         const userDropdown = document.getElementById('userDropdown');
         const loginLightbox = document.getElementById('loginLightbox');
         const closeLightboxBtn = document.getElementById('closeLightboxBtn');
+        
         const googleLoginAction = document.getElementById('googleLoginAction');
+        const phoneRegisterAction = document.getElementById('phoneRegisterAction');
         const logoutBtn = document.getElementById('logoutBtn');
+        
         const simBuyerBtn = document.getElementById('simBuyerBtn');
         const simSellerBtn = document.getElementById('simSellerBtn');
         const sellerMenuBlock = document.getElementById('sellerMenuBlock');
+        
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
 
-        // 控制燈箱彈窗開關
+        // 顯示燈箱
         bindFastClick(loginTriggerBtn, () => { loginLightbox.style.display = 'flex'; });
+        // 關閉燈箱
         bindFastClick(closeLightboxBtn, () => { loginLightbox.style.display = 'none'; });
 
-        // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心
-        bindFastClick(googleLoginAction, () => {
-            signInWithPopup(auth, provider)
-                .then((result) => {
-                    loginLightbox.style.display = 'none';
-                    console.log("真實登入成功，用戶資料：", result.user);
-                })
-                .catch((error) => {
-                    console.error("Firebase 登入失敗防線拦截：", error.message);
-                    alert("Google 登入失敗，請確認 Firebase 後台的 Authorized Domains 有加入您的網址！");
-                });
-        });
+        // 模擬成功登入
+        function handleLoginSuccess() {
+            loginLightbox.style.display = 'none';
+            loginTriggerBtn.style.display = 'none';
+            userAvatarBtn.style.display = 'flex';
+            // 登入後模擬有單狀態
+            statusDot.classList.add('active');
+            statusText.innerText = "您的訂單 #023 製作中...";
+        }
 
-        // 🚪 登出按鈕真實功能對接
+        bindFastClick(googleLoginAction, handleLoginSuccess);
+        bindFastClick(phoneRegisterAction, handleLoginSuccess);
+
+        // 登出
         bindFastClick(logoutBtn, () => {
-            signOut(auth).then(() => {
-                userDropdown.style.display = 'none';
-            });
+            userDropdown.style.display = 'none';
+            userAvatarBtn.style.display = 'none';
+            loginTriggerBtn.style.display = 'block';
+            statusDot.classList.remove('active');
+            statusText.innerText = "您目前沒有訂單（快去上方搜尋商圈美味小吃吧！）";
         });
 
-        // 📡 5. 全局實時監聽買家登入狀態 (Firebase 最高指揮官監聽外掛)
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // 🟢 狀態：已登入 (解鎖數位門面)
-                loginTriggerBtn.style.display = 'none';
-                userAvatarBtn.style.display = 'flex';
-                statusDot.classList.add('active');
-                statusText.innerText = `您的訂單 #023 製作中 (${user.displayName || '買家'} 已連線)`;
-            } else {
-                // 🔴 狀態：未登入 (強行鎖定安全防線)
-                loginTriggerBtn.style.display = 'block';
-                userAvatarBtn.style.display = 'none';
-                statusDot.classList.remove('active');
-                statusText.innerText = "您目前沒有訂單（快去點擊店家看菜單吧！）";
-            }
-        });
-
-        // 展開與關閉控制台下拉選單
+        // 展開選單
         bindFastClick(userAvatarBtn, (e) => {
             e.stopPropagation();
             const isOpen = userDropdown.style.display === 'block';
@@ -728,7 +698,7 @@
             }
         });
 
-        // 身分測試切換面板 (保留前前端測試路徑)
+        // 身分測試切換面板功能
         bindFastClick(simBuyerBtn, () => {
             simBuyerBtn.classList.add('active');
             simSellerBtn.classList.remove('active');
@@ -741,42 +711,51 @@
             sellerMenuBlock.style.display = 'block';
         });
 
-        // 🚀 6. 終極大廠級：滑動鎖定 0 誤觸跳轉外掛 (100% 完美保留不跑版)
-        const navElements = document.querySelectorAll('.nav-fast');
-        navElements.forEach(elem => {
-            let touchStartX = 0;
-            let touchStartY = 0;
-            let isSwipe = false;
+       
 
-            elem.addEventListener('touchstart', (e) => {
-                touchStartX = e.touches.clientX;
-                touchStartY = e.touches.clientY;
-                isSwipe = false;
-            }, { passive: true });
+      // 🚀 終極大廠級：滑動鎖定 0 誤觸跳轉外掛
+const navElements = document.querySelectorAll('.nav-fast');
+navElements.forEach(elem => {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwipe = false;
 
-            elem.addEventListener('touchmove', (e) => {
-                let moveX = e.touches.clientX;
-                let moveY = e.touches.clientY;
-                if (Math.abs(moveX - touchStartX) > 15 || Math.abs(moveY - touchStartY) > 15) {
-                    isSwipe = true;
-                }
-            }, { passive: true });
+    elem.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isSwipe = false; // 每次按下一秒重設狀態
+    }, { passive: true });
 
-            elem.addEventListener('touchend', (e) => {
-                if (isSwipe) { e.preventDefault(); return; }
-                const dest = elem.getAttribute('href');
-                if (dest && dest !== '#') { window.location.href = dest; }
-            });
+    elem.addEventListener('touchmove', (e) => {
+        let moveX = e.touches[0].clientX;
+        let moveY = e.touches[0].clientY;
+        
+        // 🎯 精準防線：只要水平或垂直滑動位移超過 15 像素，立刻判定為「滑動頁面」
+        if (Math.abs(moveX - touchStartX) > 15 || Math.abs(moveY - touchStartY) > 15) {
+            isSwipe = true;
+        }
+    }, { passive: true });
 
-            elem.addEventListener('click', (e) => {
-                if (isSwipe) return;
-                const dest = elem.getAttribute('href');
-                if (dest && dest !== '#') { window.location.href = dest; }
-            });
-        });
-    </script>
-</body>
-</html>
+    elem.addEventListener('touchend', (e) => {
+        // 🎯 終極防線：如果剛才在滑動，手放開時強行攔截，絕對留在原網頁！
+        if (isSwipe) {
+            e.preventDefault();
+            return;
+        }
+        
+        // 只有 100% 原地放開（純點擊），才允許 0 秒閃轉進店
+        const dest = elem.getAttribute('href');
+        if (dest && dest !== '#') { window.location.href = dest; }
+    });
 
+    // 留給電腦滑鼠點擊相容
+    elem.addEventListener('click', (e) => {
+        if (isSwipe) return;
+        const dest = elem.getAttribute('href');
+        if (dest && dest !== '#') { window.location.href = dest; }
+    });
+});
+
+</script>
 </body>
 </html>

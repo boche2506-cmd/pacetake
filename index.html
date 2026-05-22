@@ -617,7 +617,7 @@
         // 初始化 Firebase 與 Auth 驗證系統防線
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+                const provider = new GoogleAuthProvider();
 
         // 🚀 2. 0秒無縫閃轉外掛與觸控手勢防線核心架構
         function bindFastClick(element, callback) {
@@ -662,16 +662,43 @@
         const sellerMenuBlock = document.getElementById('sellerMenuBlock');
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
+        
+        // 取得電子郵件相關新元素
+        const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
+        const emailFormSection = document.getElementById('emailFormSection');
+        const customReturnBtn = document.getElementById('customReturnBtn');
 
         // 控制燈箱彈窗開關
         bindFastClick(loginTriggerBtn, () => { loginLightbox.style.display = 'flex'; });
-        bindFastClick(closeLightboxBtn, () => { loginLightbox.style.display = 'none'; });
+        
+        // 點擊最原始的關閉按鈕，或是暫時返回，都將視窗恢復初始狀態並關閉
+        function resetAndCloseLightbox() {
+            if (googleLoginAction) googleLoginAction.style.display = 'flex';
+            if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'flex';
+            if (emailFormSection) emailFormSection.style.display = 'none';
+            loginLightbox.style.display = 'none';
+        }
+        bindFastClick(closeLightboxBtn, resetAndCloseLightbox);
+
+        // 新增：用加速外掛接管「電子郵件登入」按鈕的點擊行為
+        bindFastClick(toggleEmailFormBtn, () => {
+            if (googleLoginAction) googleLoginAction.style.display = 'none';
+            if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'none';
+            if (emailFormSection) emailFormSection.style.display = 'block';
+        });
+
+        // 新增：用加速外掛接管「暫時返回」按鈕的點擊行為
+        bindFastClick(customReturnBtn, () => {
+            if (googleLoginAction) googleLoginAction.style.display = 'flex';
+            if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'flex';
+            if (emailFormSection) emailFormSection.style.display = 'none';
+        });
 
         // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心
         bindFastClick(googleLoginAction, () => {
             signInWithPopup(auth, provider)
                 .then((result) => {
-                    loginLightbox.style.display = 'none';
+                    resetAndCloseLightbox();
                     console.log("真實登入成功，用戶資料：", result.user);
                 })
                 .catch((error) => {
@@ -765,8 +792,5 @@
         });
 
     </script>
-</body>
-</html>
-
 </body>
 </html>

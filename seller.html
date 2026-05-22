@@ -4,15 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PACE 派思 - 2.1 RWD手勢盲操後台</title>
+    <!-- FontAwesome 圖標庫 -->
+    <link rel="stylesheet" href="https://cloudflare.com">
     <style>
         :root { --brand-blue: #007AFF; --status-green: #34c759; --status-red: #ff3b30; --status-orange: #ff9500; --bg-body: #111111; --bg-card: #1C1C1E; --bg-nav: #2C2C2E; --text-main: #ffffff; --text-sub: #8E8E93; --border-line: #3A3A3C; --light-off: #48484A; }
         body.light-theme { --bg-body: #F2F2F7; --bg-card: #ffffff; --bg-nav: #FAFAFC; --text-main: #111111; --text-sub: #8E8E93; --border-line: #E5E5EA; --light-off: #D1D1D6; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 8px; box-sizing: border-box; height: 100vh; display: flex; justify-content: center; overflow: hidden; -webkit-user-select: none; user-select: none; transition: background-color 0.2s; }
         .seller-container { width: 100%; max-width: 900px; background: var(--bg-card); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; }
-        .top-navbar { display: flex; border-bottom: 2px solid var(--border-line); }
-        .online-toggle-btn { flex: 3; padding: 22px; font-size: 20px; font-weight: 900; border: none; cursor: pointer; color: white; background-color: var(--status-green); }
+        .top-navbar { display: flex; border-bottom: 2px solid var(--border-line); height: 70px; }
+        .online-toggle-btn { flex: 2; padding: 0 20px; font-size: 18px; font-weight: 900; border: none; cursor: pointer; color: white; background-color: var(--status-green); text-align: left; transition: all 0.2s; }
         .online-toggle-btn.offline { background-color: var(--status-red); }
-        .theme-toggle-btn { flex: 1; background-color: var(--bg-nav); color: var(--text-main); border: none; border-left: 2px solid var(--border-line); font-size: 14px; font-weight: bold; cursor: pointer; }
+        .nav-right-actions { display: flex; flex: 1.5; border-left: 2px solid var(--border-line); }
+        /* ⚙️ 核心跳轉按鈕樣式 */
+        .manage-link-btn { flex: 1; background-color: var(--brand-blue); color: white; border: none; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; text-decoration: none; }
+        .manage-link-btn:hover { opacity: 0.9; }
+        .theme-toggle-btn { flex: 1; background-color: var(--bg-nav); color: var(--text-main); border: none; border-left: 2px solid var(--border-line); font-size: 14px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; }
         .order-tabs-row { display: flex; background-color: var(--bg-nav); border-bottom: 2px solid var(--border-line); overflow-x: auto; }
         .order-tabs-row::-webkit-scrollbar { display: none; }
         .jump-to-unfinished { padding: 12px; font-size: 12px; font-weight: bold; background-color: var(--border-line); color: var(--text-main); border: none; cursor: pointer; white-space: nowrap; }
@@ -41,8 +47,9 @@
         .complete-btn { width: 100%; padding: 18px; font-size: 22px; font-weight: 900; color: white; background-color: var(--brand-blue); border: none; border-radius: 16px; cursor: pointer; }
         .hint-text { font-size: 13px; color: var(--text-sub); margin-top: 10px; font-weight: bold; }
 
-        /* ⚡ 超強手機直屏自動重組技術（RWD） */
         @media (max-width: 600px) {
+            .top-navbar { height: 60px; }
+            .online-toggle-btn { font-size: 15px; padding: 0 10px; }
             .main-workspace { flex-direction: column; }
             .status-light-panel { width: 100%; height: auto; flex-direction: row; border-right: none; border-bottom: 2px solid var(--border-line); }
             .light-indicator { padding: 10px 4px; border-bottom: none; border-right: 1px solid var(--border-line); font-size: 10px; }
@@ -53,28 +60,216 @@
 </head>
 <body>
 <div class="seller-container">
+    <!-- 頂部功能列：強行重組置入帶有 href 的菜單管理傳送門 -->
     <div class="top-navbar">
-        <button class="online-toggle-btn" id="onlineBtn" onclick="toggleOnlineStatus()">🟢 店家營業中 (點擊切換打烊)</button>
-        <button class="theme-toggle-btn" id="themeBtn" onclick="toggleTheme()">🌙 夜間模式</button>
+        <button class="online-toggle-btn" id="onlineBtn" onclick="toggleOnlineStatus()">🟢 營業中</button>
+        <div class="nav-right-actions">
+            <!-- ⚙️ 正式嵌入跳轉到管理後台的超連結 -->
+            <a href="manage.html" class="manage-link-btn">
+                <i class="fa-solid fa-gear" style="font-size:16px;"></i>
+                <span>菜單管理</span>
+            </a>
+            <button class="theme-toggle-btn" id="themeBtn" onclick="toggleTheme()">
+                <i class="fa-solid fa-moon" id="themeIcon" style="font-size:16px;"></i>
+                <span id="themeText">夜間模式</span>
+            </button>
+        </div>
     </div>
+    
     <div class="order-tabs-row" id="tabsRow">
         <button class="jump-to-unfinished">未完成<br>看板</button>
         <button class="order-tab active" id="tab-0" onclick="selectOrder(0)">#023</button>
         <button class="order-tab" id="tab-1" onclick="selectOrder(1)">#024</button>
     </div>
+    
     <div class="main-workspace" id="swipeZone">
         <div class="status-light-panel">
             <div class="light-indicator" id="light-unpaid">付款方式<strong id="payMethodText">--</strong></div>
-            <div class="light-indicator" id="light-paid">款項狀態<strong>已付款</strong></div>
+            <div class="light-indicator" id="light-paid">款項狀態<strong id="payStatusText">--</strong></div>
             <div class="light-indicator" id="light-reserve">預約取餐<strong id="reserveTimeText">--</strong><span class="countdown" id="countdownText"></span></div>
             <div class="light-indicator" id="light-dine-in">用餐方式<strong id="dineInText">--</strong></div>
         </div>
         <div class="details-panel">
             <div class="kitchen-title">⚡ 當前準備品項 (LARGE KITCHEN MODE)</div>
             <div class="kitchen-card-list" id="kitchenList"></div>
-            <div class="kitchen-total-box"><div style="font-size: 18px; color: var(--text-sub); font-weight: bold;">總計金額</div><div class="kitchen-total-amount" id="totalPriceText">$0</div></div>
+            <div class="kitchen-total-box">
+                <div style="font-size: 18px; color: var(--text-sub); font-weight: bold;">總計金額</div>
+                <div class="kitchen-total-amount" id="totalPriceText">$0</div>
+            </div>
         </div>
     </div>
-    <div class="bottom-action-panel"><button class="complete-btn" onclick="completeOrder()">確定完成訂單</button><div class="hint-text">👉 【手勢功能】可在螢幕上左右滑動，盲操切換訂單！</div></div>
+    <div class="bottom-action-panel">
+        <button class="complete-btn" onclick="completeOrder()">確定完成訂單</button>
+        <div class="hint-text">👉 【手勢功能】可在螢幕上左右滑動，盲操切換訂單！</div>
+    </div>
 </div>
-<script
+
+<script>
+    // 實戰動態模擬數據防線
+    const ordersData = [
+        {
+            id: "#023",
+            payMethod: "線上已付",
+            payStatus: "已扣款",
+            type: "online",
+            reserveTime: "12:30",
+            countdown: 20,
+            dineIn: "外帶自取",
+            items: [
+                { name: "招牌絕品便當", qty: 2, price: 120 },
+                { name: "大師兄秘製大雞排", qty: 1, price: 85 }
+            ],
+            total: 325
+        },
+        {
+            id: "#024",
+            payMethod: "現場付現",
+            payStatus: "未付款",
+            type: "cash",
+            reserveTime: "即時出餐",
+            countdown: 0,
+            dineIn: "內用/05桌",
+            items: [
+                { name: "在地小農輕食沙拉", qty: 1, price: 95 }
+            ],
+            total: 95
+        }
+    ];
+
+    let currentOrderIndex = 0;
+
+    // 大廠級清脆新單提示音 Web Audio API 防線 (免外部檔案音訊解法)
+    function playOrderSound() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1); // A5
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.4);
+        } catch(e) { console.log("音訊阻擋，需店家點擊互動解鎖"); }
+    }
+
+    function renderOrder(index) {
+        const order = ordersData[index];
+        if(!order) return;
+
+        // 渲染亮燈防線
+        const lightUnpaid = document.getElementById("light-unpaid");
+        const lightPaid = document.getElementById("light-paid");
+        const lightReserve = document.getElementById("light-reserve");
+        const lightDineIn = document.getElementById("light-dine-in");
+
+        // 重設狀態
+        lightUnpaid.className = "light-indicator";
+        lightPaid.className = "light-indicator";
+        lightReserve.className = "light-indicator";
+        lightDineIn.className = "light-indicator";
+
+        document.getElementById("payMethodText").innerText = order.payMethod;
+        document.getElementById("payStatusText").innerText = order.payStatus;
+        document.getElementById("reserveTimeText").innerText = order.reserveTime;
+        document.getElementById("dineInText").innerText = order.dineIn;
+
+        // 根據付款與用餐類型，啟動實戰亮燈
+        if(order.type === 'cash') {
+            lightUnpaid.classList.add("active", "unpaid");
+            lightPaid.classList.add("active", "unpaid");
+        } else {
+            lightUnpaid.classList.add("active", "online-pay");
+            lightPaid.classList.add("active", "paid");
+        }
+
+        if(order.countdown > 0) {
+            lightReserve.classList.add("active", "reserve");
+            document.getElementById("countdownText").innerText = `剩 ${order.countdown} 分鐘`;
+        } else {
+            document.getElementById("countdownText").innerText = "";
+        }
+
+        if(order.dineIn.includes("內用")) {
+            lightDineIn.classList.add("active", "dine-in");
+        }
+
+        // 渲染大字明細
+        const listContainer = document.getElementById("kitchenList");
+        listContainer.innerHTML = "";
+        order.items.forEach(item => {
+            const row = document.createElement("div");
+            row.className = "kitchen-item-row";
+            row.innerHTML = `
+                <div>
+                    <div class="item-name-box">${item.name}</div>
+                    <div class="item-price">$${item.price}</div>
+                </div>
+                <div class="item-qty-badge">x${item.qty}</div>
+            `;
+            listContainer.appendChild(row);
+        });
+
+        document.getElementById("totalPriceText").innerText = `$${order.total}`;
+    }
+
+    function selectOrder(index) {
+        currentOrderIndex = index;
+        document.querySelectorAll(".order-tab").forEach((tab, idx) => {
+            tab.classList.toggle("active", idx === index);
+        });
+        renderOrder(index);
+    }
+
+    function toggleOnlineStatus() {
+        const btn = document.getElementById("onlineBtn");
+        btn.classList.toggle("offline");
+        if(btn.classList.contains("offline")) {
+            btn.innerText = "🔴 店家打烊中 (點擊切換營業)";
+        } else {
+            btn.innerText = "🟢 店家營業中 (點擊切換打烊)";
+        }
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle("light-theme");
+        const isLight = document.body.classList.contains("light-theme");
+        document.getElementById("themeText").innerText = isLight ? "日間模式" : "夜間模式";
+        document.getElementById("themeIcon").className = isLight ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    }
+
+    function completeOrder() {
+        alert(`${ordersData[currentOrderIndex].id} 訂單處理完畢！已自動發送自取簡訊給買家。`);
+        playOrderSound(); // 模擬下一張單進來的洗腦叮咚聲
+    }
+
+    // 💥 全螢幕手勢滑動盲操邏輯
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const swipeZone = document.getElementById("swipeZone");
+
+    swipeZone.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
+    swipeZone.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, false);
+
+    function handleSwipe() {
+        if (touchEndX < touchStartX - 60) {
+            // 向左滑：下一張單
+            if(currentOrderIndex < ordersData.length - 1) selectOrder(currentOrderIndex + 1);
+        }
+        if (touchEndX > touchStartX + 60) {
+            // 向右滑：前一張單
+            if(currentOrderIndex > 0) selectOrder(currentOrderIndex - 01);
+        }
+    }
+
+    // 初始化網頁加載第一張單
+    window.onload = () => { renderOrder(0); };
+</script>
+</body>
+</html>

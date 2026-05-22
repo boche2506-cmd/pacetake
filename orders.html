@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>快拿自取街 pacetake.tw - 訂單追蹤</title>
+    <!-- 精品藍色便當純代碼 SVG Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C/svg%3E">
+    <style>
+        /* 全局變數與主題防線 */
+        :root {
+            --bg-global: #F8FAFC;
+            --bg-container: #FFFFFF;
+            --border-color: #E2E8F0;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --brand-blue: #0066FF;
+            --brand-green: #10B981;
+            --brand-amber: #D97706;
+            --card-bg: #FFFFFF;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-global: #0A0A0A;
+            --bg-container: #111111;
+            --border-color: #262626;
+            --text-main: #F5F5F5;
+            --text-muted: #A3A3A3;
+            --brand-blue: #3B82F6;
+            --brand-green: #34D399;
+            --brand-amber: #F59E0B;
+            --card-bg: #1C1C1E;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-global);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            transition: background-color 0.15s ease;
+        }
+
+        .phone-wrapper {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background-color: var(--bg-container);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            padding-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 24px 20px 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            text-decoration: none;
+            background-color: var(--card-bg);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            font-size: 16px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            background-color: var(--card-bg);
+        }
+
+        .content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 狀態進度燈號 */
+        .status-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .status-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--brand-amber);
+            margin-bottom: 6px;
+        }
+
+        .status-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* 巨型自取號碼牌 */
+        .number-plate {
+            background-color: rgba(0, 102, 255, 0.05);
+            border: 2px dashed var(--brand-blue);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .number-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--brand-blue);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .number-code {
+            font-size: 54px;
+            font-weight: 900;
+            color: var(--brand-blue);
+            margin-top: 4px;
+            letter-spacing: -1px;
+        }
+
+        .detail-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .detail-name {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .detail-qty {
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .detail-price {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+        }
+
+        /* 買家自由手打備註欄展示防線 */
+        .note-box {
+            background-color: var(--bg-global);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 13px;
+            color: var(--text-main);
+            border-left: 4px solid var(--brand-blue);
+            font-weight: 500;
+        }
+
+        .note-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .nav-btn {
+            background-color: var(--brand-blue);
+            color: white;
+            border: none;
+            width: 100%;
+            height: 48px;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-wrapper">
+        <header class="header">
+            <a href="index.html" class="back-btn nav-fast">🏠 回首頁</a>
+            <h1 style="font-size: 18px; font-weight: 800;">點單預約狀態</h1>
+            <button class="theme-toggle" id="themeToggleBtn">🌓</button>
+        </header>
+
+        <main class="content">
+            <!-- 狀態進度 -->
+            <div class="status-card">
+                <div class="status-title">⏱️ 餐點製作中...</div>
+                <div class="status-desc">店家已接單，預估 12:30 準時出餐 (剩餘 15 分鐘)</div>
+            </div>
+
+            <!-- 巨型自取號碼牌 -->
+            <div class="number-plate">
+                <div class="number-label">自取核對代碼</div>
+                <div class="number-code">#023</div>
+            </div>
+
+            <!-- 明細與備註展示 -->
+            <div class="detail-card">
+                <div style="font-size: 13px; font-weight: 700; color:var(--text-muted);">明細核對</div>
+                
+                <div class="detail-row">
+                    <span class="detail-name">招牌木盒便當 <span class="detail-qty">x2</span></span>
+                    <span class="detail-price">$240</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-name">酥炸大雞腿便當 <span class="detail-qty">x1</span></span>
+                    <span class="detail-price">$135</span>
+                </div>
+                
+                <div class="divider"></div>
+
+                <!-- 🎯 買家自由備註欄展示防線 -->
+                <div>
+                    <div class="note-title">您的訂單備註：</div>
+                    <div class="note-box">
+                        飯多、大辣、雞腿跟便當分開裝。飲料請幫我做去冰微糖，謝謝老闆！
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+                
+                <div class="detail-row" style="padding-top:4px;">
+                    <span style="font-weight: 800; font-size: 15px;">實付金額 (線上已付)</span>
+                    <span style="font-size: 20px; font-weight: 900; color: var(--brand-blue);">$375</span>
+                </div>
+            </div>
+
+            <!-- GPS 導航自取大鈕 -->
+            <a href="https://google.com" class="nav-btn">📍 導航前往：池上木盒便當 - 信義店</a>
+        </main>
+    </div>
+
+    <script>
+        function bindFastClick(element, callback) {
+            if (!element) return;
+            let triggered = false;
+            function trigger(e) {
+                if (!triggered) {
+                    triggered = true;
+                    setTimeout(() => { triggered = false; }, 300);
+                    callback(e);
+                }
+                e.preventDefault();
+            }
+            element.addEventListener('touchstart', trigger, { passive: false });
+            element.addEventListener('mousedown', trigger);
+        }
+
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        function initTheme() {
+            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+        bindFastClick(themeToggleBtn, () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('pacetake-theme', newTheme);
+        });
+        initTheme();
+
+        const navElements = document.querySelectorAll('.nav-fast');
+        navElements.forEach(elem => {
+            bindFastClick(elem, () => {
+                const dest = elem.getAttribute('href');
+                if (dest && dest !== '#') { window.location.href = dest; }
+            });
+        });
+    </script>
+</body>
+</html>

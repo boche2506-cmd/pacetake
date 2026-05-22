@@ -504,9 +504,9 @@
                 
                 <!-- 下拉選單面板 -->
                 <div class="dropdown-menu" id="userDropdown">
-                    <a href="#" class="nav-fast" data-target="orders">🛒 我的訂單</a>
-                    <a href="#" class="nav-fast" data-target="history">⏳ 歷史訂單</a>
-                    <a href="register.html" class="nav-fast">💼 月費開店</a>
+                    <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
+                    <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
+                    <a href="register.html" class="nav-fast">💼 月費開店(暫不收費)</a>
                     
                     <!-- 賣家解封路徑區 -->
                     <div class="seller-unlock" id="sellerMenuBlock">
@@ -518,18 +518,10 @@
                     
                     <div class="menu-divider"></div>
                     <button id="logoutBtn">🚪 登出</button>
-                    
-                    <!-- 身分切換測試面板 -->
-                    <div class="test-panel">
-                        <div class="test-title">身分模擬測試切換：</div>
-                        <div class="test-btns">
-                            <button id="simBuyerBtn" class="active">一般買家</button>
-                            <button id="simSellerBtn">月費賣家</button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </header>
+
 
         <!-- 中間搜尋欄 -->
         <div class="search-container">
@@ -542,45 +534,8 @@
         
 
         <!-- 店家列表 -->
-        <main class="store-list">
-            <!-- 店家 1 -->
-            <a href="store.html" class="store-card nav-fast">
-                <div class="store-img">🍱</div>
-                <div class="store-info">
-                    <div class="store-name">池上木盒便當 - 信義店</div>
-                    <div class="store-meta">便當簡餐 · 📍 0.05 km (最近)</div>
-                    <div class="store-tags">
-                        <span class="tag-time">⏱️ 10-15 分</span>
-                        <span class="tag-pay">💳 支援線上刷卡/LINE Pay</span>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 店家 2 -->
-            <a href="store.html" class="store-card nav-fast">
-                <div class="store-img">🧋</div>
-                <div class="store-info">
-                    <div class="store-name">大苑子茶飲 - 數位站</div>
-                    <div class="store-meta">傳統手搖 · 📍 0.12 km</div>
-                    <div class="store-tags">
-                        <span class="tag-time">⏱️ 5-10 分</span>
-                        <span class="tag-pay">💵 僅限現場付現</span>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 店家 3 -->
-            <a href="store.html" class="store-card nav-fast">
-                <div class="store-img">🍜</div>
-                <div class="store-info">
-                    <div class="store-name">老張牛肉麵 - 通用數位門牌店</div>
-                    <div class="store-meta">經典麵攤 · 📍 0.35 km</div>
-                    <div class="store-tags">
-                        <span class="tag-time">⏱️ 15-20 分</span>
-                        <span class="tag-pay">💳 支援線上刷卡/LINE Pay</span>
-                    </div>
-                </div>
-            </a>
+        <main class="store-list" id="store-container">
+            
         </main>
 
         <!-- 底部懸浮欄 -->
@@ -774,6 +729,83 @@
                 if (dest && dest !== '#') { window.location.href = dest; }
             });
         });
+            // ==========================================================
+    // 【核心空降外掛】新任 CTO 注入：真實店家動態撈取與搜尋連動防線
+    // ==========================================================
+    (async function() {
+        try {
+            // 初始化 Firestore 資料庫（使用與你相同的 v9.23.0 語法）
+            const { getFirestore, collection, getDocs } = await import("https://gstatic.com");
+            const db = getFirestore(app);
+
+            // 獲取前端動態容器（對接你剛剛加了 id="store-container" 的 main 標籤）
+            const storeContainer = document.getElementById('store-container');
+            
+            // 終極盲測搜尋框：自動捕捉網頁中任何輸入框，不論前任有沒有寫 id
+            const searchInput = document.getElementById('search-input') 
+                               || document.querySelector('.search-bar input') 
+                               || document.querySelector('input[type="text"]') 
+                               || document.querySelector('input');
+
+            let allStores = []; // 雲端實時店家緩存陣列
+
+            if (!storeContainer) return;
+            storeContainer.innerHTML = '<p style="padding: 20px; text-align: center; color: #888;">真實店家核心載入中...</p>';
+            
+            const querySnapshot = await getDocs(collection(db, "stores"));
+            allStores = [];
+            querySnapshot.forEach((doc) => {
+                allStores.push({ id: doc.id, ...doc.data() });
+            });
+
+            // 完美貼合原廠 CSS 規格之動態渲染
+            function renderStores(storesList) {
+                if (storesList.length === 0) {
+                    storeContainer.innerHTML = '<p style="padding: 20px; text-align: center; color: #aaa;">🔍 找不到任何相符的真實店家</p>';
+                    return;
+                }
+
+                const cardsHTML = storesList.map(store => {
+                    return `
+                        <a href="store.html?id=${store.id}" class="store-card nav-fast" data-id="${store.id}">
+                            <div class="store-img">${store.emoji || '🏪'}</div>
+                            <div class="store-info">
+                                <div class="store-name">${store.name || '未命名店家'}</div>
+                                <div class="store-meta">${store.category || '未分類'} · 📍 ${store.distance || '0.00'} km</div>
+                                <div class="store-tags">
+                                    <span class="tag-time">⏱️ ${store.time || '10-15'} 分</span>
+                                    <span class="tag-pay">${store.payMethod || '💵 現金支付'}</span>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+
+                storeContainer.innerHTML = cardsHTML;
+            }
+
+            renderStores(allStores);
+
+            // 實時監聽搜尋框輸入事件
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.trim().toLowerCase();
+                    const filteredStores = allStores.filter(store => {
+                        const nameMatch = store.name ? store.name.toLowerCase().includes(searchTerm) : false;
+                        const categoryMatch = store.category ? store.category.toLowerCase().includes(searchTerm) : false;
+                        return nameMatch || categoryMatch;
+                    });
+                    renderStores(filteredStores);
+                });
+                console.log("【系統通知】搜尋框監聽防線已成功掛載！");
+            } else {
+                console.warn("【系統警告】畫面上找不到任何輸入框，搜尋功能暫時掛載失敗。");
+            }
+        } catch (error) {
+            console.error("Firestore 核心運行出錯:", error);
+        }
+    })();
+
     </script>
 </body>
 </html>

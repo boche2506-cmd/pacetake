@@ -1,29 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>快拿自取街 pacetake.tw | 聰明自取，零秒閃轉</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>快拿自取街 pacetake.tw - 店內價預約外帶自取系統</title>
     
-    <!-- 1. 核心視覺：全選覆蓋強行點亮 Tailwind CSS -->
+    <!-- 終極必勝防線：全選覆蓋強行點亮 Tailwind CSS 視覺 -->
     <script src="https://tailwindcss.com"></script>
-    
-    <!-- 2. 全球原生圖標：提供右上角 Google 登入與功能選單所需的 UI 圖標 -->
+
+    <!-- FontAwesome 圖標標準防線：點亮 Google 登入與箭頭符號 -->
     <link rel="stylesheet" href="https://cloudflare.com">
-    
-    <!-- 3. 完美體復活：Favicon 網站圖標 (整合專案標準閃電自取意象) -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://w3.org viewBox=%220%22 width=%22100%22 height=%22100%22><text y=%220.9em%22 font-size=%2290%22>⚡</text></svg>">
-    
-    <!-- 4. 自訂微調樣式：確保橫向滾動條隱藏與高質感細邊界完美呈現 -->
+
+    <!-- 大廠級免外部圖檔「精品藍色便當」我的最愛 Favicon 護城河 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%230066FF'%3E%3Cpath d='M2 9h20v2H2V9zm1 4h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6zm3-8a3 3 0 0 1 6 0h2a3 3 0 0 1 6 0v2H2V5h1zm3 0a1 1 0 0 0-2 0v2h2V5zm8 0a1 1 0 0 0-2 0v2h2V5z'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%230066FF'%3E%3Cpath d='M2 9h20v2H2V9zm1 4h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6zm3-8a3 3 0 0 1 6 0h2a3 3 0 0 1 6 0v2H2V5h1zm3 0a1 1 0 0 0-2 0v2h2V5zm8 0a1 1 0 0 0-2 0v2h2V5z'/%3E%3C/svg%3E">
+
+    <!-- 預先載入其他後台，強行打通秒開防線 -->
+    <link rel="prefetch" href="register.html">
+    <link rel="prefetch" href="seller.html">
+    <link rel="prefetch" href="manage.html">
+
     <style>
-        /* 隱藏滾動條但保持功能，確保手機版盲操視覺純淨 */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .smooth-transition { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .dropdown-menu { display: none; position: absolute; top: 60px; right: 0; background: white; border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 16px; width: 210px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); z-index: 50; overflow: hidden; }
+        .dropdown-menu.active { display: block; }
+        .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #475569; font-size: 13px; font-weight: bold; text-decoration: none; transition: background 0.1s; }
+        .dropdown-item:hover { background: #F8FAFC; color: #0066FF; }
         
-        /* 店家與刷卡標籤高質感超細邊界 */
-        .premium-border {
-            border: 1px solid rgba(229, 231, 235, 0.6);
-        }
-        .dark .premium-border {
-            border: 1px solid rgba(75, 85, 99, 0.4);
-        }
+        /* 高質感超細邊界 */
+        .premium-border { border: 1px solid rgba(226, 232, 240, 0.6); }
     </style>
 </head>
+<body class="bg-slate-50 text-slate-900 min-h-screen pb-28">
+
+    <!-- 頂部大字留白導覽列 -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-40 backdrop-blur-md bg-white/90">
+        <div class="max-w-xl mx-auto px-4 h-16 flex items-center justify-between relative">
+            <div class="flex flex-col">
+                <span class="text-xl font-black tracking-wider text-[#0066FF]">PACE 派思</span>
+                <span class="text-[10px] text-slate-400 font-bold -mt-1">店內價預約外帶自取點單系統</span>
+            </div>
+            
+            <!-- 右上角 Google 登入微互動 -->
+            <div class="relative flex items-center">
+                <button onclick="simulateGoogleLogin()" id="googleLoginBtn" class="smooth-transition text-xs font-black text-white bg-[#0066FF] hover:bg-[#0052CC] px-4 py-2.5 rounded-xl shadow-md active:scale-95">
+                    <i class="fa-brands fa-google mr-1"></i> Google 一鍵登入
+                </button>
+
+                <div onclick="toggleDropdown(event)" id="userAvatar" class="w-10 h-10 rounded-full border-2 border-[#0066FF] overflow-hidden cursor-pointer active:scale-95 smooth-transition hidden shadow-md">
+                    <!-- 使用內建 SVG 預防頭像失效破圖 -->
+                    <svg class="w-full h-full bg-slate-200 text-slate-400 p-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+
+                <div class="dropdown-menu" id="avatarDropdown">
+                    <div onclick="simulateSellerStatus()" class="dropdown-item bg-amber-50 text-amber-700 border-b border-slate-100 cursor-pointer text-center text-[11px] justify-center">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> 【測試】解鎖已開店老闆
+                    </div>
+                    <a href="register.html" id="dropRegisterBtn" class="dropdown-item border-b border-slate-100">
+                        <i class="fa-solid fa-store text-slate-400"></i> 💼 商家開店註冊
+                    </a>
+                    <a href="seller.html" id="dropSellerBtn" class="dropdown-item border-b border-slate-100 hidden">
+                        <i class="fa-solid fa-fire-burner text-[#34c759]"></i> 🧑‍🍳 進入接單後台
+                    </a>
+                    <a href="manage.html" id="dropManageBtn" class="dropdown-item border-b border-slate-100 hidden">
+                        <i class="fa-solid fa-sliders text-[#0066FF]"></i> ⚙️ 菜單管理後台
+                    </a>
+                    <div class="dropdown-item text-slate-400 text-[11px] border-b border-slate-50 pointer-events-none">
+                        身份：一般買家
+                    </div>
+                    <button onclick="simulateLogout()" class="dropdown-item w-full text-left text-rose-500 border-none bg-transparent cursor-pointer">
+                        <i class="fa-solid fa-right-from-bracket"></i> 🚪 登出帳號
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-xl mx-auto px-4 mt-6 space-y-6">
+        <!-- 中間搜尋欄 -->
+        <div class="relative shadow-sm rounded-2xl overflow-hidden border border-slate-200">
+            <input type="text" placeholder="搜尋商圈美味小吃、店家名稱..." class="w-full bg-white px-5 py-4 pl-12 text-sm font-bold focus:outline-none focus:bg-white smooth-transition">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-base"></i>
+        </div>
+
+        <!-- 下方店家卡片 -->
+        <section class="space-y-4">
+            <div class="bg-white rounded-3xl p-4 flex gap-4 border border-slate-200 shadow-sm hover:shadow-md smooth-transition cursor-pointer">
+                <div class="w-24 h-24 rounded-2xl overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-100 flex items-center justify-center">
+                    <!-- 使用內建 SVG 替代未指定完成的 Unsplash 網址，維持精品 UI -->
+                    <i class="fa-solid fa-utensils text-slate-300 text-3xl"></i>
+                </div>
+                <div class="flex-1 flex flex-col justify-between py-0.5">
+                    <h2 class="font-black text-slate-800 text-lg tracking-wide leading-snug">派思絕品精緻便當屋 (總店)</h2>
+                    <p class="text-xs font-bold text-slate-400">精緻便當 · 站前商圈 0.05 km</p>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="bg-slate-100 text-slate-700 text-[10px] font-black px-2 py-1 rounded-md premium-border">
+                            <i class="fa-regular fa-clock mr-0.5"></i> 15 分鐘出餐
+                        </span>
+                        <span class="text-slate-400 text-[10px] font-bold premium-border px-2 py-0.5 rounded-md bg-slate-50/50">
+                            💳 支援線上刷卡/LINE Pay
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 底部懸浮欄 -->
+    <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[calc(100%-32px)] max-w-lg bg-white/80 backdrop-blur-lg border border-slate-200/80 rounded-2xl px-5 py-4 flex items-center justify-between shadow-xl z-30">
+        <div class="flex items-center gap-3">
+            <span class="flex h-2.5 w-2.5 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <div>
+                <p class="text-xs font-black text-slate-800">您的訂單 #023 製作中</p>
+                <p class="text-[10px] text-slate-400 font-bold mt-0.5">預計 12:30 準時可外帶自取</p>
+            </div>
+        </div>
+        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+    </div>
+
+    <script>
+        // 補足未完成的模擬腳本，確保右上角選單運作順暢
+        function toggleDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('avatarDropdown').classList.toggle('active');
+        }
+        
+        function simulateGoogleLogin() {
+            localStorage.setItem('userStatus', 'loggedInBuyer');
+            showLoggedInState(false);
+        }
+
+        function simulateSellerStatus() {
+            localStorage.setItem('userStatus', 'loggedInSeller');
+            showLoggedInState(true);
+        }
+
+        function simulateLogout() {
+            localStorage.removeItem('userStatus');
+            document.getElementById('googleLoginBtn').classList.remove('hidden');
+            document.getElementById('userAvatar').classList.add('hidden');
+            document.getElementById('avatarDropdown').classList.remove('active');
+        }
+
+        function showLoggedInState(isSeller) {
+            document.getElementById('googleLoginBtn').classList.add('hidden');
+            document.getElementById('userAvatar').classList.remove('hidden');
+            
+            if (isSeller) {
+                document.getElementById('dropSellerBtn').classList.remove('hidden');
+                document.getElementById('dropManageBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('dropSellerBtn').classList.add('hidden');
+                document.getElementById('dropManageBtn').classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('click', () => {
+            document.getElementById('avatarDropdown').classList.remove('active');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedStatus = localStorage.getItem('userStatus');
+            if(savedStatus === 'loggedInBuyer') {
+                showLoggedInState(false);
+            } else if(savedStatus === 'loggedInSeller') {
+                showLoggedInState(true);
+            }
+
+            const fastRedirects = [
+                { id: "dropRegisterBtn", target: "register.html" },
+                { id: "dropSellerBtn", target: "seller.html" },
+                { id: "dropManageBtn", target: "manage.html" }
+            ];
+            fastRedirects.forEach(item => {
+                const el = document.getElementById(item.id);
+                if(el) {
+                    el.addEventListener('click', (e) => {
+                        // 保留原生連結跳轉
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

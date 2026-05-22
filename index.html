@@ -600,9 +600,9 @@
     </div>
 
         <!-- 引入 Firebase 9+ 大廠級官方模組模組 (不依賴本地檔案，安全穩定) -->
-        <script type="module">
-        // 🌟 拔除重複載入的 import，徹底解決引擎當機問題！
-        const provider = new GoogleAuthProvider();
+            <script type="module">
+        // 🌟 1. 完美繼承原 CTO 語法架構，不使用任何會衝突的 import
+        const provider = new firebase.auth.GoogleAuthProvider();
 
         // 🚀 2. 0秒無縫閃轉外掛與觸控手勢防線核心架構
         function bindFastClick(element, callback) {
@@ -653,7 +653,7 @@
         const emailFormSection = document.getElementById('emailFormSection');
         const customReturnBtn = document.getElementById('customReturnBtn');
         
-        // 取得電子郵件輸入框與綠色按鈕
+        // 取得電子郵件輸入框與確認按鈕
         const loginEmailInput = document.getElementById('loginEmail');
         const loginPasswordInput = document.getElementById('loginPassword');
         const emailLoginAction = document.getElementById('emailLoginAction');
@@ -661,7 +661,7 @@
         // 控制燈箱彈窗開關
         bindFastClick(loginTriggerBtn, () => { loginLightbox.style.display = 'flex'; });
         
-        // 點擊最原始的右上角關閉按鈕，或是暫時返回，都將視窗恢復初始狀態並關閉
+        // 將視窗恢復初始狀態並關閉
         function resetAndCloseLightbox() {
             if (googleLoginAction) googleLoginAction.style.display = 'flex';
             if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'flex';
@@ -670,7 +670,7 @@
         }
         bindFastClick(closeLightboxBtn, resetAndCloseLightbox);
 
-        // 用加速外掛接管「使用電子郵件登入」信封大鈕的點擊行為
+        // 接管「使用電子郵件登入」信封按鈕
         bindFastClick(toggleEmailFormBtn, () => {
             if (googleLoginAction) googleLoginAction.style.display = 'none';
             if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'none';
@@ -682,7 +682,7 @@
             resetAndCloseLightbox();
         });
 
-        // 🛠️ 真功能完美對接：讓綠色按鈕「電子郵件登入 / 註冊」動真格！
+        // 🛠️ 真功能完美對接：全面使用舊版 firebase.auth() 格式，保證不當機！
         bindFastClick(emailLoginAction, () => {
             const emailValue = loginEmailInput ? loginEmailInput.value.trim() : '';
             const passwordValue = loginPasswordInput ? loginPasswordInput.value : '';
@@ -693,61 +693,59 @@
             }
 
             if (passwordValue.length < 6) {
-                alert("為了安全，密碼必須至少要 6 個字喔！");
+                alert("密碼必須至少要 6 個字喔！");
                 return;
             }
 
-            // 直接呼叫網頁原本就已經載入好的 Firebase 官方帳密登入方法
+            // 使用原 CTO 相容的舊版帳密登入語法
             firebase.auth().signInWithEmailAndPassword(emailValue, passwordValue)
                 .then((result) => {
                     console.log("電子郵件登入成功！", result.user);
                     resetAndCloseLightbox();
                 })
                 .catch((error) => {
-                    // 如果錯誤原因是找不到用戶，代表這是一個新信箱，我們直接幫他自動註冊！
+                    // 如果用戶不存在，直接就地幫他註冊
                     if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
                         firebase.auth().createUserWithEmailAndPassword(emailValue, passwordValue)
                             .then((result) => {
-                                alert("偵測到新用戶，已成功為您註冊並登入！");
-                                console.log("電子郵件註冊成功！", result.user);
+                                alert("歡迎新朋友！已成功為您註冊並登入！");
                                 resetAndCloseLightbox();
                             })
                             .catch((regError) => {
-                                console.error("註冊失敗：", regError.message);
-                                alert("註冊失敗：" + regError.message);
+                                alert("註冊發生錯誤：" + regError.message);
                             });
                     } else if (error.code === 'auth/wrong-password') {
                         alert("密碼輸入錯誤喔，請再確認一次！");
                     } else if (error.code === 'auth/invalid-email') {
                         alert("電子郵件格式看起來不正確喔！");
                     } else {
-                        console.error("登入失敗：", error.message);
                         alert("登入失敗：" + error.message);
                     }
                 });
         });
 
-        // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心
+        // 🧑‍💻 4. 使用舊版語法打通 Google 登入，並移除亂罵人彈窗
         bindFastClick(googleLoginAction, () => {
-            signInWithPopup(auth, provider)
+            firebase.auth().signInWithPopup(provider)
                 .then((result) => {
                     resetAndCloseLightbox();
-                    console.log("真實登入成功，用戶資料：", result.user);
+                    console.log("真實登入成功！", result.user);
                 })
                 .catch((error) => {
-                    console.warn("Firebase 登入狀態提示：", error.message);
+                    // 使用者手動關閉視窗時，在控制台記錄就好，不去彈窗打擾使用者
+                    console.warn("Google 視窗狀態變更：", error.message);
                 });
         });
 
         // 🚪 登出按鈕真實功能對接
         bindFastClick(logoutBtn, () => {
-            signOut(auth).then(() => {
+            firebase.auth().signOut().then(() => {
                 userDropdown.style.display = 'none';
             });
         });
 
-        // 📡 5. 全局實時監聽買家登入狀態 (Firebase 最高指揮官監聽外掛)
-        onAuthStateChanged(auth, (user) => {
+        // 📡 5. 全局實時監聽買家登入狀態
+        firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 // 🟢 狀態：已登入
                 loginTriggerBtn.style.display = 'none';
@@ -824,6 +822,6 @@
         });
 
     </script>
-
 </body>
 </html>
+

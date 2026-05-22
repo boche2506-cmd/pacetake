@@ -618,39 +618,9 @@
         // 初始化 Firebase 與 Auth 驗證系統防線
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-                const provider = new GoogleAuthProvider();
+                        const provider = new GoogleAuthProvider();
 
-        // 🚀 2. 0秒無縫閃轉外掛與觸控手勢防線核心架構
-        function bindFastClick(element, callback) {
-            if (!element) return;
-            let triggered = false;
-            function trigger(e) {
-                if (!triggered) {
-                    triggered = true;
-                    setTimeout(() => { triggered = false; }, 300);
-                    callback(e);
-                }
-                e.preventDefault();
-            }
-            element.addEventListener('touchstart', trigger, { passive: false });
-            element.addEventListener('mousedown', trigger);
-        }
-
-        // 🌓 系統最高膚色指揮官防線邏輯
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        function initTheme() {
-            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        }
-        bindFastClick(themeToggleBtn, () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('pacetake-theme', newTheme);
-        });
-        initTheme();
-
-                // 🪪 3. 獲取前端畫面的所有控制台元素
+        // 🪪 3. 獲取前端畫面的所有控制台元素
         const loginTriggerBtn = document.getElementById('loginTriggerBtn');
         const userAvatarBtn = document.getElementById('avatarMenuBtn');
         const userDropdown = document.getElementById('userDropdown');
@@ -669,160 +639,172 @@
         const emailFormSection = document.getElementById('emailFormSection');
         const customReturnBtn = document.getElementById('customReturnBtn');
         
-        // 取得電子郵件輸入框與綠色按鈕
+        // 取得電子郵件輸入框與綠色確認按鈕
         const loginEmailInput = document.getElementById('loginEmail');
         const loginPasswordInput = document.getElementById('loginPassword');
         const emailLoginAction = document.getElementById('emailLoginAction');
 
-                // 控制燈箱彈窗開關
-        bindFastClick(loginTriggerBtn, () => { loginLightbox.style.display = 'flex'; });
+        // 🌓 系統膚色切換（改用最標準的點擊監聽）
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('pacetake-theme', newTheme);
+            });
+        }
+        // 初始化膚色
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+
+        // 控制燈箱彈窗開關（拋棄舊外掛，全部回歸網頁原生點擊）
+        if (loginTriggerBtn) {
+            loginTriggerBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
+        }
         
-        // 點擊右上角關閉按鈕，將視窗恢復初始狀態並關閉
+        // 統一的狀態重設與關閉函式
         function resetAndCloseLightbox() {
             if (googleLoginAction) googleLoginAction.style.display = 'flex';
             if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'flex';
             if (emailFormSection) emailFormSection.style.display = 'none';
             loginLightbox.style.display = 'none';
         }
-        bindFastClick(closeLightboxBtn, resetAndCloseLightbox);
+        if (closeLightboxBtn) {
+            closeLightboxBtn.addEventListener('click', resetAndCloseLightbox);
+        }
 
-        // 接管「使用電子郵件登入」信封大鈕的點擊行為
-        bindFastClick(toggleEmailFormBtn, () => {
-            if (googleLoginAction) googleLoginAction.style.display = 'none';
-            if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'none';
-            if (emailFormSection) emailFormSection.style.display = 'block';
-        });
-
-        // 接管「暫時返回」按鈕的點擊行為
-        bindFastClick(customReturnBtn, () => {
-            resetAndCloseLightbox();
-        });
-
-        // 🛠️ 配合新版 v9 語法：讓綠色按鈕「電子郵件登入 / 註冊」動真格！
-        bindFastClick(emailLoginAction, () => {
-            const emailValue = loginEmailInput ? loginEmailInput.value.trim() : '';
-            const passwordValue = loginPasswordInput ? loginPasswordInput.value : '';
-
-            if (!emailValue || !passwordValue) {
-                alert("請將電子郵件和密碼都填寫完整喔！");
-                return;
-            }
-
-            if (passwordValue.length < 6) {
-                alert("密碼必須至少要 6 個字喔！");
-                return;
-            }
-
-            // 直接引用最頂端已經載入好的新版函式庫
-            import("https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js").then((mod) => {
-                mod.signInWithEmailAndPassword(auth, emailValue, passwordValue)
-                    .then((result) => {
-                        console.log("電子郵件登入成功！", result.user);
-                        resetAndCloseLightbox();
-                    })
-                    .catch((error) => {
-                        // 如果是用戶不存在或帳密失效，直接就地註冊
-                        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-                            mod.createUserWithEmailAndPassword(auth, emailValue, passwordValue)
-                                .then((result) => {
-                                    alert("歡迎新朋友！已成功為您註冊並登入！");
-                                    resetAndCloseLightbox();
-                                })
-                                .catch((regError) => {
-                                    alert("註冊失敗，請確認格式：" + regError.message);
-                                });
-                        } else {
-                            alert("登入提示：" + error.message);
-                        }
-                    });
+        // 點擊「使用電子郵件登入」信封按鈕
+        if (toggleEmailFormBtn) {
+            toggleEmailFormBtn.addEventListener('click', () => {
+                if (googleLoginAction) googleLoginAction.style.display = 'none';
+                if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'none';
+                if (emailFormSection) emailFormSection.style.display = 'block';
             });
-        });
+        }
 
+        // 點擊「暫時返回」按鈕
+        if (customReturnBtn) {
+            customReturnBtn.addEventListener('click', resetAndCloseLightbox);
+        }
 
+        // 🛠️ 綠色按鈕「電子郵件登入 / 註冊」真實功能（原生通電！）
+        if (emailLoginAction) {
+            emailLoginAction.addEventListener('click', () => {
+                const emailValue = loginEmailInput ? loginEmailInput.value.trim() : '';
+                const passwordValue = loginPasswordInput ? loginPasswordInput.value : '';
+
+                if (!emailValue || !passwordValue) {
+                    alert("請將電子郵件和密碼都填寫完整喔！");
+                    return;
+                }
+
+                if (passwordValue.length < 6) {
+                    alert("密碼必須至少要 6 個字喔！");
+                    return;
+                }
+
+                // 呼叫 Firebase 官方標準帳密功能
+                import("https://gstatic.com").then((mod) => {
+                    mod.signInWithEmailAndPassword(auth, emailValue, passwordValue)
+                        .then((result) => {
+                            console.log("電子郵件登入成功！", result.user);
+                            resetAndCloseLightbox();
+                        })
+                        .catch((error) => {
+                            // 用戶不存在或無效時，就地自動註冊
+                            if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+                                mod.createUserWithEmailAndPassword(auth, emailValue, passwordValue)
+                                    .then((result) => {
+                                        alert("歡迎新朋友！已成功為您註冊並登入！");
+                                        resetAndCloseLightbox();
+                                    })
+                                    .catch((regError) => {
+                                        alert("註冊失敗，請確認格式：" + regError.message);
+                                    });
+                            } else {
+                                alert("登入提示：" + error.message);
+                            }
+                        });
+                });
+            });
+        }
+
+        // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心（無 alert 溫和版）
+        if (googleLoginAction) {
+            googleLoginAction.addEventListener('click', () => {
+                import("https://gstatic.com").then((mod) => {
+                    mod.signInWithPopup(auth, provider)
+                        .then((result) => {
+                            resetAndCloseLightbox();
+                            console.log("真實登入成功，用戶資料：", result.user);
+                        })
+                        .catch((error) => {
+                            console.warn("Firebase 登入狀態提示：", error.message);
+                        });
+                });
+            });
+        }
 
         // 🚪 登出按鈕真實功能對接
-        bindFastClick(logoutBtn, () => {
-            signOut(auth).then(() => {
-                userDropdown.style.display = 'none';
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                import("https://gstatic.com").then((mod) => {
+                    mod.signOut(auth).then(() => {
+                        userDropdown.style.display = 'none';
+                    });
+                });
             });
-        });
+        }
 
-        // 📡 5. 全局實時監聽買家登入狀態 (Firebase 最高指揮官監聽外掛)
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // 🟢 狀態：已登入 (解鎖數位門面)
-                loginTriggerBtn.style.display = 'none';
-                userAvatarBtn.style.display = 'flex';
-                statusDot.classList.add('active');
-                statusText.innerText = `您的訂單 #023 製作中 (${user.displayName || '買家'} 已連線)`;
-            } else {
-                // 🔴 狀態：未登入 (強行鎖定安全防線)
-                loginTriggerBtn.style.display = 'block';
-                userAvatarBtn.style.display = 'none';
-                statusDot.classList.remove('active');
-                statusText.innerText = "您目前沒有訂單（快去點擊店家看菜單吧！）";
-            }
+        // 📡 5. 全局實時監聽買家登入狀態
+        import("https://gstatic.com").then((mod) => {
+            mod.onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    loginTriggerBtn.style.display = 'none';
+                    userAvatarBtn.style.display = 'flex';
+                    statusDot.classList.add('active');
+                    statusText.innerText = `您的訂單 #023 製作中 (${user.displayName || '買家'} 已連線)`;
+                } else {
+                    loginTriggerBtn.style.display = 'block';
+                    userAvatarBtn.style.display = 'none';
+                    statusDot.classList.remove('active');
+                    statusText.innerText = "您目前沒有訂單（快去點擊店家看菜單吧！）";
+                }
+            });
         });
 
         // 展開與關閉控制台下拉選單
-        bindFastClick(userAvatarBtn, (e) => {
-            e.stopPropagation();
-            const isOpen = userDropdown.style.display === 'block';
-            userDropdown.style.display = isOpen ? 'none' : 'block';
-        });
+        if (userAvatarBtn) {
+            userAvatarBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = userDropdown.style.display === 'block';
+                userDropdown.style.display = isOpen ? 'none' : 'block';
+            });
+        }
 
         document.addEventListener('mousedown', (e) => {
-            if (!userDropdown.contains(e.target) && e.target !== userAvatarBtn) {
+            if (userDropdown && !userDropdown.contains(e.target) && e.target !== userAvatarBtn) {
                 userDropdown.style.display = 'none';
             }
         });
 
-        // 身分測試切換面板 (保留前前端測試路徑)
-        bindFastClick(simBuyerBtn, () => {
-            simBuyerBtn.classList.add('active');
-            simSellerBtn.classList.remove('active');
-            sellerMenuBlock.style.display = 'none';
-        });
-
-        bindFastClick(simSellerBtn, () => {
-            simSellerBtn.classList.add('active');
-            simBuyerBtn.classList.remove('active');
-            sellerMenuBlock.style.display = 'block';
-        });
-
-        // 🚀 6. 終極大廠級：滑動鎖定 0 誤觸跳轉外掛 (100% 完美保留不跑版)
-        const navElements = document.querySelectorAll('.nav-fast');
-        navElements.forEach(elem => {
-            let touchStartX = 0;
-            let touchStartY = 0;
-            let isSwipe = false;
-
-            elem.addEventListener('touchstart', (e) => {
-                touchStartX = e.touches.clientX;
-                touchStartY = e.touches.clientY;
-                isSwipe = false;
-            }, { passive: true });
-
-            elem.addEventListener('touchmove', (e) => {
-                let moveX = e.touches.clientX;
-                let moveY = e.touches.clientY;
-                if (Math.abs(moveX - touchStartX) > 15 || Math.abs(moveY - touchStartY) > 15) {
-                    isSwipe = true;
-                }
-            }, { passive: true });
-
-            elem.addEventListener('touchend', (e) => {
-                if (isSwipe) { e.preventDefault(); return; }
-                const dest = elem.getAttribute('href');
-                if (dest && dest !== '#') { window.location.href = dest; }
+        // 身分測試切換面板
+        if (simBuyerBtn && simSellerBtn && sellerMenuBlock) {
+            simBuyerBtn.addEventListener('click', () => {
+                simBuyerBtn.classList.add('active');
+                simSellerBtn.classList.remove('active');
+                sellerMenuBlock.style.display = 'none';
             });
 
-            elem.addEventListener('click', (e) => {
-                if (isSwipe) return;
-                const dest = elem.getAttribute('href');
-                if (dest && dest !== '#') { window.location.href = dest; }
+            simSellerBtn.addEventListener('click', () => {
+                simSellerBtn.classList.add('active');
+                simBuyerBtn.classList.remove('active');
+                sellerMenuBlock.style.display = 'block';
             });
-        });
+        }
 
     </script>
 </body>

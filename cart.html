@@ -308,21 +308,30 @@
             <div>
                 <div class="section-title">點單明細</div>
                 <div class="bill-card">
-                    <div class="bill-item">
-                        <div class="item-name">招牌木盒便當<span class="item-qty">x2</span></div>
-                        <div class="item-price">$240</div>
-                    </div>
-                    <div class="bill-item">
-                        <div class="item-name">酥炸大雞腿便當<span class="item-qty">x1</span></div>
-                        <div class="item-price">$135</div>
-                    </div>
-                    
-                    <div class="bill-total-row">
-                        <div class="total-label">實付總計金額</div>
-                        <div class="total-amount">$375</div>
-                    </div>
+                                <!-- 品項 1 -->
+            <div class="bill-item" style="display: flex; flex-direction: column; align-items: stretch; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="item-name">招牌木盒便當<span class="item-qty">x2</span></div>
+                    <div class="item-price">$240</div>
                 </div>
+                <input type="text" placeholder="此品項自取備註 (如：一個大辣、一個不要香菜...)" style="width: 100%; height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-global); color: var(--text-main); font-size: 12px; outline: none;">
             </div>
+
+            <!-- 品項 2 -->
+            <div class="bill-item" style="display: flex; flex-direction: column; align-items: stretch; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="item-name">酥炸大雞腿便當<span class="item-qty">x1</span></div>
+                    <div class="item-price">$135</div>
+                </div>
+                <input type="text" placeholder="此品項自取備註 (如：雞腿和飯分開裝...)" style="width: 100%; height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-global); color: var(--text-main); font-size: 12px; outline: none;">
+            </div>
+            
+            <div class="bill-total-row">
+                <div class="total-label">實付總計金額</div>
+                <div class="total-amount">$375</div>
+            </div>
+        </div>
+    </div>
 
             <!-- 出餐時間提示防線 -->
             <div class="time-defense-box">

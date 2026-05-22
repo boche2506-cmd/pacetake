@@ -650,7 +650,7 @@
         });
         initTheme();
 
-        // 🪪 3. 獲取前端畫面的所有控制台元素
+                // 🪪 3. 獲取前端畫面的所有控制台元素
         const loginTriggerBtn = document.getElementById('loginTriggerBtn');
         const userAvatarBtn = document.getElementById('avatarMenuBtn');
         const userDropdown = document.getElementById('userDropdown');
@@ -664,15 +664,20 @@
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
         
-        // 取得電子郵件相關新元素
+        // 取得電子郵件相關元素
         const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
         const emailFormSection = document.getElementById('emailFormSection');
         const customReturnBtn = document.getElementById('customReturnBtn');
+        
+        // 取得電子郵件輸入框與綠色按鈕
+        const loginEmailInput = document.getElementById('loginEmail');
+        const loginPasswordInput = document.getElementById('loginPassword');
+        const emailLoginAction = document.getElementById('emailLoginAction');
 
         // 控制燈箱彈窗開關
         bindFastClick(loginTriggerBtn, () => { loginLightbox.style.display = 'flex'; });
         
-        // 點擊最原始的關閉按鈕，或是暫時返回，都將視窗恢復初始狀態並關閉
+        // 點擊最原始的右上角關閉按鈕，將視窗恢復初始狀態並關閉
         function resetAndCloseLightbox() {
             if (googleLoginAction) googleLoginAction.style.display = 'flex';
             if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'flex';
@@ -681,19 +686,30 @@
         }
         bindFastClick(closeLightboxBtn, resetAndCloseLightbox);
 
-        // 新增：用加速外掛接管「電子郵件登入」按鈕的點擊行為
+        // 用加速外掛接管「電子郵件登入」按鈕的點擊行為（隱藏大鈕、展開表單）
         bindFastClick(toggleEmailFormBtn, () => {
             if (googleLoginAction) googleLoginAction.style.display = 'none';
             if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'none';
             if (emailFormSection) emailFormSection.style.display = 'block';
         });
 
-        // 新增：用加速外掛接管「暫時返回」按鈕的點擊行為
+        // 🛠️ 修正：接管「暫時返回」按鈕的點擊行為（隱藏表單、變回初始狀態、關閉燈箱返回首頁）
         bindFastClick(customReturnBtn, () => {
-            if (googleLoginAction) googleLoginAction.style.display = 'flex';
-            if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'flex';
-            if (emailFormSection) emailFormSection.style.display = 'none';
+            resetAndCloseLightbox();
         });
+
+        // 🛠️ 新增：讓綠色按鈕「電子郵件登入 / 註冊」點擊時彈出成功訊息並關閉視窗
+        bindFastClick(emailLoginAction, () => {
+            const emailValue = loginEmailInput ? loginEmailInput.value : '';
+            if (!emailValue) {
+                alert("請填寫電子郵件喔！");
+                return;
+            }
+            alert("正在使用電子郵件登入中...");
+            // 這邊成功後會自動關閉視窗
+            resetAndCloseLightbox();
+        });
+
 
                 // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心
         bindFastClick(googleLoginAction, () => {

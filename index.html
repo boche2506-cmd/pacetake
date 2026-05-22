@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PACE 派思 pacetake.tw - 買家首頁</title>
+    <title>快拿自取街 pacetake.tw - 買家首頁</title>
     <!-- 精品藍色便當純代碼 SVG Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E">
 
@@ -553,44 +553,13 @@
         <!-- Google 登入燈箱彈窗 -->
         <div class="lightbox-modal" id="loginLightbox">
             <div class="modal-card">
-            <div class="modal-title" style="font-weight: 700; margin-bottom: 25px; color: #1f2937; text-align: center;">加入PACE 派思</div>
-            
-            <!-- 1. 強制覆蓋：官方原廠 Google 彩虹四色一鍵登入按鈕 -->
-            <button class="modal-btn google" id="googleLoginAction" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white !important; border: 1px solid #e5e7eb !important; border-radius: 8px !important; padding: 12px; font-size: 14px; font-weight: 500; color: #374151 !important; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-                <!-- 注入官方真實四色神經網格，不調用前任藍色 -->
-                <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:12px; flex-shrink: 0;">
-                    <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.866-3.577-7.866-8s3.536-8 7.866-8c2.46 0 4.105 1.025 5.047 1.926l3.227-3.111C18.29 1.845 15.54 0 12.24 0 5.58 0 0 5.37 0 12s5.58 12 12.24 12c6.96 0 11.57-4.854 11.57-11.79 0-.795-.085-1.4-.19-1.925H12.24z"/>
-                </svg>
-                Google 一鍵登入
-            </button>
-
-            <!-- 2. 高級設計：與 Google 規格完全對稱的「櫻花粉信封 Email 登入」按鈕 -->
-            <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; margin-top: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
-                <!-- 櫻花粉紅優雅信封圖標 -->
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8A9A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:12px; flex-shrink: 0;">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22,6 12,13 2,6"></polyline>
-                </svg>
-                使用電子郵件登入
-            </button>
-
-            <!-- 3. 精修展開表單：點擊上面信封後才會優雅現身 -->
-            <div id="emailFormSection" style="display: none; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto;">
-                <div style="margin-bottom: 12px;">
-                    <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">電子郵件</label>
-                    <input type="email" id="loginEmail" placeholder="請輸入 Email" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb;">
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">密碼</label>
-                    <input type="password" id="loginPassword" placeholder="請輸入密碼" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb;">
-                </div>
-                <!-- 綠色確認登入按鈕 -->
-                <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15); transition: background 0.2s;">電子郵件登入 / 註冊</button>
-            </div>
-
-            <span class="modal-close" id="closeLightboxBtn" style="margin-top: 20px; display: inline-block;">暫時返回</span>
-
-
+                <div class="modal-title">加入快拿自取街</div>
+                <button class="modal-btn google" id="googleLoginAction">
+                    <svg width="16" height="16" viewBox="0 0 24 24" style="margin-right:4px;"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69c-.29 1.5-.14 3.01-1.3 4a7.74 7.74 0 0 1-5.39 2.1c-4.3 0-7.92-3.41-7.92-7.9s3.62-7.9 7.92-7.9c2.01 0 3.84.77 5.24 2.17l3.07-3.07C18.25 1.41 15.32 0 12 0 5.38 0 0 5.38 0 12s5.38 12 12 12c6.88 0 12-4.84 12-12.23 0-.5-.04-1.01-.1-1.5z"/></svg>
+                    Google 一鍵登入
+                </button>
+                <button class="modal-btn phone" id="phoneRegisterAction">平台手機註冊</button>
+                <span class="modal-close" id="closeLightboxBtn">暫時返回</span>
             </div>
         </div>
     </div>
@@ -763,85 +732,6 @@
             // ==========================================================
     // 【核心空降外掛】新任 CTO 注入：真實店家動態撈取與搜尋連動防線
     // ==========================================================
-    // ==========================================================
-    // 【電子郵件登入核心外掛】新任 CTO 注入：實時切換與 Email 登入/註冊防線
-    // ==========================================================
-    (async function() {
-        try {
-            // 引入 Firebase 官方的 Email 登入與註冊模組
-            const { signInWithEmailAndPassword, createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js");
-            
-            // 獲取 HTML 節點
-            const toggleBtn = document.getElementById('toggleEmailFormBtn');
-            const emailSection = document.getElementById('emailFormSection');
-            const loginBtn = document.getElementById('emailLoginAction');
-            const emailInput = document.getElementById('loginEmail');
-            const passwordInput = document.getElementById('loginPassword');
-
-            // 1. 點擊「使用電子郵件登入」按鈕，切換展開或隱藏輸入框
-            if (toggleBtn && emailSection) {
-                toggleBtn.addEventListener('click', () => {
-                    if (emailSection.style.display === 'none') {
-                        emailSection.style.display = 'block';
-                        toggleBtn.textContent = '隱藏電子郵件登入';
-                    } else {
-                        emailSection.style.display = 'none';
-                        toggleBtn.textContent = '使用電子郵件登入';
-                    }
-                });
-            }
-
-            // 2. 處理電子郵件 登入 / 註冊 核心邏輯
-            if (loginBtn) {
-                loginBtn.addEventListener('click', async () => {
-                    const email = emailInput.value.trim();
-                    const password = passwordInput.value.trim();
-
-                    if (!email || !password) {
-                        alert('請輸入完整電子郵件與密碼！');
-                        return;
-                    }
-                    if (password.length < 6) {
-                        alert('為了安全防線，密碼長度請至少填寫 6 碼以上！');
-                        return;
-                    }
-
-                    loginBtn.disabled = true;
-                    loginBtn.textContent = '正在驗證身分防線...';
-
-                    try {
-                        // 先嘗試直接登入
-                        await signInWithEmailAndPassword(auth, email, password);
-                        alert('登入成功！歡迎回來 PACE 派對！');
-                        if (typeof closeLightboxBtn !== 'undefined' && closeLightboxBtn) closeLightboxBtn.click(); // 登入成功自動關彈窗
-                    } catch (loginError) {
-                        // 如果錯誤代碼是找不到使用者，代表是新用戶，立刻啟動「自動註冊防線」
-                        if (loginError.code === 'auth/user-not-found') {
-                            try {
-                                await createUserWithEmailAndPassword(auth, email, password);
-                                alert('偵測為新用戶，已成功為您創建帳號並登入！');
-                                if (typeof closeLightboxBtn !== 'undefined' && closeLightboxBtn) closeLightboxBtn.click();
-                            } catch (regError) {
-                                console.error('註冊失敗:', regError);
-                                alert('註冊帳號失敗：' + regError.message);
-                            }
-                        } else if (loginError.code === 'auth/wrong-password') {
-                            alert('密碼輸入錯誤，請重新確認！');
-                        } else {
-                            console.error('登入出錯:', loginError);
-                            alert('驗證失敗：' + loginError.message);
-                        }
-                    } finally {
-                        loginBtn.disabled = false;
-                        loginBtn.textContent = '電子郵件登入 / 註冊';
-                    }
-                });
-            }
-        } catch (e) {
-            console.error("Email 登入模組加載失敗:", e);
-        }
-    })();
-
     (async function() {
         try {
             // 初始化 Firestore 資料庫（使用與你相同的 v9.23.0 語法）

@@ -5,17 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PACE 派思 - 店內價預約外帶自取/內用點單系統</title>
     
-    <!-- 1. 全球原生圖標標準防線 -->
+    <!-- 1. Google 官方身分驗證核心 JavaScript 庫 -->
+    <script src="https://google.com" async defer></script>
+    
+    <!-- 2. 全球原生圖標標準防線 -->
     <link rel="stylesheet" href="https://cloudflare.com">
 
-    <!-- 2. 點亮大廠級免外部圖檔「精品藍色便當」我的最愛 Favicon 護城河 -->
+    <!-- 3. 點亮大廠級免外部圖檔「精品藍色便當」我的最愛 Favicon 護城河 -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23007AFF'%3E%3Cpath d='M2 9h20v2H2V9zm1 4h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6zm3-8a3 3 0 0 1 6 0h2a3 3 0 0 1 6 0v2H2V5h1zm3 0a1 1 0 0 0-2 0v2h2V5zm8 0a1 1 0 0 0-2 0v2h2V5z'/%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23007AFF'%3E%3Cpath d='M2 9h20v2H2V9zm1 4h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6zm3-8a3 3 0 0 1 6 0h2a3 3 0 0 1 6 0v2H2V5h1zm3 0a1 1 0 0 0-2 0v2h2V5zm8 0a1 1 0 0 0-2 0v2h2V5z'/%3E%3C/svg%3E">
-
-    <!-- 3. 預載加速防線，強行打通 0 秒閃轉 -->
-    <link rel="prefetch" href="register.html">
-    <link rel="prefetch" href="seller.html">
-    <link rel="prefetch" href="manage.html">
 
     <style>
         :root { 
@@ -38,9 +36,10 @@
         .header-left p { font-size: 13px; color: var(--text-gray); margin: 4px 0 0 0; font-weight: 500; }
         
         /* 右上角驗證區塊 */
-        .auth-container { margin-top: 6px; position: relative; }
-        .login-btn { background-color: var(--bg-light); color: var(--text-dark); border: none; padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
-        .login-btn:active { transform: scale(0.95); }
+        .auth-container { margin-top: 6px; position: relative; min-height: 36px; display: flex; align-items: center; }
+        
+        /* 官方 Google 登入晶片按鈕容器 */
+        #googleBtnContainer { display: block; }
         
         /* 用戶頭像選單 */
         .user-profile { display: none; align-items: center; gap: 8px; cursor: pointer; }
@@ -85,18 +84,23 @@
 </head>
 <body>
 
+<!-- 🌐 實體 Google OAuth 初始化金鑰設定 -->
+<div id="g_id_onload"
+     data-client_id="://googleusercontent.com"
+     data-callback="handleCredentialResponse"
+     data-auto_prompt="false">
+</div>
+
 <div class="app-container">
     <header>
         <div class="header-left"><h1>PACE 派思</h1><p>店內價預約外帶自取/內用點單系統</p></div>
         <div class="auth-container">
-            <!-- 登入 / 註冊 按鈕 -->
-            <button class="login-btn" id="loginBtn" onclick="triggerMockLogin()">
-                <i class="fa-brands fa-google" style="color: #007AFF;"></i> 登入 / 註冊
-            </button>
+            <!-- 🌐 實體 Google 官方高奢晶片登入/註冊按鈕渲染錨點 -->
+            <div id="googleBtnContainer"></div>
             
-            <!-- 登入成功後的帳號頭像狀態圈 -->
+            <!-- 登入成功後的真實 Google 大頭貼狀態圈 -->
             <div class="user-profile" id="userProfile" onclick="toggleBossMenu(event)">
-                <img class="user-avatar" id="userAvatar" src="https://unsplash.com" alt="頭像">
+                <img class="user-avatar" id="userAvatar" src="" alt="Google頭像">
                 
                 <!-- 🔒 帳號狀態下拉選單（包含買賣家視野切換） -->
                 <div class="boss-menu" id="bossMenu">
@@ -178,20 +182,14 @@
             <span class="status-dot"></span> 您的訂單 #023 製作中...
         </div>
         <div class="footer-right">
-            <!-- 買家用的手機開店按鈕（切換為賣家老闆時，此按鈕會自動拿掉蒸發） -->
-            <a href="register.html" class="portal-btn" id="btnRegister">💼 手機開店</a>
+            <!-- 🔧 精準修補防線：未登入時絕對隱藏；登入後按角色分流顯示或完全拿掉 -->
+            <a href="register.html" class="portal-btn" id="btnRegister" style="display: none;">💼 手機開店</a>
             <button class="cart-btn">🛒 購物車 (0)</button>
         </div>
     </div>
 </div>
 
 <script>
-    function triggerMockLogin() {
-        localStorage.setItem('pace_logged_in', 'true');
-        localStorage.setItem('pace_role', 'buyer');
-        applyRoleUI();
-    }
-
     function toggleBossMenu(e) {
         e.stopPropagation();
         document.getElementById('bossMenu').classList.toggle('active');
@@ -210,28 +208,59 @@
         location.reload();
     }
 
+    // 🌐 官方實體 Google 驗證令牌解析與大頭貼自動提取
+    function handleCredentialResponse(response) {
+        try {
+            const base64Url = response.credential.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const userData = JSON.parse(decodeURIComponent(escape(window.atob(base64))));
+            
+            // 提取 Google 真實頭像與狀態
+            localStorage.setItem('pace_logged_in', 'true');
+            localStorage.setItem('pace_avatar', userData.picture);
+            localStorage.setItem('pace_role', 'buyer'); // 實體登入後預設是一般買家
+            applyRoleUI();
+        } catch (error) {
+            console.error("Google 登入權杖解析失敗:", error);
+        }
+    }
+
     function applyRoleUI() {
         const isLoggedIn = localStorage.getItem('pace_logged_in') === 'true';
         const role = localStorage.getItem('pace_role') || 'buyer';
+        const avatar = localStorage.getItem('pace_avatar');
 
-        // 控管右上角登入按鈕
+        // 1. 控管右上角 Google 實體登入晶片按鈕與頭像的切換
         if(isLoggedIn) {
-            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('googleBtnContainer').style.display = 'none';
             document.getElementById('userProfile').style.display = 'flex';
+            document.getElementById('userAvatar').src = avatar;
         } else {
-            document.getElementById('loginBtn').style.display = 'flex';
+            document.getElementById('googleBtnContainer').style.display = 'block';
             document.getElementById('userProfile').style.display = 'none';
+            
+            // 🛡️ 未登入防線：強制調用 Google 官方渲染引擎畫出真實按鈕 (包含登入與註冊整合)
+            if (window.google && google.accounts && google.accounts.id) {
+                google.accounts.id.renderButton(
+                    document.getElementById("googleBtnContainer"),
+                    { theme: "outline", size: "medium", text: "signin_with", shape: "pill" }
+                );
+            }
         }
 
-        // 精準控制分流與按鈕拿掉
-        if(role === 'seller') {
-            document.getElementById('btnRegister').style.display = 'none';     // 手機開店拿掉
-            document.getElementById('buyerGroup').style.display = 'none';       // 隱藏一般買家選項
-            document.getElementById('sellerGroup').style.display = 'block';     // 點亮接單管理、後台管理、繳費
+        // 2. 🎯 精準對齊藍圖：未登入、已開店老闆狀態下皆不顯示「手機開店」，只有一般買家登入後才現形！
+        if (!isLoggedIn) {
+            document.getElementById('btnRegister').style.display = 'none';       // 未登入：隱藏
+            document.getElementById('buyerGroup').style.display = 'block';
+            document.getElementById('sellerGroup').style.display = 'none';
+        } else if (role === 'seller') {
+            document.getElementById('btnRegister').style.display = 'none';       // 月費賣家老闆：拿掉蒸發
+            document.getElementById('buyerGroup').style.display = 'none';       // 隱藏買家選單
+            document.getElementById('sellerGroup').style.display = 'block';     // 點亮接單管理、後台、繳費
         } else {
-            document.getElementById('btnRegister').style.display = 'inline-flex';
-            document.getElementById('buyerGroup').style.display = 'block';      // 點亮我的訂單、歷史訂單、月費開店
-            document.getElementById('sellerGroup').style.display = 'none';     // 隱藏賣家選項
+            document.getElementById('btnRegister').style.display = 'inline-flex'; // 只有一般買家登入：現形
+            document.getElementById('buyerGroup').style.display = 'block';      
+            document.getElementById('sellerGroup').style.display = 'none';     
         }
     }
 
@@ -241,10 +270,14 @@
         if(menu) menu.classList.remove('active');
     });
 
-    // 頁面初始化檢查
     document.addEventListener('DOMContentLoaded', () => {
         applyRoleUI();
     });
+
+    // 確保 Google 身分驗證套件非同步加載完成後能自動觸發按鈕渲染
+    window.onload = function () {
+        applyRoleUI();
+    }
 </script>
 </body>
 </html>

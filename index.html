@@ -555,18 +555,19 @@
             <div class="modal-card">
             <div class="modal-title" style="font-weight: 700; margin-bottom: 25px; color: #1f2937; text-align: center;">加入PACE 派思</div>
             
-            <!-- 1. 官方原廠：Google 彩虹四色一鍵登入按鈕 -->
-            <button class="modal-btn google" id="googleLoginAction" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+            <!-- 1. 強制覆蓋：官方原廠 Google 彩虹四色一鍵登入按鈕 -->
+            <button class="modal-btn google" id="googleLoginAction" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white !important; border: 1px solid #e5e7eb !important; border-radius: 8px !important; padding: 12px; font-size: 14px; font-weight: 500; color: #374151 !important; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                <!-- 注入官方真實四色神經網格，不調用前任藍色 -->
                 <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:12px; flex-shrink: 0;">
-                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69c-.29 1.5-.14 3.01-1.3 4a7.74 7.74 0 0 1-5.39 2.1c-4.3 0-7.92-3.41-7.92-7.9s3.62-7.9 7.92-7.9c2.01 0 3.84.77 5.24 2.17l3.07-3.07C18.25 1.41 15.32 0 12 0 5.38 0 0 5.38 0 12s5.38 12 12 12c6.88 0 12-4.84 12-12.23 0-.5-.04-1.01-.1-1.5z"/>
+                    <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.866-3.577-7.866-8s3.536-8 7.866-8c2.46 0 4.105 1.025 5.047 1.926l3.227-3.111C18.29 1.845 15.54 0 12.24 0 5.58 0 0 5.37 0 12s5.58 12 12.24 12c6.96 0 11.57-4.854 11.57-11.79 0-.795-.085-1.4-.19-1.925H12.24z"/>
                 </svg>
                 Google 一鍵登入
             </button>
 
-            <!-- 2. 高級設計：與 Google 規格完全對稱的「信封 Email 登入」按鈕（徹底告別醜灰底） -->
+            <!-- 2. 高級設計：與 Google 規格完全對稱的「櫻花粉信封 Email 登入」按鈕 -->
             <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; margin-top: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
-                <!-- 精緻炭黑色信封圖標 -->
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:12px; flex-shrink: 0;">
+                <!-- 櫻花粉紅優雅信封圖標 -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8A9A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:12px; flex-shrink: 0;">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                     <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
@@ -588,6 +589,7 @@
             </div>
 
             <span class="modal-close" id="closeLightboxBtn" style="margin-top: 20px; display: inline-block;">暫時返回</span>
+
 
             </div>
         </div>

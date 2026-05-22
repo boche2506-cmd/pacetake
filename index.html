@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PACE 派思 - 店內價預約外帶自取/內用點單系統</title>
     
-    <!-- 全球原生圖標標準防線 -->
+    <!-- 1. 全球原生圖標標準防線 -->
     <link rel="stylesheet" href="https://cloudflare.com">
 
-    <!-- 徹底斷絕 SVG 破圖可能性 的安全設定 -->
-    <link rel="icon" href="data:,">
+    <!-- 2. 點亮大廠級免外部圖檔「精品藍色便當」我的最愛 Favicon 護城河 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23007AFF'%3E%3Cpath d='M2 9h20v2H2V9zm1 4h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6zm3-8a3 3 0 0 1 6 0h2a3 3 0 0 1 6 0v2H2V5h1zm3 0a1 1 0 0 0-2 0v2h2V5zm8 0a1 1 0 0 0-2 0v2h2V5z'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23007AFF'%3E%3Cpath d='M2 9h20v2H2V9zm1 4h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6zm3-8a3 3 0 0 1 6 0h2a3 3 0 0 1 6 0v2H2V5h1zm3 0a1 1 0 0 0-2 0v2h2V5zm8 0a1 1 0 0 0-2 0v2h2V5z'/%3E%3C/svg%3E">
+
+    <!-- 3. 預載加速防線，強行打通 0 秒閃轉 -->
+    <link rel="prefetch" href="register.html">
+    <link rel="prefetch" href="seller.html">
+    <link rel="prefetch" href="manage.html">
 
     <style>
         :root { 
@@ -31,7 +37,7 @@
         .header-left h1 { font-size: 32px; font-weight: 900; margin: 0; letter-spacing: -0.5px; }
         .header-left p { font-size: 13px; color: var(--text-gray); margin: 4px 0 0 0; font-weight: 500; }
         
-        /* 右上角權限區塊 */
+        /* 右上角驗證區塊 */
         .auth-container { margin-top: 6px; position: relative; }
         .login-btn { background-color: var(--bg-light); color: var(--text-dark); border: none; padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
         .login-btn:active { transform: scale(0.95); }
@@ -40,7 +46,7 @@
         .user-profile { display: none; align-items: center; gap: 8px; cursor: pointer; }
         .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--brand-blue); background-color: var(--bg-light); }
         
-        /* 🔒 隱藏在帳號狀態內的老闆密道選單 */
+        /* 🔒 老闆測試專屬隱藏選單（點擊頭像跳出） */
         .boss-menu { display: none; position: absolute; top: 42px; right: 0; background: white; border: 1px solid #E5E5EA; border-radius: 14px; width: 190px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); z-index: 110; overflow: hidden; }
         .boss-menu.active { display: block; }
         .boss-item { padding: 12px 14px; font-size: 13px; font-weight: bold; color: #111111; border-bottom: 1px solid #F2F2F7; display: flex; align-items: center; gap: 10px; text-decoration: none; transition: background 0.15s; }
@@ -83,30 +89,51 @@
     <header>
         <div class="header-left"><h1>PACE 派思</h1><p>店內價預約外帶自取/內用點單系統</p></div>
         <div class="auth-container">
-            <!-- 模擬登入按鈕 -->
+            <!-- 登入 / 註冊 按鈕 -->
             <button class="login-btn" id="loginBtn" onclick="triggerMockLogin()">
-                <i class="fa-brands fa-google" style="color: #007AFF;"></i> Google 登入
+                <i class="fa-brands fa-google" style="color: #007AFF;"></i> 登入 / 註冊
             </button>
             
             <!-- 登入成功後的帳號頭像狀態圈 -->
             <div class="user-profile" id="userProfile" onclick="toggleBossMenu(event)">
                 <img class="user-avatar" id="userAvatar" src="https://unsplash.com" alt="頭像">
                 
-                <!-- 🔒 接單與管理入口，被死死鎖定隱藏在裡面的選單中 -->
+                <!-- 🔒 帳號狀態下拉選單（包含買賣家視野切換） -->
                 <div class="boss-menu" id="bossMenu">
-                    <div class="boss-item" onclick="unlockSellerBackend(event)" style="background: #FFF9E6; color: #B78103; cursor: pointer;">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> 🔓 解鎖已開店老闆
+                    
+                    <!-- 【視野 A：一般買家狀態】 -->
+                    <div id="buyerGroup" style="display: block;">
+                        <!-- 測試解鎖按鈕 -->
+                        <div class="boss-item" onclick="unlockSellerBackend(event)" style="background: #FFF9E6; color: #B78103; cursor: pointer; font-size: 11px;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> 【測試】解鎖已開店老闆
+                        </div>
+                        <div class="boss-item" onclick="alert('打開我的訂單畫面')">
+                            <i class="fa-solid fa-receipt" style="color: var(--brand-blue);"></i> 我的訂單
+                        </div>
+                        <div class="boss-item" onclick="alert('打開歷史訂單紀錄')">
+                            <i class="fa-solid fa-clock-rotate-left" style="color: var(--text-gray);"></i> 歷史訂單
+                        </div>
+                        <a href="register.html" class="boss-item">
+                            <i class="fa-solid fa-store" style="color: #FF9500;"></i> 月費開店
+                        </a>
                     </div>
-                    <!-- 🧑‍🍳 老闆接單專用秘密密道 -->
-                    <a href="seller.html" class="boss-item" id="menuSeller" style="display: none;">
-                        <i class="fa-solid fa-fire-burner" style="color: #34C759;"></i> 🧑‍🍳 進入接單後台
-                    </a>
-                    <!-- ⚙️ 老闆管理專用秘密密道 -->
-                    <a href="manage.html" class="boss-item" id="menuManage" style="display: none;">
-                        <i class="fa-solid fa-sliders" style="color: #007AFF;"></i> ⚙️ 進入管理後台
-                    </a>
+
+                    <!-- 【視野 B：月費賣家狀態】 -->
+                    <div id="sellerGroup" style="display: none;">
+                        <a href="seller.html" class="boss-item">
+                            <i class="fa-solid fa-fire-burner" style="color: #34C759;"></i> 接單管理
+                        </a>
+                        <a href="manage.html" class="boss-item">
+                            <i class="fa-solid fa-sliders" style="color: #007AFF;"></i> 後台管理
+                        </a>
+                        <div class="boss-item" onclick="alert('進入月費繳費帳務畫面')">
+                            <i class="fa-solid fa-credit-card" style="color: #FF3B30;"></i> 繳費
+                        </div>
+                    </div>
+                    
+                    <!-- 公用登出按鈕 -->
                     <div class="boss-item" onclick="handleLogout()" style="color: #FF3B30; cursor: pointer; border-top: 1px solid #F2F2F7;">
-                        <i class="fa-solid fa-right-from-bracket"></i> 🚪 登出帳號
+                        <i class="fa-solid fa-right-from-bracket"></i> 登出
                     </div>
                 </div>
             </div>
@@ -114,8 +141,6 @@
     </header>
     
     <div class="search-container"><input type="text" class="search-bar" placeholder="搜尋美食、甜點、店家名稱..."></div>
-    
-    <!-- ✂️ 已經完美拔除橫向分類滑動欄 -->
     
     <main class="store-section">
         <div class="section-title">附近營業中 (GPS 依距離排序)</div>
@@ -153,7 +178,7 @@
             <span class="status-dot"></span> 您的訂單 #023 製作中...
         </div>
         <div class="footer-right">
-            <!-- 買家用的開店按鈕 -->
+            <!-- 買家用的手機開店按鈕（切換為賣家老闆時，此按鈕會自動拿掉蒸發） -->
             <a href="register.html" class="portal-btn" id="btnRegister">💼 手機開店</a>
             <button class="cart-btn">🛒 購物車 (0)</button>
         </div>
@@ -163,6 +188,7 @@
 <script>
     function triggerMockLogin() {
         localStorage.setItem('pace_logged_in', 'true');
+        localStorage.setItem('pace_role', 'buyer');
         applyRoleUI();
     }
 
@@ -176,7 +202,7 @@
         localStorage.setItem('pace_role', 'seller');
         applyRoleUI();
         document.getElementById('bossMenu').classList.remove('active');
-        alert('⚡ 密碼解除！已成功解鎖「老闆接單」與「菜單管理」權限外掛。');
+        alert('⚡ 權限點亮！已成功轉換為「月費賣家」專屬管理視野。');
     }
 
     function handleLogout() {
@@ -188,7 +214,7 @@
         const isLoggedIn = localStorage.getItem('pace_logged_in') === 'true';
         const role = localStorage.getItem('pace_role') || 'buyer';
 
-        // 控管右上角：有登入就顯示頭像，沒登入就顯示 Google 按鈕
+        // 控管右上角登入按鈕
         if(isLoggedIn) {
             document.getElementById('loginBtn').style.display = 'none';
             document.getElementById('userProfile').style.display = 'flex';
@@ -197,15 +223,15 @@
             document.getElementById('userProfile').style.display = 'none';
         }
 
-        // 🛡️ 權限大對決：只有觸發 role === 'seller'，右下角開店鈕才會蒸發，並且讓後台功能在下拉選單裡現形
+        // 精準控制分流與按鈕拿掉
         if(role === 'seller') {
-            document.getElementById('btnRegister').style.display = 'none'; // 買家開店按鈕蒸發
-            document.getElementById('menuSeller').style.display = 'flex';  // 選單內接單現形
-            document.getElementById('menuManage').style.display = 'flex';  // 選單內管理現形
+            document.getElementById('btnRegister').style.display = 'none';     // 手機開店拿掉
+            document.getElementById('buyerGroup').style.display = 'none';       // 隱藏一般買家選項
+            document.getElementById('sellerGroup').style.display = 'block';     // 點亮接單管理、後台管理、繳費
         } else {
             document.getElementById('btnRegister').style.display = 'inline-flex';
-            document.getElementById('menuSeller').style.display = 'none';
-            document.getElementById('menuManage').style.display = 'none';
+            document.getElementById('buyerGroup').style.display = 'block';      // 點亮我的訂單、歷史訂單、月費開店
+            document.getElementById('sellerGroup').style.display = 'none';     // 隱藏賣家選項
         }
     }
 
@@ -215,7 +241,7 @@
         if(menu) menu.classList.remove('active');
     });
 
-    // 頁面初始化狀態檢查
+    // 頁面初始化檢查
     document.addEventListener('DOMContentLoaded', () => {
         applyRoleUI();
     });

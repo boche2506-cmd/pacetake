@@ -591,7 +591,8 @@
                 <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15); transition: background 0.2s;">電子郵件登入 / 註冊</button>
             </div>
 
-                        <span class="modal-close" id="closeLightboxBtn" onclick="document.getElementById('googleLoginAction').style.display='flex'; document.getElementById('toggleEmailFormBtn').style.display='flex'; document.getElementById('emailFormSection').style.display='none';" style="margin-top: 20px; display: inline-block; cursor: pointer;">暫時返回</span>
+                     <span class="modal-close" id="customReturnBtn" onclick="document.getElementById('googleLoginAction').style.removeAttribute ? document.getElementById('googleLoginAction').style.removeAttribute('display') : document.getElementById('googleLoginAction').style.display='flex'; document.getElementById('toggleEmailFormBtn').style.removeAttribute ? document.getElementById('toggleEmailFormBtn').style.removeAttribute('display') : document.getElementById('toggleEmailFormBtn').style.display='flex'; document.getElementById('emailFormSection').style.display='none';" style="margin-top: 20px; display: inline-block; cursor: pointer; color: #6b7280; font-size: 14px; text-decoration: underline;">暫時返回</span>
+
 
             </div>
         </div>

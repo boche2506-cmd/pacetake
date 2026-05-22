@@ -713,16 +713,39 @@
 
        
 
-        // 全局相對路徑跳轉無縫對接
-        const navElements = document.querySelectorAll('.nav-fast');
-        navElements.forEach(elem => {
-            bindFastClick(elem, () => {
-                const dest = elem.getAttribute('href');
-                if (dest && dest !== '#') {
-                    window.location.href = dest;
-                }
-            });
-        });
-    </script>
+       // 🚀 頂級大廠級：滑動與點擊分流無誤觸跳轉外掛
+const navElements = document.querySelectorAll('.nav-fast');
+navElements.forEach(elem => {
+    let touchStartY = 0;
+    let isMoving = false;
+
+    elem.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches.clientY;
+        isMoving = false;
+    }, { passive: true });
+
+    elem.addEventListener('touchmove', (e) => {
+        let currentY = e.touches.clientY;
+        // 如果手指上下滑動超過 10 像素，判定買家只是在滑動螢幕，鎖死點擊
+        if (Math.abs(currentY - touchStartY) > 10) {
+            isMoving = true;
+        }
+    }, { passive: true });
+
+    elem.addEventListener('touchend', (e) => {
+        // 只有在手指原地放開、沒有滑動網頁時，才允許 0 秒閃轉進店！
+        if (!isMoving) {
+            const dest = elem.getAttribute('href');
+            if (dest && dest !== '#') { window.location.href = dest; }
+        }
+    });
+
+    // 留給電腦滑鼠點擊相容
+    elem.addEventListener('click', (e) => {
+        const dest = elem.getAttribute('href');
+        if (dest && dest !== '#') { window.location.href = dest; }
+    });
+});
+</script>
 </body>
 </html>

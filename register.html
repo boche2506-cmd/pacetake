@@ -435,10 +435,32 @@
                     <input type="text" class="input-style" placeholder="請輸入完整地址，以便計算GPS距離" required>
                 </div>
                 <div class="input-group">
-                    <label>平均餐點準備時間 (分鐘)</label>
-                    <input type="number" class="input-style" value="15" min="1" required>
+                                    <label>平均餐點準備時間 (分鐘)</label>
+                <input type="number" class="input-style" value="15" min="1" required>
+            </div>
+            
+            <!-- 🎯 營業時間與公休日控制防線 -->
+            <div class="input-group" style="margin-top: 8px;">
+                <label>每日營業時間區間</label>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <input type="time" class="input-style" style="height:38px;" value="11:00">
+                    <span style="font-size:12px; color:var(--text-muted);">至</span>
+                    <input type="time" class="input-style" style="height:38px;" value="20:00">
                 </div>
             </div>
+            <div class="input-group" style="margin-top: 8px;">
+                <label>每週固定公休日</label>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:4px;">
+                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox">一</label>
+                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox">二</label>
+                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox">三</label>
+                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox">四</label>
+                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox">五</label>
+                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox" checked>六</label>
+                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox" checked>日</label>
+                </div>
+            </div>
+
 
             <!-- 金流防棄單防禦線 -->
             <div class="form-section">

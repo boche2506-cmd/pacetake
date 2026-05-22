@@ -3,291 +3,522 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PACE 派思 - 2.1 RWD手勢盲操後台</title>
-    <!-- 純代碼免圖檔便當標誌（Favicon）數位門面 -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%23007AFF'%3E%3Cpath d='M2 9h20v2H2V9zm1 4h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6zm3-8a3 3 0 0 1 6 0h2a3 3 0 0 1 6 0v2H2V5h1zm3 0a1 1 0 0 0-2 0v2h2V5zm8 0a1 1 0 0 0-2 0v2h2V5z'/%3E%3C/svg%3E">
-    <!-- FontAwesome 圖標庫 -->
-    <link rel="stylesheet" href="https://cloudflare.com">
-    <!-- 預先載入 manage.html 與 index.html 強行打通秒開防線 -->
-    <link rel="prefetch" href="manage.html">
-    <link rel="prefetch" href="index.html">
+    <title>快拿自取街 pacetake.tw - 手勢盲操接單後台</title>
+    <!-- 精品藍色便當純代碼 SVG Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 100 100'%3E%3Crect x='10' y='30' width='80' height='55' rx='10' fill='%230066FF'/%3E%3Cpath d='M25 30 V15 Q25 10 35 10 H65 Q75 10 75 15 V30' fill='none' stroke='%230066FF' stroke-width='8'/%3E%3Cline x1='10' y1='55' x2='90' y2='55' stroke='%23ffffff' stroke-width='4'/%3E%3C/svg%3E">
     <style>
-        :root { --brand-blue: #007AFF; --status-green: #34c759; --status-red: #ff3b30; --status-orange: #ff9500; --bg-body: #111111; --bg-card: #1C1C1E; --bg-nav: #2C2C2E; --text-main: #ffffff; --text-sub: #8E8E93; --border-line: #3A3A3C; --light-off: #48484A; }
-        body.light-theme { --bg-body: #F2F2F7; --bg-card: #ffffff; --bg-nav: #FAFAFC; --text-main: #111111; --text-sub: #8E8E93; --border-line: #E5E5EA; --light-off: #D1D1D6; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 8px; box-sizing: border-box; height: 100vh; display: flex; justify-content: center; overflow: hidden; -webkit-user-select: none; user-select: none; transition: background-color 0.2s; }
-        .seller-container { width: 100%; max-width: 900px; background: var(--bg-card); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; border: 2px solid var(--border-line); }
-        .top-navbar { display: flex; border-bottom: 2px solid var(--border-line); height: 70px; }
-        .online-toggle-btn { flex: 1.5; padding: 0 20px; font-size: 18px; font-weight: 900; border: none; cursor: pointer; color: white; background-color: var(--status-green); text-align: left; transition: all 0.2s; }
-        .online-toggle-btn.offline { background-color: var(--status-red); }
+        /* 全局變數與主題防線 (全面對齊系統規範) */
+        :root {
+            --bg-global: #F8FAFC;
+            --bg-container: #FFFFFF;
+            --border-color: #E2E8F0;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --brand-blue: #0066FF;
+            --brand-green: #10B981;
+            --brand-red: #EF4444;
+            --brand-amber: #D97706;
+            --brand-purple: #8B5CF6;
+            --card-bg: #FFFFFF;
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
+            --sidebar-bg: #F1F5F9;
+            --tab-bg: #F1F5F9;
+        }
+
+        [data-theme="dark"] {
+            --bg-global: #0A0A0A;
+            --bg-container: #111111;
+            --border-color: #262626;
+            --text-main: #F5F5F5;
+            --text-muted: #A3A3A3;
+            --brand-blue: #3B82F6;
+            --brand-green: #34D399;
+            --brand-red: #F87171;
+            --brand-amber: #F59E0B;
+            --brand-purple: #A855F7;
+            --card-bg: #1C1C1E;
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
+            --sidebar-bg: #161618;
+            --tab-bg: #161618;
+        }
+
+        /* 基礎重設 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-global);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        /* 手機直屏精品大外框與細邊界 */
+        .phone-wrapper {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background-color: var(--bg-container);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+        }
+
+        /* 頂部一體化全新排版導覽列 */
+        .header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 最左側：巨型盲操營業開關 */
+        .status-toggle-btn {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--brand-green);
+            color: var(--brand-green);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
         
-        /* 右側功能區塊與左右對調全新排版 */
-        .nav-right-actions { display: flex; flex: 2; border-left: 2px solid var(--border-line); }
-        .home-btn { flex: 1; background-color: var(--bg-nav); color: var(--text-main); border: none; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; text-decoration: none; }
-        .theme-toggle-btn { flex: 1; background-color: var(--bg-nav); color: var(--text-main); border: none; border-left: 2px solid var(--border-line); font-size: 13px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; }
-        .manage-link-btn { flex: 1.2; background-color: var(--brand-blue); color: white; border: none; border-left: 2px solid var(--border-line); font-size: 13px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; text-decoration: none; transition: background-color 0.1s; }
-        .manage-link-btn:active { background-color: #0052CC; }
+        .status-toggle-btn.close-shop {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: var(--brand-red);
+            color: var(--brand-red);
+        }
 
-        .order-tabs-row { display: flex; background-color: var(--bg-nav); border-bottom: 2px solid var(--border-line); overflow-x: auto; }
-        .order-tabs-row::-webkit-scrollbar { display: none; }
-        .jump-to-unfinished { padding: 12px; font-size: 12px; font-weight: bold; background-color: var(--border-line); color: var(--text-main); border: none; cursor: pointer; white-space: nowrap; }
-        .order-tab { flex: 1; padding: 14px 24px; font-size: 15px; font-weight: 700; background-color: transparent; color: var(--text-sub); border: none; border-right: 1px solid var(--border-line); cursor: pointer; white-space: nowrap; }
-        .order-tab.active { background-color: var(--brand-blue); color: white; }
-        .main-workspace { display: flex; flex: 1; min-height: 0; }
-        .status-light-panel { width: 145px; border-right: 2px solid var(--border-line); display: flex; flex-direction: column; background-color: var(--bg-nav); flex-shrink: 0; }
-        .light-indicator { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 1px solid var(--border-line); font-size: 11px; font-weight: bold; color: var(--light-off); text-align: center; }
-        .light-indicator strong { font-size: 15px; margin-top: 4px; display: block; }
-        .light-indicator span.countdown { font-size: 12px; color: #ff9500; margin-top: 2px; font-weight: 900; }
-        .light-indicator.active.unpaid { color: #ff453a; background: rgba(255,69,58,0.12); }
-        .light-indicator.active.online-pay { color: #0a84ff; background: rgba(10,132,255,0.12); }
-        .light-indicator.active.paid { color: #30d158; background: rgba(48,209,88,0.12); }
-        .light-indicator.active.reserve { color: #ff9f0a; background: rgba(255,159,10,0.12); }
-        .light-indicator.active.dine-in { color: #bf5af2; background: rgba(191,90,242,0.12); }
-        .details-panel { flex: 1; display: flex; flex-direction: column; padding: 24px; box-sizing: border-box; overflow-y: auto; }
-        .kitchen-title { font-size: 14px; font-weight: bold; color: var(--text-sub); margin-bottom: 16px; }
-        .kitchen-card-list { flex: 1; }
-        .kitchen-item-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 2px solid var(--border-line); }
-        .item-name-box { font-size: 32px; font-weight: 900; color: var(--text-main); }
-        .item-qty-badge { font-size: 36px; font-weight: 900; color: var(--brand-blue); background-color: rgba(0,122,255,0.12); padding: 2px 16px; border-radius: 12px; }
-        .item-price { font-size: 20px; color: var(--text-sub); font-weight: bold; }
-        .kitchen-total-box { display: flex; justify-content: space-between; align-items: center; border-top: 3px solid var(--border-line); padding-top: 16px; margin-top: 20px; }
-        .kitchen-total-amount { font-size: 36px; font-weight: 900; color: #30d158; }
-        .bottom-action-panel { padding: 16px 24px; border-top: 2px solid var(--border-line); background-color: var(--bg-nav); text-align: center; }
-        .complete-btn { width: 100%; padding: 18px; font-size: 22px; font-weight: 900; color: white; background-color: var(--brand-blue); border: none; border-radius: 16px; cursor: pointer; }
-        .hint-text { font-size: 13px; color: var(--text-sub); margin-top: 10px; font-weight: bold; }
+        /* 中間與右側功能鈕與同步日夜切換 */
+        .nav-right-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-        @media (max-width: 600px) {
-            .top-navbar { height: 60px; }
-            .online-toggle-btn { font-size: 15px; padding: 0 10px; }
-            .main-workspace { flex-direction: column; }
-            .status-light-panel { width: 100%; height: auto; flex-direction: row; border-right: none; border-bottom: 2px solid var(--border-line); }
-            .light-indicator { padding: 10px 4px; border-bottom: none; border-right: 1px solid var(--border-line); font-size: 10px; }
-            .light-indicator strong { font-size: 13px; margin-top: 2px; }
-            .item-name-box { font-size: 24px; } .item-qty-badge { font-size: 26px; padding: 2px 10px; }
+        .nav-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            background-color: var(--card-bg);
+        }
+
+        /* 橫向滑動列訂單編號 */
+        .order-tabs-scroll {
+            display: flex;
+            overflow-x: auto;
+            background-color: var(--tab-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 16px;
+            gap: 8px;
+            scrollbar-width: none;
+        }
+
+        .order-tabs-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .order-tab {
+            flex-shrink: 0;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .order-tab.active {
+            background-color: var(--brand-blue);
+            color: #FFFFFF;
+            border-color: var(--brand-blue);
+        }
+
+        /* 核心盲操主工作區 */
+        .workspace-layout {
+            display: flex;
+            flex-grow: 1;
+            position: relative;
+        }
+
+        /* 左側連動狀態亮燈區 */
+        .lights-sidebar {
+            width: 100px;
+            border-right: 1px solid var(--border-color);
+            background-color: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            padding: 12px 6px;
+            gap: 12px;
+        }
+
+        .light-indicator-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 4px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .light-title {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .light-badge {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 2px;
+            border-radius: 6px;
+            width: 90%;
+            text-align: center;
+        }
+
+        /* 狀態色彩防線 (在明暗模式下皆保持高亮易讀) */
+        .badge-red { background-color: var(--brand-red); color: white; }
+        .badge-green { background-color: var(--brand-green); color: #FFFFFF; }
+        [data-theme="light"] .badge-green { color: #111111; }
+        .badge-amber { background-color: var(--brand-amber); color: white; }
+        .badge-purple { background-color: var(--brand-purple); color: white; }
+
+        .time-countdown {
+            font-size: 10px;
+            color: var(--brand-amber);
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /* 右側巨型廚房字體與手勢工作區 */
+        .gesture-main-board {
+            flex-grow: 1;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: var(--bg-container);
+            position: relative;
+        }
+
+        /* 巨型廚房大字明細區 */
+        .kitchen-bill-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .kitchen-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px dotted var(--border-color);
+        }
+
+        .kitchen-food-name {
+            font-size: 42px; /* 字體放大 3 倍 */
+            font-weight: 900;
+            color: var(--text-main);
+            letter-spacing: -1px;
+        }
+
+        /* 品牌藍色大方框突顯數量 */
+        .kitchen-food-qty {
+            background-color: var(--brand-blue);
+            color: #FFFFFF;
+            font-size: 38px;
+            font-weight: 900;
+            padding: 4px 16px;
+            border-radius: 12px;
+            min-width: 65px;
+            text-align: center;
+        }
+
+        /* 手勢操作提示底浮層 */
+        .gesture-hint-footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 模擬資料滑動切換載體動畫 */
+        .slide-animate {
+            animation: slideInEffect 0.15s ease-out;
+        }
+
+        @keyframes slideInEffect {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
 <body>
-<div class="seller-container">
-    <div class="top-navbar">
-        <button class="online-toggle-btn" id="onlineBtn" onclick="toggleOnlineStatus()">🟢 營業中</button>
-        <div class="nav-right-actions">
-            <!-- 🏠 補齊返回首頁 -->
-            <a href="index.html" class="home-btn" id="homeBtn">
-                <i class="fa-solid fa-house" style="font-size:16px;"></i>
-                <span>回首頁</span>
-            </a>
-            <!-- 🌓 夜間模式 -->
-            <button class="theme-toggle-btn" id="themeBtn" onclick="toggleTheme()">
-                <i class="fa-solid fa-moon" id="themeIcon" style="font-size:16px;"></i>
-                <span id="themeText">夜間模式</span>
-            </button>
-            <!-- ⚙️ 菜單管理（支援0秒無縫閃轉） -->
-            <a href="manage.html" class="manage-link-btn" id="manageBtn">
-                <i class="fa-solid fa-gear" style="font-size:16px;"></i>
-                <span>菜單管理</span>
-            </a>
-        </div>
-    </div>
-    
-    <div class="order-tabs-row" id="tabsRow">
-        <button class="jump-to-unfinished">未完成<br>看板</button>
-        <button class="order-tab active" id="tab-0" onclick="selectOrder(0)">#023</button>
-        <button class="order-tab" id="tab-1" onclick="selectOrder(1)">#024</button>
-    </div>
-    
-    <div class="main-workspace" id="swipeZone">
-        <div class="status-light-panel">
-            <div class="light-indicator" id="light-unpaid">付款方式<strong id="payMethodText">--</strong></div>
-            <div class="light-indicator" id="light-paid">款項狀態<strong id="payStatusText">--</strong></div>
-            <div class="light-indicator" id="light-reserve">預約取餐<strong id="reserveTimeText">--</strong><span class="countdown" id="countdownText"></span></div>
-            <div class="light-indicator" id="light-dine-in">用餐方式<strong id="dineInText">--</strong></div>
-        </div>
-        <div class="details-panel">
-            <div class="kitchen-title">⚡ 當前準備品項 (LARGE KITCHEN MODE)</div>
-            <div class="kitchen-card-list" id="kitchenList"></div>
-            <div class="kitchen-total-box">
-                <div style="font-size: 18px; color: var(--text-sub); font-weight: bold;">總計金額</div>
-                <div class="kitchen-total-amount" id="totalPriceText">$0</div>
+
+    <div class="phone-wrapper">
+        <!-- 頂部一體化導覽列 -->
+        <header class="header">
+            <!-- 最左側：巨型盲操營業開關 -->
+            <button class="status-toggle-btn" id="shopStatusToggle">🟢 營業中</button>
+            
+            <!-- 右側快速跳轉群組與日夜同步鈕 -->
+            <div class="nav-right-group">
+                <button class="theme-toggle" id="themeToggleBtn">🌓</button>
+                <a href="index.html" class="nav-btn nav-fast">🏠 首頁</a>
+                <a href="manage.html" class="nav-btn nav-fast">⚙️ 管理</a>
             </div>
+        </header>
+
+        <!-- 橫向滑動列：訂單編號常亮 -->
+        <div class="order-tabs-scroll" id="orderTabsContainer">
+            <div class="order-tab active" id="tab_023">#023</div>
+            <div class="order-tab" id="tab_022">#022</div>
+            <div class="order-tab" id="tab_021">#021</div>
+        </div>
+
+        <!-- 核心工作區區塊 -->
+        <div class="workspace-layout">
+            
+            <!-- 左側連動亮燈區 -->
+            <aside class="lights-sidebar">
+                <!-- 金流狀態燈 -->
+                <div class="light-indicator-card">
+                    <span class="light-title">金流防線</span>
+                    <span class="light-badge badge-green" id="light_pay">線上已付</span>
+                </div>
+
+                <!-- 預約取餐時間燈 -->
+                <div class="light-indicator-card">
+                    <span class="light-title">預約取餐</span>
+                    <span class="light-badge badge-amber" id="light_time">12:30</span>
+                    <span class="time-countdown" id="light_countdown">剩 20 分</span>
+                </div>
+
+                <!-- 用餐方式燈 -->
+                <div class="light-indicator-card">
+                    <span class="light-title">用餐方式</span>
+                    <span class="light-badge badge-purple" id="light_type">外帶自取</span>
+                </div>
+            </aside>
+
+            <!-- 右側巨型廚房大字明細與全螢幕手勢工作區 -->
+            <main class="gesture-main-board" id="gestureTouchBoard">
+                <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer">
+                    <!-- 商品資料行一 -->
+                    <div class="kitchen-row">
+                        <span class="kitchen-food-name">木盒便當</span>
+                        <span class="kitchen-food-qty">x2</span>
+                    </div>
+                    <!-- 商品資料行二 -->
+                    <div class="kitchen-row">
+                        <span class="kitchen-food-name">大雞腿</span>
+                        <span class="kitchen-food-qty">x1</span>
+                    </div>
+                </div>
+
+                <!-- 底部手勢手感提示 -->
+                <div class="gesture-hint-footer">
+                    <span>👈 左滑下一單</span>
+                    <span>•</span>
+                    <span>右滑前一單 👉</span>
+                </div>
+            </main>
+
         </div>
     </div>
-    <div class="bottom-action-panel">
-        <button class="complete-btn" onclick="completeOrder()">確定完成訂單</button>
-        <div class="hint-text">👉 【手勢功能】可在螢幕上左右滑動，盲操切換訂單！</div>
-    </div>
-</div>
 
-<script>
-    const ordersData = [
-        {
-            id: "#023",
-            payMethod: "線上已付",
-            payStatus: "已扣款",
-            type: "online",
-            reserveTime: "12:30",
-            countdown: 20,
-            dineIn: "外帶自取",
-            items: [
-                { name: "招牌絕品便當", qty: 2, price: 120 },
-                { name: "大師兄秘製大雞排", qty: 1, price: 85 }
-            ],
-            total: 325
-        },
-        {
-            id: "#024",
-            payMethod: "現場付現",
-            payStatus: "未付款",
-            type: "cash",
-            reserveTime: "即時出餐",
-            countdown: 0,
-            dineIn: "內用/05桌",
-            items: [
-                { name: "在地小農輕食沙拉", qty: 1, price: 95 }
-            ],
-            total: 95
-        }
-    ];
-
-    let currentOrderIndex = 0;
-
-    function playOrderSound() {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
-            gain.gain.setValueAtTime(0.1, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.4);
-        } catch(e) { console.log("音訊解鎖防線"); }
-    }
-
-    function renderOrder(index) {
-        const order = ordersData[index];
-        if(!order) return;
-
-        const lightUnpaid = document.getElementById("light-unpaid");
-        const lightPaid = document.getElementById("light-paid");
-        const lightReserve = document.getElementById("light-reserve");
-        const lightDineIn = document.getElementById("light-dine-in");
-
-        lightUnpaid.className = "light-indicator";
-        lightPaid.className = "light-indicator";
-        lightReserve.className = "light-indicator";
-        lightDineIn.className = "light-indicator";
-
-        document.getElementById("payMethodText").innerText = order.payMethod;
-        document.getElementById("payStatusText").innerText = order.payStatus;
-        document.getElementById("reserveTimeText").innerText = order.reserveTime;
-        document.getElementById("dineInText").innerText = order.dineIn;
-
-        if(order.type === 'cash') {
-            lightUnpaid.classList.add("active", "unpaid");
-            lightPaid.classList.add("active", "unpaid");
-        } else {
-            lightUnpaid.classList.add("active", "online-pay");
-            lightPaid.classList.add("active", "paid");
+    <script>
+        // 🚀 0秒無縫閃轉外掛核心架構
+        function bindFastClick(element, callback) {
+            if (!element) return;
+            let triggered = false;
+            function trigger(e) {
+                if (!triggered) {
+                    triggered = true;
+                    setTimeout(() => { triggered = false; }, 300);
+                    callback(e);
+                }
+                e.preventDefault();
+            }
+            element.addEventListener('touchstart', trigger, { passive: false });
+            element.addEventListener('mousedown', trigger);
         }
 
-        if(order.countdown > 0) {
-            lightReserve.classList.add("active", "reserve");
-            document.getElementById("countdownText").innerText = `剩 ${order.countdown} 分鐘`;
-        } else {
-            document.getElementById("countdownText").innerText = "";
+        // 🌓 系統全局膚色同步防線 (完美對齊首頁與全房間)
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        function initTheme() {
+            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
         }
+        bindFastClick(themeToggleBtn, () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('pacetake-theme', newTheme);
+        });
+        initTheme();
 
-        if(order.dineIn.includes("內用")) {
-            lightDineIn.classList.add("active", "dine-in");
-        }
-
-        const listContainer = document.getElementById("kitchenList");
-        listContainer.innerHTML = "";
-        order.items.forEach(item => {
-            const row = document.createElement("div");
-            row.className = "kitchen-item-row";
-            row.innerHTML = `
-                <div>
-                    <div class="item-name-box">${item.name}</div>
-                    <div class="item-price">$${item.price}</div>
-                </div>
-                <div class="item-qty-badge">x${item.qty}</div>
-            `;
-            listContainer.appendChild(row);
+        // 🟢 🔴 最左側巨型營業狀態切換防線
+        const shopStatusToggle = document.getElementById('shopStatusToggle');
+        bindFastClick(shopStatusToggle, () => {
+            if (shopStatusToggle.classList.contains('close-shop')) {
+                shopStatusToggle.classList.remove('close-shop');
+                shopStatusToggle.innerText = '🟢 營業中';
+            } else {
+                shopStatusToggle.classList.add('close-shop');
+                shopStatusToggle.innerText = '🔴 打烊中';
+            }
         });
 
-        document.getElementById("totalPriceText").innerText = `$${order.total}`;
-    }
+        // 🧑‍🍳 廚房假資料庫與狀態資料連動防線
+        const ordersDatabase = {
+            "023": {
+                items: [ { name: "木盒便當", qty: "x2" }, { name: "大雞腿", qty: "x1" } ],
+                pay: { text: "線上已付", cls: "badge-green" },
+                time: "12:30", countdown: "剩 20 分", timeCls: "badge-amber",
+                type: "外帶自取", typeCls: "badge-purple"
+            },
+            "022": {
+                items: [ { name: "大排骨", qty: "x2" } ],
+                pay: { text: "現場付現", cls: "badge-red" },
+                time: "12:45", countdown: "剩 35 分", timeCls: "badge-amber",
+                type: "內用/05桌", typeCls: "badge-purple"
+            },
+            "021": {
+                items: [ { name: "鯖魚便當", qty: "x1" }, { name: "經典手搖", qty: "x1" } ],
+                pay: { text: "線上已付", cls: "badge-green" },
+                time: "13:00", countdown: "剩 50 分", timeCls: "badge-amber",
+                type: "外帶自取", typeCls: "badge-purple"
+            }
+        };
 
-    function selectOrder(index) {
-        currentOrderIndex = index;
-        document.querySelectorAll(".order-tab").forEach((tab, idx) => {
-            tab.classList.toggle("active", idx === index);
+        const orderIds = ["023", "022", "021"];
+        let currentOrderIndex = 0;
+
+        const kitchenBillContainer = document.getElementById('kitchenBillContainer');
+        const lightPay = document.getElementById('light_pay');
+        const lightTime = document.getElementById('light_time');
+        const lightCountdown = document.getElementById('light_countdown');
+        const lightType = document.getElementById('light_type');
+
+        function renderOrder(id) {
+            const data = ordersDatabase[id];
+            
+            document.querySelectorAll('.order-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`tab_${id}`).classList.add('active');
+
+            lightPay.className = `light-badge ${data.pay.cls}`;
+            lightPay.innerText = data.pay.text;
+            
+            lightTime.innerText = data.time;
+            lightCountdown.innerText = data.countdown;
+            
+            lightType.innerText = data.type;
+
+            kitchenBillContainer.innerHTML = '';
+            data.items.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'kitchen-row';
+                row.innerHTML = `
+                    <span class="kitchen-food-name">${item.name}</span>
+                    <span class="kitchen-food-qty">${item.qty}</span>
+                `;
+                kitchenBillContainer.appendChild(row);
+            });
+
+            kitchenBillContainer.classList.remove('slide-animate');
+            void kitchenBillContainer.offsetWidth; 
+            kitchenBillContainer.classList.add('slide-animate');
+        }
+
+        // 👈 👉 盲操全螢幕手勢滑動偵測外掛
+        const gestureTouchBoard = document.getElementById('gestureTouchBoard');
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        gestureTouchBoard.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches.screenX;
+        }, { passive: true });
+
+        gestureTouchBoard.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches.screenX;
+            handleSwipeGesture();
+        }, { passive: true });
+
+        function handleSwipeGesture() {
+            const threshold = 50;
+            if (touchStartX - touchEndX > threshold) {
+                if (currentOrderIndex < orderIds.length - 1) {
+                    currentOrderIndex++;
+                    renderOrder(orderIds[currentOrderIndex]);
+                }
+            } else if (touchEndX - touchStartX > threshold) {
+                if (currentOrderIndex > 0) {
+                    currentOrderIndex--;
+                    renderOrder(orderIds[currentOrderIndex]);
+                }
+            }
+        }
+
+        // 全局相對路徑跳轉無縫對接
+        const navElements = document.querySelectorAll('.nav-fast');
+        navElements.forEach(elem => {
+            bindFastClick(elem, () => {
+                const dest = elem.getAttribute('href');
+                if (dest && dest !== '#') {
+                    window.location.href = dest;
+                }
+            });
         });
-        renderOrder(index);
-    }
-
-    function toggleOnlineStatus() {
-        const btn = document.getElementById("onlineBtn");
-        btn.classList.toggle("offline");
-        if(btn.classList.contains("offline")) {
-            btn.innerText = "🔴 打烊中";
-        } else {
-            btn.innerText = "🟢 營業中";
-        }
-    }
-
-    function toggleTheme() {
-        document.body.classList.toggle("light-theme");
-        const isLight = document.body.classList.contains("light-theme");
-        document.getElementById("themeText").innerText = isLight ? "日間模式" : "夜間模式";
-        document.getElementById("themeIcon").className = isLight ? "fa-solid fa-sun" : "fa-solid fa-moon";
-    }
-
-    function completeOrder() {
-        alert(`${ordersData[currentOrderIndex].id} 訂單處理完畢！`);
-        playOrderSound();
-    }
-
-    // 🚀 大廠級「0秒無縫閃轉外掛」：手指剛碰到按鈕就強行預先執行跳轉
-    const manageBtn = document.getElementById("manageBtn");
-    const homeBtn = document.getElementById("homeBtn");
-
-    const setupFastLink = (btn, url) => {
-        if(!btn) return;
-        const handler = (e) => { e.preventDefault(); window.location.href = url; };
-        btn.addEventListener("touchstart", handler, { passive: false });
-        btn.addEventListener("mousedown", handler);
-    };
-    
-    setupFastLink(manageBtn, "manage.html");
-    setupFastLink(homeBtn, "index.html");
-
-    // 全螢幕手勢
-    let touchStartX = 0;
-    let touchEndX = 0;
-    const swipeZone = document.getElementById("swipeZone");
-
-    swipeZone.addEventListener('touchstart', e => { touchStartX = e.changedTouches.screenX; }, { passive: true });
-    swipeZone.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches.screenX;
-        handleSwipe();
-    }, { passive: true });
-
-    function handleSwipe() {
-        if (touchEndX < touchStartX - 60) {
-            if(currentOrderIndex < ordersData.length - 1) selectOrder(currentOrderIndex + 1);
-        }
-        if (touchEndX > touchStartX + 60) {
-            if(currentOrderIndex > 0) selectOrder(currentOrderIndex - 1);
-        }
-    }
-
-    window.onload = () => { renderOrder(0); };
-</script>
+    </script>
 </body>
 </html>

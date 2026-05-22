@@ -4,320 +4,618 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>快拿自取街 pacetake.tw - 賣家管理後台</title>
-    <!-- 純代碼免圖檔便當標誌（Favicon）數位門面 -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%230066FF'%3E%3Cpath d='M2 9h20v2H2V9zm1 4h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6zm3-8a3 3 0 0 1 6 0h2a3 3 0 0 1 6 0v2H2V5h1zm3 0a1 1 0 0 0-2 0v2h2V5zm8 0a1 1 0 0 0-2 0v2h2V5z'/%3E%3C/svg%3E">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://jsdelivr.net"></script>
-    <!-- FontAwesome 圖標 -->
-    <link rel="stylesheet" href="https://cloudflare.com">
-    <!-- 預先載入接單後台與首頁，確保0秒無縫閃轉 -->
-    <link rel="prefetch" href="seller.html">
-    <link rel="prefetch" href="index.html">
+    <!-- 精品藍色便當純代碼 SVG Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 100 100'%3E%3Crect x='10' y='30' width='80' height='55' rx='10' fill='%230066FF'/%3E%3Cpath d='M25 30 V15 Q25 10 35 10 H65 Q75 10 75 15 V30' fill='none' stroke='%230066FF' stroke-width='8'/%3E%3Cline x1='10' y1='55' x2='90' y2='55' stroke='%23ffffff' stroke-width='4'/%3E%3C/svg%3E">
     <style>
-        :root { 
-            --brand-blue: #007AFF; 
-            --status-green: #34c759; 
-            --status-red: #ff3b30; 
-            --bg-body: #111111; 
-            --bg-card: #1C1C1E; 
-            --bg-nav: #2C2C2E; 
-            --text-main: #ffffff; 
-            --text-sub: #8E8E93; 
-            --border-line: #3A3A3C; 
+        /* 全局變數與主題防線 */
+        :root {
+            --bg-global: #F8FAFC;
+            --bg-container: #FFFFFF;
+            --border-color: #E2E8F0;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --brand-blue: #0066FF;
+            --brand-red: #EF4444;
+            --brand-green: #10B981;
+            --card-bg: #FFFFFF;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
+            --highlight-bg: #E2E8F0;
         }
-        body {
+
+        [data-theme="dark"] {
+            --bg-global: #0A0A0A;
+            --bg-container: #111111;
+            --border-color: #262626;
+            --text-main: #F5F5F5;
+            --text-muted: #A3A3A3;
+            --brand-blue: #3B82F6;
+            --brand-red: #F87171;
+            --brand-green: #34D399;
+            --card-bg: #1C1C1E;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
+            --highlight-bg: #262626;
+        }
+
+        /* 基礎重設 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-body);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-global);
             color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            transition: background-color 0.15s ease;
         }
-        .smooth-transition {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+        /* 手機直屏精品大外框與細邊界 */
+        .phone-wrapper {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background-color: var(--bg-container);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            padding-bottom: 40px;
+            display: flex;
+            flex-direction: column;
         }
-        .sold-out-gray {
-            filter: grayscale(1) contrast(0.8);
-            opacity: 0.3;
+
+        /* 頂部導航 */
+        .header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .switch-bg {
-            background-color: var(--border-line);
+
+        .nav-left-group {
+            display: flex;
+            gap: 6px;
         }
-        input:checked ~ .switch-bg {
-            background-color: var(--status-green);
+
+        .back-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            text-decoration: none;
+            background-color: var(--card-bg);
         }
-        /* 頭像下拉選單樣式 */
+
+        .control-panel {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            background-color: var(--card-bg);
+        }
+
+        .avatar-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        /* 下拉選單與當前頁面高亮 */
         .dropdown-menu {
             display: none;
             position: absolute;
-            top: 60px;
+            top: 38px;
             right: 0;
-            background: #2C2C2E;
-            border: 2px solid #3A3A3C;
-            border-radius: 16px;
             width: 180px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
             z-index: 100;
-            overflow: hidden;
+            padding: 4px;
         }
-        .dropdown-menu.active {
+
+        .dropdown-menu a {
             display: block;
+            width: 100%;
+            padding: 10px 12px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 13px;
+            border-radius: 8px;
         }
-        .dropdown-item {
+
+        /* 強制高亮反黑當前頁面 */
+        .dropdown-menu a.current-page {
+            background-color: var(--highlight-bg);
+            font-weight: 800;
+            border-left: 3px solid var(--brand-blue);
+        }
+
+        .menu-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 4px 0;
+        }
+
+        /* 帳務記帳本區塊 */
+        .main-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .ledger-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .ledger-row-main {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .ledger-stat h3 {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .ledger-stat div {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--text-main);
+            margin-top: 4px;
+        }
+
+        .ledger-stat .revenue-num {
+            color: var(--brand-blue);
+        }
+
+        .ledger-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .ledger-row-sub {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* 菜單與售罄管理排版 */
+        .menu-management-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .manage-food-card {
+            display: flex;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 12px;
+            gap: 12px;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .food-img {
+            width: 65px;
+            height: 65px;
+            border-radius: 12px;
+            background-color: var(--bg-global);
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            color: white;
-            font-size: 13px;
-            font-weight: bold;
-            text-decoration: none;
-            transition: background 0.1s;
+            justify-content: center;
+            font-size: 26px;
+            flex-shrink: 0;
+            border: 1px solid var(--border-color);
         }
-        .dropdown-item:hover {
-            background: #3A3A3C;
+
+        .food-info-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+        }
+
+        .food-name-txt {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .food-price-txt {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--brand-blue);
+        }
+
+        /* 動作控制右側 */
+        .manage-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        /* 原生滑動開關器（售罄開關） */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--brand-green); /* 預設開關未啟動代表營業中（綠燈） */
+            transition: .2s; border-radius: 22px;
+        }
+
+        .slider::before {
+            position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
+            background-color: white; transition: .2s; border-radius: 50%;
+        }
+
+        /* 當開關被勾選時，代表啟用「售罄防線」（變紅燈） */
+        input:checked + .slider { background-color: var(--brand-red); }
+        input:checked + .slider::before { transform: translateX(22px); }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .delete-btn:hover { color: var(--brand-red); }
+
+        /* 新增品項大按鈕 */
+        .add-item-btn {
+            background-color: var(--bg-global);
+            border: 1px dashed var(--border-color);
+            color: var(--brand-blue);
+            height: 48px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        /* 地推專用 QR Code 貼紙區 */
+        .qrcode-sticker-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+
+        .qrcode-url-display {
+            background-color: var(--bg-global);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--brand-blue);
+            font-weight: 700;
+            margin: 8px 0 14px 0;
+            word-break: break-all;
+        }
+
+        .download-sticker-btn {
+            background-color: var(--brand-blue);
+            color: white;
+            border: none;
+            width: 100%;
+            height: 44px;
+            border-radius: 22px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="min-h-screen pb-24 px-3 pt-3 select-none">
+<body>
 
-    <!-- RWD 一體化容器 -->
-    <div class="max-w-[900px] mx-auto bg-[#1C1C1E] rounded-[24px] overflow-hidden border-2 border-[#3A3A3C] shadow-2xl flex flex-col">
-        
-        <!-- 頂部高質感導覽列 -->
-        <header class="flex items-center justify-between px-6 h-[70px] border-b-2 border-[#3A3A3C] bg-[#2C2C2E]">
-            <div class="flex items-center gap-3">
-                <a href="index.html" id="logoHomeBtn" class="text-xl font-black tracking-wider text-[#007AFF] no-underline">PACE 派思</a>
-                <span class="bg-[#3A3A3C] text-[#8E8E93] text-xs px-2 py-0.5 rounded-md font-bold">管理後台 1.0</span>
+    <div class="phone-wrapper">
+        <!-- 頂部導覽列 -->
+        <header class="header">
+            <div class="nav-left-group">
+                <a href="seller.html" class="back-btn nav-fast">🧑‍🍳 接單後台</a>
+                <a href="index.html" class="back-btn nav-fast">🏠 首頁</a>
             </div>
             
-            <!-- 右側一體化控制台 (包含返回接單後台與用戶頭像) -->
-            <div class="flex items-center gap-4 relative">
-                <a href="seller.html" id="backBtn" class="smooth-transition text-xs font-bold text-white bg-[#007AFF] hover:bg-[#0052CC] px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-lg active:scale-95 no-underline">
-                    <i class="fa-solid fa-chef-hat"></i> 返回接單後台
-                </a>
+            <div class="control-panel">
+                <button class="theme-toggle" id="themeToggleBtn">🌓</button>
+                <button class="avatar-btn" id="avatarMenuBtn">🧑‍💼 帳號</button>
                 
-                <!-- 模擬已登入帳號狀態頭像 -->
-                <div class="w-10 h-10 rounded-full border-2 border-[#007AFF] overflow-hidden cursor-pointer active:scale-95 smooth-transition" id="userAvatar">
-                    <img src="https://unsplash.com" alt="老闆頭像" class="w-full h-full object-cover">
-                </div>
-
-                <!-- 帳號狀態整合下拉選單 -->
-                <div class="dropdown-menu" id="avatarDropdown">
-                    <a href="index.html" id="dropHomeBtn" class="dropdown-item border-b border-[#3A3A3C]">
-                        <i class="fa-solid fa-house text-slate-400"></i> 🏠 返回買家首頁
-                    </a>
-                    <a href="seller.html" id="dropSellerBtn" class="dropdown-item border-b border-[#3A3A3C]">
-                        <i class="fa-solid fa-fire-burner text-[#34c759]"></i> 🧑‍🍳 進入接單後台
-                    </a>
-                    <div class="dropdown-item text-slate-400 bg-[#1C1C1E] border-b border-[#3A3A3C]">
-                        <i class="fa-solid fa-circle-check text-[#34c759]"></i> 👑 店鋪月費已繳
-                    </div>
-                    <a href="index.html" class="dropdown-item text-rose-400" onclick="localStorage.removeItem('userStatus');">
-                        <i class="fa-solid fa-right-from-bracket"></i> 🚪 登出帳號
-                    </a>
+                <!-- 用戶下拉選單 (內建當前頁面高亮) -->
+                <div class="dropdown-menu" id="userDropdown">
+                    <a href="index.html" class="nav-fast">🛒 我的訂單</a>
+                    <a href="register.html" class="nav-fast">💼 月費開店</a>
+                    <div class="menu-divider"></div>
+                    <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
+                    <a href="manage.html" class="nav-fast current-page">⚙️ 後台管理</a>
                 </div>
             </div>
         </header>
 
-        <main class="p-6 space-y-6">
-
-            <!-- 區塊一：財務記帳本 -->
-            <section class="bg-[#2C2C2E] rounded-2xl p-5 border-2 border-[#3A3A3C]">
-                <h2 class="text-xs font-bold text-[#8E8E93] tracking-wider uppercase mb-3"><i class="fa-solid fa-chart-pie mr-1"></i> 今日財務記帳本 (打烊結帳)</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="flex flex-col justify-center space-y-1 py-2">
-                        <p class="text-[#8E8E93] text-xs font-bold">今日總接單量 / 總營業額</p>
-                        <div class="flex items-baseline gap-3">
-                            <span class="text-4xl font-black text-[#007AFF]">42 <span class="text-sm font-normal text-[#8E8E93]">單</span></span>
-                            <span class="text-4xl font-black text-white">$18,450</span>
+        <main class="main-content">
+            <!-- 帳務記帳本 -->
+            <section>
+                <div class="section-title">今日帳務記帳本</div>
+                <div class="ledger-card">
+                    <div class="ledger-row-main">
+                        <div class="ledger-stat">
+                            <h3>今日總接單量</h3>
+                            <div>42 單</div>
+                        </div>
+                        <div class="ledger-stat" style="text-align: right;">
+                            <h3>今日總營業額</h3>
+                            <div class="revenue-num">$5,340</div>
                         </div>
                     </div>
-                    <div class="bg-[#1C1C1E] rounded-xl p-4 flex flex-col justify-center space-y-2.5 border border-[#3A3A3C]">
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-[#8E8E93] font-bold"><i class="fa-solid fa-money-bill-wave text-[#34c759] mr-1"></i> 現場現金實收：</span>
-                            <span class="font-black text-white">$5,200</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="text-[#8E8E93] font-bold"><i class="fa-solid fa-credit-card text-[#007AFF] mr-1"></i> 藍新線上支付 (已扣內扣)：</span>
-                            <span class="font-black text-white">$13,250</span>
-                        </div>
-                        <div class="border-t border-[#3A3A3C] my-1"></div>
-                        <p class="text-[10px] text-[#8E8E93] text-right font-medium">0.1秒自動對帳完成 · 平台抽成 0%</p>
+                    <div class="ledger-divider"></div>
+                    <div class="ledger-row-sub">
+                        <span>💵 現場付現實收：$1,240</span>
+                        <span>💳 藍線上支付：$4,100</span>
                     </div>
                 </div>
             </section>
 
-            <!-- 區塊二：售罄下一秒下架管理 -->
-            <section class="bg-[#2C2C2E] rounded-2xl p-5 border-2 border-[#3A3A3C]">
-                <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <h2 class="text-xs font-bold text-[#8E8E93] tracking-wider uppercase"><i class="fa-solid fa-utensils mr-1"></i> 🍱 菜單品項管理</h2>
-                        <p class="text-[11px] text-[#8E8E93] mt-0.5">料沒了「啪」一聲秒下架，買家端即刻連動變灰</p>
-                    </div>
-                    <span class="text-xs bg-[rgba(0,122,255,0.15)] text-[#007AFF] px-2.5 py-1 rounded-full font-black border border-[#007AFF]">店內價模式</span>
-                </div>
-
-                <!-- 商品清單 (加上獨立精緻邊界卡片) -->
-                <div class="space-y-3">
+            <!-- 菜單與售罄管理 -->
+            <section>
+                <div class="section-title">菜單商品與售罄增刪管理</div>
+                <div class="menu-management-list" id="menuManagementList">
+                    
                     <!-- 商品 1 -->
-                    <div id="item-1" class="flex items-center justify-between p-3 bg-[#1C1C1E] rounded-xl border border-[#3A3A3C] smooth-transition">
-                        <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-xl bg-[#2C2C2E] overflow-hidden relative border border-[#3A3A3C] flex-shrink-0">
-                                <img id="img-1" src="https://unsplash.com" alt="招牌經典便當" class="w-full h-full object-cover smooth-transition">
-                            </div>
-                            <div>
-                                <h3 id="title-1" class="font-black text-white smooth-transition text-lg tracking-wide">招牌招牌絕品便當</h3>
-                                <p class="text-[#007AFF] font-black mt-0.5 text-base">$ 120</p>
-                            </div>
+                    <div class="manage-food-card">
+                        <div class="food-img">🍱</div>
+                        <div class="food-info-fields">
+                            <div class="food-name-txt">招牌木盒便當</div>
+                            <div class="food-price-txt">$120</div>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer select-none">
-                            <input type="checkbox" checked onchange="toggleProduct(1)" class="sr-only peer">
-                            <div class="w-14 h-7 switch-bg peer-focus:outline-none rounded-full peer after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full smooth-transition"></div>
-                            <span id="status-text-1" class="text-xs font-black ml-2.5 text-[#34c759] w-12 text-center">上架中</span>
-                        </label>
+                        <div class="manage-actions">
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="soldout-toggle">
+                                <span class="slider"></span>
+                            </label>
+                            <button class="delete-btn">🗑️ 刪除</button>
+                        </div>
                     </div>
 
                     <!-- 商品 2 -->
-                    <div id="item-2" class="flex items-center justify-between p-3 bg-[#1C1C1E] rounded-xl border border-[#3A3A3C] smooth-transition">
-                        <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-xl bg-[#2C2C2E] overflow-hidden relative border border-[#3A3A3C] flex-shrink-0">
-                                <img id="img-2" src="https://unsplash.com" alt="輕食藜麥沙拉" class="w-full h-full object-cover smooth-transition">
-                            </div>
-                            <div>
-                                <h3 id="title-2" class="font-black text-white smooth-transition text-lg tracking-wide">在地小農輕食沙拉</h3>
-                                <p class="text-[#007AFF] font-black mt-0.5 text-base">$ 95</p>
-                            </div>
+                    <div class="manage-food-card">
+                        <div class="food-img">🍗</div>
+                        <div class="food-info-fields">
+                            <div class="food-name-txt">酥炸大雞腿便當</div>
+                            <div class="food-price-txt">$135</div>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer select-none">
-                            <input type="checkbox" checked onchange="toggleProduct(2)" class="sr-only peer">
-                            <div class="w-14 h-7 switch-bg peer-focus:outline-none rounded-full peer after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full smooth-transition"></div>
-                            <span id="status-text-2" class="text-xs font-black ml-2.5 text-[#34c759] w-12 text-center">上架中</span>
-                        </label>
+                        <div class="manage-actions">
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="soldout-toggle">
+                                <span class="slider"></span>
+                            </label>
+                            <button class="delete-btn">🗑️ 刪除</button>
+                        </div>
                     </div>
 
-                    <!-- 商品 3 -->
-                    <div id="item-3" class="flex items-center justify-between p-3 bg-[#1C1C1E] rounded-xl border border-[#3A3A3C] smooth-transition">
-                        <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-xl bg-[#2C2C2E] overflow-hidden relative border border-[#3A3A3C] flex-shrink-0">
-                                <img id="img-3" src="https://unsplash.com" alt="秘製香酥雞排" class="w-full h-full object-cover smooth-transition sold-out-gray">
-                            </div>
-                            <div>
-                                <h3 id="title-3" class="font-black smooth-transition text-lg tracking-wide text-[#8E8E93]">大師兄秘製大雞排</h3>
-                                <p class="text-[#007AFF] font-black mt-0.5 text-base">$ 85</p>
-                            </div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer select-none">
-                            <input type="checkbox" onchange="toggleProduct(3)" class="sr-only peer">
-                            <div class="w-14 h-7 switch-bg peer-focus:outline-none rounded-full peer after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full smooth-transition"></div>
-                            <span id="status-text-3" class="text-xs font-black ml-2.5 text-[#ff3b30] w-12 text-center">🔴售罄</span>
-                        </label>
-                    </div>
                 </div>
+                <button class="add-item-btn" id="addItemCardBtn">＋ 新增品項</button>
             </section>
 
-            <!-- 區塊三：核心商圈地推王牌 -->
-            <section class="bg-[#2C2C2E] rounded-2xl p-6 border-2 border-[#3A3A3C] text-center space-y-5">
-                <div>
-                    <h2 class="text-xs font-bold text-[#8E8E93] tracking-wider uppercase mb-1"><i class="fa-solid fa-qrcode mr-1"></i> 核心商圈地推王牌</h2>
-                    <p class="text-xl font-black text-white">您專屬的永久點餐 QR Code 貼紙</p>
-                    <p class="text-xs text-[#8E8E93] mt-2 max-w-md mx-auto">買家現場或便當盒上掃描此碼，手機會以 0.01 秒強制直達您店家的專屬精品菜單，自動隔絕其他競品！</p>
+            <!-- 地推專用 QR Code 貼紙區 (效能解放優化) -->
+            <section>
+                <div class="section-title">地推專用數位門牌貼紙</div>
+                <div class="qrcode-sticker-card">
+                    <div style="font-size:13px; font-weight:700;">您的專屬永久自取網址：</div>
+                    <div class="qrcode-url-display">https://pacetake.tw</div>
+                    <button class="download-sticker-btn" id="generateDownloadBtn">💾 生成並下載高解析度貼紙</button>
                 </div>
-
-                <div class="flex flex-col items-center justify-center p-5 bg-[#1C1C1E] rounded-2xl border-2 border-dashed border-[#3A3A3C] w-60 mx-auto shadow-inner">
-                    <div class="bg-white p-3 rounded-2xl shadow-lg">
-                        <img id="qrcodeImg" src="" alt="QR Code" class="w-36 h-36">
-                    </div>
-                    <p class="text-[11px] font-mono text-[#8E8E93] mt-4 bg-[#2C2C2E] px-3 py-1 rounded-full border border-[#3A3A3C]">pacetake.tw/?store=store_023</p>
-                </div>
-
-                <button onclick="downloadQRCode()" class="smooth-transition w-full max-w-xs bg-[#007AFF] hover:bg-[#0052CC] text-white font-black py-3.5 px-6 rounded-xl shadow-lg shadow-blue-500/10 active:scale-[0.98] inline-flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-file-arrow-down text-lg"></i> 💾 下載高解析度貼紙
-                </button>
             </section>
-
         </main>
     </div>
 
-    <footer class="text-center text-xs text-[#8E8E93] mt-10 mb-6">
-        &copy; 2026 快拿自取街 pacetake.tw · 店內價 0 平台抽成防線
-    </footer>
-
     <script>
-        const storeID = "store_023";
-        const targetUrl = window.location.origin + "/index.html?store=" + storeID;
+        // 🚀 0秒無縫閃轉外掛核心架構
+        function bindFastClick(element, callback) {
+            if (!element) return;
+            let triggered = false;
+            function trigger(e) {
+                if (!triggered) {
+                    triggered = true;
+                    setTimeout(() => { triggered = false; }, 300);
+                    callback(e);
+                }
+                e.preventDefault();
+            }
+            element.addEventListener('touchstart', trigger, { passive: false });
+            element.addEventListener('mousedown', trigger);
+        }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const qrImg = document.getElementById("qrcodeImg");
-            qrImg.src = `https://qrserver.com{encodeURIComponent(targetUrl)}`;
+        // 🌓 系統全局膚色同步防線
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        function initTheme() {
+            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+        bindFastClick(themeToggleBtn, () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('pacetake-theme', newTheme);
+        });
+        initTheme();
+
+        // 🧑‍💼 用戶頭像下拉控制
+        const avatarMenuBtn = document.getElementById('avatarMenuBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        bindFastClick(avatarMenuBtn, (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdown.style.display === 'block';
+            userDropdown.style.display = isOpen ? 'none' : 'block';
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (!userDropdown.contains(e.target) && e.target !== avatarMenuBtn) {
+                userDropdown.style.display = 'none';
+            }
+        });
+
+        // 🗑️ 刪除與動態售罄開關事件委派綁定
+        const menuManagementList = document.getElementById('menuManagementList');
+        
+        menuManagementList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const card = e.target.closest('.manage-food-card');
+                if (card) card.remove();
+            }
+        });
+
+        // ➕ 動態新增品項卡片
+        const addItemCardBtn = document.getElementById('addItemCardBtn');
+        bindFastClick(addItemCardBtn, () => {
+            const newCard = document.createElement('div');
+            newCard.className = 'manage-food-card';
+            newCard.innerHTML = `
+                <div class="food-img">🍳</div>
+                <div class="food-info-fields">
+                    <input type="text" placeholder="新項目名稱" style="width:100%; height:26px; border:1px solid var(--border-color); background:var(--bg-global); color:var(--text-main); border-radius:6px; padding:0 6px; font-size:12px;">
+                    <input type="number" placeholder="金額" style="width:70px; height:26px; border:1px solid var(--border-color); background:var(--bg-global); color:var(--text-main); border-radius:6px; padding:0 6px; font-size:12px; margin-top:2px;">
+                </div>
+                <div class="manage-actions">
+                    <label class="toggle-switch">
+                        <input type="checkbox" class="soldout-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <button class="delete-btn">🗑️ 刪除</button>
+                </div>
+            `;
+            menuManagementList.appendChild(newCard);
+        });
+
+        // 💾 QR Code 效能解放優化：即時高速原生 API 生成並下載 SVG
+        const generateDownloadBtn = document.getElementById('generateDownloadBtn');
+        bindFastClick(generateDownloadBtn, () => {
+            // 使用原生純代碼拼裝極客風高解析度 SVG 數位門牌貼紙外框與矩陣模擬
+            const svgString = `
+                <svg xmlns="http://w3.org" viewBox="0 0 400 500" width="400" height="500">
+                    <rect width="400" height="500" rx="30" fill="#0066FF"/>
+                    <rect x="20" y="20" width="360" height="460" rx="20" fill="#ffffff"/>
+                    <text x="200" y="70" font-family="sans-serif" font-size="28" font-weight="900" fill="#0066FF" text-anchor="middle">快拿自取街</text>
+                    <text x="200" y="105" font-family="sans-serif" font-size="14" font-weight="700" fill="#64748B" text-anchor="middle">pacetake.tw 數位門牌</text>
+                    <!-- 模擬高速 QR 矩陣核心邊框 -->
+                    <rect x="80" y="140" width="240" height="240" rx="12" fill="none" stroke="#0066FF" stroke-width="6"/>
+                    <rect x="105" y="165" width="50" height="50" fill="#111111"/>
+                    <rect x="245" y="165" width="50" height="50" fill="#111111"/>
+                    <rect x="105" y="305" width="50" height="50" fill="#111111"/>
+                    <rect x="180" y="240" width="40" height="40" fill="#0066FF"/>
+                    <!-- 裝飾微小點陣 -->
+                    <rect x="170" y="170" width="20" height="20" fill="#111111"/><rect x="210" y="190" width="20" height="20" fill="#111111"/>
+                    <rect x="170" y="320" width="30" height="20" fill="#111111"/><rect x="270" y="270" width="25" height="40" fill="#111111"/>
+                    <text x="200" y="430" font-family="sans-serif" font-size="16" font-weight="800" fill="#111111" text-anchor="middle">手機掃碼 ‧ 免投 App 點單</text>
+                    <text x="200" y="460" font-family="sans-serif" font-size="13" font-weight="600" fill="#0066FF" text-anchor="middle">店內價 0 平台抽成</text>
+                </svg>
+            `;
             
-            // 🚀 0秒強行雙向閃轉對齊防線
-            const fastRedirects = [
-                { id: "backBtn", target: "seller.html" },
-                { id: "logoHomeBtn", target: "index.html" },
-                { id: "dropHomeBtn", target: "index.html" },
-                { id: "dropSellerBtn", target: "seller.html" }
-            ];
+            // 轉換為 Blob URL 並觸發高解析度原生物件下載
+            const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const blobUrl = URL.createObjectURL(blob);
+            
+            const downloadLink = document.createElement('a');
+            downloadLink.href = blobUrl;
+            downloadLink.download = 'pacetake-store-sticker.svg';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(blobUrl);
+        });
 
-            fastRedirects.forEach(item => {
-                const el = document.getElementById(item.id);
-                if(el) {
-                    const doFast = (e) => {
-                        e.preventDefault();
-                        window.location.href = item.target;
-                    };
-                    el.addEventListener('touchstart', doFast);
-                    el.addEventListener('mousedown', doFast);
+        // 全局相對路徑跳轉無縫對接
+        const navElements = document.querySelectorAll('.nav-fast');
+        navElements.forEach(elem => {
+            bindFastClick(elem, () => {
+                const dest = elem.getAttribute('href');
+                if (dest && dest !== '#') {
+                    window.location.href = dest;
                 }
             });
         });
-
-        // 頭像下拉選單切換
-        const avatar = document.getElementById('userAvatar');
-        const dropdown = document.getElementById('avatarDropdown');
-        if(avatar && dropdown) {
-            avatar.addEventListener('click', (e) => {
-                e.stopPropagation();
-                dropdown.classList.toggle('active');
-            });
-            document.addEventListener('click', () => {
-                dropdown.classList.remove('active');
-            });
-        }
-
-        function toggleProduct(id) {
-            const img = document.getElementById(`img-${id}`);
-            const title = document.getElementById(`title-${id}`);
-            const statusText = document.getElementById(`status-text-${id}`);
-            
-            if (statusText.innerText === "上架中") {
-                img.classList.add('sold-out-gray');
-                title.className = "font-black smooth-transition text-lg tracking-wide text-[#8E8E93]";
-                statusText.innerText = "🔴售罄";
-                statusText.className = "text-xs font-black ml-2.5 text-[#ff3b30] w-12 text-center";
-            } else {
-                img.classList.remove('sold-out-gray');
-                title.className = "font-black smooth-transition text-lg tracking-wide text-white";
-                statusText.innerText = "上架中";
-                statusText.className = "text-xs font-black ml-2.5 text-[#34c759] w-12 text-center";
-            }
-        }
-
-        function downloadQRCode() {
-            const qrImg = document.getElementById("qrcodeImg");
-            if (qrImg && qrImg.src) {
-                fetch(qrImg.src)
-                    .then(response => response.blob())
-                    .then(blob => {
-                        const url = window.URL.createObjectURL(blob);
-                        const link = document.createElement("a");
-                        link.href = url;
-                        link.download = `pacetake_store_${storeID}_qrcode.png`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(url);
-                    })
-                    .catch(() => alert("QR Code 下載失敗"));
-            }
-        }
     </script>
 </body>
 </html>

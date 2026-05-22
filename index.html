@@ -674,10 +674,10 @@
         const loginPasswordInput = document.getElementById('loginPassword');
         const emailLoginAction = document.getElementById('emailLoginAction');
 
-        // 控制燈箱彈窗開關
+                // 控制燈箱彈窗開關
         bindFastClick(loginTriggerBtn, () => { loginLightbox.style.display = 'flex'; });
         
-        // 點擊最原始的右上角關閉按鈕，將視窗恢復初始狀態並關閉
+        // 點擊右上角關閉按鈕，將視窗恢復初始狀態並關閉
         function resetAndCloseLightbox() {
             if (googleLoginAction) googleLoginAction.style.display = 'flex';
             if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'flex';
@@ -686,43 +686,58 @@
         }
         bindFastClick(closeLightboxBtn, resetAndCloseLightbox);
 
-        // 用加速外掛接管「電子郵件登入」按鈕的點擊行為（隱藏大鈕、展開表單）
+        // 接管「使用電子郵件登入」信封大鈕的點擊行為
         bindFastClick(toggleEmailFormBtn, () => {
             if (googleLoginAction) googleLoginAction.style.display = 'none';
             if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'none';
             if (emailFormSection) emailFormSection.style.display = 'block';
         });
 
-        // 🛠️ 修正：接管「暫時返回」按鈕的點擊行為（隱藏表單、變回初始狀態、關閉燈箱返回首頁）
+        // 接管「暫時返回」按鈕的點擊行為
         bindFastClick(customReturnBtn, () => {
             resetAndCloseLightbox();
         });
 
-        // 🛠️ 新增：讓綠色按鈕「電子郵件登入 / 註冊」點擊時彈出成功訊息並關閉視窗
+        // 🛠️ 配合新版 v9 語法：讓綠色按鈕「電子郵件登入 / 註冊」動真格！
         bindFastClick(emailLoginAction, () => {
-            const emailValue = loginEmailInput ? loginEmailInput.value : '';
-            if (!emailValue) {
-                alert("請填寫電子郵件喔！");
+            const emailValue = loginEmailInput ? loginEmailInput.value.trim() : '';
+            const passwordValue = loginPasswordInput ? loginPasswordInput.value : '';
+
+            if (!emailValue || !passwordValue) {
+                alert("請將電子郵件和密碼都填寫完整喔！");
                 return;
             }
-            alert("正在使用電子郵件登入中...");
-            // 這邊成功後會自動關閉視窗
-            resetAndCloseLightbox();
+
+            if (passwordValue.length < 6) {
+                alert("密碼必須至少要 6 個字喔！");
+                return;
+            }
+
+            // 直接引用最頂端已經載入好的新版函式庫
+            import("https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js").then((mod) => {
+                mod.signInWithEmailAndPassword(auth, emailValue, passwordValue)
+                    .then((result) => {
+                        console.log("電子郵件登入成功！", result.user);
+                        resetAndCloseLightbox();
+                    })
+                    .catch((error) => {
+                        // 如果是用戶不存在或帳密失效，直接就地註冊
+                        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+                            mod.createUserWithEmailAndPassword(auth, emailValue, passwordValue)
+                                .then((result) => {
+                                    alert("歡迎新朋友！已成功為您註冊並登入！");
+                                    resetAndCloseLightbox();
+                                })
+                                .catch((regError) => {
+                                    alert("註冊失敗，請確認格式：" + regError.message);
+                                });
+                        } else {
+                            alert("登入提示：" + error.message);
+                        }
+                    });
+            });
         });
 
-
-                // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心
-        bindFastClick(googleLoginAction, () => {
-            signInWithPopup(auth, provider)
-                .then((result) => {
-                    resetAndCloseLightbox();
-                    console.log("真實登入成功，用戶資料：", result.user);
-                })
-                .catch((error) => {
-                    // 這裡把嚇人的 alert 拔掉了！使用者自己關掉視窗時，網頁會保持安靜不打擾。
-                    console.warn("Firebase 登入狀態提示：", error.message);
-                });
-        });
 
 
         // 🚪 登出按鈕真實功能對接

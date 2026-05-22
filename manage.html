@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快拿自取街 pacetake.tw - 賣家管理後台</title>
+    <!-- Tailwind CSS  CDN -->
+    <script src="https://jsdelivr.net"></script>
+    <!-- FontAwesome 圖標 -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <!-- qrcode.js CDN (用於動態生成地推專用永久 QR Code) -->
+    <script src="https://cloudflare.com"></script>
+    <style>
+        :root {
+            --brand-blue: #0066FF;
+            --brand-blue-hover: #0052CC;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F8FAFC;
+        }
+        /* 0.2秒流暢微動畫 */
+        .smooth-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* 售罄變灰效果 */
+        .sold-out-gray {
+            filter: grayscale(1);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="text-slate-900 min-h-screen pb-24">
+
+    <!-- 頂部導覽列 -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-50 backdrop-blur-md bg-white/90">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-xl font-black tracking-wider text-[#0066FF]">PACE 派思</span>
+                <span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded font-medium">管理後台 1.0</span>
+            </div>
+            <!-- 返回接單後台跳轉連結 -->
+            <a href="seller.html" class="smooth-transition text-sm font-medium text-slate-600 hover:text-[#0066FF] flex items-center gap-2 bg-slate-50 hover:bg-blue-50 px-3 py-2 rounded-xl">
+                <i class="fa-solid fa-chef-hat"></i> 返回接單後台
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-6 space-y-6">
+
+        <!-- 區塊一：財務記帳本 (0.1秒秒速對帳) -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <h2 class="text-sm font-bold text-slate-400 tracking-wider uppercase mb-4">📊 今日財務記帳本 (打烊結帳)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 左側：總單量與總營收大字 -->
+                <div class="space-y-2">
+                    <p class="text-slate-500 text-sm font-medium">今日總接單量 / 總營業額</p>
+                    <div class="flex items-baseline gap-4">
+                        <span class="text-4xl font-black text-[#0066FF]">42 <span class="text-lg font-normal text-slate-400">單</span></span>
+                        <span class="text-4xl font-black text-slate-900">$18,450</span>
+                    </div>
+                </div>
+                <!-- 右側：金流細項拆解 -->
+                <div class="bg-slate-50 rounded-xl p-4 flex flex-col justify-center space-y-2 border border-slate-100">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-slate-500 font-medium"><i class="fa-solid fa-money-bill-wave text-emerald-500 mr-1"></i> 現場現金實收：</span>
+                        <span class="font-bold text-slate-700">$5,200</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-slate-500 font-medium"><i class="fa-solid fa-credit-card text-blue-500 mr-1"></i> 藍新線上支付 (已扣內扣)：</span>
+                        <span class="font-bold text-slate-700">$13,250</span>
+                    </div>
+                    <div class="border-t border-slate-200 my-1"></div>
+                    <p class="text-[11px] text-slate-400 text-right">0.1秒自動對帳完成 · 平台抽成 0%</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 區塊二：售罄下一秒下架管理 -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-sm font-bold text-slate-400 tracking-wider uppercase">🍱 菜單品項管理</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">料沒了「啪」一聲秒下架，買家端即刻連動</p>
+                </div>
+                <span class="text-xs bg-blue-50 text-[#0066FF] px-2.5 py-1 rounded-full font-semibold">店內價模式</span>
+            </div>
+
+            <!-- 商品清單列表 -->
+            <div class="divide-y divide-slate-100">
+                <!-- 商品 1 -->
+                <div id="item-1" class="flex items-center justify-between py-4 smooth-transition">
+                    <div class="flex items-center gap-4">
+                        <!-- 左圖：1:1 圓角正方形 -->
+                        <div class="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden relative border border-slate-100 flex-shrink-0">
+                            <img id="img-1" src="https://unsplash.com" alt="招牌經典便當" class="w-full h-full object-cover smooth-transition">
+                        </div>
+                        <!-- 右兩格排版 -->
+                        <div>
+                            <h3 id="title-1" class="font-bold text-slate-800 smooth-transition text-base">招牌招牌絕品便當</h3>
+                            <p class="text-[#0066FF] font-black mt-0.5">$ 120</p>
+                        </div>
+                    </div>
+                    <!-- 高質感極簡開關 -->
+                    <label class="relative inline-flex items-center cursor-pointer select-none">
+                        <input type="checkbox" checked onchange="toggleProduct(1)" class="sr-only peer">
+                        <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all smooth-transition peer-checked:bg-emerald-500"></div>
+                        <span id="status-text-1" class="text-xs font-bold ml-2 text-emerald-600 w-10">上架中</span>
+                    </label>
+                </div>
+
+                <!-- 商品 2 -->
+                <div id="item-2" class="flex items-center justify-between py-4 smooth-transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden relative border border-slate-100 flex-shrink-0">
+                            <img id="img-2" src="https://unsplash.com" alt="輕食藜麥沙拉" class="w-full h-full object-cover smooth-transition">
+                        </div>
+                        <div>
+                            <h3 id="title-2" class="font-bold text-slate-800 smooth-transition text-base">在地小農輕食沙拉</h3>
+                            <p class="text-[#0066FF] font-black mt-0.5">$ 95</p>
+                        </div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer select-none">
+                        <input type="checkbox" checked onchange="toggleProduct(2)" class="sr-only peer">
+                        <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all smooth-transition peer-checked:bg-emerald-500"></div>
+                        <span id="status-text-2" class="text-xs font-bold ml-2 text-emerald-600 w-10">上架中</span>
+                    </label>
+                </div>
+
+                <!-- 商品 3 (模擬原本已售罄狀態) -->
+                <div id="item-3" class="flex items-center justify-between py-4 smooth-transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden relative border border-slate-100 flex-shrink-0">
+                            <img id="img-3" src="https://unsplash.com" alt="秘製香酥雞排" class="w-full h-full object-cover smooth-transition sold-out-gray">
+                        </div>
+                        <div>
+                            <h3 id="title-3" class="font-bold text-slate-800 smooth-transition text-base text-slate-400">大師兄秘製大雞排</h3>
+                            <p class="text-[#0066FF] font-black mt-0.5">$ 85</p>
+                        </div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer select-none">
+                        <input type="checkbox" onchange="toggleProduct(3)" class="sr-only peer">
+                        <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all smooth-transition peer-checked:bg-emerald-500"></div>
+                        <span id="status-text-3" class="text-xs font-bold ml-2 text-rose-500 w-10">🔴售罄</span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- 區塊三：核心商圈地推王牌 (QR Code 貼紙自動生成) -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm text-center space-y-6">
+            <div>
+                <h2 class="text-sm font-bold text-slate-400 tracking-wider uppercase mb-1">🎯 核心商圈地推王牌</h2>
+                <p class="text-xl font-black text-slate-800">您專屬的永久點餐 QR Code 貼紙</p>
+                <p class="text-xs text-slate-500 mt-2 max-w-md mx-auto">買家現場或便當盒上掃描此碼，手機會以 0.01 秒強制直達您店家的專屬精品菜單，自動跳過其他對手！</p>
+            </div>
+
+            <!-- QR Code 渲染外框區 -->
+            <div class="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-2xl border border-dashed border-slate-200 w-64 mx-auto shadow-inner">
+                <!-- 網頁加載時會在此自動繪製 QR Code -->
+                <div id="qrcode" class="bg-white p-3 rounded-xl shadow-sm"></div>
+                <!-- 永久專屬網址顯示 -->
+                <p class="text-[11px] font-mono text-slate-400 mt-4 bg-white px-3 py-1 rounded-full border border-slate-100">pacetake.tw/?store=store_023</p>
+            </div>
+
+            <!-- 下載高解析度貼紙大按鈕 -->
+            <button onclick="downloadQRCode()" class="smooth-transition w-full max-w-xs bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 active:scale-[0.98] inline-flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-arrow-down text-lg"></i> 💾 下載高解析度貼紙
+            </button>
+        </section>
+
+    </main>
+
+    <!-- 底部固定資訊欄 -->
+    <footer class="text-center text-xs text-slate-400 mt-12 mb-6">
+        &copy; 2026 快拿自取街 pacetake.tw · 店內價 0 平台抽成防線
+    </footer>
+
+    <!-- 前端互動與下載邏輯 -->
+    <script>
+        // 模擬店家專屬 ID，會直達 index.html 並帶上參數
+        const storeID = "store_023";
+        const targetUrl = window.location.origin + "/index.html?store=" + storeID;
+
+        // 頁面載入時自動初始化 QR Code
+        window.addEventListener('DOMContentLoaded', () => {
+            new QRCode(document.getElementById("qrcode"), {
+                text: targetUrl,
+                width: 160,
+                height: 160,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        });
+
+        // 「啪」一聲售罄變灰、上架變綠邏輯切換
+        function toggleProduct(id) {
+            const img = document.getElementById(`img-${id}`);
+            const title = document.getElementById(`title-${id}`);
+            const statusText = document.getElementById(`status-text-${id}`);
+            
+            // 藉由狀態文字或 class 判斷目前是否為下架狀態
+            if (statusText.innerText === "上架中") {
+                // 變更為售罄下架
+                img.classList.add('sold-out-gray');
+                title.classList.add('text-slate-400');
+                statusText.innerText = "🔴售罄";
+                statusText.className = "text-xs font-bold ml-2 text-rose-500 w-10";
+            } else {
+                // 恢復為上架中
+                img.classList.remove('sold-out-gray');
+                title.classList.remove('text-slate-400');
+                statusText.innerText = "上架中";
+                statusText.className = "text-xs font-bold ml-2 text-emerald-600 w-10";
+            }
+        }
+
+        // 下載高解析度貼紙圖檔
+        function downloadQRCode() {
+            const qrImg = document.querySelector("#qrcode img");
+            if (qrImg) {
+                const link = document.createElement("a");
+                link.href = qrImg.src;
+                link.download = `pacetake_store_${storeID}_qrcode.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                alert("QR Code 尚未生成完畢，請稍候再試。");
+            }
+        }
+    </script>
+</body>
+</html>

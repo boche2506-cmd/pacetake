@@ -553,34 +553,42 @@
         <!-- Google 登入燈箱彈窗 -->
         <div class="lightbox-modal" id="loginLightbox">
             <div class="modal-card">
-                        <div class="modal-title">加入PACE 派思</div>
+            <div class="modal-title" style="font-weight: 700; margin-bottom: 25px; color: #1f2937; text-align: center;">加入PACE 派思</div>
             
-            <!-- 1. 原廠規格：Google 一鍵登入按鈕 -->
-            <button class="modal-btn google" id="googleLoginAction">
-                <svg width="16" height="16" viewBox="0 0 24 24" style="margin-right:4px;"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69c-.29 1.5-.14 3.01-1.3 4a7.74 7.74 0 0 1-5.39 2.1c-4.3 0-7.92-3.41-7.92-7.9s3.62-7.9 7.92-7.9c2.01 0 3.84.77 5.24 2.17l3.07-3.07C18.25 1.41 15.32 0 12 0 5.38 0 0 5.38 0 12s5.38 12 12 12c6.88 0 12-4.84 12-12.23 0-.5-.04-1.01-.1-1.5z"/></svg>
+            <!-- 1. 官方原廠：Google 彩虹四色一鍵登入按鈕 -->
+            <button class="modal-btn google" id="googleLoginAction" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:12px; flex-shrink: 0;">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69c-.29 1.5-.14 3.01-1.3 4a7.74 7.74 0 0 1-5.39 2.1c-4.3 0-7.92-3.41-7.92-7.9s3.62-7.9 7.92-7.9c2.01 0 3.84.77 5.24 2.17l3.07-3.07C18.25 1.41 15.32 0 12 0 5.38 0 0 5.38 0 12s5.38 12 12 12c6.88 0 12-4.84 12-12.23 0-.5-.04-1.01-.1-1.5z"/>
+                </svg>
                 Google 一鍵登入
             </button>
 
-            <!-- 2. 電子郵件輸入表單（預設隱藏，點擊後展開） -->
-            <div id="emailFormSection" style="display: none; margin-top: 15px; text-align: left; width: 100%;">
-                <div style="margin-bottom: 12px;">
-                    <label style="display:block; margin-bottom:6px; font-size:14px; color:#4b5563; font-weight:500;">電子郵件</label>
-                    <input type="email" id="loginEmail" placeholder="請輸入 Email" style="width:100%; padding:12px; border:1px solid #d1d5db; border-radius:10px; box-sizing:border-box; font-size:15px; background-color:#f9fafb;">
-                </div>
-                <div style="margin-bottom: 18px;">
-                    <label style="display:block; margin-bottom:6px; font-size:14px; color:#4b5563; font-weight:500;">密碼</label>
-                    <input type="password" id="loginPassword" placeholder="請輸入密碼" style="width:100%; padding:12px; border:1px solid #d1d5db; border-radius:10px; box-sizing:border-box; font-size:15px; background-color:#f9fafb;">
-                </div>
-                <!-- 質感升級：綠色確認按鈕 -->
-                <button class="modal-btn" id="emailLoginAction" style="background-color: #10B981; color: white; border: none; width:100%; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);">電子郵件登入 / 註冊</button>
-            </div>
-
-            <!-- 3. 質感升級：切換顯示電子郵件的按鈕（完美複製原廠按鈕感，改為優雅灰色調） -->
-            <button class="modal-btn phone" id="toggleEmailFormBtn" style="background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; margin-top: 12px;">
+            <!-- 2. 高級設計：與 Google 規格完全對稱的「信封 Email 登入」按鈕（徹底告別醜灰底） -->
+            <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; margin-top: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                <!-- 精緻炭黑色信封圖標 -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:12px; flex-shrink: 0;">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
                 使用電子郵件登入
             </button>
 
-            <span class="modal-close" id="closeLightboxBtn">暫時返回</span>
+            <!-- 3. 精修展開表單：點擊上面信封後才會優雅現身 -->
+            <div id="emailFormSection" style="display: none; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto;">
+                <div style="margin-bottom: 12px;">
+                    <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">電子郵件</label>
+                    <input type="email" id="loginEmail" placeholder="請輸入 Email" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">密碼</label>
+                    <input type="password" id="loginPassword" placeholder="請輸入密碼" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb;">
+                </div>
+                <!-- 綠色確認登入按鈕 -->
+                <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15); transition: background 0.2s;">電子郵件登入 / 註冊</button>
+            </div>
+
+            <span class="modal-close" id="closeLightboxBtn" style="margin-top: 20px; display: inline-block;">暫時返回</span>
+
             </div>
         </div>
     </div>

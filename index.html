@@ -698,17 +698,54 @@
             resetAndCloseLightbox();
         });
 
-        // 🛠️ 新增：讓綠色按鈕「電子郵件登入 / 註冊」點擊時彈出成功訊息並關閉視窗
+                // 🛠️ 升級：打通「真‧電子郵件登入 / 註冊」Firebase 最高指揮防線
         bindFastClick(emailLoginAction, () => {
-            const emailValue = loginEmailInput ? loginEmailInput.value : '';
-            if (!emailValue) {
-                alert("請填寫電子郵件喔！");
+            const emailValue = loginEmailInput ? loginEmailInput.value.trim() : '';
+            const passwordValue = loginPasswordInput ? loginPasswordInput.value : '';
+
+            if (!emailValue || !passwordValue) {
+                alert("請將電子郵件和密碼都填寫完整喔！");
                 return;
             }
-            alert("正在使用電子郵件登入中...");
-            // 這邊成功後會自動關閉視窗
-            resetAndCloseLightbox();
+
+            if (passwordValue.length < 6) {
+                alert("為了安全，密碼必須至少要 6 個字喔！");
+                return;
+            }
+
+            // 先嘗試用這個帳密登入
+            import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+            
+            signInWithEmailAndPassword(auth, emailValue, passwordValue)
+                .then((result) => {
+                    console.log("電子郵件登入成功！", result.user);
+                    resetAndCloseLightbox();
+                })
+                .catch((error) => {
+                    // 如果錯誤原因是「找不到用戶」，代表這是一個新信箱，我們直接幫他自動註冊！
+                    if (error.code === 'auth/user-not-found') {
+                        createUserWithEmailAndPassword(auth, emailValue, passwordValue)
+                            .then((result) => {
+                                alert("偵測到新用戶，已成功為您註冊並登入！");
+                                console.log("電子郵件註冊成功！", result.user);
+                                resetAndCloseLightbox();
+                            })
+                            .catch((regError) => {
+                                console.error("註冊失敗：", regError.message);
+                                alert("註冊失敗：" + regError.message);
+                            });
+                    } else if (error.code === 'auth/wrong-password') {
+                        alert("密碼輸入錯誤喔，請再確認一次！");
+                    } else if (error.code === 'auth/invalid-email') {
+                        alert("電子郵件格式看起來不正確喔！");
+                    } else {
+                        // 其他未知錯誤（例如連線問題）
+                        console.error("登入失敗：", error.message);
+                        alert("登入失敗：" + error.message);
+                    }
+                });
         });
+
 
 
                 // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心

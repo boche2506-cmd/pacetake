@@ -8,11 +8,11 @@
     <!-- 1. Google 一鍵登入標準防線 -->
     <script src="https://google.com" async defer></script>
     
-    <!-- 2. 全球原生圖標庫：點亮 Google 與選單圖標 -->
+    <!-- 2. 全球原生圖標庫：點亮 Google、便當屋與各類高奢 icon -->
     <link rel="stylesheet" href="https://cloudflare.com">
 
-    <!-- 3. 超級護城河防線：採用絕對不破圖、不干擾排版的文字型 Favicon -->
-    <link rel="icon" href="data:image/x-icon;,">
+    <!-- 3. 超級護城河防線：採用絕對不破圖、不干擾 HTML 排版的安全 Favicon -->
+    <link rel="icon" href="data:,">
 
     <!-- 4. 預載加速防線，強行打通 0 秒閃轉 -->
     <link rel="prefetch" href="register.html">
@@ -36,20 +36,23 @@
         header { padding: 40px 24px 16px 24px; display: flex; justify-content: space-between; align-items: flex-start; }
         .header-left h1 { font-size: 32px; font-weight: 900; margin: 0; letter-spacing: -0.5px; }
         .header-left p { font-size: 13px; color: var(--text-gray); margin: 4px 0 0 0; font-weight: 500; }
+        
         .auth-container { margin-top: 6px; position: relative; }
         .login-btn { background-color: var(--bg-light); color: var(--text-dark); border: none; padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
         .login-btn:active { transform: scale(0.95); }
+        
         .user-profile { display: none; align-items: center; gap: 8px; cursor: pointer; }
         .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--brand-blue); }
         
-        /* 隱藏的老闆測試選單選框 */
-        .boss-menu { display: none; position: absolute; top: 42px; right: 0; background: white; border: 1px solid #E5E5EA; border-radius: 14px; width: 180px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); z-index: 110; overflow: hidden; }
+        /* 🔒 老闆測試專屬隱藏選單（點擊頭像跳出） */
+        .boss-menu { display: none; position: absolute; top: 42px; right: 0; background: white; border: 1px solid #E5E5EA; border-radius: 14px; width: 190px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); z-index: 110; overflow: hidden; }
         .boss-menu.active { display: block; }
-        .boss-item { padding: 12px 14px; font-size: 12px; font-weight: bold; color: #444; border-bottom: 1px solid #F2F2F7; display: flex; align-items: center; gap: 8px; }
+        .boss-item { padding: 12px 14px; font-size: 13px; font-weight: bold; color: #111111; border-bottom: 1px solid #F2F2F7; display: flex; align-items: center; gap: 10px; text-decoration: none; transition: background 0.15s; }
         .boss-item:hover { background: #F2F2F7; }
 
         .search-container { padding: 0 24px 16px 24px; }
         .search-bar { width: 100%; padding: 12px 16px; background-color: var(--bg-light); border: none; border-radius: 12px; font-size: 15px; box-sizing: border-box; outline: none; }
+        
         .category-slider { display: flex; overflow-x: auto; padding: 0 24px 20px 24px; gap: 8px; }
         .category-slider::-webkit-scrollbar { display: none; }
         .cat-btn { padding: 8px 16px; border-radius: 20px; border: none; background-color: var(--bg-light); color: #555555; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
@@ -60,26 +63,26 @@
         .section-title { font-size: 12px; font-weight: 700; color: var(--text-gray); margin-bottom: 12px; }
         .store-card { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid #F2F2F7; cursor: pointer; transition: all 0.2s; }
         .store-card:active { opacity: 0.7; transform: scale(0.99); }
-        .store-img-placeholder { width: 76px; height: 76px; border-radius: 14px; background-color: var(--bg-light); flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.03); }
+        .store-img-placeholder { width: 76px; height: 76px; border-radius: 14px; background-color: var(--bg-light); flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.02); }
         .store-img-placeholder i { color: var(--text-gray); font-size: 24px; }
         .store-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
         .store-name { font-size: 16px; font-weight: 700; margin: 0 0 4px 0; }
         .store-meta { font-size: 13px; color: var(--text-gray); margin: 0 0 6px 0; }
         
         .store-tags-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-        .store-time-tag { font-size: 11px; font-weight: 700; color: #48484A; background-color: var(--bg-light); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.02); }
+        .store-time-tag { font-size: 11px; font-weight: 700; color: #48484A; background-color: var(--bg-light); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.01); }
         
-        .pay-tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.02); }
+        .pay-tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.01); }
         .pay-tag.digital { background-color: var(--tag-pay-bg); color: var(--tag-pay-text); }
         .pay-tag.cash-only { background-color: var(--tag-cash-bg); color: var(--tag-cash-text); }
         
-        /* 底部懸浮狀態欄 */
+        /* 底部懸浮狀態欄 (保持純淨買家視覺) */
         .floating-footer { position: fixed; bottom: 0; left: 0; right: 0; max-width: 450px; margin: 0 auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0, 0, 0, 0.05); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 100; }
         .status-text { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
         .status-dot { width: 8px; height: 8px; background-color: #34C759; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #34C759; }
         .footer-right { display: flex; gap: 8px; align-items: center; }
         .cart-btn { background-color: var(--brand-blue); color: white; border: none; padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
-              .portal-btn { background-color: var(--bg-light); color: #555555; border: none; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; text-decoration: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .portal-btn { background-color: var(--bg-light); color: #555555; border: none; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; text-decoration: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
         .portal-btn:active { transform: scale(0.95); }
     </style>
 </head>
@@ -94,12 +97,21 @@
             </button>
             <div class="user-profile" id="userProfile" onclick="toggleBossMenu(event)">
                 <img class="user-avatar" id="userAvatar" src="" alt="頭像">
-                <!-- 🔓 隱藏核心選單：解鎖已開店老闆測試紐 -->
+                
+                <!-- 🔓 隱藏核心狀態選單：接單管理全部移入此處 -->
                 <div class="boss-menu" id="bossMenu">
-                    <div class="boss-item" onclick="unlockSellerBackend(event)" style="background: #FFF9E6; color: #B78103;">
+                    <div class="boss-item" onclick="unlockSellerBackend(event)" style="background: #FFF9E6; color: #B78103; cursor: pointer;">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> 🔓 解鎖已開店老闆
                     </div>
-                    <div class="boss-item" onclick="handleLogout()" style="color: #FF3B30;">
+                    <!-- 🧑‍🍳 商家接單入口：預設隱藏，解鎖後在選單內現形 -->
+                    <a href="seller.html" class="boss-item" id="menuSeller" style="display: none;">
+                        <i class="fa-solid fa-fire-burner" style="color: #34C759;"></i> 🧑‍🍳 進入接單後台
+                    </a>
+                    <!-- ⚙️ 菜單管理入口：預設隱藏，解鎖後在選單內現形 -->
+                    <a href="manage.html" class="boss-item" id="menuManage" style="display: none;">
+                        <i class="fa-solid fa-sliders" style="color: #007AFF;"></i> ⚙️ 進入管理後台
+                    </a>
+                    <div class="boss-item" onclick="handleLogout()" style="color: #FF3B30; cursor: pointer; border-top: 1px solid #F2F2F7;">
                         <i class="fa-solid fa-right-from-bracket"></i> 🚪 登出帳號
                     </div>
                 </div>
@@ -147,14 +159,13 @@
         </div>
     </main>
     
+    <!-- 底部懸浮導覽列 (純淨無干擾狀態) -->
     <div class="floating-footer">
         <div class="status-text" id="statusText">
             <span class="status-dot"></span> 您的訂單 #023 製作中...
         </div>
         <div class="footer-right">
             <a href="register.html" class="portal-btn" id="btnRegister">💼 開店</a>
-            <a href="seller.html" class="portal-btn" id="btnSeller" style="display:none;">🧑‍🍳 接單</a>
-            <a href="manage.html" class="portal-btn" id="btnManage" style="display:none;">⚙️ 管理</a>
             <button class="cart-btn">🛒 購物車 (0)</button>
         </div>
     </div>
@@ -167,6 +178,7 @@
     }
     
     function triggerGoogleLogin() { 
+        // 模擬成功一鍵登入，塞入預設極簡買家頭像
         handleMockLogin("https://unsplash.com");
     }
 
@@ -205,13 +217,15 @@
             document.getElementById('userAvatar').src = avatar || "data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24'%3E%3Cpath fill='%238E8E93' d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
         }
 
+        // 核心邏輯切換：如果偵測到是老闆身份，將入口隱藏在帳號選單內，並移除右下角買家開店鈕
         if(role === 'seller') {
             document.getElementById('btnRegister').style.display = 'none';
-            document.getElementById('btnSeller').style.display = 'inline-flex';
-            document.getElementById('btnManage').style.display = 'inline-flex';
+            document.getElementById('menuSeller').style.display = 'flex';
+            document.getElementById('menuManage').style.display = 'flex';
         }
     }
 
+    // 點擊外面任一處自動收合隱藏選單
     document.addEventListener('click', () => {
         const menu = document.getElementById('bossMenu');
         if(menu) menu.classList.remove('active');
@@ -221,6 +235,7 @@
         applyRoleUI();
     });
 
+    // 預留標準 Google 憑證回傳介面
     function handleCredentialResponse(response) {
         const base64Url = response.credential.split('.');
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');

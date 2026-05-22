@@ -600,13 +600,8 @@
     </div>
 
         <!-- 引入 Firebase 9+ 大廠級官方模組模組 (不依賴本地檔案，安全穩定) -->
-    <script type="module">
-        // 🌟 1. 核心載入：把所有 Firebase 必備功能和新功能都放在最頂端，絕對不塞車！
-        import { initializeApp } from "https://gstatic.com";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://gstatic.com";
-
-        // （這裡會自動繼承你原本頂部已經初始化好的 Firebase config 相關代碼，請放心）
-
+        <script type="module">
+        // 🌟 拔除重複載入的 import，徹底解決引擎當機問題！
         const provider = new GoogleAuthProvider();
 
         // 🚀 2. 0秒無縫閃轉外掛與觸控手勢防線核心架構
@@ -702,16 +697,16 @@
                 return;
             }
 
-            // 先嘗試用這個帳密登入
-            signInWithEmailAndPassword(auth, emailValue, passwordValue)
+            // 直接呼叫網頁原本就已經載入好的 Firebase 官方帳密登入方法
+            firebase.auth().signInWithEmailAndPassword(emailValue, passwordValue)
                 .then((result) => {
                     console.log("電子郵件登入成功！", result.user);
                     resetAndCloseLightbox();
                 })
                 .catch((error) => {
-                    // 如果錯誤原因是「找不到用戶」，代表這是一個新信箱，我們直接幫他自動註冊！
+                    // 如果錯誤原因是找不到用戶，代表這是一個新信箱，我們直接幫他自動註冊！
                     if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-                        createUserWithEmailAndPassword(auth, emailValue, passwordValue)
+                        firebase.auth().createUserWithEmailAndPassword(emailValue, passwordValue)
                             .then((result) => {
                                 alert("偵測到新用戶，已成功為您註冊並登入！");
                                 console.log("電子郵件註冊成功！", result.user);
@@ -829,5 +824,6 @@
         });
 
     </script>
+
 </body>
 </html>

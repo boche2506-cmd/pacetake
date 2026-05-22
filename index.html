@@ -6,9 +6,19 @@
     <title>PACE 派思 - 店內價預約外帶自取/內用點單系統</title>
     <script src="https://google.com" async defer></script>
     <style>
-        :root { --brand-blue: #007AFF; --bg-white: #ffffff; --text-dark: #111111; --text-gray: #8E8E93; --bg-light: #F2F2F7; }
+        :root { 
+            --brand-blue: #007AFF; 
+            --bg-white: #ffffff; 
+            --text-dark: #111111; 
+            --text-gray: #8E8E93; 
+            --bg-light: #F2F2F7; 
+            --tag-pay-bg: #E5F1FF;
+            --tag-pay-text: #007AFF;
+            --tag-cash-bg: #F2F2F7;
+            --tag-cash-text: #555555;
+        }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-white); color: var(--text-dark); margin: 0; padding: 0; }
-        .app-container { max-width: 450px; margin: 0 auto; padding-bottom: 90px; }
+        .app-container { max-width: 450px; margin: 0 auto; padding-bottom: 110px; }
         header { padding: 40px 24px 16px 24px; display: flex; justify-content: space-between; align-items: flex-start; }
         .header-left h1 { font-size: 32px; font-weight: 900; margin: 0; letter-spacing: -0.5px; }
         .header-left p { font-size: 13px; color: var(--text-gray); margin: 4px 0 0 0; font-weight: 500; }
@@ -22,17 +32,33 @@
         .category-slider::-webkit-scrollbar { display: none; }
         .cat-btn { padding: 8px 16px; border-radius: 20px; border: none; background-color: var(--bg-light); color: #555555; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
         .cat-btn.active { background-color: var(--brand-blue); color: white; transform: scale(0.96); }
+        
+        /* 店家清單排版 */
         .store-section { padding: 0 24px; }
         .section-title { font-size: 12px; font-weight: 700; color: var(--text-gray); margin-bottom: 12px; }
-        .store-card { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid #F2F2F7; cursor: pointer; }
-        .store-img { width: 72px; height: 72px; border-radius: 14px; background-color: var(--bg-light); flex-shrink: 0; object-fit: cover; }
+        .store-card { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid #F2F2F7; cursor: pointer; transition: all 0.2s; }
+        .store-card:active { opacity: 0.7; transform: scale(0.99); }
+        .store-img { width: 76px; height: 76px; border-radius: 14px; background-color: var(--bg-light); flex-shrink: 0; object-fit: cover; }
         .store-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
         .store-name { font-size: 16px; font-weight: 700; margin: 0 0 4px 0; }
         .store-meta { font-size: 13px; color: var(--text-gray); margin: 0 0 6px 0; }
-        .store-time-tag { align-self: flex-start; font-size: 11px; font-weight: 700; color: #48484A; background-color: var(--bg-light); padding: 3px 8px; border-radius: 6px; }
-        .floating-footer { position: fixed; bottom: 0; left: 0; right: 0; max-width: 450px; margin: 0 auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0, 0, 0, 0.05); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 100; }
+        
+        /* ⚡ 完美的第三格：出餐時間 ＆ 金流標籤排版 */
+        .store-tags-row { display: flex; gap: 6px; align-items: center; }
+        .store-time-tag { font-size: 11px; font-weight: 700; color: #48484A; background-color: var(--bg-light); padding: 3px 8px; border-radius: 6px; }
+        
+        /* 💳/💵 高質感電子支付/付現標籤樣式 */
+        .pay-tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+        .pay-tag.digital { background-color: var(--tag-pay-bg); color: var(--tag-pay-text); }
+        .pay-tag.cash-only { background-color: var(--tag-cash-bg); color: var(--tag-cash-text); }
+        
+        /* 底部懸浮狀態欄 */
+        .floating-footer { position: fixed; bottom: 0; left: 0; right: 0; max-width: 450px; margin: 0 auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0, 0, 0, 0.05); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 100; }
         .status-text { font-size: 13px; font-weight: 500; }
-        .cart-btn { background-color: var(--brand-blue); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .footer-right { display: flex; gap: 8px; align-items: center; }
+        .cart-btn { background-color: var(--brand-blue); color: white; border: none; padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .portal-btn { background-color: var(--bg-light); color: #555555; border: none; padding: 10px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+        .portal-btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -45,7 +71,9 @@
             <div class="user-profile" id="userProfile" onclick="handleLogout()"><img class="user-avatar" id="userAvatar" src="" alt="頭像"></div>
         </div>
     </header>
+    
     <div class="search-container"><input type="text" class="search-bar" placeholder="搜尋美食、甜點、店家名稱..."></div>
+    
     <div class="category-slider">
         <button class="cat-btn active" onclick="switchCategory(this)">全部</button>
         <button class="cat-btn" onclick="switchCategory(this)">甜點</button>
@@ -53,24 +81,53 @@
         <button class="cat-btn" onclick="switchCategory(this)">珍奶</button>
         <button class="cat-btn" onclick="switchCategory(this)">中式美食</button>
     </div>
+    
     <main class="store-section">
         <div class="section-title">附近營業中 (GPS 依距離排序)</div>
-        <div class="store-card">
+        
+        <!-- 店家 1：啟用藍新線上金流的精品店 -->
+        <div class="store-card" onclick="alert('進入司機推爆肉糟飯點餐畫面')">
             <img class="store-img" src="https://unsplash.com">
-            <div class="store-info"><div class="store-name">司機推爆肉糟飯</div><div class="store-meta">中式美食 · 距離 50m</div><div class="store-time-tag">約 5 分鐘出餐</div></div>
+            <div class="store-info">
+                <div class="store-name">司機推爆肉糟飯</div>
+                <div class="store-meta">中式美食 · 距離 50m</div>
+                <div class="store-tags-row">
+                    <span class="store-time-tag">約 5 分鐘出餐</span>
+                    <!-- 💡 成功嵌上：高質感線上支付標籤 -->
+                    <span class="pay-tag digital">💳 支援線上刷卡/LINE Pay</span>
+                </div>
+            </div>
         </div>
-        <div class="store-card">
+        
+        <!-- 店家 2：傳統無建立藍新、只開現場付現的店 -->
+        <div class="store-card" onclick="alert('進入黑糖波霸鮮奶茶點餐畫面')">
             <img class="store-img" src="https://unsplash.com">
-            <div class="store-info"><div class="store-name">黑糖波霸鮮奶茶</div><div class="store-meta">珍奶 · 距離 120m</div><div class="store-time-tag">約 3 分鐘出餐</div></div>
+            <div class="store-info">
+                <div class="store-name">黑糖波霸鮮奶茶</div>
+                <div class="store-meta">珍奶 · 距離 120m</div>
+                <div class="store-tags-row">
+                    <span class="store-time-tag">約 3 分鐘出餐</span>
+                    <!-- 💡 成功嵌上：高質感僅限現金標籤 -->
+                    <span class="pay-tag cash-only">💵 僅限現場付現</span>
+                </div>
+            </div>
         </div>
     </main>
-    <div class="floating-footer"><div class="status-text" id="statusText">您的訂單 #023 製作中...</div><button class="cart-btn">🛒 購物車 (0)</button></div>
+    
+    <div class="floating-footer">
+        <div class="status-text" id="statusText">您的訂單 #023 製作中...</div>
+        <div class="footer-right">
+            <a href="/register.html" class="portal-btn">💼 開店</a>
+            <a href="/seller.html" class="portal-btn">🧑‍🍳 後台</a>
+            <button class="cart-btn">🛒 購物車 (0)</button>
+        </div>
+    </div>
 </div>
 <script>
     function switchCategory(element) { document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active')); element.classList.add('active'); }
     function triggerGoogleLogin() { google.accounts.id.prompt(); }
     function handleCredentialResponse(response) {
-        const base64Url = response.credential.split('.')[1];
+        const base64Url = response.credential.split('.');
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         const userData = JSON.parse(decodeURIComponent(escape(window.atob(base64))));
         document.getElementById('loginBtn').style.display = 'none';

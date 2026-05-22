@@ -5,19 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PACE 派思 - 店內價預約外帶自取/內用點單系統</title>
     
-    <!-- 1. Google 官方一鍵登入核心 JavaScript 庫 -->
-    <script src="https://google.com" async defer></script>
-    
-    <!-- 2. 全球原生圖標庫：點亮各類 UI 圖標 -->
+    <!-- 全球原生圖標標準防線 -->
     <link rel="stylesheet" href="https://cloudflare.com">
 
-    <!-- 3. 超級安全 Favicon 防線 -->
+    <!-- 徹底斷絕 SVG 破圖可能性 的安全設定 -->
     <link rel="icon" href="data:,">
-
-    <!-- 4. 預載加速防線，強行打通 0 秒閃轉 -->
-    <link rel="prefetch" href="register.html">
-    <link rel="prefetch" href="seller.html">
-    <link rel="prefetch" href="manage.html">
 
     <style>
         :root { 
@@ -33,83 +25,83 @@
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-white); color: var(--text-dark); margin: 0; padding: 0; }
         .app-container { max-width: 450px; margin: 0 auto; padding-bottom: 110px; }
+        
+        /* 導覽列排版 */
         header { padding: 40px 24px 16px 24px; display: flex; justify-content: space-between; align-items: flex-start; }
         .header-left h1 { font-size: 32px; font-weight: 900; margin: 0; letter-spacing: -0.5px; }
         .header-left p { font-size: 13px; color: var(--text-gray); margin: 4px 0 0 0; font-weight: 500; }
         
+        /* 右上角權限區塊 */
         .auth-container { margin-top: 6px; position: relative; }
+        .login-btn { background-color: var(--bg-light); color: var(--text-dark); border: none; padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+        .login-btn:active { transform: scale(0.95); }
         
-        /* 官方 Google 登入按鈕專用容器樣式 */
-        #googleBtnContainer { display: inline-block; }
-        
+        /* 用戶頭像選單 */
         .user-profile { display: none; align-items: center; gap: 8px; cursor: pointer; }
-        .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--brand-blue); }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--brand-blue); background-color: var(--bg-light); }
         
-        /* 🔒 老闆測試專屬隱藏選單（點擊頭像跳出） */
+        /* 🔒 隱藏在帳號狀態內的老闆密道選單 */
         .boss-menu { display: none; position: absolute; top: 42px; right: 0; background: white; border: 1px solid #E5E5EA; border-radius: 14px; width: 190px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); z-index: 110; overflow: hidden; }
         .boss-menu.active { display: block; }
         .boss-item { padding: 12px 14px; font-size: 13px; font-weight: bold; color: #111111; border-bottom: 1px solid #F2F2F7; display: flex; align-items: center; gap: 10px; text-decoration: none; transition: background 0.15s; }
         .boss-item:hover { background: #F2F2F7; }
 
+        /* 搜尋欄 */
         .search-container { padding: 0 24px 20px 24px; }
         .search-bar { width: 100%; padding: 12px 16px; background-color: var(--bg-light); border: none; border-radius: 12px; font-size: 15px; box-sizing: border-box; outline: none; }
         
-        /* 店家與細邊界排版 */
+        /* 店家清單 */
         .store-section { padding: 0 24px; }
         .section-title { font-size: 12px; font-weight: 700; color: var(--text-gray); margin-bottom: 12px; }
         .store-card { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid #F2F2F7; cursor: pointer; transition: all 0.2s; }
         .store-card:active { opacity: 0.7; transform: scale(0.99); }
-        .store-img-placeholder { width: 76px; height: 76px; border-radius: 14px; background-color: var(--bg-light); flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.02); }
+        .store-img-placeholder { width: 76px; height: 76px; border-radius: 14px; background-color: var(--bg-light); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         .store-img-placeholder i { color: var(--text-gray); font-size: 24px; }
         .store-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
         .store-name { font-size: 16px; font-weight: 700; margin: 0 0 4px 0; }
         .store-meta { font-size: 13px; color: var(--text-gray); margin: 0 0 6px 0; }
         
         .store-tags-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-        .store-time-tag { font-size: 11px; font-weight: 700; color: #48484A; background-color: var(--bg-light); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.01); }
+        .store-time-tag { font-size: 11px; font-weight: 700; color: #48484A; background-color: var(--bg-light); padding: 3px 8px; border-radius: 6px; }
         
-        .pay-tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.01); }
+        .pay-tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
         .pay-tag.digital { background-color: var(--tag-pay-bg); color: var(--tag-pay-text); }
         .pay-tag.cash-only { background-color: var(--tag-cash-bg); color: var(--tag-cash-text); }
         
-        /* 底部懸浮狀態欄 */
+        /* 底部懸浮導覽列 */
         .floating-footer { position: fixed; bottom: 0; left: 0; right: 0; max-width: 450px; margin: 0 auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0, 0, 0, 0.05); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; z-index: 100; }
         .status-text { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
         .status-dot { width: 8px; height: 8px; background-color: #34C759; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #34C759; }
         .footer-right { display: flex; gap: 8px; align-items: center; }
         .cart-btn { background-color: var(--brand-blue); color: white; border: none; padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
         .portal-btn { background-color: var(--bg-light); color: #555555; border: none; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; text-decoration: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
-        .portal-btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
-
-<!-- ⚡ Google 官方實體一鍵授權初始化防線（此處配置回傳處理函式） -->
-<div id="g_id_onload"
-     data-client_id="://googleusercontent.com"
-     data-callback="handleCredentialResponse"
-     data-auto_prompt="false">
-</div>
 
 <div class="app-container">
     <header>
         <div class="header-left"><h1>PACE 派思</h1><p>店內價預約外帶自取/內用點單系統</p></div>
         <div class="auth-container">
-            <!-- 🌐 官方實體 Google 登入/註冊按鈕渲染容器 -->
-            <div id="googleBtnContainer"></div>
+            <!-- 模擬登入按鈕 -->
+            <button class="login-btn" id="loginBtn" onclick="triggerMockLogin()">
+                <i class="fa-brands fa-google" style="color: #007AFF;"></i> Google 登入
+            </button>
             
+            <!-- 登入成功後的帳號頭像狀態圈 -->
             <div class="user-profile" id="userProfile" onclick="toggleBossMenu(event)">
-                <img class="user-avatar" id="userAvatar" src="" alt="頭像">
+                <img class="user-avatar" id="userAvatar" src="https://unsplash.com" alt="頭像">
                 
-                <!-- 🔒 老闆測試專屬隱藏選單 -->
+                <!-- 🔒 接單與管理入口，被死死鎖定隱藏在裡面的選單中 -->
                 <div class="boss-menu" id="bossMenu">
                     <div class="boss-item" onclick="unlockSellerBackend(event)" style="background: #FFF9E6; color: #B78103; cursor: pointer;">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> 🔓 解鎖已開店老闆
                     </div>
-                    <!-- 🧑‍🍳 商家接單與管理入口：未解鎖前絕對隱藏，不論登入與否都看不到 -->
+                    <!-- 🧑‍🍳 老闆接單專用秘密密道 -->
                     <a href="seller.html" class="boss-item" id="menuSeller" style="display: none;">
                         <i class="fa-solid fa-fire-burner" style="color: #34C759;"></i> 🧑‍🍳 進入接單後台
                     </a>
+                    <!-- ⚙️ 老闆管理專用秘密密道 -->
                     <a href="manage.html" class="boss-item" id="menuManage" style="display: none;">
                         <i class="fa-solid fa-sliders" style="color: #007AFF;"></i> ⚙️ 進入管理後台
                     </a>
@@ -123,7 +115,7 @@
     
     <div class="search-container"><input type="text" class="search-bar" placeholder="搜尋美食、甜點、店家名稱..."></div>
     
-    <!-- ✂️ 已經完美拔除橫向分類滑動欄，視覺極致純淨 -->
+    <!-- ✂️ 已經完美拔除橫向分類滑動欄 -->
     
     <main class="store-section">
         <div class="section-title">附近營業中 (GPS 依距離排序)</div>
@@ -161,13 +153,19 @@
             <span class="status-dot"></span> 您的訂單 #023 製作中...
         </div>
         <div class="footer-right">
-            <a href="register.html" class="portal-btn" id="btnRegister">💼 開店</a>
+            <!-- 買家用的開店按鈕 -->
+            <a href="register.html" class="portal-btn" id="btnRegister">💼 手機開店</a>
             <button class="cart-btn">🛒 購物車 (0)</button>
         </div>
     </div>
 </div>
 
 <script>
+    function triggerMockLogin() {
+        localStorage.setItem('pace_logged_in', 'true');
+        applyRoleUI();
+    }
+
     function toggleBossMenu(e) {
         e.stopPropagation();
         document.getElementById('bossMenu').classList.toggle('active');
@@ -181,12 +179,6 @@
         alert('⚡ 密碼解除！已成功解鎖「老闆接單」與「菜單管理」權限外掛。');
     }
 
-    function handleMockLogin(avatarUrl) {
-        localStorage.setItem('pace_logged_in', 'true');
-        localStorage.setItem('pace_avatar', avatarUrl);
-        applyRoleUI();
-    }
-
     function handleLogout() {
         localStorage.clear();
         location.reload();
@@ -195,29 +187,21 @@
     function applyRoleUI() {
         const isLoggedIn = localStorage.getItem('pace_logged_in') === 'true';
         const role = localStorage.getItem('pace_role') || 'buyer';
-        const avatar = localStorage.getItem('pace_avatar');
 
+        // 控管右上角：有登入就顯示頭像，沒登入就顯示 Google 按鈕
         if(isLoggedIn) {
-            document.getElementById('googleBtnContainer').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'none';
             document.getElementById('userProfile').style.display = 'flex';
-            document.getElementById('userAvatar').src = avatar || "data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24'%3E%3Cpath fill='%238E8E93' d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
         } else {
-            document.getElementById('googleBtnContainer').style.display = 'inline-block';
+            document.getElementById('loginBtn').style.display = 'flex';
             document.getElementById('userProfile').style.display = 'none';
-            // 沒登入時強制初始化官方實體 Google 按鈕
-            if (window.google && google.accounts && google.accounts.id) {
-                google.accounts.id.renderButton(
-                    document.getElementById("googleBtnContainer"),
-                    { theme: "outline", size: "medium", text: "signin_with", shape: "pill" }
-                );
-            }
         }
 
-        // 🛡️ 權限護城河：只有 role === 'seller' 時才放行現形，其他狀態死死鎖定隱藏
+        // 🛡️ 權限大對決：只有觸發 role === 'seller'，右下角開店鈕才會蒸發，並且讓後台功能在下拉選單裡現形
         if(role === 'seller') {
-            document.getElementById('btnRegister').style.display = 'none';
-            document.getElementById('menuSeller').style.display = 'flex';
-            document.getElementById('menuManage').style.display = 'flex';
+            document.getElementById('btnRegister').style.display = 'none'; // 買家開店按鈕蒸發
+            document.getElementById('menuSeller').style.display = 'flex';  // 選單內接單現形
+            document.getElementById('menuManage').style.display = 'flex';  // 選單內管理現形
         } else {
             document.getElementById('btnRegister').style.display = 'inline-flex';
             document.getElementById('menuSeller').style.display = 'none';
@@ -225,31 +209,16 @@
         }
     }
 
-    // 🌐 官方實體 Google 驗證令牌解析回傳防線
-    function handleCredentialResponse(response) {
-        // 解碼 Google JWT 權杖以獲取真實用戶大頭貼
-        const base64Url = response.credential.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const userData = JSON.parse(decodeURIComponent(escape(window.atob(base64))));
-        
-        // 將官方真實大頭貼與狀態存入本地快取
-        handleMockLogin(userData.picture);
-    }
-
-    // 點擊外面任一處自動收合選單
+    // 點擊外面自動收合選單
     document.addEventListener('click', () => {
         const menu = document.getElementById('bossMenu');
         if(menu) menu.classList.remove('active');
     });
 
+    // 頁面初始化狀態檢查
     document.addEventListener('DOMContentLoaded', () => {
         applyRoleUI();
     });
-
-    // 確保 Google API 異步載入完成後能自動渲染官方實體按鈕
-    window.onload = function () {
-        applyRoleUI();
-    }
 </script>
 </body>
 </html>

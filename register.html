@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PACE 派思 - 3分鐘手機開店</title>
+    <style>
+        :root { --brand-blue: #007AFF; --bg-white: #ffffff; --text-dark: #111111; --text-gray: #8E8E93; --bg-light: #F2F2F7; --status-green: #34c759; --status-red: #ff3b30; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-white); color: var(--text-dark); margin: 0; padding: 0; }
+        .register-container { max-width: 450px; margin: 0 auto; padding: 40px 24px 120px 24px; box-sizing: border-box; }
+        header { margin-bottom: 32px; }
+        header h1 { font-size: 32px; font-weight: 900; margin: 0; }
+        header p { font-size: 14px; color: var(--text-gray); margin: 6px 0 0 0; line-height: 1.4; }
+        .section-title { font-size: 13px; font-weight: 700; color: var(--brand-blue); text-transform: uppercase; margin: 32px 0 16px 0; border-bottom: 1px solid var(--bg-light); padding-bottom: 8px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; display: block; }
+        .form-input { width: 100%; padding: 14px 16px; background-color: var(--bg-light); border: none; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; background-color: #FAFAFC; padding: 14px 16px; border-radius: 12px; margin-bottom: 12px; }
+        .toggle-label { font-size: 15px; font-weight: 700; }
+        .toggle-switch { width: 50px; height: 28px; background-color: #E5E5EA; border-radius: 15px; position: relative; cursor: pointer; transition: all 0.2s; }
+        .toggle-switch::after { content: ""; width: 24px; height: 24px; background-color: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: all 0.2s; }
+        .toggle-switch.active { background-color: var(--status-green); }
+        .toggle-switch.active::after { left: 24px; }
+        .menu-item-box { display: flex; gap: 16px; align-items: center; background-color: #FAFAFC; padding: 16px; border-radius: 16px; margin-bottom: 12px; }
+        .upload-square { width: 80px; height: 80px; background-color: var(--bg-light); border-radius: 14px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 2px dashed #C7C7CC; flex-shrink: 0; }
+        .upload-square span { font-size: 10px; color: var(--text-gray); margin-top: 4px; }
+        .menu-inputs { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .price-input-wrapper { position: relative; display: flex; align-items: center; }
+        .price-symbol { position: absolute; left: 14px; font-size: 16px; font-weight: 700; color: var(--text-gray); }
+        .price-field { padding-left: 28px !important; }
+        .add-more-btn { width: 100%; padding: 12px; background: none; border: 2px dashed var(--brand-blue); color: var(--brand-blue); font-size: 14px; font-weight: 700; border-radius: 12px; cursor: pointer; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-box { background: white; width: 85%; max-width: 340px; padding: 24px; border-radius: 20px; text-align: center; }
+        .modal-title { font-size: 18px; font-weight: 900; color: var(--status-red); margin-bottom: 12px; }
+        .modal-desc { font-size: 14px; color: #444; line-height: 1.5; margin-bottom: 20px; }
+        .modal-btn-row { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .btn-confirm { background-color: var(--status-red); color: white; }
+        .btn-cancel { background-color: var(--bg-light); color: var(--text-dark); }
+        .bottom-action-panel { position: fixed; bottom: 0; left: 0; right: 0; max-width: 450px; margin: 0 auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(0, 0, 0, 0.05); padding: 16px 24px; box-sizing: border-box; z-index: 100; }
+        .submit-btn { width: 100%; padding: 16px; font-size: 18px; font-weight: 900; color: white; background-color: var(--brand-blue); border: none; border-radius: 14px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="modal-overlay" id="alertModal">
+    <div class="modal-box">
+        <div class="modal-title">⚠️ 確定開啟現場付現？</div>
+        <div class="modal-desc">您正開啟現場付現功能。唯若買家下單後現場棄單未取，<b>此筆損失需由店鋪自行吸收。</b>請問是否同意並開啟？</div>
+        <div class="modal-btn-row"><button class="modal-btn btn-cancel" onclick="cancelCashOpen()">取消</button><button class="modal-btn btn-confirm" onclick="confirmCashOpen()">同意開啟</button></div>
+    </div>
+</div>
+<div class="register-container">
+    <header><h1>3分鐘 手機開店</h1><p>加入 PACE 派思自主自取市集，牢牢鎖住每一分利潤。</p></header>
+    <main>
+        <div class="section-title">1. 店鋪基本資料</div>
+        <div class="form-group"><label class="form-label">店鋪名稱</label><input type="text" class="form-input" placeholder="例如：司機推爆肉糟飯" id="storeName"></div>
+        <div class="form-group"><label class="form-label">店鋪地址 (AI自動轉經緯度)</label><input type="text" class="form-input" placeholder="台北市中山區新生北路二段..."></div>
+        <div class="form-group"><label class="form-label">平均餐點準備時間 (分鐘)</label><input type="number" class="form-input" value="15"></div>
+        <div class="section-title">2. 收款金流設定</div>
+        <div class="toggle-row"><div class="toggle-label">現場付現 (預設關閉)</div><div class="toggle-switch" id="cashToggle" onclick="handleCashToggleClick()"></div></div>
+        <div class="form-group"><label class="form-label">請貼上您的「藍新金流個人專屬收款網址」</label><input type="text" class="form-input" placeholder="https://newebpay.com..."></div>
+        <div class="section-title">3. 快速上架首批餐點</div>
+        <div id="menuContainer">
+            <div class="menu-item-box">
+                <div class="upload-square">📸<span>上傳照片</span></div>
+                <div class="menu-inputs"><input type="text" class="form-input" placeholder="品項名稱（如：招牌肉糟飯）"><div class="price-input-wrapper"><span class="price-symbol">$</span><input type="number" class="form-input price-field" placeholder="店內價金額"></div></div>
+            </div>
+        </div>
+        <button class="add-more-btn" onclick="addNewItemField()">＋ 新增下一個品項</button>
+    </main>
+    <div class="bottom-action-panel"><button class="submit-btn" onclick="submitReg()">建立店鋪，立刻開張！</button></div>
+</div>
+<script>
+    function handleCashToggleClick() { const t = document.getElementById('cashToggle'); if (t.classList.contains('active')) t.classList.remove('active'); else document.getElementById('alertModal').style.display = 'flex'; }
+    function confirmCashOpen() { document.getElementById('cashToggle').classList.add('active'); document.getElementById('alertModal').style.display = 'none'; }
+    function cancelCashOpen() { document.getElementById('alertModal').style.display = 'none'; }
+    function addNewItemField() {
+        const c = document.getElementById('menuContainer'); const b = document.createElement('div'); b.className = 'menu-item-box';
+        b.innerHTML = `<div class="upload-square">📸<span>上傳照片</span></div><div class="menu-inputs"><input type="text" class="form-input" placeholder="品項名稱"><div class="price-input-wrapper"><span class="price-symbol">$</span><input type="number" class="form-input price-field" placeholder="店內價金額"></div></div>`;
+        c.appendChild(b);
+    }
+    function submitReg() { alert("🎉 店鋪註冊成功！資料已成功寫入，魔性後台已自動開通！"); window.location.href = '/seller.html'; }
+</script>
+</body>
+</html>

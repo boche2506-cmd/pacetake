@@ -695,7 +695,7 @@
             if (emailFormSection) emailFormSection.style.display = 'none';
         });
 
-        // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心
+                // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心
         bindFastClick(googleLoginAction, () => {
             signInWithPopup(auth, provider)
                 .then((result) => {
@@ -703,10 +703,11 @@
                     console.log("真實登入成功，用戶資料：", result.user);
                 })
                 .catch((error) => {
-                    console.error("Firebase 登入失敗防線拦截：", error.message);
-                    alert("Google 登入失敗，請確認 Firebase 後台的 Authorized Domains 有加入您的網址！");
+                    // 這裡把嚇人的 alert 拔掉了！使用者自己關掉視窗時，網頁會保持安靜不打擾。
+                    console.warn("Firebase 登入狀態提示：", error.message);
                 });
         });
+
 
         // 🚪 登出按鈕真實功能對接
         bindFastClick(logoutBtn, () => {

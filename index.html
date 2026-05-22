@@ -713,39 +713,49 @@
 
        
 
-       // 🚀 頂級大廠級：滑動與點擊分流無誤觸跳轉外掛
+      // 🚀 終極大廠級：滑動鎖定 0 誤觸跳轉外掛
 const navElements = document.querySelectorAll('.nav-fast');
 navElements.forEach(elem => {
+    let touchStartX = 0;
     let touchStartY = 0;
-    let isMoving = false;
+    let isSwipe = false;
 
     elem.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches.clientY;
-        isMoving = false;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isSwipe = false; // 每次按下一秒重設狀態
     }, { passive: true });
 
     elem.addEventListener('touchmove', (e) => {
-        let currentY = e.touches.clientY;
-        // 如果手指上下滑動超過 10 像素，判定買家只是在滑動螢幕，鎖死點擊
-        if (Math.abs(currentY - touchStartY) > 10) {
-            isMoving = true;
+        let moveX = e.touches[0].clientX;
+        let moveY = e.touches[0].clientY;
+        
+        // 🎯 精準防線：只要水平或垂直滑動位移超過 15 像素，立刻判定為「滑動頁面」
+        if (Math.abs(moveX - touchStartX) > 15 || Math.abs(moveY - touchStartY) > 15) {
+            isSwipe = true;
         }
     }, { passive: true });
 
     elem.addEventListener('touchend', (e) => {
-        // 只有在手指原地放開、沒有滑動網頁時，才允許 0 秒閃轉進店！
-        if (!isMoving) {
-            const dest = elem.getAttribute('href');
-            if (dest && dest !== '#') { window.location.href = dest; }
+        // 🎯 終極防線：如果剛才在滑動，手放開時強行攔截，絕對留在原網頁！
+        if (isSwipe) {
+            e.preventDefault();
+            return;
         }
+        
+        // 只有 100% 原地放開（純點擊），才允許 0 秒閃轉進店
+        const dest = elem.getAttribute('href');
+        if (dest && dest !== '#') { window.location.href = dest; }
     });
 
     // 留給電腦滑鼠點擊相容
     elem.addEventListener('click', (e) => {
+        if (isSwipe) return;
         const dest = elem.getAttribute('href');
         if (dest && dest !== '#') { window.location.href = dest; }
     });
 });
+
 </script>
 </body>
 </html>

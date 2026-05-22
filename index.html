@@ -538,15 +538,7 @@
             </div>
         </div>
 
-        <!-- 橫向滑動圓角分類鈕 -->
-        <div class="category-scroll">
-            <button class="cat-btn active">全部</button>
-            <button class="cat-btn">🍱 便當簡餐</button>
-            <button class="cat-btn">🧋 傳統手搖</button>
-            <button class="cat-btn">🍜 經典麵攤</button>
-            <button class="cat-btn">🥐 烘焙甜點</button>
-            <button class="cat-btn">🍗 炸物宵夜</button>
-        </div>
+      
 
         <!-- 店家列表 -->
         <main class="store-list">
@@ -718,14 +710,7 @@
             sellerMenuBlock.style.display = 'block';
         });
 
-        // 分類標籤切換效果
-        const catBtns = document.querySelectorAll('.cat-btn');
-        catBtns.forEach(btn => {
-            bindFastClick(btn, () => {
-                catBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
+      
 
         // 全局相對路徑跳轉無縫對接
         const navElements = document.querySelectorAll('.nav-fast');

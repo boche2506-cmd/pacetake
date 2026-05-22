@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>快拿自取街 pacetake.tw - 賣家管理後台</title>
-    <!-- 🌟 精品藍色便當純代碼 SVG Favicon（大廠級高度相容優化版） -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C/svg%3E">
+    <!-- 精品藍色便當純代碼 SVG Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E">
+
     <style>
         /* 全局變數與主題防線 */
         :root {
@@ -132,7 +133,7 @@
             cursor: pointer;
         }
 
-        /* 下拉選單 */
+        /* 下拉選單與當前頁面高亮 */
         .dropdown-menu {
             display: none;
             position: absolute;
@@ -157,6 +158,7 @@
             border-radius: 8px;
         }
 
+        /* 強制高亮反黑當前頁面 */
         .dropdown-menu a.current-page {
             background-color: var(--highlight-bg);
             font-weight: 800;
@@ -169,6 +171,7 @@
             margin: 4px 0;
         }
 
+        /* 帳務記帳本區塊 */
         .main-content {
             padding: 20px;
             display: flex;
@@ -229,20 +232,7 @@
             font-weight: 500;
         }
 
-        /* 營業時間自訂輸入框樣式 */
-        .input-style {
-            width: 100%;
-            height: 38px;
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 0 10px;
-            font-size: 13px;
-            color: var(--text-main);
-            outline: none;
-        }
-
-        /* 菜單增刪管理排版 */
+        /* 菜單與售罄管理排版 */
         .menu-management-list {
             display: flex;
             flex-direction: column;
@@ -294,6 +284,7 @@
             color: var(--brand-blue);
         }
 
+        /* 動作控制右側 */
         .manage-actions {
             display: flex;
             flex-direction: column;
@@ -314,7 +305,7 @@
 
         .slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--brand-green);
+            background-color: var(--brand-green); /* 預設開關未啟動代表營業中（綠燈） */
             transition: .2s; border-radius: 22px;
         }
 
@@ -323,6 +314,7 @@
             background-color: white; transition: .2s; border-radius: 50%;
         }
 
+        /* 當開關被勾選時，代表啟用「售罄防線」（變紅燈） */
         input:checked + .slider { background-color: var(--brand-red); }
         input:checked + .slider::before { transform: translateX(22px); }
 
@@ -333,3 +325,298 @@
             font-size: 11px;
             font-weight: 600;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .delete-btn:hover { color: var(--brand-red); }
+
+        /* 新增品項大按鈕 */
+        .add-item-btn {
+            background-color: var(--bg-global);
+            border: 1px dashed var(--border-color);
+            color: var(--brand-blue);
+            height: 48px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        /* 地推專用 QR Code 貼紙區 */
+        .qrcode-sticker-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+
+        .qrcode-url-display {
+            background-color: var(--bg-global);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--brand-blue);
+            font-weight: 700;
+            margin: 8px 0 14px 0;
+            word-break: break-all;
+        }
+
+        .download-sticker-btn {
+            background-color: var(--brand-blue);
+            color: white;
+            border: none;
+            width: 100%;
+            height: 44px;
+            border-radius: 22px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-wrapper">
+        <!-- 頂部導覽列 -->
+        <header class="header">
+            <div class="nav-left-group">
+                <a href="seller.html" class="back-btn nav-fast">🧑‍🍳 接單後台</a>
+                <a href="index.html" class="back-btn nav-fast">🏠 首頁</a>
+            </div>
+            
+            <div class="control-panel">
+                <button class="theme-toggle" id="themeToggleBtn">🌓</button>
+                <button class="avatar-btn" id="avatarMenuBtn">🧑‍💼 帳號</button>
+                
+                <!-- 用戶下拉選單 (內建當前頁面高亮) -->
+                <div class="dropdown-menu" id="userDropdown">
+                    <a href="index.html" class="nav-fast">🛒 我的訂單</a>
+                    <a href="register.html" class="nav-fast">💼 月費開店</a>
+                    <div class="menu-divider"></div>
+                    <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
+                    <a href="manage.html" class="nav-fast current-page">⚙️ 後台管理</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- 帳務記帳本 -->
+            <section>
+                <div class="section-title">今日帳務記帳本</div>
+                <div class="ledger-card">
+                    <div class="ledger-row-main">
+                        <div class="ledger-stat">
+                            <h3>今日總接單量</h3>
+                            <div>42 單</div>
+                        </div>
+                        <div class="ledger-stat" style="text-align: right;">
+                            <h3>今日總營業額</h3>
+                            <div class="revenue-num">$5,340</div>
+                        </div>
+                    </div>
+                    <div class="ledger-divider"></div>
+                    <div class="ledger-row-sub">
+                        <span>💵 現場付現實收：$1,240</span>
+                        <span>💳 藍線上支付：$4,100</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 菜單與售罄管理 -->
+            <section>
+                <div class="section-title">菜單商品與售罄增刪管理</div>
+                <div class="menu-management-list" id="menuManagementList">
+                    
+                    <!-- 商品 1 -->
+                    <div class="manage-food-card">
+                        <div class="food-img">🍱</div>
+                        <div class="food-info-fields">
+                            <div class="food-name-txt">招牌木盒便當</div>
+                            <div class="food-price-txt">$120</div>
+                        </div>
+                        <div class="manage-actions">
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="soldout-toggle">
+                                <span class="slider"></span>
+                            </label>
+                            <button class="delete-btn">🗑️ 刪除</button>
+                        </div>
+                    </div>
+
+                    <!-- 商品 2 -->
+                    <div class="manage-food-card">
+                        <div class="food-img">🍗</div>
+                        <div class="food-info-fields">
+                            <div class="food-name-txt">酥炸大雞腿便當</div>
+                            <div class="food-price-txt">$135</div>
+                        </div>
+                        <div class="manage-actions">
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="soldout-toggle">
+                                <span class="slider"></span>
+                            </label>
+                            <button class="delete-btn">🗑️ 刪除</button>
+                        </div>
+                    </div>
+
+                </div>
+                <button class="add-item-btn" id="addItemCardBtn">＋ 新增品項</button>
+            </section>
+
+            <!-- 地推專用 QR Code 貼紙區 (效能解放優化) -->
+            <section>
+                <div class="section-title">地推專用數位門牌貼紙</div>
+                <div class="qrcode-sticker-card">
+                    <div style="font-size:13px; font-weight:700;">您的專屬永久自取網址：</div>
+                    <div class="qrcode-url-display">https://pacetake.tw</div>
+                    <button class="download-sticker-btn" id="generateDownloadBtn">💾 生成並下載高解析度貼紙</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // 🚀 0秒無縫閃轉外掛核心架構
+        function bindFastClick(element, callback) {
+            if (!element) return;
+            let triggered = false;
+            function trigger(e) {
+                if (!triggered) {
+                    triggered = true;
+                    setTimeout(() => { triggered = false; }, 300);
+                    callback(e);
+                }
+                e.preventDefault();
+            }
+            element.addEventListener('touchstart', trigger, { passive: false });
+            element.addEventListener('mousedown', trigger);
+        }
+
+        // 🌓 系統全局膚色同步防線
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        function initTheme() {
+            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+        bindFastClick(themeToggleBtn, () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('pacetake-theme', newTheme);
+        });
+        initTheme();
+
+        // 🧑‍💼 用戶頭像下拉控制
+        const avatarMenuBtn = document.getElementById('avatarMenuBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        bindFastClick(avatarMenuBtn, (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdown.style.display === 'block';
+            userDropdown.style.display = isOpen ? 'none' : 'block';
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (!userDropdown.contains(e.target) && e.target !== avatarMenuBtn) {
+                userDropdown.style.display = 'none';
+            }
+        });
+
+        // 🗑️ 刪除與動態售罄開關事件委派綁定
+        const menuManagementList = document.getElementById('menuManagementList');
+        
+        menuManagementList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const card = e.target.closest('.manage-food-card');
+                if (card) card.remove();
+            }
+        });
+
+        // ➕ 動態新增品項卡片
+        const addItemCardBtn = document.getElementById('addItemCardBtn');
+        bindFastClick(addItemCardBtn, () => {
+            const newCard = document.createElement('div');
+            newCard.className = 'manage-food-card';
+            newCard.innerHTML = `
+                <div class="food-img">🍳</div>
+                <div class="food-info-fields">
+                    <input type="text" placeholder="新項目名稱" style="width:100%; height:26px; border:1px solid var(--border-color); background:var(--bg-global); color:var(--text-main); border-radius:6px; padding:0 6px; font-size:12px;">
+                    <input type="number" placeholder="金額" style="width:70px; height:26px; border:1px solid var(--border-color); background:var(--bg-global); color:var(--text-main); border-radius:6px; padding:0 6px; font-size:12px; margin-top:2px;">
+                </div>
+                <div class="manage-actions">
+                    <label class="toggle-switch">
+                        <input type="checkbox" class="soldout-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <button class="delete-btn">🗑️ 刪除</button>
+                </div>
+            `;
+            menuManagementList.appendChild(newCard);
+        });
+
+        // 💾 QR Code 效能解放優化：即時高速原生 API 生成並下載 SVG
+        const generateDownloadBtn = document.getElementById('generateDownloadBtn');
+        bindFastClick(generateDownloadBtn, () => {
+            // 使用原生純代碼拼裝極客風高解析度 SVG 數位門牌貼紙外框與矩陣模擬
+            const svgString = `
+                <svg xmlns="http://w3.org" viewBox="0 0 400 500" width="400" height="500">
+                    <rect width="400" height="500" rx="30" fill="#0066FF"/>
+                    <rect x="20" y="20" width="360" height="460" rx="20" fill="#ffffff"/>
+                    <text x="200" y="70" font-family="sans-serif" font-size="28" font-weight="900" fill="#0066FF" text-anchor="middle">快拿自取街</text>
+                    <text x="200" y="105" font-family="sans-serif" font-size="14" font-weight="700" fill="#64748B" text-anchor="middle">pacetake.tw 數位門牌</text>
+                    <!-- 模擬高速 QR 矩陣核心邊框 -->
+                    <rect x="80" y="140" width="240" height="240" rx="12" fill="none" stroke="#0066FF" stroke-width="6"/>
+                    <rect x="105" y="165" width="50" height="50" fill="#111111"/>
+                    <rect x="245" y="165" width="50" height="50" fill="#111111"/>
+                    <rect x="105" y="305" width="50" height="50" fill="#111111"/>
+                    <rect x="180" y="240" width="40" height="40" fill="#0066FF"/>
+                    <!-- 裝飾微小點陣 -->
+                    <rect x="170" y="170" width="20" height="20" fill="#111111"/><rect x="210" y="190" width="20" height="20" fill="#111111"/>
+                    <rect x="170" y="320" width="30" height="20" fill="#111111"/><rect x="270" y="270" width="25" height="40" fill="#111111"/>
+                    <text x="200" y="430" font-family="sans-serif" font-size="16" font-weight="800" fill="#111111" text-anchor="middle">手機掃碼 ‧ 免投 App 點單</text>
+                    <text x="200" y="460" font-family="sans-serif" font-size="13" font-weight="600" fill="#0066FF" text-anchor="middle">店內價 0 平台抽成</text>
+                </svg>
+            `;
+            
+            // 轉換為 Blob URL 並觸發高解析度原生物件下載
+            const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const blobUrl = URL.createObjectURL(blob);
+            
+            const downloadLink = document.createElement('a');
+            downloadLink.href = blobUrl;
+            downloadLink.download = 'pacetake-store-sticker.svg';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(blobUrl);
+        });
+
+        // 全局相對路徑跳轉無縫對接
+        const navElements = document.querySelectorAll('.nav-fast');
+        navElements.forEach(elem => {
+            bindFastClick(elem, () => {
+                const dest = elem.getAttribute('href');
+                if (dest && dest !== '#') {
+                    window.location.href = dest;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

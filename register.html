@@ -2,84 +2,229 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PACE 派思 - 3分鐘手機開店</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快拿自取街 pacetake.tw - 商家3分鐘手機開店註冊</title>
+    <!-- 純代碼免圖檔便當標誌（Favicon）數位門面 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='%230066FF'%3E%3Cpath d='M2 9h20v2H2V9zm1 4h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6zm3-8a3 3 0 0 1 6 0h2a3 3 0 0 1 6 0v2H2V5h1zm3 0a1 1 0 0 0-2 0v2h2V5zm8 0a1 1 0 0 0-2 0v2h2V5z'/%3E%3C/svg%3E">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://jsdelivr.net"></script>
+    <!-- FontAwesome 圖標 -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <!-- 0秒預先載入接單後台 -->
+    <link rel="prefetch" href="seller.html">
     <style>
-        :root { --brand-blue: #007AFF; --bg-white: #ffffff; --text-dark: #111111; --text-gray: #8E8E93; --bg-light: #F2F2F7; --status-green: #34c759; --status-red: #ff3b30; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-white); color: var(--text-dark); margin: 0; padding: 0; }
-        .register-container { max-width: 450px; margin: 0 auto; padding: 40px 24px 120px 24px; box-sizing: border-box; }
-        header { margin-bottom: 32px; }
-        header h1 { font-size: 32px; font-weight: 900; margin: 0; }
-        header p { font-size: 14px; color: var(--text-gray); margin: 6px 0 0 0; line-height: 1.4; }
-        .section-title { font-size: 13px; font-weight: 700; color: var(--brand-blue); text-transform: uppercase; margin: 32px 0 16px 0; border-bottom: 1px solid var(--bg-light); padding-bottom: 8px; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; display: block; }
-        .form-input { width: 100%; padding: 14px 16px; background-color: var(--bg-light); border: none; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; }
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; background-color: #FAFAFC; padding: 14px 16px; border-radius: 12px; margin-bottom: 12px; }
-        .toggle-label { font-size: 15px; font-weight: 700; }
-        .toggle-switch { width: 50px; height: 28px; background-color: #E5E5EA; border-radius: 15px; position: relative; cursor: pointer; transition: all 0.2s; }
-        .toggle-switch::after { content: ""; width: 24px; height: 24px; background-color: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: all 0.2s; }
-        .toggle-switch.active { background-color: var(--status-green); }
-        .toggle-switch.active::after { left: 24px; }
-        .menu-item-box { display: flex; gap: 16px; align-items: center; background-color: #FAFAFC; padding: 16px; border-radius: 16px; margin-bottom: 12px; }
-        .upload-square { width: 80px; height: 80px; background-color: var(--bg-light); border-radius: 14px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; border: 2px dashed #C7C7CC; flex-shrink: 0; }
-        .upload-square span { font-size: 10px; color: var(--text-gray); margin-top: 4px; }
-        .menu-inputs { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-        .price-input-wrapper { position: relative; display: flex; align-items: center; }
-        .price-symbol { position: absolute; left: 14px; font-size: 16px; font-weight: 700; color: var(--text-gray); }
-        .price-field { padding-left: 28px !important; }
-        .add-more-btn { width: 100%; padding: 12px; background: none; border: 2px dashed var(--brand-blue); color: var(--brand-blue); font-size: 14px; font-weight: 700; border-radius: 12px; cursor: pointer; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-box { background: white; width: 85%; max-width: 340px; padding: 24px; border-radius: 20px; text-align: center; }
-        .modal-title { font-size: 18px; font-weight: 900; color: var(--status-red); margin-bottom: 12px; }
-        .modal-desc { font-size: 14px; color: #444; line-height: 1.5; margin-bottom: 20px; }
-        .modal-btn-row { display: flex; gap: 12px; }
-        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; }
-        .btn-confirm { background-color: var(--status-red); color: white; }
-        .btn-cancel { background-color: var(--bg-light); color: var(--text-dark); }
-        .bottom-action-panel { position: fixed; bottom: 0; left: 0; right: 0; max-width: 450px; margin: 0 auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(0, 0, 0, 0.05); padding: 16px 24px; box-sizing: border-box; z-index: 100; }
-        .submit-btn { width: 100%; padding: 16px; font-size: 18px; font-weight: 900; color: white; background-color: var(--brand-blue); border: none; border-radius: 14px; cursor: pointer; }
+        .smooth-transition { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal-blur { backdrop-filter: blur(8px); }
     </style>
 </head>
-<body>
-<div class="modal-overlay" id="alertModal">
-    <div class="modal-box">
-        <div class="modal-title">⚠️ 確定開啟現場付現？</div>
-        <div class="modal-desc">您正開啟現場付現功能。唯若買家下單後現場棄單未取，<b>此筆損失需由店鋪自行吸收。</b>請問是否同意並開啟？</div>
-        <div class="modal-btn-row"><button class="modal-btn btn-cancel" onclick="cancelCashOpen()">取消</button><button class="modal-btn btn-confirm" onclick="confirmCashOpen()">同意開啟</button></div>
-    </div>
-</div>
-<div class="register-container">
-    <header><h1>3分鐘 手機開店</h1><p>加入 PACE 派思自主自取市集，牢牢鎖住每一分利潤。</p></header>
-    <main>
-        <div class="section-title">1. 店鋪基本資料</div>
-        <div class="form-group"><label class="form-label">店鋪名稱</label><input type="text" class="form-input" placeholder="例如：司機推爆肉糟飯" id="storeName"></div>
-        <div class="form-group"><label class="form-label">店鋪地址 (AI自動轉經緯度)</label><input type="text" class="form-input" placeholder="台北市中山區新生北路二段..."></div>
-        <div class="form-group"><label class="form-label">平均餐點準備時間 (分鐘)</label><input type="number" class="form-input" value="15"></div>
-        <div class="section-title">2. 收款金流設定</div>
-        <div class="toggle-row"><div class="toggle-label">現場付現 (預設關閉)</div><div class="toggle-switch" id="cashToggle" onclick="handleCashToggleClick()"></div></div>
-        <div class="form-group"><label class="form-label">請貼上您的「藍新金流個人專屬收款網址」</label><input type="text" class="form-input" placeholder="https://newebpay.com..."></div>
-        <div class="section-title">3. 快速上架首批餐點</div>
-        <div id="menuContainer">
-            <div class="menu-item-box">
-                <div class="upload-square">📸<span>上傳照片</span></div>
-                <div class="menu-inputs"><input type="text" class="form-input" placeholder="品項名稱（如：招牌肉糟飯）"><div class="price-input-wrapper"><span class="price-symbol">$</span><input type="number" class="form-input price-field" placeholder="店內價金額"></div></div>
+<body class="bg-slate-50 text-slate-900 min-h-screen pb-12">
+
+    <!-- 頂部導覽列 -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-40 backdrop-blur-md bg-white/90">
+        <div class="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <a href="index.html" class="text-xl font-black tracking-wider text-[#0066FF] no-underline">PACE 派思</a>
+                <span class="bg-blue-50 text-[#0066FF] text-[10px] px-2 py-0.5 rounded font-bold">商家註冊</span>
+            </div>
+            <a href="index.html" id="navHomeBtn" class="smooth-transition text-xs font-bold text-slate-500 hover:text-[#0066FF] flex items-center gap-1 bg-slate-100 px-3 py-2 rounded-xl">
+                <i class="fa-solid fa-house"></i> 回首頁
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-xl mx-auto px-4 mt-6">
+        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-6">
+            <div>
+                <h1 class="text-2xl font-black text-slate-800">🧑‍🍳 3分鐘手機開店</h1>
+                <p class="text-xs text-slate-400 mt-1">商圈限時地推福利：首月 $0 元免費體驗！</p>
+            </div>
+
+            <form id="registerForm" class="space-y-5" onsubmit="handleFormSubmit(event)">
+                <!-- 欄位一 -->
+                <div class="space-y-1.5">
+                    <label class="text-sm font-bold text-slate-700">店鋪名稱 <span class="text-rose-500">*</span></label>
+                    <input type="text" required placeholder="例如：大師兄脆皮雞排" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#0066FF] focus:bg-white smooth-transition">
+                </div>
+
+                <!-- 欄位二 -->
+                <div class="space-y-1.5">
+                    <label class="text-sm font-bold text-slate-700">店鋪地址 <span class="text-rose-500">*</span></label>
+                    <input type="text" required placeholder="例如：台北市信義區松壽路12號" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-[#0066FF] focus:bg-white smooth-transition">
+                    <p class="text-[10px] text-slate-400"><i class="fa-solid fa-wand-magic-sparkles mr-0.5"></i> AI 系統將在後端自動轉為精確 GPS 經緯度</p>
+                </div>
+
+                <!-- 欄位三 -->
+                <div class="space-y-1.5">
+                    <label class="text-sm font-bold text-slate-700">平均餐點準備時間 <span class="text-rose-500">*</span></label>
+                    <select class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-[#0066FF] focus:bg-white smooth-transition">
+                        <option value="10">10 分鐘</option>
+                        <option value="15" selected>15 分鐘 (建議)</option>
+                        <option value="20">20 分鐘</option>
+                        <option value="30">30 分鐘</option>
+                    </select>
+                </div>
+
+                <!-- 金流防棄單防禦線 -->
+                <div class="bg-blue-50/50 rounded-2xl p-4 border border-blue-100 space-y-4">
+                    <h3 class="text-xs font-black text-[#0066FF] uppercase tracking-wider"><i class="fa-solid fa-shield-halved mr-1"></i> 金流防棄單安全防線</h3>
+                    
+                    <!-- 線上刷卡 -->
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">線上刷卡 / LINE Pay</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">建構預收機制，杜絕惡意棄單</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer select-none">
+                            <input type="checkbox" id="onlinePayToggle" checked class="sr-only peer" onchange="toggleOnlineField(this)">
+                            <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all smooth-transition peer-checked:bg-[#0066FF]"></div>
+                        </label>
+                    </div>
+
+                    <!-- 藍新網址輸入格 -->
+                    <div id="blueNewPayGroup" class="space-y-1.5 smooth-transition">
+                        <label class="text-xs font-bold text-slate-600">請貼上您的藍新金流專屬收款網址 <span class="text-rose-500">*</span></label>
+                        <input type="url" id="blueNewPayUrl" required placeholder="https://newebpay.com..." class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:border-[#0066FF] smooth-transition">
+                    </div>
+
+                    <div class="border-t border-slate-200/60 my-2"></div>
+
+                    <!-- 現場付現 -->
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">現場付現功能</p>
+                            <p class="text-[11px] text-rose-500/80 font-medium mt-0.5">⚠️ 開啟現場付現具有棄單風險</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer select-none">
+                            <input type="checkbox" id="cashPayToggle" class="sr-only peer" onchange="verifyCashActivation(this)">
+                            <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all smooth-transition peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 菜單上架排版 -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">🍱 初始菜單上架 (WebP自動高壓30KB防線)</h3>
+                    
+                    <div id="menuItemsContainer" class="space-y-3">
+                        <!-- 品項 1 -->
+                        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100 relative group">
+                            <!-- 左邊：1:1 圓角上傳框 -->
+                            <label class="w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 bg-white flex flex-col items-center justify-center cursor-pointer flex-shrink-0 hover:border-[#0066FF] smooth-transition">
+                                <i class="fa-solid fa-camera text-slate-400 text-sm"></i>
+                                <span class="text-[9px] text-slate-400 font-bold mt-1">上傳</span>
+                                <input type="file" accept="image/*" class="hidden">
+                            </label>
+                            <!-- 右邊兩格垂直疊加 -->
+                            <div class="flex-1 grid grid-cols-3 gap-2">
+                                <input type="text" required placeholder="品項名稱" class="col-span-2 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#0066FF]">
+                                <input type="number" required placeholder="$ 金額" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-black text-[#0066FF] focus:outline-none focus:border-[#0066FF]">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="addNewMenuItem()" class="smooth-transition w-full border border-dashed border-slate-300 hover:border-[#0066FF] text-slate-500 hover:text-[#0066FF] font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 bg-white">
+                        <i class="fa-solid fa-plus"></i> 新增下一個品項
+                    </button>
+                </div>
+
+                <!-- 建立店鋪大按鈕 -->
+                <button type="submit" id="submitBtn" class="smooth-transition w-full bg-[#0066FF] hover:bg-[#0052CC] text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/10 active:scale-[0.99] flex items-center justify-center gap-2 mt-6">
+                    <i class="fa-solid fa-store"></i> 建立店鋪、秒入接單後台
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- 高質感半透明警語彈窗 -->
+    <div id="alertModal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none smooth-transition modal-blur">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl scale-95 smooth-transition transform" id="modalCard">
+            <div class="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center mx-auto text-rose-500 text-xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <h4 class="font-black text-slate-800 text-lg">您正開啟現場付現功能</h4>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed">開啟後買家可免付費直接下單。若遭遇棄單未取，一切食材與營業損失需由店鋪自行吸收。請問是否同意承擔風險？</p>
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="confirmCashAction(false)" class="smooth-transition bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-xs">不同意返回</button>
+                <button onclick="confirmCashAction(true)" class="smooth-transition bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 rounded-xl text-xs">我同意承擔</button>
             </div>
         </div>
-        <button class="add-more-btn" onclick="addNewItemField()">＋ 新增下一個品項</button>
-    </main>
-    <div class="bottom-action-panel"><button class="submit-btn" onclick="submitReg()">建立店鋪，立刻開張！</button></div>
-</div>
-<script>
-    function handleCashToggleClick() { const t = document.getElementById('cashToggle'); if (t.classList.contains('active')) t.classList.remove('active'); else document.getElementById('alertModal').style.display = 'flex'; }
-    function confirmCashOpen() { document.getElementById('cashToggle').classList.add('active'); document.getElementById('alertModal').style.display = 'none'; }
-    function cancelCashOpen() { document.getElementById('alertModal').style.display = 'none'; }
-    function addNewItemField() {
-        const c = document.getElementById('menuContainer'); const b = document.createElement('div'); b.className = 'menu-item-box';
-        b.innerHTML = `<div class="upload-square">📸<span>上傳照片</span></div><div class="menu-inputs"><input type="text" class="form-input" placeholder="品項名稱"><div class="price-input-wrapper"><span class="price-symbol">$</span><input type="number" class="form-input price-field" placeholder="店內價金額"></div></div>`;
-        c.appendChild(b);
-    }
-    function submitReg() { alert("🎉 店鋪註冊成功！資料已成功寫入，魔性後台已自動開通！"); window.location.href = '/seller.html'; }
-</script>
+    </div>
+
+    <script>
+        // 🚀 0秒強行閃轉機制
+        document.addEventListener('DOMContentLoaded', () => {
+            const btns = [document.getElementById('navHomeBtn'), document.getElementById('submitBtn')];
+            btns.forEach(btn => {
+                if(!btn) return;
+                const fastRedirect = (e) => {
+                    if(btn.id === 'submitBtn' && !document.getElementById('registerForm').checkValidity()) return;
+                    e.preventDefault();
+                    window.location.href = btn.id === 'submitBtn' ? "seller.html" : "index.html";
+                };
+                btn.addEventListener('touchstart', fastRedirect, { passive: false });
+                btn.addEventListener('mousedown', fastRedirect);
+            });
+        });
+
+        function toggleOnlineField(toggle) {
+            const urlInput = document.getElementById('blueNewPayUrl');
+            const group = document.getElementById('blueNewPayGroup');
+            if(toggle.checked) {
+                group.style.opacity = '1';
+                group.style.pointerEvents = 'auto';
+                urlInput.required = true;
+            } else {
+                group.style.opacity = '0.3';
+                group.style.pointerEvents = 'none';
+                urlInput.required = false;
+            }
+        }
+
+        let pendingToggle = null;
+        function verifyCashActivation(toggle) {
+            if(toggle.checked) {
+                pendingToggle = toggle;
+                const modal = document.getElementById('alertModal');
+                const card = document.getElementById('modalCard');
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                card.classList.remove('scale-95');
+            }
+        }
+
+        function confirmCashAction(isAgreed) {
+            const modal = document.getElementById('alertModal');
+            const card = document.getElementById('modalCard');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.add('scale-95');
+            
+            if(!isAgreed && pendingToggle) {
+                pendingToggle.checked = false; // 漏洞防禦：不同意則強制彈回關閉
+            }
+            pendingToggle = null;
+        }
+
+        function addNewMenuItem() {
+            const container = document.getElementById('menuItemsContainer');
+            const div = document.createElement('div');
+            div.className = "flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100 opacity-0 transform translate-y-2 smooth-transition";
+            div.innerHTML = `
+                <label class="w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 bg-white flex flex-col items-center justify-center cursor-pointer flex-shrink-0 hover:border-[#0066FF] smooth-transition">
+                    <i class="fa-solid fa-camera text-slate-400 text-sm"></i>
+                    <span class="text-[9px] text-slate-400 font-bold mt-1">上傳</span>
+                    <input type="file" accept="image/*" class="hidden">
+                </label>
+                <div class="flex-1 grid grid-cols-3 gap-2">
+                    <input type="text" required placeholder="品項名稱" class="col-span-2 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#0066FF]">
+                    <input type="number" required placeholder="$ 金額" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-black text-[#0066FF] focus:outline-none focus:border-[#0066FF]">
+                </div>
+            `;
+            container.appendChild(div);
+            setTimeout(() => { div.classList.remove('opacity-0', 'translate-y-2'); }, 50);
+        }
+
+        function handleFormSubmit(e) { e.preventDefault(); }
+    </script>
 </body>
 </html>

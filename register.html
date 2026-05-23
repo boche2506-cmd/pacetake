@@ -634,12 +634,16 @@
     const addItemRowBtn = document.getElementById('addItemRowBtn');
     const menuUploadList = document.getElementById('menuUploadList');
 
-    if(addItemRowBtn && menuUploadList) {
+  if(addItemRowBtn && menuUploadList) {
         addItemRowBtn.addEventListener('click', () => {
             const newRow = document.createElement('div');
             newRow.className = 'menu-item-row';
             newRow.innerHTML = `
-                <div class="img-upload-box">📷<span>上傳照片</span></div>
+                <div class="img-upload-box" onclick="triggerUpload(this)">
+                    <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                    <div class="upload-placeholder">📷<span>上傳照片</span></div>
+                </div>
                 <div class="item-fields">
                     <input type="text" class="input-style" style="height:34px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
                     <div class="price-input-wrapper">
@@ -651,6 +655,29 @@
             menuUploadList.appendChild(newRow);
         });
     }
+
+    // 點擊相機框框時，自動去點擊裡面隱藏的檔案選取器
+    window.triggerUpload = function(box) {
+        const fileInput = box.querySelector('.image-input');
+        if (fileInput) fileInput.click();
+    };
+
+    // 選好照片後，即時在框框內預覽縮圖
+    window.previewImage = function(input) {
+        const box = input.parentElement;
+        const img = box.querySelector('.preview-img');
+        const placeholder = box.querySelector('.upload-placeholder');
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                img.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    };
 
     // 🚀 5. 真‧建立店鋪並安全寫入 Firebase 雲端資料庫
     const createShopBtn = document.getElementById('createShopBtn');

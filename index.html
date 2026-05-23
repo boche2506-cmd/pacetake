@@ -732,11 +732,17 @@
             });
         }
 
-        // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心（無 alert 溫和版）
+                // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心（無 alert 溫和復活版）
         if (googleLoginAction) {
             googleLoginAction.addEventListener('click', () => {
                 import("https://gstatic.com").then((mod) => {
-                    mod.signInWithPopup(auth, provider)
+                    // 修正：從 window 或是當前環境精準抓取 auth 金鑰，確保不失聯
+                    const currentAuth = window.auth || (typeof auth !== 'undefined' ? auth : null);
+                    if (!currentAuth) {
+                        console.error("找不到 Firebase Auth 金鑰！");
+                        return;
+                    }
+                    mod.signInWithPopup(currentAuth, provider)
                         .then((result) => {
                             resetAndCloseLightbox();
                             console.log("真實登入成功，用戶資料：", result.user);
@@ -747,6 +753,7 @@
                 });
             });
         }
+
 
         // 🚪 登出按鈕真實功能對接
         if (logoutBtn) {

@@ -521,9 +521,10 @@
 
     <!-- 🧠 引入 Firebase 9+ 核心防線 (包含驗證 Auth 與雲端資料庫 Firestore) -->
     <script type="module">
-        import { initializeApp } from "https://gstatic.com";
-        import { getAuth, createUserWithEmailAndPassword } from "https://gstatic.com";
-        import { getFirestore, doc, setDoc } from "https://gstatic.com";
+// 智慧拆分防卡死：瀏覽器會自動把這些字串拼回完整的網址
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
@@ -634,7 +635,7 @@
             });
         }
 
-        // --- 3. 保留前任 CTO 留下的所有原汁原味 UI 互動功能 ---
+                // --- 3. 保留前任 CTO 留下的所有原汁原味 UI 互動功能 ---
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         if(themeToggleBtn) {
             themeToggleBtn.addEventListener('click', () => {
@@ -647,9 +648,29 @@
 
         const toggleOnline = document.getElementById('toggleOnline');
         const newebpayContainer = document.getElementById('newebpayContainer');
+        
+        // ✨ 自動注入三大金鑰輸入區
+        if(newebpayContainer) {
+            newebpayContainer.innerHTML = `
+                <label style="margin-bottom:12px; display:block;">🔒 藍新金流 API 開發參數設定</label>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" id="merchantIdInput" class="input-style" style="height:38px;" placeholder="請輸入 商店代號 (MerchantID)" required>
+                    <input type="text" id="hashKeyInput" class="input-style" style="height:38px;" placeholder="請輸入 HashKey" required>
+                    <input type="text" id="hashIvInput" class="input-style" style="height:38px;" placeholder="請輸入 HashIV" required>
+                </div>
+            `;
+        }
+
         if(toggleOnline && newebpayContainer) {
             toggleOnline.addEventListener('change', () => {
-                newebpayContainer.style.display = toggleOnline.checked ? 'block' : 'none';
+                const inputs = newebpayContainer.querySelectorAll('input');
+                if(toggleOnline.checked) {
+                    newebpayContainer.style.display = 'block';
+                    inputs.forEach(i => i.setAttribute('required', 'true'));
+                } else {
+                    newebpayContainer.style.display = 'none';
+                    inputs.forEach(i => i.removeAttribute('required'));
+                }
             });
         }
 
@@ -660,18 +681,95 @@
 
         if(toggleCash && cashWarningModal) {
             toggleCash.addEventListener('change', () => {
-                if(toggleCash.checked) cashWarningModal.style.display = 'flex';
+                if(toggleCash.checked) {
+                    toggleCash.checked = false; // 先拉回，等彈窗確認
+                    cashWarningModal.style.display = 'flex';
+                }
             });
         }
         if(warningCancelBtn) {
             warningCancelBtn.addEventListener('click', () => {
-                toggleCash.checked = false;
+                if(toggleCash) toggleCash.checked = false;
                 cashWarningModal.style.display = 'none';
             });
         }
         if(warningConfirmBtn) {
             warningConfirmBtn.addEventListener('click', () => {
+                if(toggleCash) toggleCash.checked = true;
                 cashWarningModal.style.display = 'none';
+            });
+        }
+
+        // 🚀 4. 真‧建立店鋪並安全寫入 Firebase 雲端資料庫 (精準修復版)
+        const createShopBtn = document.getElementById('createShopBtn');
+        if(createShopBtn) {
+            createShopBtn.addEventListener('click', async () => {
+                const form = document.getElementById('shopRegisterForm');
+                
+                if (form && !form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                if (!currentUserId) {
+                    alert("目前未偵測到您的登入帳號，無法綁定店鋪！請先回首頁登入。");
+                    return;
+                }
+
+                // 🛠️【小白救星修正】：依序抓取基本資料 (加上陣列索引，避免存入空白)
+                const inputs = form.querySelectorAll('.form-section:nth-child(1) .input-style');
+                const shopName = inputs[0] ? inputs[0].value.trim() : '';
+                const shopAddress = inputs[1] ? inputs[1].value.trim() : '';
+                const prepareTime = inputs[2] ? parseInt(inputs[2].value) || 15 : 15;
+
+                // 抓取藍新金流參數
+                const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
+                const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
+                const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
+
+                const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
+                const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
+
+                // 🛠️【小白救星修正】：抓取動態菜單列表，打包成乾淨的陣列 (加上陣列索引)
+                const menuRows = document.querySelectorAll('.menu-item-row');
+                const menuItems = [];
+                menuRows.forEach(row => {
+                    const fields = row.querySelectorAll('.item-fields .input-style');
+                    const name = fields[0] ? fields[0].value.trim() : '';
+                    const price = fields[1] ? parseInt(fields[1].value) || 0 : 0;
+                    if (name) {
+                        menuItems.push({ name: name, price: price });
+                    }
+                });
+
+                const shopData = {
+                    sellerUid: currentUserId,
+                    shopName: shopName,
+                    shopAddress: shopAddress,
+                    prepareTime: prepareTime,
+                    isOnlinePayEnabled: isOnlinePayEnabled,
+                    isCashPayEnabled: isCashPayEnabled,
+                    newebpayConfig: {
+                        MerchantID: merchantIdValue,
+                        HashKey: hashKeyValue,
+                        HashIV: hashIvValue
+                    },
+                    menuList: menuItems,
+                    createdAt: new Date().toISOString()
+                };
+
+                createShopBtn.innerText = "⚡ 正在打通雲端地基中...";
+                createShopBtn.disabled = true;
+
+                try {
+                    await setDoc(doc(db, "stores", currentUserId), shopData);
+                    alert("🎉 恭喜哥！店鋪資料已成功寫入雲端 Firestore！\n系統即將引導您進入接單管理後台。");
+                    window.location.href = "seller.html";
+                } catch (dbError) {
+                    alert("地基寫入失敗，請檢查 Firebase 權限：" + dbError.message);
+                    createShopBtn.innerText = "建立店鋪";
+                    createShopBtn.disabled = false;
+                }
             });
         }
     </script>

@@ -497,11 +497,10 @@
                 </div>
                 <button type="button" class="add-row-btn" id="addItemRowBtn">＋ 新增下一個品項</button>
             </div>
-                      </form>
+                              </form>
 
         <!-- 底部註冊確認大鈕 -->
         <footer class="footer-action">
-            <!-- 💡 將按鈕加上 form 屬性，觸發原生 HTML5 高質感必填驗證，完美解決卡住問題 -->
             <button class="submit-btn" id="createShopBtn" form="shopRegisterForm" type="submit">建立店鋪</button>
         </footer>
 
@@ -524,7 +523,6 @@
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
         import { getAuth, createUserWithEmailAndPassword } from "https://gstatic.com";
-        // 💡 補上真實資料庫必備的 Firestore 模組，不閹割資料寫入功能！
         import { getFirestore, doc, setDoc } from "https://gstatic.com";
 
         const firebaseConfig = {
@@ -540,7 +538,7 @@
         // 初始化系統
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app); // 啟用資料庫
+        const db = getFirestore(app);
 
         // --- 1. 動態插入「管理者帳密欄位」至基本資料區最上方 ---
         const formContainer = document.getElementById('shopRegisterForm');
@@ -561,10 +559,10 @@
             formContainer.insertBefore(authSection, formContainer.firstChild);
         }
 
-        // --- 2. 處理表單提交 (當所有 required 必填欄位都過關時才會觸發) ---
+        // --- 2. 處理表單提交 ---
         if (formContainer) {
             formContainer.addEventListener('submit', async (e) => {
-                e.preventDefault(); // 阻擋網頁跳轉重新整理
+                e.preventDefault(); // 阻擋網頁跳轉
 
                 const email = document.getElementById('fbEmail').value;
                 const password = document.getElementById('fbPassword').value;
@@ -575,26 +573,26 @@
                     return;
                 }
 
-                // 進入載入狀態
                 createShopBtn.disabled = true;
                 createShopBtn.innerText = '正在建立店鋪與雲端資料庫...';
 
                 try {
-                    // 核心步驟 A：在 Firebase Authentication 建立帳號
+                    // 核心步驟 A：建立帳號
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const uid = userCredential.user.uid;
 
-                    // 核心步驟 B：收集網頁上「所有」輸入的真實資料，絕不漏掉
+                    // 核心步驟 B：精準收集欄位資料 (修正上一版陣列抓取錯誤)
                     const inputs = formContainer.querySelectorAll('.input-style');
-                    const shopName = inputs[2].value;        // 店鋪名稱
-                    const shopAddress = inputs[3].value;     // 店鋪地址
-                    const prepTime = inputs[4].value;        // 準備時間
+                    // 因為我們動態插入了 2 個帳密欄位，所以原本的店鋪名稱會順延變成第 3 個欄位 (索引值為 2)
+                    const shopName = inputs[2] ? inputs[2].value : '';
+                    const shopAddress = inputs[3] ? inputs[3].value : '';
+                    const prepTime = inputs[4] ? inputs[4].value : '15';
                     
                     const isOnlinePay = document.getElementById('toggleOnline').checked;
                     const newebpayUrl = document.getElementById('newebpayUrlInput').value;
                     const isCashPay = document.getElementById('toggleCash').checked;
 
-                    // 收集菜單品項資料
+                    // 收集菜單品項資料 (修正上一版 fields.value 錯誤)
                     const menuItems = [];
                     const rows = document.querySelectorAll('.menu-item-row');
                     rows.forEach(row => {
@@ -607,7 +605,7 @@
                         }
                     });
 
-                    // 核心步驟 C：將全部商家資料寫入 Firestore 資料庫的 "shops" 集合中
+                    // 核心步驟 C：完整寫入資料庫
                     await setDoc(doc(db, "shops", uid), {
                         uid: uid,
                         email: email,
@@ -624,15 +622,11 @@
                     });
 
                     alert('🎉 恭喜！店鋪帳號與雲端資料庫皆完美建立成功！');
-                    window.location.href = 'seller.html'; // 順利導入下一關
+                    window.location.href = 'seller.html';
 
                 } catch (error) {
                     console.error("Firebase 發生錯誤：", error);
-                    if (error.code === 'auth/email-already-in-use') {
-                        alert('❌ 這個 Email 已經被註冊過囉！');
-                    } else {
-                        alert('❌ 串聯失敗，錯誤代碼：' + error.message);
-                    }
+                    alert('❌ 串聯失敗，錯誤原因：' + error.message);
                 } finally {
                     createShopBtn.disabled = false;
                     createShopBtn.innerText = '建立店鋪';
@@ -640,8 +634,7 @@
             });
         }
 
-        // --- 3. 保留前任 CTO 留下的所有 UI 互動防線 ---
-        // 亮暗主題切換
+        // --- 3. 保留前任 CTO 留下的所有原汁原味 UI 互動功能 ---
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         if(themeToggleBtn) {
             themeToggleBtn.addEventListener('click', () => {
@@ -652,7 +645,6 @@
             });
         }
 
-        // 藍新金流隱藏/顯示連動
         const toggleOnline = document.getElementById('toggleOnline');
         const newebpayContainer = document.getElementById('newebpayContainer');
         if(toggleOnline && newebpayContainer) {
@@ -661,7 +653,6 @@
             });
         }
 
-        // 現場付現高質感警語彈窗互動
         const toggleCash = document.getElementById('toggleCash');
         const cashWarningModal = document.getElementById('cashWarningModal');
         const warningCancelBtn = document.getElementById('warningCancelBtn');

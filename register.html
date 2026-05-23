@@ -604,9 +604,9 @@
                                 <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
                             </div>
                         </div>
-<div class="item-right-ctrls">
-    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
+<div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 6px; justify-content: center;">
     <div class="drag-handle" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">☰</div>
+    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
 </div>
                     </div>
 
@@ -862,9 +862,9 @@ newRow.innerHTML = `
             <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
         </div>
     </div>
-    <div class="item-right-ctrls">
-        <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
+    <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 6px; justify-content: center;">
         <div class="drag-handle" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">☰</div>
+        <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
     </div>
 `;
             menuUploadList.appendChild(newRow);

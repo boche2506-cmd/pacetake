@@ -158,7 +158,38 @@
             transition: background-color 0.15s ease, border-color 0.15s ease;
         }
 
-        /* 👑 縣市區域並排選單 */
+        /* 👑 招牌圖片與店鋪名稱並排排版 */
+        .shop-name-block {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .shop-logo-box {
+            width: 64px;
+            height: 64px;
+            border-radius: 14px;
+            border: 2px dashed var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background-color: var(--bg-global);
+            cursor: pointer;
+            color: var(--text-muted);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .shop-logo-box span {
+            font-size: 9px;
+            margin-top: 2px;
+            font-weight: 700;
+        }
+
+        /* 縣市區域並排選單 */
         .select-row {
             display: flex;
             gap: 8px;
@@ -240,7 +271,7 @@
 
         /* 藍新金流隱藏區塊 */
         .newebpay-box {
-            display: none; /* 👑 因線上刷卡預設關閉，此處同步改為隱藏 */
+            display: none; 
             animation: fadeIn 0.2s ease;
         }
 
@@ -251,69 +282,31 @@
             gap: 12px;
         }
 
-        /* 👑 跨平台拖曳優化樣式 */
+        /* 👑 菜單排版大魔改：單列橫向佈局 */
         .menu-item-row {
             display: flex;
-            flex-direction: column;
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 14px;
             padding: 12px;
             gap: 10px;
+            align-items: center;
             box-shadow: var(--shadow-sm);
             position: relative;
-            touch-action: none; /* 關鍵防線：防止手機滑動網頁干擾拖曳 */
+            touch-action: none; 
             user-select: none;
         }
 
-        .menu-item-ctrls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px dashed var(--border-color);
-            padding-bottom: 8px;
-        }
-
-        .drag-handle {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-muted);
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            padding: 4px 10px;
-            border-radius: 8px;
-            cursor: grab;
-        }
-        .drag-handle:active {
-            cursor: grabbing;
-        }
-
-        .del-row-btn {
-            background: none;
-            border: none;
-            color: var(--brand-red);
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .menu-item-body {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            width: 100%;
-        }
-
         .img-upload-box {
-            width: 70px;
-            height: 70px;
+            width: 64px;
+            height: 64px;
             border-radius: 12px;
             border: 2px dashed var(--border-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             background-color: var(--bg-global);
             cursor: pointer;
             color: var(--text-muted);
@@ -332,7 +325,7 @@
         }
 
         .img-upload-box span {
-            font-size: 10px;
+            font-size: 9px;
             margin-top: 2px;
         }
 
@@ -341,6 +334,7 @@
             flex-direction: column;
             gap: 6px;
             flex-grow: 1;
+            min-width: 0; /* 防止輸入框爆開 */
         }
 
         .price-input-wrapper {
@@ -359,6 +353,41 @@
 
         .price-input {
             padding-left: 26px !important;
+        }
+
+        /* 👑 刪除與排序移到右側控制區 */
+        .item-right-ctrls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .del-row-btn {
+            background-color: var(--bg-global);
+            border: 1px solid var(--border-color);
+            color: var(--brand-red);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .drag-handle {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background-color: var(--bg-global);
+            border: 1px solid var(--border-color);
+            padding: 6px 8px;
+            border-radius: 8px;
+            cursor: grab;
+            white-space: nowrap;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
         }
 
         .add-row-btn {
@@ -492,9 +521,17 @@
         <form class="form-container" id="shopRegisterForm" onsubmit="return false;">
             <div class="form-section">
                 <div class="section-title">基本資料設定</div>
+                
                 <div class="input-group">
-                    <label>店鋪名稱</label>
-                    <input type="text" class="input-style" placeholder="請輸入您的店鋪招牌名稱" required>
+                    <label>店鋪招牌與名稱</label>
+                    <div class="shop-name-block">
+                        <div class="shop-logo-box" onclick="triggerUpload(this)">
+                            <input type="file" id="shopLogoInput" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                            <img class="preview-img" id="shopLogoPreview" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+                            <div class="upload-placeholder">📸<span>上傳招牌</span></div>
+                        </div>
+                        <input type="text" id="shopNameInput" class="input-style" placeholder="請輸入您的店鋪招牌名稱" required style="flex-grow:1;">
+                    </div>
                 </div>
                 
                 <div class="input-group">
@@ -511,11 +548,11 @@
 
                 <div class="input-group">
                     <label>詳細地址 <span style="color:var(--brand-blue); font-size:11px;">(AI自動轉換經緯度)</span></label>
-                    <input type="text" class="input-style" placeholder="請輸入巷弄門牌，不需重複寫縣市" required>
+                    <input type="text" id="shopAddressInput" class="input-style" placeholder="請輸入巷弄門牌，不需重複寫縣市" required>
                 </div>
                 <div class="input-group">
                     <label>平均餐點準備時間 (分鐘)</label>
-                    <input type="number" class="input-style" value="15" min="1" required>
+                    <input type="number" id="prepareTimeInput" class="input-style" value="15" min="1" required>
                 </div>
             </div>
 
@@ -544,7 +581,7 @@
                         <div class="switch-desc">開啟現場付款，需自行承擔未取貨風險</div>
                     </div>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="toggleCash" checked>
+                        <input type="checkbox" id="toggleCash">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -555,23 +592,21 @@
                 <div class="menu-upload-list" id="menuUploadList">
                     
                     <div class="menu-item-row">
-                        <div class="menu-item-ctrls">
-                            <div class="drag-handle">☰ 排序</div>
-                            <button type="button" class="del-row-btn" onclick="deleteRow(this)">❌ 刪除</button>
+                        <div class="img-upload-box" onclick="triggerUpload(this)">
+                            <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                            <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                            <div class="upload-placeholder">📷<span>上傳照片</span></div>
                         </div>
-                        <div class="menu-item-body">
-                            <div class="img-upload-box" onclick="triggerUpload(this)">
-                                <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                                <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                                <div class="upload-placeholder">📷<span>上傳照片</span></div>
+                        <div class="item-fields">
+                            <input type="text" class="input-style" style="height:32px; padding: 0 10px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
+                            <div class="price-input-wrapper">
+                                <span class="price-symbol">$</span>
+                                <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
                             </div>
-                            <div class="item-fields">
-                                <input type="text" class="input-style" style="height:34px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
-                                <div class="price-input-wrapper">
-                                    <span class="price-symbol">$</span>
-                                    <input type="number" class="input-style price-input" style="height:34px;" placeholder="店內價金額" min="0" required>
-                                </div>
-                            </div>
+                        </div>
+                        <div class="item-right-ctrls">
+                            <button type="button" class="del-row-btn" onclick="deleteRow(this)">❌ 刪除</button>
+                            <div class="drag-handle">☰ 排序</div>
                         </div>
                     </div>
 
@@ -628,7 +663,6 @@
         }
     });
 
-    // 🌓 2. 膚色指揮官防線（完美同步首頁儲存的鍵名 pacetake-theme）
     function initTheme() {
         const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
@@ -645,7 +679,6 @@
     }
     initTheme();
 
-    // 👑 全台 22 縣市極致地基數據
     const areaData = {
         "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
         "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -745,7 +778,7 @@
         });
     }
 
-    // 👑 4. 跨平台雙棲流暢拖曳排序核心防線 (相容電腦與手機手指觸控)
+    // 👑 4. 跨平台雙棲流暢拖曳排序核心防線 (即便移至最右側依然流暢觸控)
     const menuUploadList = document.getElementById('menuUploadList');
     let activeDragItem = null;
     let startY = 0;
@@ -753,15 +786,11 @@
 
     function makeItemDraggable(row) {
         const handle = row.querySelector('.drag-handle');
-        
-        // 💻 電腦版滑鼠事件
         handle.addEventListener('mousedown', (e) => startDrag(e, row));
-        // 📱 手機版觸控事件
         handle.addEventListener('touchstart', (e) => startDrag(e, row), { passive: false });
     }
 
     function startDrag(e, row) {
-        // 防止觸控時引發手機瀏覽器原生滑動行為
         if (e.cancelable) e.preventDefault();
         
         activeDragItem = row;
@@ -786,7 +815,6 @@
 
         currentY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
         
-        // 算出行列中，滑鼠或手指最靠近哪一個品項
         const siblings = [...menuUploadList.querySelectorAll('.menu-item-row:not([style*="dashed"])')];
         const nextSibling = siblings.find(sibling => {
             const box = sibling.getBoundingClientRect();
@@ -807,44 +835,40 @@
         activeDragItem.style.border = '1px solid var(--border-color)';
         activeDragItem = null;
 
-        // 解除全局監聽
         window.removeEventListener('mousemove', onDragMove);
         window.removeEventListener('mouseup', onDragEnd);
         window.removeEventListener('touchmove', onDragMove);
         window.removeEventListener('touchend', onDragEnd);
     }
 
-    // 初始化第一個項目
     document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
 
-    // ➕ 新增菜單品項 (完美融合拖曳與圖片上傳)
+    // ➕ 新增菜單品項 (右側並排極簡按鈕版)
     const addItemRowBtn = document.getElementById('addItemRowBtn');
     if(addItemRowBtn && menuUploadList) {
         addItemRowBtn.addEventListener('click', () => {
             const newRow = document.createElement('div');
             newRow.className = 'menu-item-row';
             newRow.innerHTML = `
-                <div class="menu-item-ctrls">
-                    <div class="drag-handle">☰ 排序</div>
-                    <button type="button" class="del-row-btn" onclick="deleteRow(this)">❌ 刪除</button>
+                <div class="img-upload-box" onclick="triggerUpload(this)">
+                    <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                    <div class="upload-placeholder">📷<span>上傳照片</span></div>
                 </div>
-                <div class="menu-item-body">
-                    <div class="img-upload-box" onclick="triggerUpload(this)">
-                        <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                        <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                        <div class="upload-placeholder">📷<span>上傳照片</span></div>
+                <div class="item-fields">
+                    <input type="text" class="input-style" style="height:32px; padding: 0 10px;" placeholder="品項名稱 (如：香濃起司蛋餅)" required>
+                    <div class="price-input-wrapper">
+                        <span class="price-symbol">$</span>
+                        <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
                     </div>
-                    <div class="item-fields">
-                        <input type="text" class="input-style" style="height:34px;" placeholder="品項名稱 (如：香濃起司蛋餅)" required>
-                        <div class="price-input-wrapper">
-                            <span class="price-symbol">$</span>
-                            <input type="number" class="input-style price-input" style="height:34px;" placeholder="店內價金額" min="0" required>
-                        </div>
-                    </div>
+                </div>
+                <div class="item-right-ctrls">
+                    <button type="button" class="del-row-btn" onclick="deleteRow(this)">❌ 刪除</button>
+                    <div class="drag-handle">☰ 排序</div>
                 </div>
             `;
             menuUploadList.appendChild(newRow);
-            makeItemDraggable(newRow); // 👑 讓新長出來的品項也能完美支援手機拖曳！
+            makeItemDraggable(newRow); 
         });
     }
 
@@ -884,18 +908,20 @@
             const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
             const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
 
-            // 👑 核心防線：如果線上刷卡跟現場付現都關閉，噴錯提示並完美攔截
             if (!isOnlinePayEnabled && !isCashPayEnabled) {
                 alert("⚠️ 報告老闆！您的店鋪目前「線上刷卡」與「現場付現」皆未開啟，請至少選擇一種收款方式才能順利開張喔！");
                 return;
             }
 
-            const inputs = form.querySelectorAll('.form-section:nth-child(1) .input-style');
-            const shopName = inputs[0] ? inputs[0].value.trim() : '';
+            const shopName = document.getElementById('shopNameInput')?.value.trim() || '';
             const city = shopCity.value;
             const district = shopDistrict.value;
-            const detailAddress = inputs[3] ? inputs[3].value.trim() : '';
-            const prepareTime = inputs[4] ? parseInt(inputs[4].value) || 15 : 15;
+            const detailAddress = document.getElementById('shopAddressInput')?.value.trim() || '';
+            const prepareTime = parseInt(document.getElementById('prepareTimeInput')?.value) || 15;
+
+            // 👑 核心加強：提取招牌 Logo 圖片數據
+            const logoEl = document.getElementById('shopLogoPreview');
+            const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
 
             if (!shopName || !city || !district || !detailAddress) {
                 alert("請確認已填寫店鋪名稱、選擇縣市區域、並填入詳細地址喔！");
@@ -911,7 +937,6 @@
                 return;
             }
 
-            // 👑 核心防線：抓取「經過手機或電腦拖曳排序後」的最新菜單陣列，並完好保留圖片
             const menuRows = document.querySelectorAll('.menu-item-row');
             const menuItems = [];
             menuRows.forEach(row => {
@@ -919,7 +944,6 @@
                 const name = fields[0] ? fields[0].value.trim() : '';
                 const price = fields[1] ? parseInt(fields[1].value) || 0 : 0;
                 
-                // 保留昨天的圖片儲存精華 (Base64)
                 const imgEl = row.querySelector('.preview-img');
                 const imgData = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : "";
 
@@ -928,12 +952,12 @@
                 }
             });
 
-            // 組合縣市、區域和詳細地址存入資料庫
             const fullAddress = `${city}${district}${detailAddress}`;
 
             const shopData = {
                 sellerUid: currentUserId,
                 shopName: shopName,
+                shopLogo: shopLogoData, // 👑 招牌大頭貼強勢進駐資料庫！
                 city: city,
                 district: district,
                 shopAddress: fullAddress,
@@ -945,7 +969,7 @@
                     HashKey: hashKeyValue,
                     HashIV: hashIvValue
                 },
-                menuList: menuItems, // 存入最新排序好的數據庫陣列！
+                menuList: menuItems, 
                 createdAt: new Date().toISOString()
             };
 
@@ -954,7 +978,7 @@
 
             try {
                 await setDoc(doc(db, "stores", currentUserId), shopData);
-                alert("🎉 恭喜哥！店鋪資料已成功寫入雲端 Firestore！\n系統即將引導您進入接單管理後台。");
+                alert("🎉 恭喜哥！店鋪資料（含招牌與菜單）已成功寫入雲端 Firestore！\n系統即將引導您進入接單管理後台。");
                 window.location.href = "seller.html";
             } catch (dbError) {
                 alert("地基寫入失敗，請確認 Firebase 權限：" + dbError.message);

@@ -435,32 +435,10 @@
                     <input type="text" class="input-style" placeholder="請輸入完整地址，以便計算GPS距離" required>
                 </div>
                 <div class="input-group">
-                                    <label>平均餐點準備時間 (分鐘)</label>
-                <input type="number" class="input-style" value="15" min="1" required>
-            </div>
-            
-            <!-- 🎯 營業時間與公休日控制防線 -->
-            <div class="input-group" style="margin-top: 8px;">
-                <label>每日營業時間區間</label>
-                <div style="display:flex; gap:8px; align-items:center;">
-                    <input type="time" class="input-style" style="height:38px;" value="11:00">
-                    <span style="font-size:12px; color:var(--text-muted);">至</span>
-                    <input type="time" class="input-style" style="height:38px;" value="20:00">
+                    <label>平均餐點準備時間 (分鐘)</label>
+                    <input type="number" class="input-style" value="15" min="1" required>
                 </div>
             </div>
-            <div class="input-group" style="margin-top: 8px;">
-                <label>每週固定公休日</label>
-                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:4px;">
-                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox">一</label>
-                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox">二</label>
-                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox">三</label>
-                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox">四</label>
-                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox">五</label>
-                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox" checked>六</label>
-                    <label style="font-size:12px; font-weight:500; display:flex; align-items:center; gap:4px;"><input type="checkbox" checked>日</label>
-                </div>
-            </div>
-
 
             <!-- 金流防棄單防禦線 -->
             <div class="form-section">
@@ -526,7 +504,7 @@
             <button class="submit-btn" id="createShopBtn">建立店鋪</button>
         </footer>
 
-        <!-- 現場付現高質感半透明警語彈窗 -->
+                <!-- 現場付現高質感半透明警語彈窗 -->
         <div class="lightbox-modal" id="cashWarningModal">
             <div class="modal-card">
                 <div class="modal-title">⚠️ 開啟現場付現風險提示</div>
@@ -541,123 +519,217 @@
         </div>
     </div>
 
-    <script>
-        // 🚀 0秒無縫閃轉外掛核心架構
-        function bindFastClick(element, callback) {
-            if (!element) return;
-            let triggered = false;
-            function trigger(e) {
-                if (!triggered) {
-                    triggered = true;
-                    setTimeout(() => { triggered = false; }, 300);
-                    callback(e);
-                }
-                e.preventDefault();
-            }
-            element.addEventListener('touchstart', trigger, { passive: false });
-            element.addEventListener('mousedown', trigger);
-        }
+    <!-- 🧠 引入 Firebase 9+ 模組防線 (包含驗證 Auth 與雲端資料庫 Firestore) -->
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getAuth, onAuthStateChanged } from "https://gstatic.com";
+        import { getFirestore, doc, setDoc } from "https://gstatic.com";
 
-        // 🌓 系統全局膚色同步防線
+        // 🧠 1. 硬核注入你的真實 Firebase 金鑰
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
+            authDomain: "://firebaseapp.com",
+            projectId: "pacetake-c6e1e",
+            storageBucket: "pacetake-c6e1e.firebasestorage.app",
+            messagingSenderId: "1052980235056",
+            appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
+            measurementId: "G-888XL8JTHW",
+        };
+
+        // 初始化 Firebase 大腦系統
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // 監聽並確保當前是用戶登入狀態 (沒登入就強行攔截)
+        let currentUserId = null;
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                console.log("當前商家已連線，UID:", currentUserId);
+            } else {
+                alert("【PACE 提示】地基防線啟動：開鋪前請先回首頁完成 Google 或電子郵件登入喔！");
+                window.location.href = "index.html";
+            }
+        });
+
+        // 🌓 2. 系統最高膚色指揮官防線邏輯 (移除暴力攔截外掛，改用標準點擊)
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         function initTheme() {
             const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
         }
-        bindFastClick(themeToggleBtn, () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('pacetake-theme', newTheme);
-        });
+        if(themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('pacetake-theme', newTheme);
+            });
+        }
         initTheme();
 
-        // 💳 金流防棄單防禦線連動邏輯
+        // 💳 3. 金流防棄單防禦線連動邏輯
         const toggleOnline = document.getElementById('toggleOnline');
         const toggleCash = document.getElementById('toggleCash');
         const newebpayContainer = document.getElementById('newebpayContainer');
-        const newebpayUrlInput = document.getElementById('newebpayUrlInput');
         const cashWarningModal = document.getElementById('cashWarningModal');
         const warningConfirmBtn = document.getElementById('warningConfirmBtn');
         const warningCancelBtn = document.getElementById('warningCancelBtn');
 
-        // 線上刷卡開關連動藍新欄位
-        toggleOnline.addEventListener('change', () => {
-            if(toggleOnline.checked) {
-                newebpayContainer.style.display = 'block';
-                newebpayUrlInput.setAttribute('required', 'true');
-            } else {
-                newebpayContainer.style.display = 'none';
-                newebpayUrlInput.removeAttribute('required');
-            }
-        });
+        // 將前任的輸入框動態替換為大廠主流的「三大金鑰輸入區」，讓賣家自己填
+        if(newebpayContainer) {
+            newebpayContainer.innerHTML = `
+                <label style="margin-bottom:12px; display:block;">🔒 藍新金流 API 開發參數設定</label>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" id="merchantIdInput" class="input-style" style="height:38px;" placeholder="請輸入 商店代號 (MerchantID)" required>
+                    <input type="text" id="hashKeyInput" class="input-style" style="height:38px;" placeholder="請輸入 HashKey" required>
+                    <input type="text" id="hashIvInput" class="input-style" style="height:38px;" placeholder="請輸入 HashIV" required>
+                </div>
+            `;
+        }
 
-        // 現場付現防護邏輯：監聽變更，若打勾則攔截並彈窗
-        toggleCash.addEventListener('change', (e) => {
-            if(toggleCash.checked) {
-                // 暫時還原打勾，等待彈窗確認
-                toggleCash.checked = false;
-                cashWarningModal.style.display = 'flex';
-            }
-        });
+        // 線上刷卡開關控制金鑰顯示
+        if(toggleOnline) {
+            toggleOnline.addEventListener('change', () => {
+                const inputs = newebpayContainer.querySelectorAll('input');
+                if(toggleOnline.checked) {
+                    newebpayContainer.style.display = 'block';
+                    inputs.forEach(i => i.setAttribute('required', 'true'));
+                } else {
+                    newebpayContainer.style.display = 'none';
+                    inputs.forEach(i => i.removeAttribute('required'));
+                }
+            });
+        }
 
-        // 警語彈窗：同意
-        bindFastClick(warningConfirmBtn, () => {
-            toggleCash.checked = true;
-            cashWarningModal.style.display = 'none';
-        });
+        // 現場付現彈窗安全攔截
+        if(toggleCash) {
+            toggleCash.addEventListener('change', () => {
+                if(toggleCash.checked) {
+                    toggleCash.checked = false; // 先拉回，等彈窗確認
+                    if(cashWarningModal) cashWarningModal.style.display = 'flex';
+                }
+            });
+        }
 
-        // 警語彈窗：不同意（強制彈回關閉）
-        bindFastClick(warningCancelBtn, () => {
-            toggleCash.checked = false;
-            cashWarningModal.style.display = 'none';
-        });
+        if(warningConfirmBtn) {
+            warningConfirmBtn.addEventListener('click', () => {
+                if(toggleCash) toggleCash.checked = true;
+                if(cashWarningModal) cashWarningModal.style.display = 'none';
+            });
+        }
 
-        // ➕ 動態新增菜單品項欄位 (0.2秒流暢動畫排版)
+        if(warningCancelBtn) {
+            warningCancelBtn.addEventListener('click', () => {
+                if(toggleCash) toggleCash.checked = false;
+                if(cashWarningModal) cashWarningModal.style.display = 'none';
+            });
+        }
+
+        // ➕ 4. 動態新增菜單品項欄位 (維持高質感排版)
         const addItemRowBtn = document.getElementById('addItemRowBtn');
         const menuUploadList = document.getElementById('menuUploadList');
 
-        bindFastClick(addItemRowBtn, () => {
-            const newRow = document.createElement('div');
-            newRow.className = 'menu-item-row';
-            newRow.innerHTML = `
-                <div class="img-upload-box">
-                    📷<span>上傳照片</span>
-                </div>
-                <div class="item-fields">
-                    <input type="text" class="input-style" style="height:34px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
-                    <div class="price-input-wrapper">
-                        <span class="price-symbol">$</span>
-                        <input type="number" class="input-style price-input" style="height:34px;" placeholder="店內價金額" min="0" required>
+        if(addItemRowBtn && menuUploadList) {
+            addItemRowBtn.addEventListener('click', () => {
+                const newRow = document.createElement('div');
+                newRow.className = 'menu-item-row';
+                newRow.innerHTML = `
+                    <div class="img-upload-box">
+                        📷<span>上傳照片</span>
                     </div>
-                </div>
-            `;
-            menuUploadList.appendChild(newRow);
-        });
+                    <div class="item-fields">
+                        <input type="text" class="input-style" style="height:34px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
+                        <div class="price-input-wrapper">
+                            <span class="price-symbol">$</span>
+                            <input type="number" class="input-style price-input" style="height:34px;" placeholder="店內價金額" min="0" required>
+                        </div>
+                    </div>
+                `;
+                menuUploadList.appendChild(newRow);
+            });
+        }
 
-        // 🚀 建立店鋪並 0.01 秒強行無縫跳轉
+        // 🚀 5. 真‧建立店鋪並安全寫入 Firebase 雲端資料庫
         const createShopBtn = document.getElementById('createShopBtn');
-        bindFastClick(createShopBtn, () => {
-            const form = document.getElementById('shopRegisterForm');
-            // 原生表單驗證攔截檢查
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-            // 驗證全數通過，直接 0.01 秒無縫轉址至接單管理後台
-            window.location.href = "seller.html";
-        });
+        if(createShopBtn) {
+            createShopBtn.addEventListener('click', async () => {
+                const form = document.getElementById('shopRegisterForm');
+                
+                // 檢查原生 HTML5 欄位必填驗證
+                if (form && !form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
 
-        // 全局相對路徑跳轉無縫對接
-        const navElements = document.querySelectorAll('.nav-fast');
-        navElements.forEach(elem => {
-            bindFastClick(elem, () => {
-                const dest = elem.getAttribute('href');
-                if (dest && dest !== '#') {
-                    window.location.href = dest;
+                if (!currentUserId) {
+                    alert("目前未偵測到您的登入帳號，無法綁定店鋪，請重新整理網頁。");
+                    return;
+                }
+
+                // 抓取畫面上所有的真實輸入內容
+                const inputs = form.querySelectorAll('.form-section:nth-child(1) .input-style');
+                const shopName = inputs[0].value.trim();
+                const shopAddress = inputs[1].value.trim();
+                const prepareTime = parseInt(inputs[2].value) || 15;
+
+                // 抓取藍新金流開發金鑰
+                const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
+                const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
+                const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
+
+                const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
+                const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
+
+                // 抓取菜單列表中的所有品項與金額資料
+                const menuRows = document.querySelectorAll('.menu-item-row');
+                const menuItems = [];
+                menuRows.forEach(row => {
+                    const fields = row.querySelectorAll('.input-style');
+                    const name = fields[0]?.value.trim() || '';
+                    const price = parseInt(fields[1]?.value) || 0;
+                    if (name) {
+                        menuItems.push({ name: name, price: price });
+                    }
+                });
+
+                // 打包準備送上雲端的硬核大廠資料結構
+                const shopData = {
+                    sellerUid: currentUserId,
+                    shopName: shopName,
+                    shopAddress: shopAddress,
+                    prepareTime: prepareTime,
+                    isOnlinePayEnabled: isOnlinePayEnabled,
+                    isCashPayEnabled: isCashPayEnabled,
+                    newebpayConfig: {
+                        MerchantID: merchantIdValue,
+                        HashKey: hashKeyValue,
+                        HashIV: hashIvValue
+                    },
+                    menuList: menuItems,
+                    createdAt: new Date().toISOString()
+                };
+
+                // 按鈕進入讀取狀態，防重複點擊
+                createShopBtn.innerText = "⚡ 正在打通雲端地基中...";
+                createShopBtn.disabled = true;
+
+                try {
+                    // 🚀 將資料寫入 Firebase Firestore 資料庫中的 "stores" 集合，以當前用戶 UID 當作檔名
+                    await setDoc(doc(db, "stores", currentUserId), shopData);
+                    
+                    alert("🎉 恭喜哥！店鋪資料已成功寫入雲端 Firestore！\n系統即將引導您進入接單管理後台。");
+                    window.location.href = "seller.html";
+
+                } catch (dbError) {
+                    alert("地基寫入失敗，請確認 Firebase 權限：" + dbError.message);
+                                        createShopBtn.innerText = "建立店鋪";
+                    createShopBtn.disabled = false;
                 }
             });
-        });
+        }
     </script>
 </body>
 </html>
+

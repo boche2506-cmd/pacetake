@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>快拿自取街 pacetake.tw - 商家手機開店</title>
-    <!-- 精品藍色便當純代碼 SVG Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E">
 
     <style>
@@ -267,6 +266,17 @@
             background-color: var(--bg-global);
             cursor: pointer;
             color: var(--text-muted);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
         }
 
         .img-upload-box span {
@@ -415,7 +425,6 @@
 <body>
 
     <div class="phone-wrapper">
-        <!-- 頂部高亮 -->
         <header class="header">
             <a href="index.html" class="back-btn nav-fast">⬅️ 返回</a>
             <h1>3分鐘手機開店</h1>
@@ -423,7 +432,6 @@
         </header>
 
         <form class="form-container" id="shopRegisterForm" onsubmit="return false;">
-            <!-- 基本資料欄位 -->
             <div class="form-section">
                 <div class="section-title">基本資料設定</div>
                 <div class="input-group">
@@ -440,11 +448,9 @@
                 </div>
             </div>
 
-            <!-- 金流防棄單防禦線 -->
             <div class="form-section">
                 <div class="section-title">金流防棄單安全防禦線</div>
                 
-                <!-- 線上刷卡 (預設開啟) -->
                 <div class="switch-row">
                     <div class="switch-info">
                         <div class="switch-title">線上刷卡 / LINE Pay</div>
@@ -456,13 +462,11 @@
                     </label>
                 </div>
 
-                <!-- 藍新網址輸入框 -->
                 <div class="input-group newebpay-box" id="newebpayContainer">
                     <label>藍新金流專屬收款網址</label>
                     <input type="url" class="input-style" placeholder="https://newebpay.com..." id="newebpayUrlInput">
                 </div>
 
-                <!-- 現場付現 (預設關閉) -->
                 <div class="switch-row">
                     <div class="switch-info">
                         <div class="switch-title">現場付現</div>
@@ -475,15 +479,15 @@
                 </div>
             </div>
 
-            <!-- 菜單上架排版 -->
             <div class="form-section">
                 <div class="section-title">菜單商品上架</div>
                 <div class="menu-upload-list" id="menuUploadList">
                     
-                    <!-- 初始品項列 -->
                     <div class="menu-item-row">
-                        <div class="img-upload-box">
-                            📷<span>上傳照片</span>
+                        <div class="img-upload-box" onclick="triggerUpload(this)">
+                            <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                            <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                            <div class="upload-placeholder">📷<span>上傳照片</span></div>
                         </div>
                         <div class="item-fields">
                             <input type="text" class="input-style" style="height:34px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
@@ -497,14 +501,12 @@
                 </div>
                 <button type="button" class="add-row-btn" id="addItemRowBtn">＋ 新增下一個品項</button>
             </div>
-                              </form>
+        </form>
 
-        <!-- 底部註冊確認大鈕 -->
         <footer class="footer-action">
             <button class="submit-btn" id="createShopBtn" form="shopRegisterForm" type="submit">建立店鋪</button>
         </footer>
 
-        <!-- 現場付現高質感半透明警語彈窗 -->
         <div class="lightbox-modal" id="cashWarningModal" style="display: none;">
             <div class="modal-card">
                 <div class="modal-title">⚠️ 開啟現場付現風險提示</div>
@@ -519,7 +521,6 @@
         </div>
     </div>
 
-<!-- 🧠 引入 Firebase 9+ 模組防線 -->
 <script type="module">
     // 【小白救星精準修正】：還原被前任改爛的官方真實 Firebase 9+ SDK 載入路徑
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -630,11 +631,11 @@
         });
     }
 
-    // ➕ 4. 動態新增菜單品項欄位
+    // ➕ 4. 動態新增菜單品項欄位與圖片預覽邏輯
     const addItemRowBtn = document.getElementById('addItemRowBtn');
     const menuUploadList = document.getElementById('menuUploadList');
 
-  if(addItemRowBtn && menuUploadList) {
+    if(addItemRowBtn && menuUploadList) {
         addItemRowBtn.addEventListener('click', () => {
             const newRow = document.createElement('div');
             newRow.className = 'menu-item-row';

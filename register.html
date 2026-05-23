@@ -520,10 +520,11 @@
     </div>
 
     <!-- 🧠 引入 Firebase 9+ 模組防線 (包含驗證 Auth 與雲端資料庫 Firestore) -->
+        <!-- 🧠 引入 Firebase 9+ 模組防線 (包含驗證 Auth 與雲端資料庫 Firestore) -->
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
         import { getAuth, onAuthStateChanged } from "https://gstatic.com";
-        import { getFirestore, doc, setDoc } from "https://gstatic.com";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
         // 🧠 1. 硬核注入你的真實 Firebase 金鑰
         const firebaseConfig = {
@@ -553,7 +554,7 @@
             }
         });
 
-        // 🌓 2. 系統最高膚色指揮官防線邏輯 (移除暴力攔截外掛，改用標準點擊)
+        // 🌓 2. 系統最高膚色指揮官防線邏輯 (改用標準點擊)
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         function initTheme() {
             const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
@@ -668,11 +669,11 @@
                     return;
                 }
 
-                // 抓取畫面上所有的真實輸入內容
+                // 🛠️ 【Bug 精準修復】：依序抓取前三個基本資料輸入框
                 const inputs = form.querySelectorAll('.form-section:nth-child(1) .input-style');
-                const shopName = inputs[0].value.trim();
-                const shopAddress = inputs[1].value.trim();
-                const prepareTime = parseInt(inputs[2].value) || 15;
+                const shopName = inputs[0] ? inputs[0].value.trim() : '';
+                const shopAddress = inputs[1] ? inputs[1].value.trim() : '';
+                const prepareTime = inputs[2] ? parseInt(inputs[2].value) || 15 : 15;
 
                 // 抓取藍新金流開發金鑰
                 const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
@@ -686,9 +687,9 @@
                 const menuRows = document.querySelectorAll('.menu-item-row');
                 const menuItems = [];
                 menuRows.forEach(row => {
-                    const fields = row.querySelectorAll('.input-style');
-                    const name = fields[0]?.value.trim() || '';
-                    const price = parseInt(fields[1]?.value) || 0;
+                    const fields = row.querySelectorAll('.item-fields .input-style');
+                    const name = fields[0] ? fields[0].value.trim() : '';
+                    const price = fields[1] ? parseInt(fields[1].value) || 0 : 0;
                     if (name) {
                         menuItems.push({ name: name, price: price });
                     }
@@ -716,7 +717,7 @@
                 createShopBtn.disabled = true;
 
                 try {
-                    // 🚀 將資料寫入 Firebase Firestore 資料庫中的 "stores" 集合，以當前用戶 UID 當作檔名
+                    // 🚀 將資料寫入 Firebase Firestore 資料庫中的 "stores" 集合
                     await setDoc(doc(db, "stores", currentUserId), shopData);
                     
                     alert("🎉 恭喜哥！店鋪資料已成功寫入雲端 Firestore！\n系統即將引導您進入接單管理後台。");
@@ -724,7 +725,7 @@
 
                 } catch (dbError) {
                     alert("地基寫入失敗，請確認 Firebase 權限：" + dbError.message);
-                                        createShopBtn.innerText = "建立店鋪";
+                    createShopBtn.innerText = "建立店鋪";
                     createShopBtn.disabled = false;
                 }
             });

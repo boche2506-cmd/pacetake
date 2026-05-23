@@ -67,9 +67,21 @@
             border-right: 1px solid var(--border-color);
             box-shadow: var(--shadow-md);
             position: relative;
-            padding-bottom: 90px; /* 👑 擴大底部留白，完美騰出空間給常駐懸浮導覽列 */
+            padding-bottom: 90px; /* 留給底部懸浮欄 */
             display: flex;
             flex-direction: column;
+        }
+
+        /* 👑 核心優化：頂部全區常駐吸附天花板 */
+        .sticky-top-group {
+            position: sticky;
+            top: 0;
+            z-index: 1000; /* 確保在店家列表上方 */
+            background-color: var(--blur-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
         }
 
         /* 頂部高級大字留白區 */
@@ -143,7 +155,7 @@
             gap: 4px;
         }
 
-        /* 下拉選單選面 */
+        /* 下拉選單面板 */
         .dropdown-menu {
             display: none;
             position: absolute;
@@ -154,7 +166,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             box-shadow: var(--shadow-md);
-            z-index: 100;
+            z-index: 1100;
             padding: 6px;
         }
 
@@ -187,7 +199,7 @@
             display: none; /* 賣家專屬功能初始隱藏 */
         }
 
-        /* 👑 新增：搜尋欄上方 精品 GPS 定位管理列 */
+        /* 精品 GPS 定位管理列 */
         .location-bar {
             padding: 4px 20px 8px 20px;
             display: flex;
@@ -233,7 +245,7 @@
 
         /* 中間：加寬搜尋欄 */
         .search-container {
-            padding: 8px 20px;
+            padding: 8px 20px 4px 20px;
         }
 
         .search-box {
@@ -259,7 +271,7 @@
 
         /* 下方：店家列表區 */
         .store-list {
-            padding: 12px 20px;
+            padding: 16px 20px;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -338,9 +350,9 @@
             border-radius: 6px;
         }
 
-        /* 👑 核心修復：永久常駐在手機螢幕最底部的精品導覽底座 */
+        /* 底部常駐懸浮欄（已鎖定底部防飄移） */
         .bottom-bar {
-            position: fixed; /* 鎖死定位 */
+            position: fixed;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
@@ -354,7 +366,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px 10px 20px; /* 為 iPhone 底部預留黑條安全區 */
+            padding: 0 20px 10px 20px;
             z-index: 999;
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
         }
@@ -366,7 +378,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            cursor: pointer; /* 點擊文字也能連動歷史紀錄 */
+            cursor: pointer;
             text-decoration: none;
         }
 
@@ -384,7 +396,6 @@
             box-shadow: 0 0 8px var(--brand-green);
         }
 
-        /* 真實訂單計數小紅包包 */
         .order-badge-count {
             background-color: var(--brand-red);
             color: white;
@@ -393,7 +404,7 @@
             min-width: 15px;
             height: 15px;
             border-radius: 8px;
-            display: none; /* 初始隱藏 */
+            display: none;
             align-items: center;
             justify-content: center;
             padding: 0 4px;
@@ -416,15 +427,15 @@
             box-shadow: var(--shadow-sm);
         }
 
-        /* 👑 頂部大頭針地址浮窗高質感燈箱 */
+        /* 大頭針及登入共用全螢幕鎖定燈箱 */
         .lightbox-modal {
             display: none;
-            position: fixed; /* 全螢幕鎖定層 */
+            position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
-            z-index: 2000; /* 超級置頂 */
+            z-index: 2000;
             justify-content: center;
             align-items: center;
             padding: 20px;
@@ -457,6 +468,7 @@
             padding: 12px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
+            text-align: left;
         }
 
         .modal-btn {
@@ -478,14 +490,8 @@
 
         .modal-btn.google {
             background-color: #FFFFFF !important;
-            color: #111111 !important;
+            color: #374151 !important;
             border-color: #E2E8F0 !important;
-        }
-
-        .modal-btn.phone {
-            background-color: var(--brand-blue);
-            color: white;
-            border: none;
         }
 
         .modal-close {
@@ -508,64 +514,65 @@
 <body>
 
     <div class="phone-wrapper">
-        <header class="header">
-            <div class="brand-title-area">
-                <h1>PACE 派思</h1>
-                <div class="brand-subtitle">店內價預約外帶自取 / 內用點單系統</div>
-            </div>
-            
-            <div class="control-panel">
-                <button class="theme-toggle" id="themeToggleBtn">🌓</button>
+        
+        <div class="sticky-top-group">
+            <header class="header">
+                <div class="brand-title-area">
+                    <h1>PACE 派思</h1>
+                    <div class="brand-subtitle">店內價預約外帶自取 / 內用點單系統</div>
+                </div>
                 
-                <button class="login-btn" id="loginTriggerBtn">Google 登入 / 註冊</button>
-                
-                <button class="user-avatar-btn" id="avatarMenuBtn">
-                    <span>🧑‍💼 帳號狀態</span>
-                </button>
-                
-                <div class="dropdown-menu" id="userDropdown">
-                    <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
-                    <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
-                    <a href="register.html" class="nav-fast">💼 月費開店(暫不收費)</a>
+                <div class="control-panel">
+                    <button class="theme-toggle" id="themeToggleBtn">🌓</button>
+                    <button class="login-btn" id="loginTriggerBtn">Google 登入 / 註冊</button>
+                    <button class="user-avatar-btn" id="avatarMenuBtn">
+                        <span>🧑‍💼 帳號狀態</span>
+                    </button>
                     
-                    <div class="seller-unlock" id="sellerMenuBlock">
+                    <div class="dropdown-menu" id="userDropdown">
+                        <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
+                        <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
+                        <a href="register.html" class="nav-fast">💼 月費開店(暫不收費)</a>
+                        
+                        <div class="seller-unlock" id="sellerMenuBlock">
+                            <div class="menu-divider"></div>
+                            <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
+                            <a href="manage.html" class="nav-fast">⚙️ 後台管理</a>
+                            <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
+                        </div>
+                        
                         <div class="menu-divider"></div>
-                        <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
-                        <a href="manage.html" class="nav-fast">⚙️ 後台管理</a>
-                        <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
+                        <button id="logoutBtn">🚪 登出</button>
                     </div>
-                    
-                    <div class="menu-divider"></div>
-                    <button id="logoutBtn">🚪 登出</button>
+                </div>
+            </header>
+
+            <div class="location-bar">
+                <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
+                <div class="location-select-group">
+                    <select class="nav-select" id="citySelect">
+                        <option value="">選擇縣市</option>
+                        <option value="基隆市">基隆市</option>
+                        <option value="臺北市">臺北市</option>
+                        <option value="新北市">新北市</option>
+                        <option value="桃園市">桃園市</option>
+                        <option value="新竹市">新竹市</option>
+                        <option value="台中市">台中市</option>
+                        <option value="彰化縣">彰化縣</option>
+                        <option value="台南市">台南市</option>
+                        <option value="高雄市">高雄市</option>
+                    </select>
+                    <select class="nav-select" id="districtSelect">
+                        <option value="">選擇區域</option>
+                    </select>
                 </div>
             </div>
-        </header>
 
-        <div class="location-bar">
-            <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
-            <div class="location-select-group">
-                <select class="nav-select" id="citySelect">
-                    <option value="">選擇縣市</option>
-                    <option value="基隆市">基隆市</option>
-                    <option value="臺北市">臺北市</option>
-                    <option value="新北市">新北市</option>
-                    <option value="桃園市">桃園市</option>
-                    <option value="新竹市">新竹市</option>
-                    <option value="台中市">台中市</option>
-                    <option value="彰化縣">彰化縣</option>
-                    <option value="台南市">台南市</option>
-                    <option value="高雄市">高雄市</option>
-                </select>
-                <select class="nav-select" id="districtSelect">
-                    <option value="">選擇區域</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="search-container">
-            <div class="search-box">
-                <span>🔍</span>
-                <input type="text" id="globalSearchInput" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
+            <div class="search-container">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" id="globalSearchInput" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
+                </div>
             </div>
         </div>
 
@@ -587,8 +594,8 @@
 
         <div class="lightbox-modal" id="loginLightbox">
             <div class="modal-card">
-                <div class="modal-title" style="font-weight: 700; margin-bottom: 25px; color: #1f2937; text-align: center;">加入PACE 派思</div>
-                <button class="modal-btn google" id="googleLoginAction" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white !important; border: 1px solid #e5e7eb !important; border-radius: 8px !important; padding: 12px; font-size: 14px; font-weight: 500; color: #374151 !important; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                <div class="modal-title" style="font-weight: 700; margin-bottom: 25px; color: #1f2937;">加入PACE 派思</div>
+                <button class="modal-btn google" id="googleLoginAction" style="box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
                     <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:12px; flex-shrink: 0;">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -598,7 +605,7 @@
                     Google 一鍵登入
                 </button>
 
-                <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; margin-top: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 100%; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; margin-top: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:12px; flex-shrink: 0;">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                         <polyline points="22,6 12,13 2,6"></polyline>
@@ -606,7 +613,7 @@
                     使用電子郵件登入
                 </button>
 
-                <div id="emailFormSection" style="display: none; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto;">
+                <div id="emailFormSection" style="display: none; margin-top: 20px; text-align: left; width: 100%;">
                     <div style="margin-bottom: 12px;">
                         <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">電子郵件</label>
                         <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb; color: #111111;">
@@ -618,9 +625,9 @@
                             <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
                         </div>
                     </div>
-                    <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15); transition: background 0.2s;">電子郵件登入 / 註冊</button>
+                    <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15);">電子郵件登入 / 註冊</button>
                 </div>
-                <span class="modal-close" id="customReturnBtn" style="margin-top: 20px; display: inline-block; cursor: pointer; color: #6b7280; font-size: 14px; text-decoration: underline;">暫時返回</span>
+                <span class="modal-close" id="customReturnBtn" style="margin-top: 20px; text-decoration: underline;">暫時返回</span>
             </div>
         </div>
 
@@ -637,10 +644,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        // 🧠 擴充：引進資料庫撈取及過濾需要的指令
-        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        // 🧠 Firebase 雲端金鑰
+        // Firebase 雲端金鑰
         const firebaseConfig = {
             apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
             authDomain: "pacetake-c6e1e.firebaseapp.com",
@@ -663,7 +669,7 @@
         let currentBuyerAddress = "正在獲取定位中...";
         let currentUserId = null;
 
-        // 🚀 台灣區域智慧連動防呆數據
+        // 台灣區域數據
         const areaData = {
             "基隆市": ["仁愛區", "信義區", "中正區", "七堵區", "安樂區", "暖暖區", "中山區"],
             "臺北市": ["信義區", "大安區", "中山區", "內湖區", "松山區", "中正區", "萬華區", "大同區", "士林區", "北投區", "文山區", "南港區"],
@@ -711,7 +717,7 @@
         const loginPasswordInput = document.getElementById('loginPassword');
         const emailLoginAction = document.getElementById('emailLoginAction');
 
-        // 定位連動元素
+        // 定位元素
         const citySelect = document.getElementById('citySelect');
         const districtSelect = document.getElementById('districtSelect');
         const gpsPinBtn = document.getElementById('gpsPinBtn');
@@ -719,7 +725,7 @@
         const modalAddressText = document.getElementById('modalAddressText');
         const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
 
-        // 縣市切換連動區域
+        // 縣市連動
         citySelect.addEventListener('change', () => {
             const selectedCity = citySelect.value;
             districtSelect.innerHTML = '<option value="">選擇區域</option>';
@@ -735,7 +741,7 @@
         });
         districtSelect.addEventListener('change', filterAndRenderStores);
 
-        // 點擊大頭針彈出精品地址浮窗
+        // 點擊大頭針
         gpsPinBtn.addEventListener('click', () => {
             modalAddressText.innerText = currentBuyerAddress;
             addressDetailLightbox.style.display = 'flex';
@@ -793,7 +799,7 @@
                         .then(() => { alert("偵測到新帳號，已自動為您註冊並登入成功！"); resetAndCloseLightbox(); })
                         .catch((regError) => {
                             if (regError.code === 'auth/email-already-in-use' || error.code === 'auth/invalid-login-credentials') {
-                                alert("【PACE 提示】此電子郵件已被註冊（或您曾使用過 Google 一鍵登入）。如果是密碼打錯請重新輸入；若您曾用 Google 登入，請直接點擊上方的「Google 一鍵登入」按鈕喔！");
+                                alert("【PACE 提示】此電子郵件已被註冊。如果是密碼打錯請重新輸入；若您曾用 Google 登入，請直接點擊上方的「Google 一鍵登入」按鈕喔！");
                             } else { alert("登入/註冊失敗：" + regError.message); }
                         });
                 });
@@ -817,13 +823,12 @@
             logoutBtn.addEventListener('click', () => { signOut(auth).then(() => { if(userDropdown) userDropdown.style.display = 'none'; }); });
         }
 
-        // 📡 5. 全局實時監聽買家登入狀態與「真‧訂單狀態紅點」打通
+        // 📡 全局監聽登入狀態與真實訂單紅點
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUserId = user.uid;
                 if(loginTriggerBtn) loginTriggerBtn.style.display = 'none';
                 if(userAvatarBtn) userAvatarBtn.style.display = 'flex';
-                // 執行真實訂單偵測
                 checkRealOrderStatus(user.uid, user.displayName || user.email);
             } else {
                 currentUserId = null;
@@ -835,14 +840,12 @@
             }
         });
 
-        // 🧠 串網 Firebase 連線查詢真實未結訂單狀態
         async function checkRealOrderStatus(uid, name) {
             try {
                 const querySnapshot = await getDocs(collection(db, "orders"));
                 let activeOrderCount = 0;
                 querySnapshot.forEach((doc) => {
                     const order = doc.data();
-                    // 篩選屬於當前買家且未結案的訂單
                     if (order.buyerUid === uid && order.status !== "completed" && order.status !== "cancelled") {
                         activeOrderCount++;
                     }
@@ -875,8 +878,44 @@
             if (userDropdown && !userDropdown.contains(e.target) && e.target !== userAvatarBtn) userDropdown.style.display = 'none';
         });
 
-        // 📍 6. HTML5 Geolocation 手機 GPS 定位與開源解析
-        function initLocation防線() {
+        // 📐 哈弗辛數學大圓公式
+        function getDistanceKm(lat1, lon1, lat2, lon2) {
+            if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // 👑 核心改裝：帶有 30 分鐘 localStorage 快取記憶體的智慧 GPS 定位系統
+        function initLocation防線(forceRefresh = false) {
+            const cacheKey = "pace-location-cache";
+            const cachedData = localStorage.getItem(cacheKey);
+            const now = Date.now();
+
+            // 如果不是強制刷新，且有 30 分鐘內的存檔，直接秒讀記憶體
+            if (!forceRefresh && cachedData) {
+                try {
+                    const parsed = JSON.parse(cachedData);
+                    if (now - parsed.timestamp < 1800000) { // 30 分鐘 = 1800000 毫秒
+                        buyerLat = parsed.lat;
+                        buyerLng = parsed.lng;
+                        currentBuyerAddress = parsed.address;
+                        
+                        // 同步選單狀態
+                        applyAddressToSelects(parsed.city, parsed.district);
+                        return;
+                    }
+                } catch(e) {
+                    localStorage.removeItem(cacheKey);
+                }
+            }
+
+            // 沒有快取或過期，啟動真實 GPS 探測
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(async (position) => {
                     buyerLat = position.coords.latitude;
@@ -894,27 +933,27 @@
                             let detectedCity = addr.city || addr.county || "";
                             let detectedDistrict = addr.suburb || addr.town || addr.district || "";
                             
-                            // 修正開源地圖字元差異
                             if(detectedCity.includes("臺北") || detectedCity.includes("台北")) detectedCity = "臺北市";
                             if(detectedCity.includes("台中")) detectedCity = "台中市";
 
-                            if (areaData[detectedCity]) {
-                                citySelect.value = detectedCity;
-                                citySelect.dispatchEvent(new Event('change'));
-                                setTimeout(() => {
-                                    if (areaData[detectedCity].includes(detectedDistrict)) {
-                                        districtSelect.value = detectedDistrict;
-                                    }
-                                    filterAndRenderStores();
-                                }, 150);
-                            }
+                            // 寫入快取防線
+                            localStorage.setItem(cacheKey, JSON.stringify({
+                                timestamp: now,
+                                lat: buyerLat,
+                                lng: buyerLng,
+                                address: currentBuyerAddress,
+                                city: detectedCity,
+                                district: detectedDistrict
+                            }));
+
+                            applyAddressToSelects(detectedCity, detectedDistrict);
                         }
                     } catch (e) {
-                        currentBuyerAddress = `定位成功！座標：(${buyerLat.toFixed(4)}, ${buyerLng.toFixed(4)})，地址解析超時。`;
+                        currentBuyerAddress = `定位成功！座標：(${buyerLat.toFixed(4)}, ${buyerLng.toFixed(4)})`;
                         filterAndRenderStores();
                     }
                 }, (err) => {
-                    currentBuyerAddress = "買家拒絕定位授權，請手動選擇上方縣市區域進行瀏覽。";
+                    currentBuyerAddress = "暫時無法取得您的 GPS 位置。可能原因：\n1. 尚未允許定位授權\n2. 手機系統的「隱私權 -> 定位服務」未開啟\n\n您可以先手動選擇上方的縣市區域進行瀏覽喔！";
                     filterAndRenderStores();
                 }, { enableHighAccuracy: true, timeout: 6000 });
             } else {
@@ -923,7 +962,28 @@
             }
         }
 
-        // 📥 7. 真實 Firestore 全台店家同步同步
+        // 輔助函式：將定位結果注入下拉選單並觸發渲染
+        function applyAddressToSelects(city, district) {
+            if (areaData[city]) {
+                citySelect.value = city;
+                citySelect.dispatchEvent(new Event('change'));
+                setTimeout(() => {
+                    if (areaData[city].includes(district)) {
+                        districtSelect.value = district;
+                    }
+                    filterAndRenderStores();
+                }, 150);
+            } else {
+                filterAndRenderStores();
+            }
+        }
+
+        // 點擊大頭針時，買家通常是想手動更新位置，這時「強制清除快取重新定位」
+        gpsPinBtn.addEventListener('click', () => {
+            initLocation防線(true); // 傳入 true 強制重刷
+        });
+
+        // 📥 真實 Firestore 店家同步
         async function fetchStores() {
             try {
                 const snapshot = await getDocs(collection(db, "stores"));
@@ -931,27 +991,14 @@
                 snapshot.forEach((doc) => {
                     allStores.push({ id: doc.id, ...doc.data() });
                 });
-                // 先啟動 GPS 盲測，隨後引導渲染
-                initLocation防線();
+                // 啟動智慧位置偵測
+                initLocation防線(false);
             } catch (error) {
                 document.getElementById('store-container').innerHTML = `<div class="loading-spinner" style="color:var(--brand-red);">雲端連線失敗: ${error.message}</div>`;
             }
         }
 
-        // 📐 哈弗辛數學大圓公式
-        function getDistanceKm(lat1, lon1, lat2, lon2) {
-            if (!lat1 || !lon1 || !lat2 || !lon2) return null;
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-
-        // 🧠 8. 智慧分流綜合搜尋引擎（文字權重優先 ＋ 距離二次排序）
+        // 🧠 智慧雙軌搜尋引擎
         function filterAndRenderStores() {
             const searchText = document.getElementById('globalSearchInput').value.trim().toLowerCase();
             const selectedCity = citySelect.value;
@@ -964,11 +1011,9 @@
                 }
                 
                 let score = 0;
-                // 1. 下拉選單命中加分
                 if (selectedCity && (store.shopAddress?.includes(selectedCity) || store.city === selectedCity)) score += 50;
                 if (selectedDistrict && (store.shopAddress?.includes(selectedDistrict) || store.district === selectedDistrict)) score += 50;
 
-                // 2. 文字框多重關鍵字加權
                 if (searchText !== "") {
                     const tokens = searchText.split(/\s+/);
                     let matched = 0;
@@ -983,24 +1028,22 @@
                     });
 
                     if (matched === tokens.length) {
-                        score += 500; // 核心關鍵字全中，強制置頂！
+                        score += 500;
                     } else if (matched > 0) {
                         score += matched * 100;
                     } else {
-                        score -= 200; // 完全沒中，打入冷宮
+                        score -= 200;
                     }
                 }
                 return { ...store, distance: dist, matchScore: score };
             });
 
-            // 排序大裁判
             scoredList.sort((a, b) => {
                 if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
                 if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
                 return 0;
             });
 
-            // 畫面生成渲染
             const container = document.getElementById('store-container');
             container.innerHTML = "";
 
@@ -1019,7 +1062,6 @@
                 card.href = `store.html?id=${store.id}`;
                 card.className = "store-card";
 
-                // 處理店家頭像預覽
                 let imgHtml = `🏪`;
                 if (store.menuList && store.menuList[0] && store.menuList[0].image) {
                     imgHtml = `<img src="${store.menuList[0].image}" class="store-img" alt="store">`;
@@ -1047,7 +1089,6 @@
             });
         }
 
-        // 監聽文字輸入框
         document.getElementById('globalSearchInput').addEventListener('input', filterAndRenderStores);
 
         // 啟動地基

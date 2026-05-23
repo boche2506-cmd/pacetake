@@ -1,3 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>快拿自取街 pacetake.tw - 確認結帳</title>
+    <style>
+        /* 全局變數與主題防線 */
+        :root {
+            --bg-global: #F8FAFC;
+            --bg-container: #FFFFFF;
+            --border-color: #E2E8F0;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --brand-blue: #0066FF;
+            --card-bg: #FFFFFF;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-global: #0A0A0A;
+            --bg-container: #111111;
+            --border-color: #262626;
+            --text-main: #F5F5F5;
+            --text-muted: #A3A3A3;
+            --brand-blue: #3B82F6;
+            --card-bg: #1C1C1E;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-global);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            transition: background-color 0.15s ease;
+        }
+
+        .phone-wrapper {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background-color: var(--bg-container);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            padding-bottom: 120px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 24px 20px 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            text-decoration: none;
+            background-color: var(--card-bg);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            font-size: 16px;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-main);
+            background-color: var(--card-bg);
+        }
+
+        .content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .bill-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .bill-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .item-name {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .item-qty {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-left: 6px;
+        }
+
+        .item-price {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .bill-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 14px;
+        }
+
+        .total-label {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .total-amount {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--brand-blue);
+        }
+
+        .time-defense-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--bg-global);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* 👑 聯絡資訊輸入框樣式 */
+        .input-style {
+            width: 100%;
+            height: 44px;
+            background-color: var(--bg-global);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0 14px;
+            font-size: 14px;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.15s ease;
+        }
+        .input-style:focus {
+            border-color: var(--brand-blue);
+        }
+
+        .pay-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .pay-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .pay-check-dot {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background-color: var(--brand-blue);
+        }
+
+        .footer-action {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 16px 20px 24px 20px;
+            background-color: var(--bg-container);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .submit-order-btn {
+            background-color: var(--brand-blue);
+            color: white;
+            border: none;
             width: 100%;
             padding: 16px;
             border-radius: 14px;
@@ -20,47 +252,43 @@
 <body>
 
     <div class="phone-wrapper">
-        <!-- 頂部導覽列 -->
         <header class="header">
             <a href="index.html" class="back-btn">⬅️ 返回首頁</a>
             <h1>確認結帳</h1>
             <button class="theme-toggle" id="themeToggleBtn">🌓</button>
         </header>
 
-        <!-- 中間明細內容 -->
         <main class="content">
             
             <div>
-                <div class="section-title">🛍️ 點餐明細</div>
-                <div class="bill-card" id="cartItemsContainer">
-                    <!-- 這裡會由 JavaScript 自動帶入購物車品項，先預設一筆測試商品 -->
-                    <div class="bill-item">
-                        <div>
-                            <span class="item-name">精品藍色便當</span>
-                            <span class="item-qty">x1</span>
-                        </div>
-                        <span class="item-price">$150</span>
+                <div class="section-title">📋 取貨聯絡資訊 (老闆接單安全防線)</div>
+                <div class="bill-card" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">取貨人真實姓名</label>
+                        <input type="text" id="buyerNameInput" class="input-style" placeholder="請輸入方便老闆稱呼的姓名" required>
                     </div>
-                    
-                    <div class="bill-total-row">
-                        <span class="total-label">總計金額</span>
-                        <!-- 總金額鎖定為 150 元用來測試藍新 -->
-                        <span class="total-amount" id="totalAmountText">$150</span>
+                    <div>
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">手機號碼 (聯絡自取用)</label>
+                        <input type="tel" id="buyerPhoneInput" class="input-style" placeholder="例如：0912345678" required>
                     </div>
                 </div>
             </div>
 
-            <!-- 出餐時間提示 -->
-            <div class="time-defense-box">
-                <span>⏳</span>
-                <span>本單預計 15 分鐘後可至店內現場自取。</span>
+            <div>
+                <div class="section-title">🛍️ 點餐明細</div>
+                <div class="bill-card" id="cartItemsContainer">
+                    <div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車空空的喔...</div>
+                </div>
             </div>
 
-            <!-- 支付方式防線 -->
+            <div class="time-defense-box">
+                <span>⏳</span>
+                <span id="defenseTimeText">本單預計 15 分鐘後可至店內現場自取。</span>
+            </div>
+
             <div class="pay-defense-group">
                 <div class="section-title">💳 支付方式</div>
-                
-                <div class="pay-option selected" data-paytype="CREDIT">
+                <div class="pay-option">
                     <div class="pay-info">
                         <span>💳</span>
                         <span>線上信用卡刷卡 (安全加密)</span>
@@ -68,10 +296,8 @@
                     <div class="pay-check-dot"></div>
                 </div>
             </div>
-
         </main>
 
-        <!-- 底部巨大提交按鈕區 -->
         <footer class="footer-action">
             <button class="submit-order-btn" id="submitOrderBtn">
                 <span>🚀 安全前往藍新金流結帳</span>
@@ -79,19 +305,35 @@
         </footer>
     </div>
 
-    <!-- 💡 建立一個隱藏的藍新傳送表單，用來「咻」一聲跳轉到刷卡頁面 -->
-    <form id="newebpayForm" method="post" action="https://newebpay.com" style="display:none;">
+    <form id="newebpayForm" method="post" action="https://ccore.newebpay.com/MPG/mpg_gateway" style="display:none;">
         <input type="text" name="MerchantID" id="formMerchantID">
         <input type="text" name="TradeInfo" id="formTradeInfo">
         <input type="text" name="TradeSha" id="formTradeSha">
         <input type="text" name="Version" value="2.0">
     </form>
 
-    <!-- 引入安全加密大廠 CryptoJS 套件 (用來動態產生藍新要求的交易密碼) -->
-    <script src="https://cloudflare.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
-    <script>
-        // 🧠 1. 硬核注入你剛剛挖出來的測試環境三大寶物金鑰
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
+            authDomain: "pacetake-c6e1e.firebaseapp.com",
+            projectId: "pacetake-c6e1e",
+            storageBucket: "pacetake-c6e1e.firebasestorage.app",
+            messagingSenderId: "1052980235056",
+            appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
+            measurementId: "G-888XL8JTHW",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // 藍新測試參數
         const NEWEBPAY_CONFIG = {
             MerchantID: "MS159240719",
             HashKey: "OHfk5ihgUykYAHw4XGaAKswrPlpnVpfj",
@@ -99,12 +341,105 @@
             Version: "2.0"
         };
 
-        // 🌓 2. 系統最高膚色指揮官防線邏輯
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        function initTheme() {
-            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
+        let finalTotalAmount = 0;
+        let cartData = [];
+
+        // 🛒 1. 從 localStorage 載入買家在 index.html 選購的真實購物車資料
+        function loadCartFromStorage() {
+            try {
+                // 假設你在 index.html 存入的 localStorage 鍵名叫 'pacetake_cart'
+                const storedCart = localStorage.getItem('pacetake_cart');
+                if (storedCart) {
+                    cartData = JSON.parse(storedCart);
+                }
+            } catch (e) {
+                console.error("購物車解析失敗", e);
+            }
+            renderCart();
         }
+
+        // 🎨 2. 動態渲染點餐明細
+        function renderCart() {
+            const container = document.getElementById('cartItemsContainer');
+            if (!container) return;
+
+            if (cartData.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車是空的，快去首頁選購吧！</div>`;
+                finalTotalAmount = 0;
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+            
+            cartData.forEach(item => {
+                const itemPrice = parseInt(item.price) || 0;
+                const itemQty = parseInt(item.qty) || 1;
+                const subtotal = itemPrice * itemQty;
+                total += subtotal;
+
+                html += `
+                    <div class="bill-item">
+                        <div>
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-qty">x${itemQty}</span>
+                        </div>
+                        <span class="item-price">$${subtotal}</span>
+                    </div>
+                `;
+            });
+
+            finalTotalAmount = total;
+
+            html += `
+                <div class="bill-total-row">
+                    <span class="total-label">總計金額</span>
+                    <span class="total-amount" id="totalAmountText">$${finalTotalAmount}</span>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        // 🧠 3. Firebase 登入狀態監聽：姓名電話自動填寫與本地暫存還原
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                console.log("買家已登入，UID:", user.uid);
+                
+                // 優先帶入第三方登入內建的名子
+                if (user.displayName && !document.getElementById('buyerNameInput').value) {
+                    document.getElementById('buyerNameInput').value = user.displayName;
+                }
+
+                // 直奔雲端資料庫抓之前記憶過的名字和電話
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists() && userDoc.data().phone) {
+                        document.getElementById('buyerNameInput').value = userDoc.data().realName || user.displayName;
+                        document.getElementById('buyerPhoneInput').value = userDoc.data().phone || "";
+                    } else {
+                        // 如果雲端沒有，看剛才被攔截前有沒有暫存在本地的資料
+                        restoreTempData();
+                    }
+                } catch (err) {
+                    restoreTempData();
+                }
+            } else {
+                console.log("買家目前處於未登入狀態（無痛購物中）");
+                restoreTempData();
+            }
+        });
+
+        function restoreTempData() {
+            if (localStorage.getItem('temp_buyer_name')) {
+                document.getElementById('buyerNameInput').value = localStorage.getItem('temp_buyer_name');
+            }
+            if (localStorage.getItem('temp_buyer_phone')) {
+                document.getElementById('buyerPhoneInput').value = localStorage.getItem('temp_buyer_phone');
+            }
+        }
+
+        // 🌓 4. 膚色主題控制
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
         if(themeToggleBtn) {
             themeToggleBtn.addEventListener('click', () => {
                 const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -113,9 +448,9 @@
                 localStorage.setItem('pacetake-theme', newTheme);
             });
         }
-        initTheme();
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('pacetake-theme') || 'light');
 
-        // 🛠️ 3. 藍新 AES 加密核心演算法 (將訂單資料打包成防護罩)
+        // 🛠️ 5. 藍新加密演算法家族
         function encryptAES(parameterString, key, iv) {
             const cryptoKey = CryptoJS.enc.Utf8.parse(key);
             const cryptoIv = CryptoJS.enc.Utf8.parse(iv);
@@ -127,61 +462,108 @@
             return encrypted.toString();
         }
 
-        // 🛠️ 4. 藍新 SHA256 驗證碼演算法 (確保金額完全沒被篡改)
         function hashSHA256(aesString, key, iv) {
             const readyString = `HashKey=${key}&${aesString}&HashIV=${iv}`;
             return CryptoJS.SHA256(readyString).toString(CryptoJS.enc.Hex).toUpperCase();
         }
 
-        // 🚀 5. 監聽「前往藍新金流結帳」按鈕行為
+        // 🚀 6. 按下結帳按鈕：發動雙層防線與藍新金流跳轉
         const submitOrderBtn = document.getElementById('submitOrderBtn');
         if(submitOrderBtn) {
-            submitOrderBtn.addEventListener('click', () => {
-                
-                // 產生一組絕對不重複的獨一無二訂單編號 (大廠必備)
+            submitOrderBtn.addEventListener('click', async () => {
+                const buyerName = document.getElementById('buyerNameInput').value.trim();
+                const buyerPhone = document.getElementById('buyerPhoneInput').value.trim();
+
+                // 台灣手機格式驗證防呆
+                const phoneRegex = /^09\d{8}$/;
+                if (!buyerName || !phoneRegex.test(buyerPhone)) {
+                    alert("⚠️ 為了維護自取誠信防線，請輸入正確的取貨真實姓名與台灣手機號碼(10碼數字)喔！");
+                    return;
+                }
+
+                if (cartData.length === 0) {
+                    alert("您的購物車空空如也，無法發動結帳金流！");
+                    return;
+                }
+
+                // 【核心第一層防線】：強制攔截未登入買家
+                const user = auth.currentUser;
+                if (!user) {
+                    alert("🔒【PACE 安全提示】偵測到您尚未登入會員！\n系統已安全封存您的購物車與剛填寫的手機姓名。\n請先登入，回來即可秒速結帳。");
+                    
+                    // 打包剛填好的電話和姓名，防止跳轉回來要重敲
+                    localStorage.setItem('temp_buyer_name', buyerName);
+                    localStorage.setItem('temp_buyer_phone', buyerPhone);
+                    
+                    // 導向你的首頁去引導登入
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                // 產生高階不重複訂單號
                 const timeStamp = Math.floor(Date.now() / 1000);
                 const orderMerchantOrderNo = "PACE_" + timeStamp;
-                const orderAmount = 150; // 測試結帳金額設定為 $150
                 
-                alert(`即將為您打包訂單！金額：$${orderAmount}\n準備安全前往藍新金流測試刷卡頁面...`);
+                alert(`🛒 安全連線建立成功！\n即將為您導向藍新加密刷卡金流，請於頁面完成付款。`);
 
-                // 📝 依照藍新官方標準格式，打包我們的訂單參數
+                // 打包藍新金流交易參數
+                const itemNames = cartData.map(i => i.name).join('、');
                 const originalParameters = [
                     `MerchantID=${NEWEBPAY_CONFIG.MerchantID}`,
                     `RespondType=JSON`,
                     `TimeStamp=${timeStamp}`,
                     `Version=${NEWEBPAY_CONFIG.Version}`,
                     `MerchantOrderNo=${orderMerchantOrderNo}`,
-                    `Amt=${orderAmount}`,
-                    `ItemDesc=PACE派思-精品藍色便當`,
-                    `Email=buyer@pacetake.tw`, // 測試買家信箱
+                    `Amt=${finalTotalAmount}`,
+                    `ItemDesc=快拿自取:${itemNames.substring(0, 20)}`, 
+                    `Email=${user.email || 'buyer@pacetake.tw'}`, 
                     `LoginType=0`,
-                    `CREDIT=1` // 直接開啟信用卡支付選項
+                    `CREDIT=1`
                 ].join('&');
 
-                console.log("原始訂單資料：", originalParameters);
-
                 try {
-                    // 開始硬核雙重加密防線
-                    const tradeInfo = encryptAES(originalParameters, NEWEBPAY_CONFIG.HashKey, { ...NEWEBPAY_CONFIG }.HashIV);
-                    const tradeSha = hashSHA256(tradeInfo, NEWEBPAY_CONFIG.HashKey, { ...NEWEBPAY_CONFIG }.HashIV);
+                    // 【核心第二層防線】：記憶洗回雲端資料庫，下次免手填
+                    await setDoc(doc(db, "users", user.uid), {
+                        realName: buyerName,
+                        phone: buyerPhone,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
 
-                    // 填入隱存表單中
+                    // 先寫入訂單歷史集合到 Firestore (狀態設定為未付款)
+                    await addDoc(collection(db, "orders"), {
+                        orderId: orderMerchantOrderNo,
+                        buyerUid: user.uid,
+                        buyerName: buyerName,
+                        buyerPhone: buyerPhone,
+                        items: cartData,
+                        totalAmount: finalTotalAmount,
+                        status: "PENDING_PAYMENT",
+                        createdAt: new Date().toISOString()
+                    });
+
+                    // 清除暫存資訊
+                    localStorage.removeItem('temp_buyer_name');
+                    localStorage.removeItem('temp_buyer_phone');
+
+                    // 執行加密並送出表單前往藍新
+                    const tradeInfo = encryptAES(originalParameters, NEWEBPAY_CONFIG.HashKey, NEWEBPAY_CONFIG.HashIV);
+                    const tradeSha = hashSHA256(tradeInfo, NEWEBPAY_CONFIG.HashKey, NEWEBPAY_CONFIG.HashIV);
+
                     document.getElementById('formMerchantID').value = NEWEBPAY_CONFIG.MerchantID;
                     document.getElementById('formTradeInfo').value = tradeInfo;
                     document.getElementById('formTradeSha').value = tradeSha;
 
-                    console.log("加密打包大成功！TradeInfo:", tradeInfo);
-                    console.log("數位簽章驗證碼！TradeSha:", tradeSha);
-
-                    // 💥 表單自動送出！「咻」一聲彈轉到藍新刷卡頁面
+                    // 咻！直接噴發前往藍新官方刷卡頁面
                     document.getElementById('newebpayForm').submit();
 
-                } catch (encryptError) {
-                    alert("加密防線啟動失敗，請檢查金鑰格式：" + encryptError.message);
+                } catch (err) {
+                    alert("安全加密金鑰防線潰散，請回報平台管理員：" + err.message);
                 }
             });
         }
+
+        // 初始化加載
+        loadCartFromStorage();
     </script>
 </body>
 </html>

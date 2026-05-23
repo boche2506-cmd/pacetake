@@ -524,12 +524,14 @@
 
 
         <!-- 中間搜尋欄 -->
-        <div class="search-container">
-            <div class="search-box">
-                <span>🔍</span>
-                <input type="text" placeholder="搜尋商圈美味小吃、店家名稱...">
-            </div>
-        </div>
+<div class="search-container">
+    <div class="search-box">
+        <span>🔍</span>
+        <!-- 加上 autocomplete="off" 叫 Chrome 滾開 -->
+        <input type="text" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
+    </div>
+</div>
+
 
         
 
@@ -581,7 +583,7 @@
                 <div id="emailFormSection" style="display: none; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto;">
                     <div style="margin-bottom: 12px;">
                         <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">電子郵件</label>
-                        <input type="email" id="loginEmail" placeholder="請輸入 Email" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb;">
+                        <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb;">
                     </div>
                                         <div style="margin-bottom: 20px; position: relative;">
                         <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">密碼</label>

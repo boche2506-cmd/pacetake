@@ -519,17 +519,19 @@
         </div>
     </div>
 
-       <!-- 🧠 引入 Firebase 9+ 模組防線 (包含驗證 Auth 與雲端資料庫 Firestore) -->
-    <script type="module">
-        // 【Bug 修復】：修正完全錯誤的 gstatic.com 碎裂路徑，改用大廠標準 9.23.0 模組化寫法
-        import { initializeApp } from "https://gstatic.com";
-        import { getAuth, onAuthStateChanged } from "https://gstatic.com";
-        import { getFirestore, doc, setDoc } from "https://gstatic.com";
+<!-- 🧠 引入 Firebase 9+ 模組防線 -->
+<script type="module">
+    import { initializeApp } from "https://www.gsta" + "://tic.com" + "js/9.23.0/fireb" + "ase-app.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gsta" + "://tic.com" + "js/9.23.0/fireb" + "ase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gsta" + "://tic.com" + "js/9.23.0/fireb" + "ase-firestore.js";
 
-        // 🧠 1. 硬核注入你的真實 Firebase 金鑰
+
+
+
+                // 🧠 1. 真實 Firebase 金鑰
         const firebaseConfig = {
             apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
-            authDomain: "://firebaseapp.com", // 【Bug 修復】：補齊漏掉的專案 ID 前綴
+            authDomain: "://firebaseapp.com",
             projectId: "pacetake-c6e1e",
             storageBucket: "pacetake-c6e1e.firebasestorage.app",
             messagingSenderId: "1052980235056",
@@ -537,29 +539,24 @@
             measurementId: "G-888XL8JTHW",
         };
 
-        // 初始化 Firebase 大腦系統
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // 監聽並確保當前是用戶登入狀態 (沒登入就強行攔截)
+        // 監聽登入狀態
         let currentUserId = null;
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUserId = user.uid;
                 console.log("當前商家已連線，UID:", currentUserId);
             } else {
-                alert("【PACE 提示】地基防線啟動：開鋪前請先回首頁完成 Google 或電子郵件登入喔！");
+                alert("【PACE 提示】開鋪前請先回首頁完成登入喔！");
                 window.location.href = "index.html";
             }
         });
 
-        // 🌓 2. 系統最高膚色指揮官防線邏輯 (改用標準點擊)
+        // 🌓 2. 膚色指揮官防線邏輯
         const themeToggleBtn = document.getElementById('themeToggleBtn');
-        function initTheme() {
-            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        }
         if(themeToggleBtn) {
             themeToggleBtn.addEventListener('click', () => {
                 const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -568,6 +565,7 @@
                 localStorage.setItem('pacetake-theme', newTheme);
             });
         }
+
         initTheme();
 
         // 💳 3. 金流防棄單防禦線連動邏輯
@@ -628,7 +626,7 @@
             });
         }
 
-        // ➕ 4. 動態新增菜單品項欄位 (維持高質感排版)
+                // ➕ 4. 動態新增菜單品項欄位
         const addItemRowBtn = document.getElementById('addItemRowBtn');
         const menuUploadList = document.getElementById('menuUploadList');
 
@@ -637,9 +635,7 @@
                 const newRow = document.createElement('div');
                 newRow.className = 'menu-item-row';
                 newRow.innerHTML = `
-                    <div class="img-upload-box">
-                        📷<span>上傳照片</span>
-                    </div>
+                    <div class="img-upload-box">📷<span>上傳照片</span></div>
                     <div class="item-fields">
                         <input type="text" class="input-style" style="height:34px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
                         <div class="price-input-wrapper">
@@ -652,11 +648,26 @@
             });
         }
 
+
         // 🚀 5. 真‧建立店鋪並安全寫入 Firebase 雲端資料庫
         const createShopBtn = document.getElementById('createShopBtn');
         if(createShopBtn) {
             createShopBtn.addEventListener('click', async () => {
                 const form = document.getElementById('shopRegisterForm');
+                                // 🛠️【小白救星精準修正】：依序抓取前三個基本資料輸入框，並防止空白
+                const inputs = form.querySelectorAll('.form-section:nth-child(1) .input-style');
+                const shopName = inputs[0] ? inputs[0].value.trim() : '';
+                const shopAddress = inputs[1] ? inputs[1].value.trim() : '';
+                const prepareTime = inputs[2] ? parseInt(inputs[2].value) || 15 : 15;
+
+                // 抓取藍新金流金鑰參數與付款開關
+                const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
+                const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
+                const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
+                const toggleOnline = document.getElementById('toggleOnline');
+                const toggleCash = document.getElementById('toggleCash');
+                const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
+                const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
                 
                 // 檢查原生 HTML5 欄位必填驗證
                 if (form && !form.checkValidity()) {
@@ -664,26 +675,7 @@
                     return;
                 }
 
-                if (!currentUserId) {
-                    alert("目前未偵測到您的登入帳號，無法綁定店鋪，請重新整理網頁。");
-                    return;
-                }
-
-                // 🛠️ 【Bug 精準修復】：依序抓取前三個基本資料輸入框
-                const inputs = form.querySelectorAll('.form-section:nth-child(1) .input-style');
-                const shopName = inputs[0] ? inputs[0].value.trim() : '';
-                const shopAddress = inputs[1] ? inputs[1].value.trim() : '';
-                const prepareTime = inputs[2] ? parseInt(inputs[2].value) || 15 : 15;
-
-                // 抓取藍新金流開發金鑰
-                const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
-                const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
-                const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
-
-                const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
-                const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
-
-                // 抓取菜單列表中的所有品項與金額資料
+                                // 🛠️【精準修復】：抓取動態菜單列表，打包成乾淨的陣列 (加上陣列索引)
                 const menuRows = document.querySelectorAll('.menu-item-row');
                 const menuItems = [];
                 menuRows.forEach(row => {
@@ -695,7 +687,6 @@
                     }
                 });
 
-                // 打包準備送上雲端的硬核大廠資料結構
                 const shopData = {
                     sellerUid: currentUserId,
                     shopName: shopName,
@@ -712,17 +703,15 @@
                     createdAt: new Date().toISOString()
                 };
 
-                // 按鈕進入讀取狀態，防重複點擊
+                                // 按鈕進入讀取狀態，防止重複點擊
                 createShopBtn.innerText = "⚡ 正在打通雲端地基中...";
                 createShopBtn.disabled = true;
 
                 try {
-                    // 🚀 將資料寫入 Firebase Firestore 資料庫中的 "stores" 集合
+                    // 🚀 將資料寫入 Firebase Firestore 資料庫
                     await setDoc(doc(db, "stores", currentUserId), shopData);
-                    
                     alert("🎉 恭喜哥！店鋪資料已成功寫入雲端 Firestore！\n系統即將引導您進入接單管理後台。");
                     window.location.href = "seller.html";
-
                 } catch (dbError) {
                     alert("地基寫入失敗，請確認 Firebase 權限：" + dbError.message);
                     createShopBtn.innerText = "建立店鋪";

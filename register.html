@@ -497,14 +497,14 @@
                 </div>
                 <button type="button" class="add-row-btn" id="addItemRowBtn">＋ 新增下一個品項</button>
             </div>
-        </form>
+               </form> <!-- 這是你原本表單的結尾 -->
 
         <!-- 底部註冊確認大鈕 -->
         <footer class="footer-action">
             <button class="submit-btn" id="createShopBtn">建立店鋪</button>
         </footer>
 
-                <!-- 現場付現高質感半透明警語彈窗 -->
+        <!-- 現場付現高質感半透明警語彈窗 -->
         <div class="lightbox-modal" id="cashWarningModal">
             <div class="modal-card">
                 <div class="modal-title">⚠️ 開啟現場付現風險提示</div>
@@ -519,47 +519,101 @@
         </div>
     </div>
 
-    <!-- 🧠 引入 Firebase 9+ 模組防線 (包含驗證 Auth 與雲端資料庫 Firestore) -->
-        <!-- 🧠 引入 Firebase 9+ 模組防線 (包含驗證 Auth 與雲端資料庫 Firestore) -->
+    <!-- 🧠 引入 Firebase 9+ 模組防線 -->
     <script type="module">
+        // 1. 引入 Firebase 官方模組，完全沿用前任 CTO 指定的 9.23.0 版本
         import { initializeApp } from "https://gstatic.com";
-        import { getAuth, onAuthStateChanged } from "https://gstatic.com";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://gstatic.com";
 
-        // 🧠 1. 硬核注入你的真實 Firebase 金鑰
+        // 2. 填入你的專案專屬金鑰
         const firebaseConfig = {
             apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
             authDomain: "://firebaseapp.com",
             projectId: "pacetake-c6e1e",
             storageBucket: "pacetake-c6e1e.firebasestorage.app",
             messagingSenderId: "1052980235056",
-            appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
-            measurementId: "G-888XL8JTHW",
+            appId: "1:1052980235056:web:de847652d41c53594896f5",
+            measurementId: "G-GSF8FY1GEP"
         };
 
-        // 初始化 Firebase 大腦系統
+        // 3. 初始化系統
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
 
-        // 監聽並確保當前是用戶登入狀態 (沒登入就強行攔截)
-        let currentUserId = null;
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUserId = user.uid;
-                console.log("當前商家已連線，UID:", currentUserId);
-            } else {
-                alert("【PACE 提示】地基防線啟動：開鋪前請先回首頁完成 Google 或電子郵件登入喔！");
-                window.location.href = "index.html";
-            }
-        });
-
-        // 🌓 2. 系統最高膚色指揮官防線邏輯 (改用標準點擊)
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        function initTheme() {
-            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
+        // --- 4. 新 CTO 幫你補上的核心：插入「帳號與密碼」輸入欄位 ---
+        // 為了讓小白好操作，我直接用 JavaScript 動態把欄位插在「基本資料設定」的最上方！
+        const formContainer = document.getElementById('shopRegisterForm');
+        if (formContainer) {
+            const authSection = document.createElement('div');
+            authSection.className = 'form-section';
+            authSection.innerHTML = `
+                <div class="section-title">管理者帳號密碼 (登入後台使用)</div>
+                <div class="input-group">
+                    <label>電子郵件 (Email)</label>
+                    <input type="email" class="input-style" id="fbEmail" placeholder="example@email.com" required>
+                </div>
+                <div class="input-group">
+                    <label>設定密碼 (Password)</label>
+                    <input type="password" class="input-style" id="fbPassword" placeholder="至少 6 位數密碼" required>
+                </div>
+            `;
+            // 將帳密欄位塞入表單的最前端
+            formContainer.insertBefore(authSection, formContainer.firstChild);
         }
+
+        // --- 5. 連動「建立店鋪」按鈕與 Firebase 註冊功能 ---
+        const createShopBtn = document.getElementById('createShopBtn');
+        
+        if (createShopBtn) {
+            createShopBtn.addEventListener('click', async () => {
+                const emailInput = document.getElementById('fbEmail');
+                const passwordInput = document.getElementById('fbPassword');
+                
+                // 檢查店家是否有乖乖填寫帳號密碼
+                if (!emailInput.value || !passwordInput.value) {
+                    alert('請先填寫帳號與密碼欄位！');
+                    return;
+                }
+
+                if (passwordInput.value.length < 6) {
+                    alert('為了安全，密碼必須至少有 6 個字元喔！');
+                    return;
+                }
+
+                // 顯示載入中狀態，防止重複點擊
+                createShopBtn.disabled = true;
+                createShopBtn.innerText = '店鋪建立中，請稍候...';
+
+                try {
+                    // 送出給 Firebase 進行帳號註冊
+                    const userCredential = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+                    const user = userCredential.user;
+                    
+                    alert('🎉 恭喜！店鋪帳號註冊成功！您的商家 UID 為: ' + user.uid);
+                    
+                    // 註冊成功後，可以跳轉到商店管理後台（例如：seller.html）
+                    window.location.href = 'seller.html';
+
+                } catch (error) {
+                    // 捕捉常見錯誤並翻譯成小白看得懂的語言
+                    console.error("註冊失敗原因：", error);
+                    if (error.code === 'auth/email-already-in-excess' || error.code === 'auth/email-already-in-use') {
+                        alert('❌ 這個 Email 已經被註冊過囉！請換一個，或直接去登入。');
+                    } else if (error.code === 'auth/invalid-email') {
+                        alert('❌ Email 格式看起來不太正確，請檢查一下。');
+                    } else {
+                        alert('❌ 建立帳號時發生錯誤：' + error.message);
+                    }
+                } finally {
+                    // 還原按鈕狀態
+                    createShopBtn.disabled = false;
+                    createShopBtn.innerText = '建立店鋪';
+                }
+            });
+        }
+
+        // --- 6. 保留前任 CTO 留下的「暗黑/亮色主題切換」功能與基礎彈窗邏輯 ---
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
         if(themeToggleBtn) {
             themeToggleBtn.addEventListener('click', () => {
                 const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -568,169 +622,40 @@
                 localStorage.setItem('pacetake-theme', newTheme);
             });
         }
-        initTheme();
 
-        // 💳 3. 金流防棄單防禦線連動邏輯
+        // 藍新金流切換顯示邏輯
         const toggleOnline = document.getElementById('toggleOnline');
-        const toggleCash = document.getElementById('toggleCash');
         const newebpayContainer = document.getElementById('newebpayContainer');
-        const cashWarningModal = document.getElementById('cashWarningModal');
-        const warningConfirmBtn = document.getElementById('warningConfirmBtn');
-        const warningCancelBtn = document.getElementById('warningCancelBtn');
-
-        // 將前任的輸入框動態替換為大廠主流的「三大金鑰輸入區」，讓賣家自己填
-        if(newebpayContainer) {
-            newebpayContainer.innerHTML = `
-                <label style="margin-bottom:12px; display:block;">🔒 藍新金流 API 開發參數設定</label>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <input type="text" id="merchantIdInput" class="input-style" style="height:38px;" placeholder="請輸入 商店代號 (MerchantID)" required>
-                    <input type="text" id="hashKeyInput" class="input-style" style="height:38px;" placeholder="請輸入 HashKey" required>
-                    <input type="text" id="hashIvInput" class="input-style" style="height:38px;" placeholder="請輸入 HashIV" required>
-                </div>
-            `;
-        }
-
-        // 線上刷卡開關控制金鑰顯示
-        if(toggleOnline) {
+        if(toggleOnline && newebpayContainer) {
             toggleOnline.addEventListener('change', () => {
-                const inputs = newebpayContainer.querySelectorAll('input');
-                if(toggleOnline.checked) {
-                    newebpayContainer.style.display = 'block';
-                    inputs.forEach(i => i.setAttribute('required', 'true'));
-                } else {
-                    newebpayContainer.style.display = 'none';
-                    inputs.forEach(i => i.removeAttribute('required'));
-                }
+                newebpayContainer.style.display = toggleOnline.checked ? 'block' : 'none';
             });
         }
 
-        // 現場付現彈窗安全攔截
-        if(toggleCash) {
+        // 現金付款警語彈窗邏輯
+        const toggleCash = document.getElementById('toggleCash');
+        const cashWarningModal = document.getElementById('cashWarningModal');
+        const warningCancelBtn = document.getElementById('warningCancelBtn');
+        const warningConfirmBtn = document.getElementById('warningConfirmBtn');
+
+        if(toggleCash && cashWarningModal) {
             toggleCash.addEventListener('change', () => {
                 if(toggleCash.checked) {
-                    toggleCash.checked = false; // 先拉回，等彈窗確認
-                    if(cashWarningModal) cashWarningModal.style.display = 'flex';
+                    cashWarningModal.style.display = 'flex';
                 }
             });
         }
-
-        if(warningConfirmBtn) {
-            warningConfirmBtn.addEventListener('click', () => {
-                if(toggleCash) toggleCash.checked = true;
-                if(cashWarningModal) cashWarningModal.style.display = 'none';
-            });
-        }
-
         if(warningCancelBtn) {
             warningCancelBtn.addEventListener('click', () => {
-                if(toggleCash) toggleCash.checked = false;
-                if(cashWarningModal) cashWarningModal.style.display = 'none';
+                toggleCash.checked = false;
+                cashWarningModal.style.display = 'none';
             });
         }
-
-        // ➕ 4. 動態新增菜單品項欄位 (維持高質感排版)
-        const addItemRowBtn = document.getElementById('addItemRowBtn');
-        const menuUploadList = document.getElementById('menuUploadList');
-
-        if(addItemRowBtn && menuUploadList) {
-            addItemRowBtn.addEventListener('click', () => {
-                const newRow = document.createElement('div');
-                newRow.className = 'menu-item-row';
-                newRow.innerHTML = `
-                    <div class="img-upload-box">
-                        📷<span>上傳照片</span>
-                    </div>
-                    <div class="item-fields">
-                        <input type="text" class="input-style" style="height:34px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
-                        <div class="price-input-wrapper">
-                            <span class="price-symbol">$</span>
-                            <input type="number" class="input-style price-input" style="height:34px;" placeholder="店內價金額" min="0" required>
-                        </div>
-                    </div>
-                `;
-                menuUploadList.appendChild(newRow);
-            });
-        }
-
-        // 🚀 5. 真‧建立店鋪並安全寫入 Firebase 雲端資料庫
-        const createShopBtn = document.getElementById('createShopBtn');
-        if(createShopBtn) {
-            createShopBtn.addEventListener('click', async () => {
-                const form = document.getElementById('shopRegisterForm');
-                
-                // 檢查原生 HTML5 欄位必填驗證
-                if (form && !form.checkValidity()) {
-                    form.reportValidity();
-                    return;
-                }
-
-                if (!currentUserId) {
-                    alert("目前未偵測到您的登入帳號，無法綁定店鋪，請重新整理網頁。");
-                    return;
-                }
-
-                // 🛠️ 【Bug 精準修復】：依序抓取前三個基本資料輸入框
-                const inputs = form.querySelectorAll('.form-section:nth-child(1) .input-style');
-                const shopName = inputs[0] ? inputs[0].value.trim() : '';
-                const shopAddress = inputs[1] ? inputs[1].value.trim() : '';
-                const prepareTime = inputs[2] ? parseInt(inputs[2].value) || 15 : 15;
-
-                // 抓取藍新金流開發金鑰
-                const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
-                const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
-                const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
-
-                const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
-                const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
-
-                // 抓取菜單列表中的所有品項與金額資料
-                const menuRows = document.querySelectorAll('.menu-item-row');
-                const menuItems = [];
-                menuRows.forEach(row => {
-                    const fields = row.querySelectorAll('.item-fields .input-style');
-                    const name = fields[0] ? fields[0].value.trim() : '';
-                    const price = fields[1] ? parseInt(fields[1].value) || 0 : 0;
-                    if (name) {
-                        menuItems.push({ name: name, price: price });
-                    }
-                });
-
-                // 打包準備送上雲端的硬核大廠資料結構
-                const shopData = {
-                    sellerUid: currentUserId,
-                    shopName: shopName,
-                    shopAddress: shopAddress,
-                    prepareTime: prepareTime,
-                    isOnlinePayEnabled: isOnlinePayEnabled,
-                    isCashPayEnabled: isCashPayEnabled,
-                    newebpayConfig: {
-                        MerchantID: merchantIdValue,
-                        HashKey: hashKeyValue,
-                        HashIV: hashIvValue
-                    },
-                    menuList: menuItems,
-                    createdAt: new Date().toISOString()
-                };
-
-                // 按鈕進入讀取狀態，防重複點擊
-                createShopBtn.innerText = "⚡ 正在打通雲端地基中...";
-                createShopBtn.disabled = true;
-
-                try {
-                    // 🚀 將資料寫入 Firebase Firestore 資料庫中的 "stores" 集合
-                    await setDoc(doc(db, "stores", currentUserId), shopData);
-                    
-                    alert("🎉 恭喜哥！店鋪資料已成功寫入雲端 Firestore！\n系統即將引導您進入接單管理後台。");
-                    window.location.href = "seller.html";
-
-                } catch (dbError) {
-                    alert("地基寫入失敗，請確認 Firebase 權限：" + dbError.message);
-                    createShopBtn.innerText = "建立店鋪";
-                    createShopBtn.disabled = false;
-                }
+        if(warningConfirmBtn) {
+            warningConfirmBtn.addEventListener('click', () => {
+                cashWarningModal.style.display = 'none';
             });
         }
     </script>
 </body>
 </html>
-

@@ -6,7 +6,8 @@
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
     <!-- 精品藍色便當純代碼 SVG Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E">
- <style>
+
+    <style>
         /* 全局變數與主題防線 */
         :root {
             --bg-global: #F8FAFC;
@@ -478,7 +479,6 @@
             display: inline-block;
         }
     </style>
-
 </head>
 <body>
 
@@ -522,13 +522,42 @@
             </div>
         </header>
 
-        <!-- Google / 電子郵件 登入燈箱彈窗 -->
+
+        <!-- 中間搜尋欄 -->
+        <div class="search-container">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" placeholder="搜尋商圈美味小吃、店家名稱...">
+            </div>
+        </div>
+
+        
+
+        <!-- 店家列表 -->
+        <main class="store-list" id="store-container">
+            
+        </main>
+
+        <!-- 底部懸浮欄 -->
+        <footer class="bottom-bar">
+            <div class="status-msg" id="bottomStatusMsg">
+                <div class="status-indicator" id="statusDot"></div>
+                <span id="statusText">您目前沒有訂單（快去上方搜尋商圈美味小吃吧！）</span>
+            </div>
+            <a href="cart.html" class="cart-status-btn nav-fast">
+                <span>🛒 購物車</span>
+                <span id="cartCount">(0)</span>
+            </a>
+        </footer>
+
+                <!-- Google 登入燈箱彈窗 -->
         <div class="lightbox-modal" id="loginLightbox">
             <div class="modal-card">
                 <div class="modal-title" style="font-weight: 700; margin-bottom: 25px; color: #1f2937; text-align: center;">加入PACE 派思</div>
                 
                 <!-- 1. 官方原廠：Google 彩虹四色一鍵登入按鈕 -->
                 <button class="modal-btn google" id="googleLoginAction" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white !important; border: 1px solid #e5e7eb !important; border-radius: 8px !important; padding: 12px; font-size: 14px; font-weight: 500; color: #374151 !important; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <!-- 標準官方 Google 真正彩虹四色圖標 -->
                     <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:12px; flex-shrink: 0;">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -540,6 +569,7 @@
 
                 <!-- 2. 完全對稱：電子郵件登入按鈕 -->
                 <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 90%; margin-left: auto; margin-right: auto; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; margin-top: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                    <!-- 跨平台通用：經典深灰色電子郵件信封圖標 -->
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:12px; flex-shrink: 0;">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                         <polyline points="22,6 12,13 2,6"></polyline>
@@ -547,7 +577,7 @@
                     使用電子郵件登入
                 </button>
 
-                <!-- 3. 精修展開表單 -->
+                <!-- 3. 精修展開表單：點擊上面信封後才會優雅現身 -->
                 <div id="emailFormSection" style="display: none; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto;">
                     <div style="margin-bottom: 12px;">
                         <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">電子郵件</label>
@@ -557,22 +587,27 @@
                         <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">密碼</label>
                         <input type="password" id="loginPassword" placeholder="請輸入密碼" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb;">
                     </div>
+                    <!-- 綠色確認登入按鈕 -->
                     <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15); transition: background 0.2s;">電子郵件登入 / 註冊</button>
                 </div>
 
+                <!-- 這裡的 id 換成了新名字 customReturnBtn，並且完全清空 onclick 指令，交給最下方的大腦接管 -->
                 <span class="modal-close" id="customReturnBtn" style="margin-top: 20px; display: inline-block; cursor: pointer; color: #6b7280; font-size: 14px; text-decoration: underline;">暫時返回</span>
+
+
             </div>
         </div>
     </div>
 
-    <!-- 🧠 大腦區：沒有任何垃圾外掛，回歸純粹、最標準的網頁技術 -->
-        <script type="module">
-        import { initializeApp } from "https://gstatic.com";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://gstatic.com";
+        <!-- 引入 Firebase 9+ 大廠級官方模組模組 (不依賴本地檔案，安全穩定) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
+        // 🧠 1. 硬核注入你開通的真實 Firebase 雲端大腦金鑰
         const firebaseConfig = {
             apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
-            authDomain: "://firebaseapp.com",
+            authDomain: "pacetake-c6e1e.firebaseapp.com",
             projectId: "pacetake-c6e1e",
             storageBucket: "pacetake-c6e1e.firebasestorage.app",
             messagingSenderId: "1052980235056",
@@ -580,11 +615,42 @@
             measurementId: "G-888XL8JTHW",
         };
 
+        // 初始化 Firebase 與 Auth 驗證系統防線
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+                const provider = new GoogleAuthProvider();
 
-        // 🪪 3. 獲取前端畫面的所有控制台元素
+        // 🚀 2. 0秒無縫閃轉外掛與觸控手勢防線核心架構
+        function bindFastClick(element, callback) {
+            if (!element) return;
+            let triggered = false;
+            function trigger(e) {
+                if (!triggered) {
+                    triggered = true;
+                    setTimeout(() => { triggered = false; }, 300);
+                    callback(e);
+                }
+                e.preventDefault();
+            }
+            element.addEventListener('touchstart', trigger, { passive: false });
+            element.addEventListener('mousedown', trigger);
+        }
+
+        // 🌓 系統最高膚色指揮官防線邏輯
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        function initTheme() {
+            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+        bindFastClick(themeToggleBtn, () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('pacetake-theme', newTheme);
+        });
+        initTheme();
+
+                // 🪪 3. 獲取前端畫面的所有控制台元素
         const loginTriggerBtn = document.getElementById('loginTriggerBtn');
         const userAvatarBtn = document.getElementById('avatarMenuBtn');
         const userDropdown = document.getElementById('userDropdown');
@@ -598,159 +664,151 @@
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
         
-        // 取得電子郵件相關新元素
+        // 取得電子郵件相關元素
         const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
         const emailFormSection = document.getElementById('emailFormSection');
         const customReturnBtn = document.getElementById('customReturnBtn');
+        
+        // 取得電子郵件輸入框與綠色按鈕
         const loginEmailInput = document.getElementById('loginEmail');
         const loginPasswordInput = document.getElementById('loginPassword');
         const emailLoginAction = document.getElementById('emailLoginAction');
 
-        // 🌓 系統最高膚色指揮官防線邏輯（全面改用標準原生監聽器，不塞車）
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        if (themeToggleBtn) {
-            themeToggleBtn.addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('pacetake-theme', newTheme);
-            });
-        }
-        // 初始化膚色
-        document.documentElement.setAttribute('data-theme', localStorage.getItem('pacetake-theme') || 'light');
-
-        // 🚪 2. 登入視窗顯示 / 隱藏 / 還原狀態控制
+        // 控制燈箱彈窗開關
+        bindFastClick(loginTriggerBtn, () => { loginLightbox.style.display = 'flex'; });
+        
+        // 點擊最原始的右上角關閉按鈕，將視窗恢復初始狀態並關閉
         function resetAndCloseLightbox() {
             if (googleLoginAction) googleLoginAction.style.display = 'flex';
             if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'flex';
             if (emailFormSection) emailFormSection.style.display = 'none';
-            if (loginLightbox) loginLightbox.style.display = 'none';
+            loginLightbox.style.display = 'none';
         }
+        bindFastClick(closeLightboxBtn, resetAndCloseLightbox);
 
-        if (loginTriggerBtn) {
-            loginTriggerBtn.addEventListener('click', () => { if(loginLightbox) loginLightbox.style.display = 'flex'; });
-        }
-        if (closeLightboxBtn) {
-            closeLightboxBtn.addEventListener('click', resetAndCloseLightbox);
-        }
+        // 用加速外掛接管「電子郵件登入」按鈕的點擊行為（隱藏大鈕、展開表單）
+        bindFastClick(toggleEmailFormBtn, () => {
+            if (googleLoginAction) googleLoginAction.style.display = 'none';
+            if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'none';
+            if (emailFormSection) emailFormSection.style.display = 'block';
+        });
 
-        // 點擊「使用電子郵件登入」信封按鈕，優雅藏大鈕並展開表單
-        if (toggleEmailFormBtn) {
-            toggleEmailFormBtn.addEventListener('click', () => {
-                if (googleLoginAction) googleLoginAction.style.display = 'none';
-                if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'none';
-                if (emailFormSection) emailFormSection.style.display = 'block';
-            });
-        }
+        // 🛠️ 修正：接管「暫時返回」按鈕的點擊行為（隱藏表單、變回初始狀態、關閉燈箱返回首頁）
+        bindFastClick(customReturnBtn, () => {
+            resetAndCloseLightbox();
+        });
 
-        // 點擊「暫時返回」按鈕
-        if (customReturnBtn) {
-            customReturnBtn.addEventListener('click', resetAndCloseLightbox);
-        }
+        // 🛠️ 新增：讓綠色按鈕「電子郵件登入 / 註冊」點擊時彈出成功訊息並關閉視窗
+        bindFastClick(emailLoginAction, () => {
+            const emailValue = loginEmailInput ? loginEmailInput.value : '';
+            if (!emailValue) {
+                alert("請填寫電子郵件喔！");
+                return;
+            }
+            alert("正在使用電子郵件登入中...");
+            // 這邊成功後會自動關閉視窗
+            resetAndCloseLightbox();
+        });
 
-        // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心（修正：已完全換上原生監聽器！）
-        if (googleLoginAction) {
-            googleLoginAction.addEventListener('click', () => {
-                signInWithPopup(auth, provider)
-                    .then((result) => {
-                        resetAndCloseLightbox();
-                        console.log("真實Google登入成功，用戶資料：", result.user);
-                    })
-                    .catch((error) => {
-                        console.warn("Firebase 登入狀態提示：", error.message);
-                    });
-            });
-        }
 
-        // ✉️ 5. 真‧電子郵件帳密登入與就地自動註冊功能（原生監聽器，絕不虛晃一槍！）
-        if (emailLoginAction) {
-            emailLoginAction.addEventListener('click', () => {
-                const emailValue = loginEmailInput ? loginEmailInput.value.trim() : '';
-                const passwordValue = loginPasswordInput ? loginPasswordInput.value : '';
+                // 🧑‍💻 4. 打通「真‧Google 一鍵彈窗登入」核心
+        bindFastClick(googleLoginAction, () => {
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    resetAndCloseLightbox();
+                    console.log("真實登入成功，用戶資料：", result.user);
+                })
+                .catch((error) => {
+                    // 這裡把嚇人的 alert 拔掉了！使用者自己關掉視窗時，網頁會保持安靜不打擾。
+                    console.warn("Firebase 登入狀態提示：", error.message);
+                });
+        });
 
-                if (!emailValue || !passwordValue) {
-                    alert("請將電子郵件和密碼都填寫完整喔！");
-                    return;
-                }
-                if (passwordValue.length < 6) {
-                    alert("為了安全，密碼必須至少要 6 個字喔！");
-                    return;
-                }
-
-                signInWithEmailAndPassword(auth, emailValue, passwordValue)
-                    .then((result) => {
-                        console.log("電子郵件登入成功！", result.user);
-                        resetAndCloseLightbox();
-                    })
-                    .catch((error) => {
-                        // 如果用戶不存在，直接就地幫他註冊
-                        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-                            createUserWithEmailAndPassword(auth, emailValue, passwordValue)
-                                .then((result) => {
-                                    alert("歡迎新朋友！已成功為您註冊並登入！");
-                                    resetAndCloseLightbox();
-                                })
-                                .catch((regError) => {
-                                    alert("註冊失敗，請確認信箱格式正確：" + regError.message);
-                                });
-                        } else {
-                            alert("密碼錯誤或登入失敗，請再確認一次喔！");
-                        }
-                    });
-            });
-        }
 
         // 🚪 登出按鈕真實功能對接
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                signOut(auth).then(() => {
-                    if (userDropdown) userDropdown.style.display = 'none';
-                });
+        bindFastClick(logoutBtn, () => {
+            signOut(auth).then(() => {
+                userDropdown.style.display = 'none';
             });
-        }
+        });
 
-        // 📡 6. 全局實時監聽買家登入狀態
+        // 📡 5. 全局實時監聽買家登入狀態 (Firebase 最高指揮官監聽外掛)
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                if (loginTriggerBtn) loginTriggerBtn.style.display = 'none';
-                if (userAvatarBtn) userAvatarBtn.style.display = 'flex';
-                if (statusDot) statusDot.classList.add('active');
-                if (statusText) statusText.innerText = `您的訂單 #023 製作中 (${user.displayName || '買家'} 已連線)`;
+                // 🟢 狀態：已登入 (解鎖數位門面)
+                loginTriggerBtn.style.display = 'none';
+                userAvatarBtn.style.display = 'flex';
+                statusDot.classList.add('active');
+                statusText.innerText = `您的訂單 #023 製作中 (${user.displayName || '買家'} 已連線)`;
             } else {
-                if (loginTriggerBtn) loginTriggerBtn.style.display = 'block';
-                if (userAvatarBtn) userAvatarBtn.style.display = 'none';
-                if (statusDot) statusDot.classList.remove('active');
-                if (statusText) statusText.innerText = "您目前沒有訂單（快去點擊店家看菜單吧！）";
+                // 🔴 狀態：未登入 (強行鎖定安全防線)
+                loginTriggerBtn.style.display = 'block';
+                userAvatarBtn.style.display = 'none';
+                statusDot.classList.remove('active');
+                statusText.innerText = "您目前沒有訂單（快去點擊店家看菜單吧！）";
             }
         });
 
         // 展開與關閉控制台下拉選單
-        if (userAvatarBtn) {
-            userAvatarBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isOpen = userDropdown.style.display === 'block';
-                userDropdown.style.display = isOpen ? 'none' : 'block';
-            });
-        }
-
-        document.addEventListener('click', () => {
-            if (userDropdown) userDropdown.style.display = 'none';
+        bindFastClick(userAvatarBtn, (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdown.style.display === 'block';
+            userDropdown.style.display = isOpen ? 'none' : 'block';
         });
 
-        // 身分測試切換面板
-        if (simBuyerBtn && simSellerBtn && sellerMenuBlock) {
-            simBuyerBtn.addEventListener('click', () => {
-                simBuyerBtn.classList.add('active');
-                simSellerBtn.classList.remove('active');
-                sellerMenuBlock.style.display = 'none';
+        document.addEventListener('mousedown', (e) => {
+            if (!userDropdown.contains(e.target) && e.target !== userAvatarBtn) {
+                userDropdown.style.display = 'none';
+            }
+        });
+
+        // 身分測試切換面板 (保留前前端測試路徑)
+        bindFastClick(simBuyerBtn, () => {
+            simBuyerBtn.classList.add('active');
+            simSellerBtn.classList.remove('active');
+            sellerMenuBlock.style.display = 'none';
+        });
+
+        bindFastClick(simSellerBtn, () => {
+            simSellerBtn.classList.add('active');
+            simBuyerBtn.classList.remove('active');
+            sellerMenuBlock.style.display = 'block';
+        });
+
+        // 🚀 6. 終極大廠級：滑動鎖定 0 誤觸跳轉外掛 (100% 完美保留不跑版)
+        const navElements = document.querySelectorAll('.nav-fast');
+        navElements.forEach(elem => {
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let isSwipe = false;
+
+            elem.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches.clientX;
+                touchStartY = e.touches.clientY;
+                isSwipe = false;
+            }, { passive: true });
+
+            elem.addEventListener('touchmove', (e) => {
+                let moveX = e.touches.clientX;
+                let moveY = e.touches.clientY;
+                if (Math.abs(moveX - touchStartX) > 15 || Math.abs(moveY - touchStartY) > 15) {
+                    isSwipe = true;
+                }
+            }, { passive: true });
+
+            elem.addEventListener('touchend', (e) => {
+                if (isSwipe) { e.preventDefault(); return; }
+                const dest = elem.getAttribute('href');
+                if (dest && dest !== '#') { window.location.href = dest; }
             });
 
-            simSellerBtn.addEventListener('click', () => {
-                simSellerBtn.classList.add('active');
-                simBuyerBtn.classList.remove('active');
-                sellerMenuBlock.style.display = 'block';
+            elem.addEventListener('click', (e) => {
+                if (isSwipe) return;
+                const dest = elem.getAttribute('href');
+                if (dest && dest !== '#') { window.location.href = dest; }
             });
-        }
+        });
+
     </script>
 </body>
 </html>

@@ -692,7 +692,7 @@
             });
         }
 
-        // 🛠️ 【真正補齊】電子郵件登入 / 自動註冊邏輯
+                // 🛠️ 【最新修正版】電子郵件登入 / 失敗自動註冊邏輯
         if(emailLoginAction) {
             emailLoginAction.addEventListener('click', () => {
                 const emailValue = loginEmailInput ? loginEmailInput.value.trim() : '';
@@ -708,31 +708,34 @@
                     return;
                 }
 
-                // 先嘗試直接登入
+                // 直接嘗試登入
                 signInWithEmailAndPassword(auth, emailValue, passwordValue)
                     .then((userCredential) => {
                         alert("登入成功！");
                         resetAndCloseLightbox();
                     })
                     .catch((error) => {
-                        // 如果錯誤碼是找不到使用者，就直接幫他自動註冊一個新帳號
-                        if (error.code === 'auth/user-not-found') {
-                            createUserWithEmailAndPassword(auth, emailValue, passwordValue)
-                                .then((userCredential) => {
-                                    alert("偵測到新帳號，已自動為您註冊並登入成功！");
-                                    resetAndCloseLightbox();
-                                })
-                                .catch((regError) => {
-                                    alert("註冊失敗：" + regError.message);
-                                });
-                        } else if (error.code === 'auth/wrong-password') {
-                            alert("密碼輸入錯誤，請再確認一次。");
-                        } else {
-                            alert("登入失敗：" + error.message);
-                        }
+                        // 針對 Firebase 新版安全機制的修正：
+                        // 只要登入失敗（帳號不存在或密碼錯），我們就貼心地幫他嘗試自動註冊！
+                        console.log("登入未成功，正在嘗試為您自動註冊新帳號...", error.code);
+                        
+                        createUserWithEmailAndPassword(auth, emailValue, passwordValue)
+                            .then((userCredential) => {
+                                alert("偵測到新帳號，已自動為您註冊並登入成功！");
+                                resetAndCloseLightbox();
+                            })
+                            .catch((regError) => {
+                                // 如果連註冊都失敗，才代表可能格式有錯或密碼不對
+                                if (regError.code === 'auth/email-already-in-use') {
+                                    alert("此電子郵件已被註冊，請檢查您的密碼是否輸入正確喔！");
+                                } else {
+                                    alert("登入/註冊失敗：" + regError.message);
+                                }
+                            });
                     });
             });
         }
+
 
         // 🧑‍💻 4. 真‧Google 一鍵彈窗登入 (修復完成)
         if(googleLoginAction) {

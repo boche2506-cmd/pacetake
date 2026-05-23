@@ -32,7 +32,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: var(--bg-global); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; }
+        body { background-color: var(--bg-global); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; transition: background 0.3s; }
         
         .phone-wrapper {
             width: 100%;
@@ -42,6 +42,7 @@
             border-right: 1px solid var(--border-color);
             padding: 24px 20px;
             position: relative;
+            transition: background 0.3s, border 0.3s;
         }
 
         .header-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
@@ -54,6 +55,7 @@
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 16px;
+            transition: background 0.3s, border 0.3s;
         }
 
         .section-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--brand-blue); display: flex; align-items: center; gap: 6px; }
@@ -63,10 +65,11 @@
         .form-control {
             width: 100%; height: 42px; border-radius: 10px; border: 1px solid var(--border-color);
             background-color: var(--bg-global); color: var(--text-main); padding: 0 12px; font-size: 14px; outline: none;
+            transition: background 0.3s, border 0.3s, color 0.3s;
         }
         .form-control:focus { border-color: var(--brand-blue); }
 
-        /* 👑 核心改裝：並排下拉選單 */
+        /* 👑 縣市區域並排選單 */
         .select-row { display: flex; gap: 8px; margin-bottom: 12px; }
         .select-row select { flex: 1; }
 
@@ -80,31 +83,45 @@
         input:checked + .slider { background-color: var(--brand-blue); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* 👑 核心改裝：可拖曳菜單品項樣式 */
-        .menu-container { display: flex; flex-direction: column; gap: 8px; }
+        /* 👑 核心優化：可拖曳菜單品項樣式 (完整保留圖片欄位) */
+        .menu-container { display: flex; flex-direction: column; gap: 12px; }
         .menu-item-row {
-            display: flex; align-items: center; gap: 8px; background-color: var(--bg-global);
-            border: 1px solid var(--border-color); padding: 10px; border-radius: 12px;
-            cursor: grab; transition: background-color 0.2s, opacity 0.2s;
+            display: flex; flex-direction: column; gap: 8px; background-color: var(--bg-global);
+            border: 1px solid var(--border-color); padding: 12px; border-radius: 14px;
+            position: relative; transition: background-color 0.2s, opacity 0.2s;
         }
-        .menu-item-row:active { cursor: grabbing; }
         .menu-item-row.dragging { opacity: 0.4; background-color: rgba(0, 98, 255, 0.05); border-style: dashed; }
         
-        .drag-handle { font-size: 16px; color: var(--text-muted); padding: 0 4px; user-select: none; }
-        .menu-inputs { display: flex; gap: 6px; flex-grow: 1; }
-        .menu-inputs .control-name { flex: 2; }
-        .menu-inputs .control-price { flex: 1; }
-        .del-item-btn { background: none; border: none; color: var(--brand-red); font-size: 16px; cursor: pointer; padding: 4px; }
+        /* 拖曳手把與上方控制列 */
+        .menu-item-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 6px; margin-bottom: 4px; }
+        .drag-handle { font-size: 18px; color: var(--text-muted); cursor: grab; user-select: none; padding: 2px 8px; background: var(--bg-container); border: 1px solid var(--border-color); border-radius: 6px; }
+        .drag-handle:active { cursor: grabbing; }
+        
+        .menu-main-content { display: flex; gap: 10px; align-items: flex-start; }
+        
+        /* 圖片上傳控制區 */
+        .image-upload-box {
+            width: 70px; height: 70px; border: 1px dashed var(--border-color); border-radius: 10px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background-color: var(--bg-container); cursor: pointer; position: relative; overflow: hidden; flex-shrink: 0;
+        }
+        .image-upload-box span { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .image-upload-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+        .image-upload-box input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+
+        .menu-inputs { display: flex; flex-direction: column; gap: 6px; flex-grow: 1; }
+        
+        .del-item-btn { background: none; border: none; color: var(--brand-red); font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 2px; }
 
         .add-item-btn {
-            width: 100%; height: 38px; border-radius: 10px; border: 1px dashed var(--brand-blue);
-            background: none; color: var(--brand-blue); font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px;
+            width: 100%; height: 42px; border-radius: 12px; border: 1px dashed var(--brand-blue);
+            background: none; color: var(--brand-blue); font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px;
         }
 
         .submit-btn {
-            width: 100%; height: 48px; background-color: var(--brand-blue); color: white;
+            width: 100%; height: 50px; background-color: var(--brand-blue); color: white;
             border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 98, 255, 0.2); margin-top: 12px;
+            box-shadow: 0 4px 12px rgba(0, 98, 255, 0.2); margin-top: 16px;
         }
         .submit-btn:active { transform: scale(0.99); }
     </style>
@@ -165,16 +182,27 @@
         </div>
 
         <div class="section-card">
-            <div class="section-title">🧑‍🍳 店家菜單品項 (可上下拖曳調整順序)</div>
+            <div class="section-title">🧑‍🍳 店家菜單品項 (按住 ☰ 即可上下拖曳排序)</div>
             <div class="menu-container" id="menuWrapper">
+                
                 <div class="menu-item-row" draggable="true">
-                    <div class="drag-handle">☰</div>
-                    <div class="menu-inputs">
-                        <input type="text" class="form-control control-name" placeholder="商品名稱，如：招牌紅燒牛肉麵">
-                        <input type="number" class="form-control control-price" placeholder="金額">
+                    <div class="menu-item-header">
+                        <div class="drag-handle">☰ 排序</div>
+                        <button class="del-item-btn" onclick="deleteRow(this)">❌ 刪除</button>
                     </div>
-                    <button class="del-item-btn" onclick="deleteRow(this)">❌</button>
+                    <div class="menu-main-content">
+                        <div class="image-upload-box">
+                            <input type="file" accept="image/*" onchange="previewMenuImage(this)">
+                            <span style="font-size:18px;">📸</span>
+                            <span>上傳圖片</span>
+                        </div>
+                        <div class="menu-inputs">
+                            <input type="text" class="form-control control-name" placeholder="商品名稱，如：招牌紅燒牛肉麵">
+                            <input type="number" class="form-control control-price" placeholder="金額">
+                        </div>
+                    </div>
                 </div>
+
             </div>
             <button class="add-item-btn" id="addItemBtn">➕ 新增下一個菜單品項</button>
         </div>
@@ -187,7 +215,6 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        // Firebase 設定 (與首頁完全對齊)
         const firebaseConfig = {
             apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
             authDomain: "pacetake-c6e1e.firebaseapp.com",
@@ -202,6 +229,10 @@
         const db = getFirestore(app);
 
         let currentUid = null;
+
+        // 👑 昨天的精華：跟隨主頁的日夜間模式防線
+        const savedTheme = localStorage.getItem("theme") || "light";
+        document.documentElement.setAttribute("data-theme", savedTheme);
 
         // 全台數據防線
         const areaData = {
@@ -229,15 +260,13 @@
             "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
         };
 
-        // 渲染縣市下拉選單
+        // 渲染縣市區域
         const shopCity = document.getElementById('shopCity');
         const shopDistrict = document.getElementById('shopDistrict');
         
         Object.keys(areaData).forEach(city => {
             const opt = document.createElement('option');
-            opt.value = city;
-            opt.innerText = city;
-            shopCity.appendChild(opt);
+            opt.value = city; opt.innerText = city; shopCity.appendChild(opt);
         });
 
         shopCity.addEventListener('change', () => {
@@ -246,75 +275,93 @@
             if(areaData[selectedCity]) {
                 areaData[selectedCity].forEach(dist => {
                     const opt = document.createElement('option');
-                    opt.value = dist;
-                    opt.innerText = dist;
-                    shopDistrict.appendChild(opt);
+                    opt.value = dist; opt.innerText = dist; shopDistrict.appendChild(opt);
                 });
             }
         });
 
-        // 驗證登入狀態
         onAuthStateChanged(auth, (user) => {
             if (user) { currentUid = user.uid; } 
             else { alert("請先回到首頁進行登入，才能開啟店鋪喔！"); window.location.href = "index.html"; }
         });
 
-        // 👑 核心改裝：綁定拖曳監聽器的精品函式
+        // 📸 昨天的精華：圖片預覽全自動掛載函式
+        window.previewMenuImage = function(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    let img = input.parentElement.querySelector('img');
+                    if(!img) {
+                        img = document.createElement('img');
+                        input.parentElement.appendChild(img);
+                    }
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        };
+
+        // 👑 完美拖曳防線：綁定拖曳監聽器 (相容手機與網頁)
         function initDragAndDrop(element) {
-            element.addEventListener('dragstart', () => { element.classList.add('dragging'); });
-            element.addEventListener('dragend', () => { element.classList.remove('dragging'); });
+            element.addEventListener('dragstart', (e) => {
+                element.classList.add('dragging');
+            });
+            element.addEventListener('dragend', () => {
+                element.classList.remove('dragging');
+            });
         }
 
-        // 初始化現有的拖曳項目
         document.querySelectorAll('.menu-item-row').forEach(row => initDragAndDrop(row));
 
-        // 處理拖曳中的容器排序邏輯
         const menuWrapper = document.getElementById('menuWrapper');
         menuWrapper.addEventListener('dragover', (e) => {
             e.preventDefault();
             const draggingItem = document.querySelector('.dragging');
             if(!draggingItem) return;
             
-            // 算出現有項目中，滑鼠最接近哪一個品項
             const siblings = [...menuWrapper.querySelectorAll('.menu-item-row:not(.dragging)')];
             const nextSibling = siblings.find(sibling => {
                 const box = sibling.getBoundingClientRect();
                 return e.clientY <= box.top + box.height / 2;
             });
             
-            // 動態插入到新位置
-            if (nextSibling) {
-                menuWrapper.insertBefore(draggingItem, nextSibling);
-            } else {
-                menuWrapper.appendChild(draggingItem);
-            }
+            if (nextSibling) { menuWrapper.insertBefore(draggingItem, nextSibling); } 
+            else { menuWrapper.appendChild(draggingItem); }
         });
 
-        // 新增品項按鈕
+        // 新增品項按鈕 (完美保留圖片欄位與拖曳手把)
         document.getElementById('addItemBtn').addEventListener('click', () => {
             const newRow = document.createElement('div');
             newRow.className = "menu-item-row";
             newRow.draggable = true;
             newRow.innerHTML = `
-                <div class="drag-handle">☰</div>
-                <div class="menu-inputs">
-                    <input type="text" class="form-control control-name" placeholder="商品名稱，如：香濃起司蛋餅">
-                    <input type="number" class="form-control control-price" placeholder="金額">
+                <div class="menu-item-header">
+                    <div class="drag-handle">☰ 排序</div>
+                    <button class="del-item-btn" onclick="deleteRow(this)">❌ 刪除</button>
                 </div>
-                <button class="del-item-btn" onclick="deleteRow(this)">❌</button>
+                <div class="menu-main-content">
+                    <div class="image-upload-box">
+                        <input type="file" accept="image/*" onchange="previewMenuImage(this)">
+                        <span style="font-size:18px;">📸</span>
+                        <span>上傳圖片</span>
+                    </div>
+                    <div class="menu-inputs">
+                        <input type="text" class="form-control control-name" placeholder="商品名稱，如：香濃起司蛋餅">
+                        <input type="number" class="form-control control-price" placeholder="金額">
+                    </div>
+                </div>
             `;
             menuWrapper.appendChild(newRow);
-            initDragAndDrop(newRow); // 讓新長出來的品項也能拖曳
+            initDragAndDrop(newRow);
         });
 
-        // 刪除品項（全域掛載）
         window.deleteRow = function(btn) {
             const rows = menuWrapper.querySelectorAll('.menu-item-row');
             if(rows.length <= 1) { alert("報告老闆，店裡至少要留一項商品才能開張喔！"); return; }
             btn.closest('.menu-item-row').remove();
         };
 
-        // 🚀 建立店鋪按下事件
+        // 🚀 建立店鋪並驗證
         document.getElementById('createShopActionBtn').addEventListener('click', async () => {
             if(!currentUid) { alert("未偵測到登入狀態，請先登入！"); return; }
 
@@ -327,7 +374,7 @@
             const payLive = document.getElementById('payLive').checked;
             const payOnline = document.getElementById('payOnline').checked;
 
-            // 👑 核心改裝：支付防線檢查（如果兩樣皆未開啟，顯示提示並攔截）
+            // 👑 核心防線：如果兩樣皆未開啟，噴錯並攔截
             if (!payLive && !payOnline) {
                 alert("⚠️ 報告老闆！建立店鋪時「現場付款」與「線上刷卡」皆未開啟，請至少選擇一種支付方式才能開張喔！");
                 return;
@@ -338,7 +385,7 @@
                 return;
             }
 
-            // 👑 核心改裝：重新抓取「拖曳排序後」的菜單陣列順序
+            // 👑 核心防線：重新抓取「拖曳排序後」的最新菜單陣列
             const menuList = [];
             const itemRows = menuWrapper.querySelectorAll('.menu-item-row');
             
@@ -346,10 +393,15 @@
             itemRows.forEach(row => {
                 const name = row.querySelector('.control-name').value.trim();
                 const price = row.querySelector('.control-price').value.trim();
+                
+                // 圖片轉為 base64 存入資料庫 (昨天的本地儲存精華)
+                const imgEl = row.querySelector('.image-upload-box img');
+                const imgData = imgEl ? imgEl.src : "";
+
                 if (name && price) {
-                    menuList.push({ name: name, price: parseFloat(price) });
+                    menuList.push({ name: name, price: parseFloat(price), image: imgData });
                 } else if (name || price) {
-                    menuValid = false; // 有填名字沒填錢，或有填錢沒填名字
+                    menuValid = false;
                 }
             });
 
@@ -358,11 +410,9 @@
                 return;
             }
 
-            // 組合完整地址存入資料庫
             const fullAddress = `${city}${district}${detailAddress}`;
 
             try {
-                // 寫入 Firebase
                 await setDoc(doc(db, "stores", currentUid), {
                     shopName: shopName,
                     city: city,
@@ -371,17 +421,16 @@
                     prepareTime: prepareTime,
                     payLive: payLive,
                     payOnline: payOnline,
-                    menuList: menuList, // 這邊就是經過拖曳排好序的精準陣列！
+                    menuList: menuList, // 完美排序+帶圖片的完全體陣列！
                     uid: currentUid,
-                    // 預設經緯度由買家定位距離去算，這邊先不硬寫
                     lat: "24.1475", 
                     lng: "120.6736"
                 });
 
                 alert("🎉 恭喜哥！店鋪成功同步上傳雲端，完美開張！");
-                window.location.href = "index.html"; // 開張成功跳回首頁看成果
+                window.location.href = "index.html";
             } catch (error) {
-                alert("上傳失敗，請檢查網路或設定: " + error.message);
+                alert("上傳失敗: " + error.message);
             }
         });
     </script>

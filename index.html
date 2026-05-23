@@ -583,10 +583,15 @@
                         <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">電子郵件</label>
                         <input type="email" id="loginEmail" placeholder="請輸入 Email" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb;">
                     </div>
-                    <div style="margin-bottom: 20px;">
+                                        <div style="margin-bottom: 20px; position: relative;">
                         <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">密碼</label>
-                        <input type="password" id="loginPassword" placeholder="請輸入密碼" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb;">
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <input type="password" id="loginPassword" placeholder="請輸入密碼" style="width:100%; padding:10px 40px 10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb;">
+                            <!-- 👁️ 密碼眼睛顯示按鈕 -->
+                            <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
+                        </div>
                     </div>
+
                     <!-- 綠色確認登入按鈕 -->
                     <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15); transition: background 0.2s;">電子郵件登入 / 註冊</button>
                 </div>
@@ -692,50 +697,87 @@
             });
         }
 
-                // 🛠️ 【最新修正版】電子郵件登入 / 失敗自動註冊邏輯
-        if(emailLoginAction) {
-            emailLoginAction.addEventListener('click', () => {
-                const emailValue = loginEmailInput ? loginEmailInput.value.trim() : '';
-                const passwordValue = loginPasswordInput ? loginPasswordInput.value : '';
-                
-                if (!emailValue || !passwordValue) {
-                    alert("請完整填寫電子郵件與密碼喔！");
-                    return;
+                        // 👁️ 1. 密碼眼睛切換顯示功能
+        const togglePasswordBtn = document.getElementById('togglePasswordVisibility');
+        if (togglePasswordBtn && loginPasswordInput) {
+            togglePasswordBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (loginPasswordInput.type === 'password') {
+                    loginPasswordInput.type = 'text';
+                    togglePasswordBtn.innerText = '🙈'; // 變成遮眼
+                } else {
+                    loginPasswordInput.type = 'password';
+                    togglePasswordBtn.innerText = '👁️'; // 變回眼睛
                 }
-                
-                if (passwordValue.length < 6) {
-                    alert("為了安全，密碼長度至少需要 6 個字元喔！");
-                    return;
-                }
-
-                // 直接嘗試登入
-                signInWithEmailAndPassword(auth, emailValue, passwordValue)
-                    .then((userCredential) => {
-                        alert("登入成功！");
-                        resetAndCloseLightbox();
-                    })
-                    .catch((error) => {
-                        // 針對 Firebase 新版安全機制的修正：
-                        // 只要登入失敗（帳號不存在或密碼錯），我們就貼心地幫他嘗試自動註冊！
-                        console.log("登入未成功，正在嘗試為您自動註冊新帳號...", error.code);
-                        
-                        createUserWithEmailAndPassword(auth, emailValue, passwordValue)
-                            .then((userCredential) => {
-                                alert("偵測到新帳號，已自動為您註冊並登入成功！");
-                                resetAndCloseLightbox();
-                            })
-                            .catch((regError) => {
-                                // 如果連註冊都失敗，才代表可能格式有錯或密碼不對
-                                if (regError.code === 'auth/email-already-in-use') {
-                                    alert("此電子郵件已被註冊，請檢查您的密碼是否輸入正確喔！");
-                                } else {
-                                    alert("登入/註冊失敗：" + regError.message);
-                                }
-                            });
-                    });
             });
         }
 
+        // 🧠 2. 封裝核心的「登入/註冊」執行動作，方便按鈕跟 Enter 鍵同時呼叫
+        function executeEmailAuth() {
+            const emailValue = loginEmailInput ? loginEmailInput.value.trim() : '';
+            const passwordValue = loginPasswordInput ? loginPasswordInput.value : '';
+            
+            if (!emailValue || !passwordValue) {
+                alert("請完整填寫電子郵件與密碼喔！");
+                return;
+            }
+            
+            if (passwordValue.length < 6) {
+                alert("為了安全，密碼長度至少需要 6 個字元喔！");
+                return;
+            }
+
+            // 嘗試登入
+            signInWithEmailAndPassword(auth, emailValue, passwordValue)
+                .then((userCredential) => {
+                    alert("登入成功！");
+                    resetAndCloseLightbox();
+                })
+                .catch((error) => {
+                    console.log("登入未成功，系統嘗試判斷原因...", error.code);
+                    
+                    // 嘗試為新用戶自動註冊
+                    createUserWithEmailAndPassword(auth, emailValue, passwordValue)
+                        .then((userCredential) => {
+                            alert("偵測到新帳號，已自動為您註冊並登入成功！");
+                            resetAndCloseLightbox();
+                        })
+                        .catch((regError) => {
+                            // 🥷 偵測到大廠級的帳號衝突（Email 已經被 Google 或其他方式綁定了）
+                            if (regError.code === 'auth/email-already-in-use' || error.code === 'auth/invalid-login-credentials') {
+                                // 智慧提示：這代表這個 Email 其實已經存在系統中（高機率是用 Google 登入過）
+                                alert("【PACE 提示】此電子郵件已被註冊（或您曾使用過 Google 一鍵登入）。如果是密碼打錯請重新輸入；若您曾用 Google 登入，請直接點擊上方的「Google 一鍵登入」按鈕喔！");
+                            } else {
+                                alert("登入/註冊失敗：" + regError.message);
+                            }
+                        });
+                });
+        }
+
+        // 🖱️ 點擊綠色按鈕觸發
+        if(emailLoginAction) {
+            emailLoginAction.addEventListener('click', executeEmailAuth);
+        }
+
+        // ⌨️ 【新增】在密碼欄位按下 Enter 鍵直接登入
+        if(loginPasswordInput) {
+            loginPasswordInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // 防止網頁重新整理
+                    executeEmailAuth();
+                }
+            });
+        }
+        
+        // ⌨️ 【新增】在 Email 欄位按下 Enter 鍵自動跳到密碼欄
+        if(loginEmailInput && loginPasswordInput) {
+            loginEmailInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    loginPasswordInput.focus(); // 游標直接跳到密碼框
+                }
+            });
+        }
 
         // 🧑‍💻 4. 真‧Google 一鍵彈窗登入 (修復完成)
         if(googleLoginAction) {

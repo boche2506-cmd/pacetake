@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>快拿自取街 pacetake.tw - 商家手機開店</title>
+    <title>PACE 派思 - 月費開店(暫不收費)</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E">
 
     <style>
-        /* 全局變數與主題防線 */
         :root {
             --bg-global: #F8FAFC;
             --bg-container: #FFFFFF;
             --border-color: #E2E8F0;
             --text-main: #0F172A;
             --text-muted: #64748B;
-            --brand-blue: #0066FF;
+            --brand-blue: #0062FF;
+            --brand-green: #10B981;
             --brand-red: #EF4444;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
             --card-bg: #FFFFFF;
         }
 
@@ -27,728 +25,365 @@
             --border-color: #262626;
             --text-main: #F5F5F5;
             --text-muted: #A3A3A3;
-            --brand-blue: #3B82F6;
+            --brand-blue: #2F80ED;
+            --brand-green: #34D399;
             --brand-red: #F87171;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
             --card-bg: #1C1C1E;
         }
 
-        /* 基礎重設 */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-global);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            transition: background-color 0.15s ease;
-        }
-
-        /* 手機直屏精品大外框與細邊界 */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+        body { background-color: var(--bg-global); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; }
+        
         .phone-wrapper {
             width: 100%;
             max-width: 430px;
-            min-height: 100vh;
             background-color: var(--bg-container);
             border-left: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md);
+            padding: 24px 20px;
             position: relative;
-            padding-bottom: 100px;
-            display: flex;
-            flex-direction: column;
         }
 
-        /* 頂部導航與大字留白 */
-        .header {
-            padding: 24px 20px 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .header-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .back-btn { background: none; border: none; font-size: 20px; color: var(--text-main); cursor: pointer; text-decoration: none; }
+        .page-title { font-size: 22px; font-weight: 800; }
 
-        .back-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-main);
-            cursor: pointer;
-            text-decoration: none;
-            background-color: var(--card-bg);
-        }
-
-        .header h1 {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        .theme-toggle {
-            background: none;
-            border: 1px solid var(--border-color);
-            font-size: 16px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-            background-color: var(--card-bg);
-        }
-
-        /* 填表區域 */
-        .form-container {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .form-section {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .input-group label {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .input-style {
-            width: 100%;
-            height: 44px;
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0 14px;
-            font-size: 14px;
-            color: var(--text-main);
-            outline: none;
-        }
-
-        /* 金流切換防禦線排版 */
-        .switch-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .section-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 14px;
-            box-shadow: var(--shadow-sm);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
         }
 
-        .switch-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+        .section-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--brand-blue); display: flex; align-items: center; gap: 6px; }
+        
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-main); }
+        .form-control {
+            width: 100%; height: 42px; border-radius: 10px; border: 1px solid var(--border-color);
+            background-color: var(--bg-global); color: var(--text-main); padding: 0 12px; font-size: 14px; outline: none;
         }
+        .form-control:focus { border-color: var(--brand-blue); }
 
-        .switch-title {
-            font-size: 14px;
-            font-weight: 700;
-        }
+        /* 👑 核心改裝：並排下拉選單 */
+        .select-row { display: flex; gap: 8px; margin-bottom: 12px; }
+        .select-row select { flex: 1; }
 
-        .switch-desc {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
+        /* 開關切換鈕 */
+        .switch-group { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+        .switch-label { font-size: 14px; font-weight: 600; }
+        .switch { position: relative; display: inline-block; width: 46px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .2s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--brand-blue); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
-        /* 原生滑動開關器 */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 46px;
-            height: 24px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #CBD5E1;
-            transition: .2s;
-            border-radius: 24px;
-        }
-
-        .slider::before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .2s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--brand-blue);
-        }
-
-        input:checked + .slider::before {
-            transform: translateX(22px);
-        }
-
-        /* 藍新金流隱藏區塊 */
-        .newebpay-box {
-            display: block; /* 預設開啟 */
-            animation: fadeIn 0.2s ease;
-        }
-
-        /* 菜單動態上架排版 */
-        .menu-upload-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
+        /* 👑 核心改裝：可拖曳菜單品項樣式 */
+        .menu-container { display: flex; flex-direction: column; gap: 8px; }
         .menu-item-row {
-            display: flex;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 12px;
-            gap: 12px;
-            align-items: center;
-            box-shadow: var(--shadow-sm);
-            animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center; gap: 8px; background-color: var(--bg-global);
+            border: 1px solid var(--border-color); padding: 10px; border-radius: 12px;
+            cursor: grab; transition: background-color 0.2s, opacity 0.2s;
         }
+        .menu-item-row:active { cursor: grabbing; }
+        .menu-item-row.dragging { opacity: 0.4; background-color: rgba(0, 98, 255, 0.05); border-style: dashed; }
+        
+        .drag-handle { font-size: 16px; color: var(--text-muted); padding: 0 4px; user-select: none; }
+        .menu-inputs { display: flex; gap: 6px; flex-grow: 1; }
+        .menu-inputs .control-name { flex: 2; }
+        .menu-inputs .control-price { flex: 1; }
+        .del-item-btn { background: none; border: none; color: var(--brand-red); font-size: 16px; cursor: pointer; padding: 4px; }
 
-        .img-upload-box {
-            width: 70px;
-            height: 70px;
-            border-radius: 12px;
-            border: 2px dashed var(--border-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            background-color: var(--bg-global);
-            cursor: pointer;
-            color: var(--text-muted);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .upload-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-        }
-
-        .img-upload-box span {
-            font-size: 10px;
-            margin-top: 2px;
-        }
-
-        .item-fields {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            flex-grow: 1;
-        }
-
-        .price-input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .price-symbol {
-            position: absolute;
-            left: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-muted);
-        }
-
-        .price-input {
-            padding-left: 26px !important;
-        }
-
-        .add-row-btn {
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            color: var(--brand-blue);
-            height: 44px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: background-color 0.2s;
-        }
-
-        .add-row-btn:active {
-            background-color: var(--border-color);
-        }
-
-        /* 底部註冊大鈕 */
-        .footer-action {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 16px 20px 24px 20px;
-            background-color: var(--bg-container);
-            border-top: 1px solid var(--border-color);
+        .add-item-btn {
+            width: 100%; height: 38px; border-radius: 10px; border: 1px dashed var(--brand-blue);
+            background: none; color: var(--brand-blue); font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px;
         }
 
         .submit-btn {
-            background-color: var(--brand-blue);
-            color: white;
-            border: none;
-            width: 100%;
-            height: 52px;
-            border-radius: 26px;
-            font-size: 16px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 4px 14px rgba(0, 102, 255, 0.3);
+            width: 100%; height: 48px; background-color: var(--brand-blue); color: white;
+            border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 98, 255, 0.2); margin-top: 12px;
         }
-
-        /* 半透明警語燈箱彈窗 */
-        .lightbox-modal {
-            display: none;
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-card {
-            background-color: var(--bg-container);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 320px;
-            padding: 24px;
-            box-shadow: var(--shadow-md);
-            text-align: center;
-        }
-
-        .modal-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--brand-red);
-            margin-bottom: 12px;
-        }
-
-        .modal-desc {
-            font-size: 13px;
-            color: var(--text-main);
-            line-height: 1.6;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .modal-action-btns {
-            display: flex;
-            gap: 10px;
-        }
-
-        .modal-action-btns button {
-            flex: 1;
-            height: 40px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-main);
-        }
-
-        .modal-action-btns .confirm-btn {
-            background-color: var(--brand-blue);
-            color: white;
-            border: none;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .submit-btn:active { transform: scale(0.99); }
     </style>
 </head>
 <body>
 
     <div class="phone-wrapper">
-        <header class="header">
-            <a href="index.html" class="back-btn nav-fast">⬅️ 返回</a>
-            <h1>3分鐘手機開店</h1>
-            <button class="theme-toggle" id="themeToggleBtn">🌓</button>
-        </header>
+        <div class="header-nav">
+            <a href="index.html" class="back-btn">⬅️</a>
+            <div class="page-title">建立我的精品店鋪</div>
+        </div>
 
-        <form class="form-container" id="shopRegisterForm" onsubmit="return false;">
-            <div class="form-section">
-                <div class="section-title">基本資料設定</div>
-                <div class="input-group">
-                    <label>店鋪名稱</label>
-                    <input type="text" class="input-style" placeholder="請輸入您的店鋪招牌名稱" required>
-                </div>
-                <div class="input-group">
-                    <label>店鋪地址 <span style="color:var(--brand-blue); font-size:11px;">(AI自動轉換經緯度)</span></label>
-                    <input type="text" class="input-style" placeholder="請輸入完整地址，以便計算GPS距離" required>
-                </div>
-                <div class="input-group">
-                    <label>平均餐點準備時間 (分鐘)</label>
-                    <input type="number" class="input-style" value="15" min="1" required>
+        <div class="section-card">
+            <div class="section-title">🏪 店鋪基本防線</div>
+            <div class="form-group">
+                <label>店鋪名稱</label>
+                <input type="text" id="shopName" class="form-control" placeholder="例如：派思精品大水餃">
+            </div>
+            
+            <div class="form-group">
+                <label>店鋪所在區域</label>
+                <div class="select-row">
+                    <select id="shopCity" class="form-control">
+                        <option value="">選擇縣市</option>
+                    </select>
+                    <select id="shopDistrict" class="form-control">
+                        <option value="">選擇區域</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="form-section">
-                <div class="section-title">金流防棄單安全防禦線</div>
-                
-                <div class="switch-row">
-                    <div class="switch-info">
-                        <div class="switch-title">線上刷卡 / LINE Pay</div>
-                        <div class="switch-desc">安全防護最高，買家先付款才接單</div>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggleOnline" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="input-group newebpay-box" id="newebpayContainer">
-                    <label>藍新金流專屬收款網址</label>
-                    <input type="url" class="input-style" placeholder="https://newebpay.com..." id="newebpayUrlInput">
-                </div>
-
-                <div class="switch-row">
-                    <div class="switch-info">
-                        <div class="switch-title">現場付現</div>
-                        <div class="switch-desc">開啟現場付款，需自行承擔未取貨風險</div>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggleCash">
-                        <span class="slider"></span>
-                    </label>
-                </div>
+            <div class="form-group">
+                <label>詳細地址</label>
+                <input type="text" id="shopAddress" class="form-control" placeholder="例如：忠孝東路四段 1 號 1 樓">
             </div>
-
-            <div class="form-section">
-                <div class="section-title">菜單商品上架</div>
-                <div class="menu-upload-list" id="menuUploadList">
-                    
-                    <div class="menu-item-row">
-                        <div class="img-upload-box" onclick="triggerUpload(this)">
-                            <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                            <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                            <div class="upload-placeholder">📷<span>上傳照片</span></div>
-                        </div>
-                        <div class="item-fields">
-                            <input type="text" class="input-style" style="height:34px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">$</span>
-                                <input type="number" class="input-style price-input" style="height:34px;" placeholder="店內價金額" min="0" required>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <button type="button" class="add-row-btn" id="addItemRowBtn">＋ 新增下一個品項</button>
-            </div>
-        </form>
-
-        <footer class="footer-action">
-            <button class="submit-btn" id="createShopBtn" form="shopRegisterForm" type="submit">建立店鋪</button>
-        </footer>
-
-        <div class="lightbox-modal" id="cashWarningModal" style="display: none;">
-            <div class="modal-card">
-                <div class="modal-title">⚠️ 開啟現場付現風險提示</div>
-                <div class="modal-desc">
-                    您正準備開啟「現場付現」功能。請注意，若遇到買家蓄意棄單、逾時未取，相關食材與營業損失需由店鋪自行全額吸收，平台恕不進行補償。請問是否同意此條款？
-                </div>
-                <div class="modal-action-btns">
-                    <button class="cancel-btn" id="warningCancelBtn">不同意</button>
-                    <button class="confirm-btn" id="warningConfirmBtn">我同意</button>
-                </div>
+            <div class="form-group">
+                <label>預估出餐時間 (分鐘)</label>
+                <input type="number" id="prepareTime" class="form-control" placeholder="例如：15" value="15">
             </div>
         </div>
+
+        <div class="section-card">
+            <div class="section-title">💵 收款結帳防線 (至少需開啟一種)</div>
+            <div class="switch-group">
+                <div class="switch-label">現場付款 (到店付現/刷卡)</div>
+                <label class="switch">
+                    <input type="checkbox" id="payLive" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="switch-group">
+                <div class="switch-label">線上刷卡 (顧客下單先扣款)</div>
+                <label class="switch">
+                    <input type="checkbox" id="payOnline">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-title">🧑‍🍳 店家菜單品項 (可上下拖曳調整順序)</div>
+            <div class="menu-container" id="menuWrapper">
+                <div class="menu-item-row" draggable="true">
+                    <div class="drag-handle">☰</div>
+                    <div class="menu-inputs">
+                        <input type="text" class="form-control control-name" placeholder="商品名稱，如：招牌紅燒牛肉麵">
+                        <input type="number" class="form-control control-price" placeholder="金額">
+                    </div>
+                    <button class="del-item-btn" onclick="deleteRow(this)">❌</button>
+                </div>
+            </div>
+            <button class="add-item-btn" id="addItemBtn">➕ 新增下一個菜單品項</button>
+        </div>
+
+        <button class="submit-btn" id="createShopActionBtn">🚀 建立店鋪並開張</button>
     </div>
 
-<script type="module">
-    // 【小白救星精準修正】：還原被前任改爛的官方真實 Firebase 9+ SDK 載入路徑
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // 🧠 1. 真實 Firebase 金鑰
-    const firebaseConfig = {
-        apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
-        authDomain: "pacetake-c6e1e.firebaseapp.com", // 【精準修復】：補上正確的專案網域
-        projectId: "pacetake-c6e1e",
-        storageBucket: "pacetake-c6e1e.firebasestorage.app",
-        messagingSenderId: "1052980235056",
-        appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
-        measurementId: "G-888XL8JTHW",
-    };
+        // Firebase 設定 (與首頁完全對齊)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
+            authDomain: "pacetake-c6e1e.firebaseapp.com",
+            projectId: "pacetake-c6e1e",
+            storageBucket: "pacetake-c6e1e.firebasestorage.app",
+            messagingSenderId: "1052980235056",
+            appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    // 監聽登入狀態
-    let currentUserId = null;
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUserId = user.uid;
-            console.log("當前商家已連線，UID:", currentUserId);
-        } else {
-            alert("【PACE 提示】開鋪前請先回首頁完成登入喔！");
-            window.location.href = "index.html";
-        }
-    });
+        let currentUid = null;
 
-    // 【小白救星精準修正】：補上被前任遺漏、導致網頁完全卡死的 initTheme 膚色初始化函數
-    function initTheme() {
-        const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    }
+        // 全台數據防線
+        const areaData = {
+            "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
+            "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
+            "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
+            "桃園市": ["桃園區", "中壢區", "大溪區", "楊梅區", "蘆竹區", "大園區", "龜山區", "八德區", "龍潭區", "平鎮區", "新屋區", "觀音區", "復興區"],
+            "新竹市": ["東區", "北區", "香山區"],
+            "新竹縣": ["竹北市", "竹東鎮", "新埔鎮", "關西鎮", "湖口鄉", "新豐鄉", "芎林鄉", "橫山鄉", "北埔鄉", "寶山鄉", "峨眉鄉", "尖石鄉", "五峰鄉"],
+            "苗栗縣": ["苗栗市", "頭份市", "竹南鎮", "後龍鎮", "通霄鎮", "苑裡鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "公館鄉", "銅鑼鄉", "三義鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "南庄鄉", "泰安鄉"],
+            "台中市": ["中區", "東區", "南區", "西區", "北區", "西屯區", "南屯區", "北屯區", "豐原區", "東勢區", "大甲區", "清水區", "沙鹿區", "梧棲區", "后里區", "神岡區", "潭子區", "大雅區", "新社區", "石岡區", "外埔區", "大安區", "烏日區", "大肚區", "龍井區", "霧峰區", "太平區", "大里區", "和平區"],
+            "彰化縣": ["彰化市", "員林市", "鹿港鎮", "和美鎮", "北斗鎮", "溪湖鎮", "田中鎮", "二林鎮", "線西鄉", "伸港鄉", "福興鄉", "秀水鄉", "花壇鄉", "芬園鄉", "大村鄉", "埔鹽鄉", "埔心鄉", "永靖鄉", "社頭鄉", "二水鄉", "田尾鄉", "埤頭鄉", "芳苑鄉", "大城鄉", "竹塘鄉", "溪州鄉"],
+            "南投縣": ["南投市", "埔里鎮", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
+            "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "西螺鎮", "土庫鎮", "北港鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "東勢鄉", "褒忠鄉", "臺西鄉", "元長鄉", "四湖鄉", "口湖鄉", "水林鄉"],
+            "嘉義市": ["東區", "西區"],
+            "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
+            "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
+            "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區", "內門區"],
+            "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
+            "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
+            "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
+            "臺東縣": ["臺東市", "成功鎮", "關山鎮", "卑南鄉", "大武鄉", "太麻里鄉", "東河鄉", "長濱鄉", "鹿野鄉", "池上鄉", "綠島鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉"],
+            "澎湖縣": ["馬公市", "湖西鄉", "白沙鄉", "西嶼鄉", "望安鄉", "七美鄉"],
+            "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
+            "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
+        };
 
-    // 🌓 2. 膚色指揮官防線邏輯
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
-    if(themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('pacetake-theme', newTheme);
-        });
-    }
-
-    initTheme();
-
-    // 💳 3. 金流防棄單防禦線連動邏輯
-    const toggleOnline = document.getElementById('toggleOnline');
-    const toggleCash = document.getElementById('toggleCash');
-    const newebpayContainer = document.getElementById('newebpayContainer');
-    const cashWarningModal = document.getElementById('cashWarningModal');
-    const warningConfirmBtn = document.getElementById('warningConfirmBtn');
-    const warningCancelBtn = document.getElementById('warningCancelBtn');
-
-    // 將前任的輸入框動態替換為大廠主流的「三大金鑰輸入區」，讓賣家自己填
-    if(newebpayContainer) {
-        newebpayContainer.innerHTML = `
-            <label style="margin-bottom:12px; display:block;">🔒 藍新金流 API 開發參數設定</label>
-            <div style="display:flex; flex-direction:column; gap:8px;">
-                <input type="text" id="merchantIdInput" class="input-style" style="height:38px;" placeholder="請輸入 商店代號 (MerchantID)" required>
-                <input type="text" id="hashKeyInput" class="input-style" style="height:38px;" placeholder="請輸入 HashKey" required>
-                <input type="text" id="hashIvInput" class="input-style" style="height:38px;" placeholder="請輸入 HashIV" required>
-            </div>
-        `;
-    }
-
-    // 線上刷卡開關控制金鑰顯示
-    if(toggleOnline) {
-        toggleOnline.addEventListener('change', () => {
-            const inputs = newebpayContainer.querySelectorAll('input');
-            if(toggleOnline.checked) {
-                newebpayContainer.style.display = 'block';
-                inputs.forEach(i => i.setAttribute('required', 'true'));
-            } else {
-                newebpayContainer.style.display = 'none';
-                inputs.forEach(i => i.removeAttribute('required'));
-            }
-        });
-    }
-
-    // 現場付現彈窗安全攔截
-    if(toggleCash) {
-        toggleCash.addEventListener('change', () => {
-            if(toggleCash.checked) {
-                toggleCash.checked = false; // 先拉回，等彈窗確認
-                if(cashWarningModal) cashWarningModal.style.display = 'flex';
-            }
-        });
-    }
-
-    if(warningConfirmBtn) {
-        warningConfirmBtn.addEventListener('click', () => {
-            if(toggleCash) toggleCash.checked = true;
-            if(cashWarningModal) cashWarningModal.style.display = 'none';
-        });
-    }
-
-    if(warningCancelBtn) {
-        warningCancelBtn.addEventListener('click', () => {
-            if(toggleCash) toggleCash.checked = false;
-            if(cashWarningModal) cashWarningModal.style.display = 'none';
-        });
-    }
-
-    // ➕ 4. 動態新增菜單品項欄位與圖片預覽邏輯
-    const addItemRowBtn = document.getElementById('addItemRowBtn');
-    const menuUploadList = document.getElementById('menuUploadList');
-
-    if(addItemRowBtn && menuUploadList) {
-        addItemRowBtn.addEventListener('click', () => {
-            const newRow = document.createElement('div');
-            newRow.className = 'menu-item-row';
-            newRow.innerHTML = `
-                <div class="img-upload-box" onclick="triggerUpload(this)">
-                    <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                    <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                    <div class="upload-placeholder">📷<span>上傳照片</span></div>
-                </div>
-                <div class="item-fields">
-                    <input type="text" class="input-style" style="height:34px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
-                    <div class="price-input-wrapper">
-                        <span class="price-symbol">$</span>
-                        <input type="number" class="input-style price-input" style="height:34px;" placeholder="店內價金額" min="0" required>
-                    </div>
-                </div>
-            `;
-            menuUploadList.appendChild(newRow);
-        });
-    }
-
-    // 點擊相機框框時，自動去點擊裡面隱藏的檔案選取器
-    window.triggerUpload = function(box) {
-        const fileInput = box.querySelector('.image-input');
-        if (fileInput) fileInput.click();
-    };
-
-    // 選好照片後，即時在框框內預覽縮圖
-    window.previewImage = function(input) {
-        const box = input.parentElement;
-        const img = box.querySelector('.preview-img');
-        const placeholder = box.querySelector('.upload-placeholder');
+        // 渲染縣市下拉選單
+        const shopCity = document.getElementById('shopCity');
+        const shopDistrict = document.getElementById('shopDistrict');
         
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                img.src = e.target.result;
-                img.style.display = 'block';
-                if (placeholder) placeholder.style.display = 'none';
-            };
-            reader.readAsDataURL(input.files[0]);
+        Object.keys(areaData).forEach(city => {
+            const opt = document.createElement('option');
+            opt.value = city;
+            opt.innerText = city;
+            shopCity.appendChild(opt);
+        });
+
+        shopCity.addEventListener('change', () => {
+            const selectedCity = shopCity.value;
+            shopDistrict.innerHTML = '<option value="">選擇區域</option>';
+            if(areaData[selectedCity]) {
+                areaData[selectedCity].forEach(dist => {
+                    const opt = document.createElement('option');
+                    opt.value = dist;
+                    opt.innerText = dist;
+                    shopDistrict.appendChild(opt);
+                });
+            }
+        });
+
+        // 驗證登入狀態
+        onAuthStateChanged(auth, (user) => {
+            if (user) { currentUid = user.uid; } 
+            else { alert("請先回到首頁進行登入，才能開啟店鋪喔！"); window.location.href = "index.html"; }
+        });
+
+        // 👑 核心改裝：綁定拖曳監聽器的精品函式
+        function initDragAndDrop(element) {
+            element.addEventListener('dragstart', () => { element.classList.add('dragging'); });
+            element.addEventListener('dragend', () => { element.classList.remove('dragging'); });
         }
-    };
 
-    // 🚀 5. 真‧建立店鋪並安全寫入 Firebase 雲端資料庫
-    const createShopBtn = document.getElementById('createShopBtn');
-    if(createShopBtn) {
-        createShopBtn.addEventListener('click', async () => {
-            const form = document.getElementById('shopRegisterForm');
-            
-            // 🛠️【小白救星精準修正】：依序抓取前三個基本資料輸入框，並防止空白
-            const inputs = form.querySelectorAll('.form-section:nth-child(1) .input-style');
-            const shopName = inputs[0] ? inputs[0].value.trim() : '';
-            const shopAddress = inputs[1] ? inputs[1].value.trim() : '';
-            const prepareTime = inputs[2] ? parseInt(inputs[2].value) || 15 : 15;
+        // 初始化現有的拖曳項目
+        document.querySelectorAll('.menu-item-row').forEach(row => initDragAndDrop(row));
 
-            // 抓取藍新金流金鑰參數與付款開關
-            const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
-            const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
-            const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
-            const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
-            const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
+        // 處理拖曳中的容器排序邏輯
+        const menuWrapper = document.getElementById('menuWrapper');
+        menuWrapper.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const draggingItem = document.querySelector('.dragging');
+            if(!draggingItem) return;
             
-            // 檢查原生 HTML5 欄位必填驗證
-            if (form && !form.checkValidity()) {
-                form.reportValidity();
+            // 算出現有項目中，滑鼠最接近哪一個品項
+            const siblings = [...menuWrapper.querySelectorAll('.menu-item-row:not(.dragging)')];
+            const nextSibling = siblings.find(sibling => {
+                const box = sibling.getBoundingClientRect();
+                return e.clientY <= box.top + box.height / 2;
+            });
+            
+            // 動態插入到新位置
+            if (nextSibling) {
+                menuWrapper.insertBefore(draggingItem, nextSibling);
+            } else {
+                menuWrapper.appendChild(draggingItem);
+            }
+        });
+
+        // 新增品項按鈕
+        document.getElementById('addItemBtn').addEventListener('click', () => {
+            const newRow = document.createElement('div');
+            newRow.className = "menu-item-row";
+            newRow.draggable = true;
+            newRow.innerHTML = `
+                <div class="drag-handle">☰</div>
+                <div class="menu-inputs">
+                    <input type="text" class="form-control control-name" placeholder="商品名稱，如：香濃起司蛋餅">
+                    <input type="number" class="form-control control-price" placeholder="金額">
+                </div>
+                <button class="del-item-btn" onclick="deleteRow(this)">❌</button>
+            `;
+            menuWrapper.appendChild(newRow);
+            initDragAndDrop(newRow); // 讓新長出來的品項也能拖曳
+        });
+
+        // 刪除品項（全域掛載）
+        window.deleteRow = function(btn) {
+            const rows = menuWrapper.querySelectorAll('.menu-item-row');
+            if(rows.length <= 1) { alert("報告老闆，店裡至少要留一項商品才能開張喔！"); return; }
+            btn.closest('.menu-item-row').remove();
+        };
+
+        // 🚀 建立店鋪按下事件
+        document.getElementById('createShopActionBtn').addEventListener('click', async () => {
+            if(!currentUid) { alert("未偵測到登入狀態，請先登入！"); return; }
+
+            const shopName = document.getElementById('shopName').value.trim();
+            const city = shopCity.value;
+            const district = shopDistrict.value;
+            const detailAddress = document.getElementById('shopAddress').value.trim();
+            const prepareTime = document.getElementById('prepareTime').value.trim();
+            
+            const payLive = document.getElementById('payLive').checked;
+            const payOnline = document.getElementById('payOnline').checked;
+
+            // 👑 核心改裝：支付防線檢查（如果兩樣皆未開啟，顯示提示並攔截）
+            if (!payLive && !payOnline) {
+                alert("⚠️ 報告老闆！建立店鋪時「現場付款」與「線上刷卡」皆未開啟，請至少選擇一種支付方式才能開張喔！");
                 return;
             }
 
-            // 🛠️【精準修復】：抓取動態菜單列表，打包成乾淨的陣列 (加上陣列索引)
-            const menuRows = document.querySelectorAll('.menu-item-row');
-            const menuItems = [];
-            menuRows.forEach(row => {
-                const fields = row.querySelectorAll('.item-fields .input-style');
-                const name = fields[0] ? fields[0].value.trim() : '';
-                const price = fields[1] ? parseInt(fields[1].value) || 0 : 0;
-                if (name) {
-                    menuItems.push({ name: name, price: price });
+            if (!shopName || !city || !district || !detailAddress) {
+                alert("請完整填寫店鋪名稱、選擇縣市區域、並填寫詳細地址喔！");
+                return;
+            }
+
+            // 👑 核心改裝：重新抓取「拖曳排序後」的菜單陣列順序
+            const menuList = [];
+            const itemRows = menuWrapper.querySelectorAll('.menu-item-row');
+            
+            let menuValid = true;
+            itemRows.forEach(row => {
+                const name = row.querySelector('.control-name').value.trim();
+                const price = row.querySelector('.control-price').value.trim();
+                if (name && price) {
+                    menuList.push({ name: name, price: parseFloat(price) });
+                } else if (name || price) {
+                    menuValid = false; // 有填名字沒填錢，或有填錢沒填名字
                 }
             });
 
-            const shopData = {
-                sellerUid: currentUserId,
-                shopName: shopName,
-                shopAddress: shopAddress,
-                prepareTime: prepareTime,
-                isOnlinePayEnabled: isOnlinePayEnabled,
-                isCashPayEnabled: isCashPayEnabled,
-                newebpayConfig: {
-                    MerchantID: merchantIdValue,
-                    HashKey: hashKeyValue,
-                    HashIV: hashIvValue
-                },
-                menuList: menuItems,
-                createdAt: new Date().toISOString()
-            };
+            if (!menuValid || menuList.length === 0) {
+                alert("請確認您的菜單品項名稱與金額都有完整填寫喔！");
+                return;
+            }
 
-            // 按鈕進入讀取狀態，防止重複點擊
-            createShopBtn.innerText = "⚡ 正在打通雲端地基中...";
-            createShopBtn.disabled = true;
+            // 組合完整地址存入資料庫
+            const fullAddress = `${city}${district}${detailAddress}`;
 
             try {
-                // 🚀 將資料寫入 Firebase Firestore 資料庫
-                await setDoc(doc(db, "stores", currentUserId), shopData);
-                alert("🎉 恭喜哥！店鋪資料已成功寫入雲端 Firestore！\n系統即將引導您進入接單管理後台。");
-                window.location.href = "seller.html";
-            } catch (dbError) {
-                alert("地基寫入失敗，請確認 Firebase 權限：" + dbError.message);
-                createShopBtn.innerText = "建立店鋪";
-                createShopBtn.disabled = false;
+                // 寫入 Firebase
+                await setDoc(doc(db, "stores", currentUid), {
+                    shopName: shopName,
+                    city: city,
+                    district: district,
+                    shopAddress: fullAddress,
+                    prepareTime: prepareTime,
+                    payLive: payLive,
+                    payOnline: payOnline,
+                    menuList: menuList, // 這邊就是經過拖曳排好序的精準陣列！
+                    uid: currentUid,
+                    // 預設經緯度由買家定位距離去算，這邊先不硬寫
+                    lat: "24.1475", 
+                    lng: "120.6736"
+                });
+
+                alert("🎉 恭喜哥！店鋪成功同步上傳雲端，完美開張！");
+                window.location.href = "index.html"; // 開張成功跳回首頁看成果
+            } catch (error) {
+                alert("上傳失敗，請檢查網路或設定: " + error.message);
             }
         });
-    }
-</script>
+    </script>
 </body>
 </html>

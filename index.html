@@ -307,8 +307,9 @@
             color: inherit;
             box-shadow: var(--shadow-sm);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+          /* 🌟 關鍵補強防線：強迫卡片指名服從手機大外框的 100% 寬度限制，絕對不准擠破框架！ */
+            width: 100%; 
         }
-
         .store-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0,0,0,0.06);

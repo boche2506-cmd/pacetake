@@ -1013,10 +1013,22 @@
             }
         }
 
-        // 初始化啟動
+      // 初始化啟動
         fetchStoresFromFirebase();
         getBrowserLocation();
 
-    </script>
+        window.toggleView = function(viewRole) {
+            console.log("成功觸發視圖切換，目標權限：", viewRole);
+            if (viewRole === 'admin') {
+                if(document.getElementById('adminView')) document.getElementById('adminView').style.display = 'block';
+                if(document.getElementById('buyerView')) document.getElementById('buyerView').style.display = 'none';
+            } else {
+                if(document.getElementById('adminView')) document.getElementById('adminView').style.display = 'none';
+                if(document.getElementById('buyerView')) document.getElementById('buyerView').style.display = 'block';
+            }
+        };
+
+    });
+</script>
 </body>
 </html>

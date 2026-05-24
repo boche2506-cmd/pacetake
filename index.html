@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%2=stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E">
 
     <style>
         /* 全局變數與主題防線 - 完美呼應 Cyber Blue 品牌色 */
@@ -90,6 +90,23 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+        }
+
+        .brand-title-area {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
         }
 
         .brand-title-area h1 {
@@ -269,12 +286,86 @@
             outline: none;
         }
 
-        /* 下方：店家列表區 */
+        /* 下方：店家列表區樣式補強面防線 */
         .store-list {
             padding: 16px 20px;
             display: flex;
             flex-direction: column;
             gap: 16px;
+        }
+
+        .store-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .store-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .store-img {
+            width: 54px;
+            height: 54px;
+            background-color: var(--bg-global);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .store-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
+            gap: 6px;
+        }
+
+        .store-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .store-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .store-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .store-tags span {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .tag-time {
+            background-color: rgba(0, 98, 255, 0.08);
+            color: var(--brand-blue);
+        }
+
+        .tag-pay {
+            background-color: rgba(16, 185, 129, 0.08);
+            color: var(--brand-green);
         }
 
         /* 底部常駐懸浮欄 */
@@ -305,7 +396,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            cursor: pointer;
             text-decoration: none;
         }
 
@@ -445,7 +535,10 @@
         <div class="sticky-top-group">
             <header class="header">
                 <div class="brand-title-area">
-                    <h1>PACE 派思</h1>
+                    <div class="brand-logo-container">
+                        <img src="logo.png" alt="PACE Logo" class="brand-logo">
+                        <h1>PACE 派思</h1>
+                    </div>
                     <div class="brand-subtitle">店內價預約外帶自取 / 內用點單系統</div>
                 </div>
                 
@@ -615,7 +708,7 @@
         let currentBuyerAddress = "正在獲取定位中...";
         let currentUserId = null;
 
-        // 🇹🇼 22縣市區域防線完美制霸數據
+        // 🇹🇼 22縣市區域防線數據
         const areaData = {
             "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
             "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -717,8 +810,9 @@
         // 燈箱控制
         loginTriggerBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
         customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
+        
         toggleEmailFormBtn.addEventListener('click', () => {
-            emailFormSection.style.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
+            emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
         });
 
         // 👁️ 密碼可見度切換

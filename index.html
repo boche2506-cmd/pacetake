@@ -6,22 +6,23 @@
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
-
+    
     <style>
-        /* 全局變數與主題防線 - 完美呼應 Cyber Blue 品牌色 */
+        /* ==========================================================================
+           1. 全局變數與白天黑夜主題防線 (鎖定不動)
+           ========================================================================== */
         :root {
             --bg-global: #F8FAFC;
             --bg-container: #FFFFFF;
             --border-color: #E2E8F0;
             --text-main: #0F172A;
             --text-muted: #64748B;
-            --brand-blue: #0062FF; 
-            --brand-green: #10B981;
             --brand-red: #EF4444;
+            --brand-blue: #0066FF;
+            --brand-green: #10B981;
+            --card-bg: #FFFFFF;
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
             --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
-            --card-bg: #FFFFFF;
-            --blur-bg: rgba(255, 255, 255, 0.95);
         }
 
         [data-theme="dark"] {
@@ -30,41 +31,39 @@
             --border-color: #262626;
             --text-main: #F5F5F5;
             --text-muted: #A3A3A3;
-            --brand-blue: #2F80ED; 
-            --brand-green: #34D399;
-            --brand-red: #F87171;
+            --brand-blue: #3B82F6;
+            --card-bg: #1C1C1E;
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
             --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
-            --card-bg: #1C1C1E;
-            --blur-bg: rgba(17, 17, 17, 0.95);
         }
 
-        /* 基礎重設 */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
-                body {
+        body {
             background-color: var(--bg-global);
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: stretch; /* 🌟 關鍵修正：強迫大盒子上下拉滿螢幕高度，不准縮水！ */
+            align-items: stretch;
             min-height: 100vh;
             margin: 0;
             padding: 0;
             transition: background-color 0.15s ease;
         }
 
-        /* 手機直屏精品大外框 - 已全面針對電腦寬螢幕浮動與高度進行優化對齊 */
+        /* ==========================================================================
+           2. 手機直屏精品大外框佈局防線 (鎖定不動)
+           ========================================================================== */
         .phone-wrapper {
             width: 100%;
             max-width: 430px;
-            height: 100vh;         /* 🌟 關鍵修正：在電腦上直接鎖定 100% 螢幕滿高度，不准被卡片壓扁！ */
+            height: 100vh;
             background-color: var(--bg-container);
             border-left: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
@@ -72,61 +71,54 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;      /* 🌟 關鍵修正：讓只有中間的店家可以像 App 一樣在裡面滾動，上下排死死卡住不动！ */
         }
 
-        /* 👑 頂部全區常駐吸附天花板 */
+        /* 📌 固定上排：吸附天花板群組 */
         .sticky-top-group {
             position: sticky;
             top: 0;
-            z-index: 1000; 
-            background-color: var(--blur-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            background-color: var(--bg-container);
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
         }
 
-        /* 頂部高級大字留白區 */
         .header {
-            padding: 24px 20px 12px 20px;
+            padding: 20px 20px 12px 20px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
         }
 
         .brand-title-area {
             display: flex;
             flex-direction: column;
+            gap: 2px;
         }
 
         .brand-logo-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .brand-logo {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             object-fit: contain;
         }
 
-        .brand-title-area h1 {
-            font-size: 28px;
+        .brand-logo-container h1 {
+            font-size: 20px;
             font-weight: 800;
             letter-spacing: -0.5px;
-            color: var(--text-main);
         }
 
         .brand-subtitle {
-            font-size: 12px;
+            font-size: 11px;
+            font-weight: 700;
             color: var(--text-muted);
-            margin-top: 4px;
-            font-weight: 500;
         }
 
-        /* 右上角一體化控制台 */
         .control-panel {
             display: flex;
             align-items: center;
@@ -137,110 +129,117 @@
         .theme-toggle {
             background: none;
             border: 1px solid var(--border-color);
-            font-size: 16px;
-            width: 36px;
-            height: 36px;
+            font-size: 15px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-main);
             background-color: var(--card-bg);
+            color: var(--text-main);
         }
 
         .login-btn {
             background-color: var(--brand-blue);
-            color: #FFFFFF;
+            color: white;
             border: none;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 0 12px;
+            height: 34px;
+            border-radius: 17px;
+            font-size: 12px;
+            font-weight: 700;
             cursor: pointer;
             box-shadow: var(--shadow-sm);
         }
 
         .user-avatar-btn {
-            display: none; 
-            background-color: var(--card-bg);
+            display: none;
+            background: none;
             border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 0 12px;
+            height: 34px;
+            border-radius: 17px;
+            font-size: 12px;
+            font-weight: 700;
             color: var(--text-main);
             cursor: pointer;
-            align-items: center;
-            gap: 4px;
+            background-color: var(--card-bg);
         }
 
-        /* 下拉選單面板 */
+        /* 下拉選單 */
         .dropdown-menu {
             display: none;
             position: absolute;
             top: 42px;
             right: 0;
-            width: 200px;
-            background-color: var(--card-bg);
+            background-color: var(--bg-container);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 14px;
+            width: 180px;
+            padding: 6px;
             box-shadow: var(--shadow-md);
             z-index: 1100;
-            padding: 6px;
         }
 
-        .dropdown-menu a, .dropdown-menu button {
-            display: flex;
-            align-items: center;
-            width: 100%;
+        .nav-fast {
+            display: block;
             padding: 10px 12px;
             color: var(--text-main);
             text-decoration: none;
             font-size: 13px;
-            border: none;
-            background: none;
-            text-align: left;
+            font-weight: 600;
             border-radius: 8px;
-            cursor: pointer;
         }
 
-        .dropdown-menu a:hover, .dropdown-menu button:hover {
+        .nav-fast:hover {
             background-color: var(--bg-global);
         }
 
         .menu-divider {
             height: 1px;
             background-color: var(--border-color);
-            margin: 6px 0;
+            margin: 4px 6px;
         }
 
-        /* 👑 智慧選單分流區塊 */
-        .seller-unlock { display: none; }
-        .admin-unlock { display: none; }
+        .seller-unlock, .admin-unlock {
+            display: none;
+        }
 
-        /* 精品 GPS 定位管理列 */
+        #logoutBtn {
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            padding: 10px 12px;
+            color: var(--brand-red);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        #logoutBtn:hover { background-color: var(--bg-global); }
+
+        /* 定位列與搜尋框 */
         .location-bar {
-            padding: 4px 20px 8px 20px;
+            padding: 0 20px 10px 20px;
             display: flex;
-            align-items: center;
             gap: 8px;
+            align-items: center;
         }
 
         .gps-trigger-btn {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--brand-blue);
-            background-color: var(--card-bg);
+            background: none;
             border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 6px 10px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
             cursor: pointer;
+            background-color: var(--card-bg);
             white-space: nowrap;
-            box-shadow: var(--shadow-sm);
         }
 
         .location-select-group {
@@ -251,31 +250,30 @@
 
         .nav-select {
             flex: 1;
-            height: 32px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            height: 28px;
             background-color: var(--bg-global);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
             color: var(--text-main);
-            font-size: 12px;
-            font-weight: 600;
             padding: 0 4px;
             outline: none;
-            cursor: pointer;
         }
 
-        /* 中間：搜尋欄 */
         .search-container {
-            padding: 8px 20px 4px 20px;
+            padding: 0 20px 14px 20px;
         }
 
         .search-box {
-            display: flex;
-            align-items: center;
             background-color: var(--bg-global);
             border: 1px solid var(--border-color);
+            height: 40px;
             border-radius: 12px;
-            padding: 0 14px;
-            height: 46px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 8px;
         }
 
         .search-box input {
@@ -283,18 +281,19 @@
             background: none;
             width: 100%;
             height: 100%;
-            margin-left: 8px;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-main);
             outline: none;
         }
 
-        /* 下方：店家列表區樣式補強面防線 */
+        /* 🛒 中間：店家滑動列表區 */
         .store-list {
             padding: 16px 20px;
             display: flex;
             flex-direction: column;
             gap: 16px;
+            flex: 1;
+            overflow-y: auto;
         }
 
         .store-card {
@@ -309,113 +308,105 @@
             color: inherit;
             box-shadow: var(--shadow-sm);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            
-            /* 🌟 核心防線：強制限制卡片寬度，絕對不准擠歪大外框 */
             width: 100%; 
         }
+
         .store-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0,0,0,0.06);
         }
 
         .store-img {
-            width: 54px;
-            height: 54px;
+            width: 58px;
+            height: 58px;
             background-color: var(--bg-global);
-            border-radius: 12px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 26px;
             flex-shrink: 0;
+            border: 1px solid var(--border-color);
         }
 
         .store-info {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            height: 58px;
             flex-grow: 1;
-            gap: 6px;
+            min-width: 0;
         }
 
         .store-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .store-meta {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
+            font-weight: 600;
             margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-
         .store-tags {
             display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
+            gap: 4px;
         }
 
-        .store-tags span {
-            font-size: 10px;
-            font-weight: 600;
-            padding: 3px 8px;
+        .tag-time, .tag-pay {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
             border-radius: 6px;
-        }
-
-        .tag-time {
-            background-color: rgba(0, 98, 255, 0.08);
+            background-color: var(--bg-global);
             color: var(--brand-blue);
         }
+        .tag-pay { color: var(--brand-green); }
 
-        .tag-pay {
-            background-color: rgba(16, 185, 129, 0.08);
-            color: var(--brand-green);
+        .loading-spinner {
+            text-align: center;
+            padding: 30px 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
         }
 
-        /* 底部常駐懸浮欄 */
+        /* 📌 固定下排：常駐底部導覽列 */
         .bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 430px;
-            height: 76px;
-            background-color: var(--blur-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 72px;
+            background-color: var(--bg-container);
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px 10px 20px;
-            z-index: 999;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+            padding: 0 20px;
+            z-index: 1000;
         }
 
         .status-msg {
-            font-size: 12px;
-            color: var(--text-muted);
-            max-width: 200px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             text-decoration: none;
+            color: var(--text-main);
+            min-width: 0;
+            flex-grow: 1;
         }
 
         .status-indicator {
-            width: 8px;
-            height: 8px;
+            width: 8px; height: 8px;
+            background-color: #CBD5E1;
             border-radius: 50%;
-            background-color: var(--text-muted);
             flex-shrink: 0;
-            position: relative;
-        }
-
-        .status-indicator.active {
-            background-color: var(--brand-green);
-            box-shadow: 0 0 8px var(--brand-green);
         }
 
         .order-badge-count {
@@ -423,36 +414,40 @@
             color: white;
             font-size: 10px;
             font-weight: 800;
-            min-width: 15px;
-            height: 15px;
-            border-radius: 8px;
+            padding: 1px 5px;
+            border-radius: 10px;
             display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 0 4px;
-            border: 1px solid var(--bg-container);
+        }
+
+        #statusText {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .cart-status-btn {
             background-color: var(--brand-blue);
             color: white;
-            border: none;
-            padding: 10px 16px;
+            padding: 0 16px;
+            height: 40px;
             border-radius: 20px;
             font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 4px;
             text-decoration: none;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
+            flex-shrink: 0;
         }
 
-        /* 燈箱樣式 */
-                .lightbox-modal {
+        /* 🔲 全螢幕標準安全燈箱防線 */
+        .lightbox-modal {
             display: none;
-            position: fixed; /* 🌟 核心防線：死死鎖定在全螢幕，絕不跟開店頁打架 */
+            position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(4px);
@@ -463,73 +458,365 @@
             padding: 20px;
         }
 
-        .modal-card {
+        .lightbox-card {
             background-color: var(--bg-container);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
+            border-radius: 24px;
             width: 100%;
-            max-width: 320px;
+            max-width: 330px;
             padding: 24px;
             box-shadow: var(--shadow-md);
-            text-align: center;
+            position: relative;
         }
 
-        .modal-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 16px;
+        .lightbox-close-btn {
+            position: absolute;
+            top: 16px; right: 16px;
+            background: none; border: none;
+            font-size: 16px; cursor: pointer;
+            color: var(--text-muted);
         }
 
-        .modal-desc-address {
-            font-size: 13px;
-            color: var(--text-main);
-            line-height: 1.5;
-            margin-bottom: 20px;
-            word-break: break-all;
-            background-color: var(--bg-global);
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            text-align: left;
+        .lightbox-title {
+            font-size: 18px; font-weight: 800;
+            text-align: center; margin-bottom: 20px;
         }
 
-        .modal-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        #adminView {
+            display: none;
             width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 10px;
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-main);
-        }
-
-        .modal-btn.google {
-            background-color: #FFFFFF !important;
-            color: #374151 !important;
-            border-color: #E2E8F0 !important;
-        }
-
-        .modal-close {
-            font-size: 12px;
-            color: var(--text-muted);
-            cursor: pointer;
-            margin-top: 12px;
-            display: inline-block;
-        }
-
-        .loading-spinner {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 600;
+            max-width: 430px;
+            background-color: var(--bg-container);
+            padding: 20px;
         }
     </style>
-    </head>
+</head>
+<body>
+
+    <!-- 🔮 核心分流開關 A：管理員控制台 -->
+    <div id="adminView">
+        <h2 style="margin-bottom:15px;">🔮 派思核心控制台</h2>
+        <button onclick="toggleView('buyer')" style="padding:8px 16px; cursor:pointer;">返回買家首頁</button>
+    </div>
+
+    <!-- 📱 核心分流開關 B：買家大外框總開關 -->
+    <div id="buyerView">
+        <div class="phone-wrapper">
+            
+            <!-- 📌 固定上排：吸附天花板群組 -->
+            <div class="sticky-top-group">
+                <header class="header">
+                    <div class="brand-title-area">
+                        <div class="brand-logo-container">
+                            <img src="logo.png" alt="PACE Logo" class="brand-logo">
+                            <h1>PACE 派思</h1>
+                        </div>
+                        <div class="brand-subtitle">店內價預約外帶自取 / 內用點單系統</div>
+                    </div>
+                    
+                    <div class="control-panel">
+                        <button class="theme-toggle" id="themeToggleBtn">🌓</button>
+                        <button class="login-btn" id="loginTriggerBtn">Google 登入</button>
+                        <button class="user-avatar-btn" id="avatarMenuBtn"><span>🧑‍💼 帳號</span></button>
+                        
+                        <!-- 下拉選單 -->
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
+                            <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
+                            <a href="register.html" class="nav-fast">💼 月費開店</a>
+                            
+                            <div class="seller-unlock" id="sellerMenuBlock">
+                                <div class="menu-divider"></div>
+                                <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
+                                <a href="manage.html" class="nav-fast">⚙️ 後台管理</a>
+                            </div>
+
+                            <div class="admin-unlock" id="adminMenuBlock">
+                                <div class="menu-divider"></div>
+                                <a href="javascript:void(0)" onclick="toggleView('admin')" style="color:var(--brand-blue); font-weight:bold;">🔮 核心控制台</a>
+                            </div>
+                            
+                            <div class="menu-divider"></div>
+                            <button id="logoutBtn">🚪 登出</button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- 定位列 -->
+                <div class="location-bar">
+                    <button class="gps-trigger-btn" id="gpsPinBtn">📍 定位位置</button>
+                    <div class="location-select-group">
+                        <select class="nav-select" id="citySelect">
+                                                    <select class="nav-select" id="citySelect">
+                            <option value="">選擇縣市</option>
+                            <option value="臺北市">臺北市</option>
+                            <option value="新北市">新北市</option>
+                            <option value="基隆市">基隆市</option>
+                            <option value="桃園市">桃園市</option>
+                            <option value="新竹市">新竹市</option>
+                            <option value="新竹縣">新竹縣</option>
+                            <option value="苗栗縣">苗栗縣</option>
+                            <option value="台中市">台中市</option>
+                            <option value="彰化縣">彰化縣</option>
+                            <option value="南投縣">南投縣</option>
+                            <option value="雲林縣">雲林縣</option>
+                            <option value="嘉義市">嘉義市</option>
+                            <option value="嘉義縣">嘉義縣</option>
+                            <option value="台南市">台南市</option>
+                            <option value="高雄市">高雄市</option>
+                            <option value="屏東縣">屏東縣</option>
+                            <option value="宜蘭縣">宜蘭縣</option>
+                            <option value="花蓮縣">花蓮縣</option>
+                            <option value="臺東縣">臺東縣</option>
+                            <option value="澎湖縣">澎湖縣</option>
+                            <option value="金門縣">金門縣</option>
+                            <option value="連江縣">連江縣</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 搜尋框 -->
+                <div class="search-container">
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <input type="text" id="globalSearchInput" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🛒 中間：店家滑動列表區 -->
+            <main class="store-list" id="store-container">
+                <div class="loading-spinner">⚡ 正在安全連線雲端資料庫...</div>
+            </main>
+
+            <!-- 📌 固定下排：常駐底部導覽列 -->
+            <footer class="bottom-bar">
+                <a href="history.html" class="status-msg" id="bottomStatusMsg">
+                    <div class="status-indicator" id="statusDot"></div>
+                    <div class="order-badge-count" id="orderBadgeCount">0</div>
+                    <span id="statusText">您目前沒有進行中的訂單喔！</span>
+                </a>
+                <a href="cart.html" class="cart-status-btn">
+                    <span>🛒 購物車</span>
+                    <span id="cartCount">(0)</span>
+                </a>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- 🔲 全螢幕 Google 登入燈箱 -->
+    <div class="lightbox-modal" id="loginLightbox">
+        <div class="lightbox-card">
+            <button class="lightbox-close-btn" id="closeLightboxBtn">✕</button>
+            <div class="lightbox-title">🔑 歡迎加入 PACE 派思</div>
+            <button id="googleLoginAction" style="width:100%; height:46px; background:#0066FF; color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer;">Google 一鍵登入 / 註冊</button>
+        </div>
+    </div>
+
+    <!-- 🚀 核心模組化引擎 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+        // 🌟 請在此處填入真實連線金鑰 🌟
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
+            authDomain: "pacetake-c6e1e.firebaseapp.com",
+            projectId: "pacetake-c6e1e",
+            storageBucket: "pacetake-c6e1e.firebasestorage.app",
+            messagingSenderId: "1052980235056",
+            appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
+            measurementId: "G-888XL8JTHW",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        let allStores = [];
+
+                const loginTriggerBtn = document.getElementById('loginTriggerBtn');
+        const userAvatarBtn = document.getElementById('avatarMenuBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        const loginLightbox = document.getElementById('loginLightbox');
+        const closeLightboxBtn = document.getElementById('closeLightboxBtn');
+        const googleLoginAction = document.getElementById('googleLoginAction');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const sellerMenuBlock = document.getElementById('sellerMenuBlock');
+        const adminMenuBlock = document.getElementById('adminMenuBlock');
+        const storeContainer = document.getElementById('store-container');
+        const globalSearchInput = document.getElementById('globalSearchInput');
+        const citySelect = document.getElementById('citySelect');
+        const districtSelect = document.getElementById('districtSelect');
+
+        // 🌓 日夜燈切換核心
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', targetTheme);
+        });
+
+        // 🗺️ 縣市連動核心
+                const areaData = { 
+            "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"], 
+            "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "樹林區", "鶯歌區", "三峽區", "淡水區", "汐止區", "瑞芳區", "土城區", "蘆洲區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"], 
+            "基隆市": ["七堵區", "仁愛區", "中正區", "信義區", "中山區", "安樂區", "暖暖區"],
+            "桃園市": ["桃園區", "中壢區", "平鎮區", "八德區", "楊梅區", "蘆竹區", "大溪區", "龍潭區", "大園區", "龜山區", "新屋區", "觀音區", "復興區"],
+            "新竹市": ["東區", "北區", "香山區"],
+            "新竹縣": ["竹北市", "竹東鎮", "新埔鎮", "關西鎮", "湖口鄉", "新豐鄉", "芎林鄉", "橫山鄉", "北埔鄉", "寶山鄉", "峨眉鄉", "尖石鄉", "五峰鄉"],
+            "苗栗縣": ["苗栗市", "頭份市", "竹南鎮", "後龍鎮", "通霄鎮", "苑裡鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "公館鄉", "銅鑼鄉", "三義鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "南庄鄉", "泰安鄉"],
+            "台中市": ["中區", "東區", "南區", "西區", "北區", "北屯區", "西屯區", "南屯區", "太平區", "大里區", "霧峰區", "烏日區", "丰原區", "后里區", "石岡區", "東勢區", "和平區", "新社區", "潭子區", "大雅區", "神岡區", "大肚區", "沙鹿區", "龍井區", "梧棲區", "清水區", "大甲區", "外埔區", "大安區"],
+            "彰化縣": ["彰化市", "員林市", "鹿港鎮", "和美鎮", "北斗鎮", "溪湖鎮", "田中鎮", "二林鎮", "線西鄉", "伸港鄉", "福興鄉", "秀水鄉", "花壇鄉", "芬園鄉", "大村鄉", "埔鹽鄉", "埔心鄉", "永靖鄉", "社頭鄉", "二水鄉", "田尾鄉", "埤頭鄉", "芳苑鄉", "大城鄉", "竹塘鄉", "溪州鄉"],
+            "南投縣": ["南投市", "埔里鎮", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
+            "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "西螺鎮", "土庫鎮", "北港鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "東勢鄉", "褒忠鄉", "臺西鄉", "元長鄉", "四湖鄉", "口湖鄉", "水林鄉"],
+            "嘉義市": ["東區", "西區"],
+            "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
+            "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
+            "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "阿蓮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區", "茄萣區"],
+            "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "高樹鄉", "鹽埔鄉", "內埔鄉", "萬巒鄉", "竹田鄉", "內埔鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
+            "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
+            "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
+            "臺東縣": ["臺東市", "成功鎮", "關山鎮", "卑南鄉", "大武鄉", "太麻里鄉", "東河鄉", "長濱鄉", "鹿野鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉", "綠島鄉"],
+            "澎湖縣": ["馬公市", "湖西鄉", "白沙鄉", "西嶼鄉", "望安鄉", "七美鄉"],
+            "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
+            "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
+        };
+
+        citySelect.addEventListener('change', () => {
+            const city = citySelect.value;
+            districtSelect.innerHTML = '<option value="">選擇區域</option>';
+            if(areaData[city]) {
+                areaData[city].forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d; opt.innerText = d; districtSelect.appendChild(opt);
+                });
+            }
+            filterAndRenderStores();
+        });
+        districtSelect.addEventListener('change', filterAndRenderStores);
+        globalSearchInput.addEventListener('input', filterAndRenderStores);
+
+        // 🔓 帳號選單點擊開關
+        userAvatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', () => { userDropdown.style.display = 'none'; });
+
+        // 🔲 燈箱開關
+        loginTriggerBtn.addEventListener('click', () => loginLightbox.style.display = 'flex');
+        closeLightboxBtn.addEventListener('click', () => loginLightbox.style.display = 'none');
+
+        // 🔑 認證邏輯防線
+        googleLoginAction.addEventListener('click', async () => {
+            try {
+                await signInWithPopup(auth, provider);
+                loginLightbox.style.display = 'none';
+            } catch(e) { console.error("登入失敗", e); }
+        });
+
+        logoutBtn.addEventListener('click', () => signOut(auth));
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                loginTriggerBtn.style.display = 'none';
+                userAvatarBtn.style.display = 'block';
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if(userDoc.exists()) {
+                    const data = userDoc.data();
+                    if(data.role === 'seller') sellerMenuBlock.style.display = 'block';
+                    if(data.role === 'admin') { sellerMenuBlock.style.display = 'block'; adminMenuBlock.style.display = 'block'; }
+                }
+            } else {
+                loginTriggerBtn.style.display = 'block';
+                userAvatarBtn.style.display = 'none';
+                sellerMenuBlock.style.display = 'none';
+                adminMenuBlock.style.display = 'none';
+            }
+        });
+
+        // 📥 讀取雲端店家並動態渲染
+        async function fetchStoresFromFirebase() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "stores"));
+                allStores = [];
+                querySnapshot.forEach((doc) => {
+                    allStores.push({ id: doc.id, ...doc.data() });
+                });
+                filterAndRenderStores();
+            } catch (error) {
+                console.error("讀取店家失敗：", error);
+                storeContainer.innerHTML = '<div class="loading-spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
+            }
+        }
+
+        function filterAndRenderStores() {
+            const selectedCity = citySelect.value;
+            const selectedDist = districtSelect.value;
+            const searchKeyword = globalSearchInput.value.toLowerCase().trim();
+
+            const filtered = allStores.filter(store => {
+                const name = store.shopName || store.name || '';
+                const address = store.shopAddress || store.address || '';
+                const matchCity = !selectedCity || store.city === selectedCity || address.includes(selectedCity);
+                const matchDist = !selectedDist || store.district === selectedDist || address.includes(selectedDist);
+                const matchKeyword = !searchKeyword || 
+                                     name.toLowerCase().includes(searchKeyword) ||
+                                     address.toLowerCase().includes(searchKeyword);
+                return matchCity && matchDist && matchKeyword;
+            });
+
+            if (filtered.length === 0) {
+                storeContainer.innerHTML = '<div class="loading-spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
+                return;
+            }
+
+            storeContainer.innerHTML = "";
+            filtered.forEach(store => {
+                // 👑 萬用兼容指名防線：自動兼容對齊新舊 CTO 欄位名稱
+                const finalName = store.shopName || store.name || '未命名店家';
+                const finalAddress = store.shopAddress || store.address || '';
+
+                const card = document.createElement('a');
+                card.href = `menu.html?storeId=${store.id}`;
+                card.className = 'store-card';
+                card.innerHTML = `
+                    <div class="store-img">${store.emoji || store.shopLogo ? `<img src="${store.shopLogo}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : '🏪'}</div>
+                    <div class="store-info">
+                        <div>
+                            <div class="store-name">${finalName}</div>
+                            <div class="store-meta">📍 ${finalAddress}</div>
+                        </div>
+                        <div class="store-tags">
+                            <span class="tag-time">⏱️ 店內價外帶</span>
+                            <span class="tag-pay">💳 行動支付</span>
+                        </div>
+                    </div>
+                `;
+                storeContainer.appendChild(card);
+            });
+        }
+
+        // 🔓 真正安全的切換視圖掛載
+        window.toggleView = function(viewRole) {
+            const adminEl = document.getElementById('adminView');
+            const buyerEl = document.getElementById('buyerView');
+            if (viewRole === 'admin') {
+                if (adminEl) adminEl.style.display = 'block';
+                if (buyerEl) buyerEl.style.display = 'none';
+            } else {
+                if (adminEl) adminEl.style.display = 'none';
+                if (buyerEl) buyerEl.style.display = 'block';
+            }
+        };
+
+        // 初始化啟動
+        fetchStoresFromFirebase();
+    </script>
+</body>
+</html>
+

@@ -48,29 +48,31 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
+                body {
             background-color: var(--bg-global);
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: stretch; /* 🌟 關鍵修正：強迫大盒子上下拉滿螢幕高度，不准縮水！ */
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
             transition: background-color 0.15s ease;
         }
 
-        /* 手機直屏精品大外框與細邊界 */
+        /* 手機直屏精品大外框 - 已全面針對電腦寬螢幕浮動與高度進行優化對齊 */
         .phone-wrapper {
             width: 100%;
             max-width: 430px;
-            min-height: 100vh;
+            height: 100vh;         /* 🌟 關鍵修正：在電腦上直接鎖定 100% 螢幕滿高度，不准被卡片壓扁！ */
             background-color: var(--bg-container);
             border-left: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
             box-shadow: var(--shadow-md);
             position: relative;
-            padding-bottom: 90px; 
             display: flex;
             flex-direction: column;
+            overflow-y: auto;      /* 🌟 關鍵修正：讓只有中間的店家可以像 App 一樣在裡面滾動，上下排死死卡住不动！ */
         }
 
         /* 👑 頂部全區常駐吸附天花板 */

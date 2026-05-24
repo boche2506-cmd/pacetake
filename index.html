@@ -1080,15 +1080,7 @@
             }
         };
 
-// 💡 注意：這裡完全不加任何額外的 }); 讓瀏覽器自己順著原來的結構走完
-        // 強制在頁面載入時，直接把 buyerView 打開
-document.addEventListener("DOMContentLoaded", () => {
-    const buyerView = document.getElementById('buyerView');
-    if (buyerView) {
-        buyerView.style.display = 'block';
-        console.log("買家視圖已強制開啟");
-    }
-});
+// 🌟 核心防線：前任 CTO 導致大跑位的 DOMContentLoaded 偏方已在這裡被徹底清除乾淨！
 </script>
 </body>
 </html>

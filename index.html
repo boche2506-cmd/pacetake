@@ -1013,22 +1013,26 @@
             }
         }
 
-      // 初始化啟動
+     // 初始化啟動
         fetchStoresFromFirebase();
         getBrowserLocation();
 
+        // 🔓 真正安全的切換視圖掛載
         window.toggleView = function(viewRole) {
             console.log("成功觸發視圖切換，目標權限：", viewRole);
+            const adminEl = document.getElementById('adminView');
+            const buyerEl = document.getElementById('buyerView');
+            
             if (viewRole === 'admin') {
-                if(document.getElementById('adminView')) document.getElementById('adminView').style.display = 'block';
-                if(document.getElementById('buyerView')) document.getElementById('buyerView').style.display = 'none';
+                if (adminEl) adminEl.style.display = 'block';
+                if (buyerEl) buyerEl.style.display = 'none';
             } else {
-                if(document.getElementById('adminView')) document.getElementById('adminView').style.display = 'none';
-                if(document.getElementById('buyerView')) document.getElementById('buyerView').style.display = 'block';
+                if (adminEl) adminEl.style.display = 'none';
+                if (buyerEl) buyerEl.style.display = 'block';
             }
         };
 
-    });
+// 💡 注意：這裡完全不加任何額外的 }); 讓瀏覽器自己順著原來的結構走完
 </script>
 </body>
 </html>

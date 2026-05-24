@@ -289,11 +289,13 @@
 
         /* 下方：店家列表區樣式補強面防線 */
         .store-list {
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex-grow: 1; /* 這是關鍵：強制讓這個區塊佔滿中間所有剩餘空間 */
+    overflow-y: auto; /* 若內容過長，在區塊內滾動，不會讓整個畫面亂跳 */
+}
 
         .store-card {
             display: flex;

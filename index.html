@@ -49,14 +49,14 @@
         }
 
         body {
-            background-color: var(--bg-global);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            transition: background-color 0.15s ease;
-        }
+    background-color: var(--bg-global);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    transition: background-color 0.15s ease;
+}
 
         /* 手機直屏精品大外框與細邊界 */
         .phone-wrapper {
@@ -287,21 +287,17 @@
             outline: none;
         }
 
-        /* 電腦版修正 */
-@media (min-width: 431px) {
-    body {
-        align-items: center; /* 電腦版讓整個手機外框居中 */
-    }
-    .phone-wrapper {
-        border-left: 1px solid var(--border-color);
-        border-right: 1px solid var(--border-color);
-        margin: 0 auto; /* 強制置中 */
-    }
-    .store-list {
-        /* 電腦版不需要給太大的 margin-top，改用固定高度讓它撐住 */
-        margin-top: 0; 
-        height: calc(100vh - 150px); /* 直接減去頭尾的高度，精準鎖定中間捲動區 */
-    }
+        /* 下方：店家列表區樣式補強面防線 */
+        .store-list {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    /* 核心修改在這裡 */
+    flex: 1;             /* 佔滿剩餘高度 */
+    overflow-y: auto;    /* 超出高度才產生捲動 */
+    min-height: 50vh;    /* 關鍵：給它一個最低高度，確保資料沒出來前盒子就不會塌陷 */
 }
 
         .store-card {

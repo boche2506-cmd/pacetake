@@ -798,7 +798,36 @@
             });
         }
         initTheme();
+// 加入這段函數來顯示資料
+async function fetchAndRenderStores() {
+    const storeContainer = document.getElementById('buyerView');
+    try {
+        const querySnapshot = await getDocs(collection(db, "stores"));
+        
+        // 如果撈到資料，先把 loading 字樣清空
+        storeContainer.innerHTML = ''; 
 
+        querySnapshot.forEach((doc) => {
+            const store = doc.data();
+            const storeElement = document.createElement('a');
+            storeElement.className = 'store-card';
+            storeElement.innerHTML = `
+                <div class="store-img">🏪</div>
+                <div class="store-info">
+                    <div class="store-name">${store.name || '未命名店家'}</div>
+                    <div class="store-meta">📍 ${store.address || '無地址'}</div>
+                </div>
+            `;
+            storeContainer.appendChild(storeElement);
+        });
+    } catch (e) {
+        console.error("撈資料失敗:", e);
+        storeContainer.innerHTML = '<div class="loading-spinner">❌ 連線失敗，請檢查網路。</div>';
+    }
+}
+
+// 確保網頁載入後執行這個函數
+document.addEventListener('DOMContentLoaded', fetchAndRenderStores);
         // DOM 元素獲取
         const loginTriggerBtn = document.getElementById('loginTriggerBtn');
         const userAvatarBtn = document.getElementById('avatarMenuBtn');

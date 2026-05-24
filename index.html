@@ -1010,64 +1010,44 @@
             initLocation防線(true); // 傳入 true 強制重刷
         });
 
-               // 📥 真實 Firestore 店家同步（已對齊欄位與安全防線）
+        // 📥 真實 Firestore 店家同步
         async function fetchStores() {
             try {
-                if (typeof getDocs !== 'function') return;
                 const snapshot = await getDocs(collection(db, "stores"));
                 allStores = [];
-                snapshot.forEach((docSnap) => {
-                    allStores.push({ id: docSnap.id, ...docSnap.data() });
+                snapshot.forEach((doc) => {
+                    allStores.push({ id: doc.id, ...doc.data() });
                 });
-                // 啟動位置偵測（加上安全防護，防止名稱不存在而卡死）
-                if (typeof initLocation防線 === 'function') {
-                    initLocation防線(false);
-                } else {
-                    filterAndRenderStores(); // 如果沒有防線函數，直接渲染店家
-                }
+                // 啟動智慧位置偵測
+                initLocation防線(false);
             } catch (error) {
-                const container = document.getElementById('store-container');
-                if (container) {
-                    container.innerHTML = `<div class="loading-spinner" style="color:var(--brand-red);">雲端連線失敗: ${error.message}</div>`;
-                }
+                document.getElementById('store-container').innerHTML = `<div class="loading-spinner" style="color:var(--brand-red);">雲端連線失敗: ${error.message}</div>`;
             }
         }
 
-        // 🧠 智慧雙軌搜尋引擎（完美相容所有 CTO 的欄位格式，並修正坍塌與跑位）
+        // 🧠 智慧雙軌搜尋引擎
         function filterAndRenderStores() {
-            const searchInput = document.getElementById('globalSearchInput');
-            const searchText = searchInput ? searchInput.value.trim().toLowerCase() : "";
-            const selectedCity = citySelect ? citySelect.value : "";
-            const selectedDistrict = districtSelect ? districtSelect.value : "";
+            const searchText = document.getElementById('globalSearchInput').value.trim().toLowerCase();
+            const selectedCity = citySelect.value;
+            const selectedDistrict = districtSelect.value;
             
-            if (!allStores || allStores.length === 0) return;
-
             let scoredList = allStores.map(store => {
                 let dist = null;
-                // 兼容多種經緯度命名
-                const lat = store.lat || store.latitude;
-                const lng = store.lng || store.longitude;
-                if (lat && lng && typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined') {
-                    dist = getDistanceKm(buyerLat, buyerLng, parseFloat(lat), parseFloat(lng));
+                if (store.lat && store.lng && buyerLat && buyerLng) {
+                    dist = getDistanceKm(buyerLat, buyerLng, parseFloat(store.lat), parseFloat(store.lng));
                 }
                 
                 let score = 0;
-                // 兼容 shopAddress 與 address、city 等多種欄位指名
-                const finalAddress = store.shopAddress || store.address || "";
-                const finalCity = store.city || "";
-                const finalDist = store.district || "";
-                const finalName = store.shopName || store.name || "";
-
-                if (selectedCity && (finalAddress.includes(selectedCity) || finalCity === selectedCity)) score += 50;
-                if (selectedDistrict && (finalAddress.includes(selectedDistrict) || finalDist === selectedDistrict)) score += 50;
+                if (selectedCity && (store.shopAddress?.includes(selectedCity) || store.city === selectedCity)) score += 50;
+                if (selectedDistrict && (store.shopAddress?.includes(selectedDistrict) || store.district === selectedDistrict)) score += 50;
 
                 if (searchText !== "") {
                     const tokens = searchText.split(/\s+/);
                     let matched = 0;
                     tokens.forEach(tk => {
                         let tokenMatch = false;
-                        if (finalName.toLowerCase().includes(tk)) tokenMatch = true;
-                        if (finalAddress.toLowerCase().includes(tk)) tokenMatch = true;
+                        if (store.shopName?.toLowerCase().includes(tk)) tokenMatch = true;
+                        if (store.shopAddress?.toLowerCase().includes(tk)) tokenMatch = true;
                         if (store.menuList && Array.isArray(store.menuList)) {
                             store.menuList.forEach(item => { if(item.name?.toLowerCase().includes(tk)) tokenMatch = true; });
                         }
@@ -1085,7 +1065,6 @@
                 return { ...store, distance: dist, matchScore: score };
             });
 
-            // 排序邏輯
             scoredList.sort((a, b) => {
                 if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
                 if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
@@ -1093,7 +1072,6 @@
             });
 
             const container = document.getElementById('store-container');
-            if (!container) return;
             container.innerHTML = "";
 
             let renderList = scoredList;
@@ -1105,30 +1083,6 @@
                 container.innerHTML = `<div class="loading-spinner">🔍 報告 CEO，全台目前沒有任何符合條件的店家喔。</div>`;
                 return;
             }
-
-            // 👑 補齊被截斷的畫卡片原始格式程式碼
-            renderList.forEach((store) => {
-                const finalName = store.shopName || store.name || "未命名店家";
-                const finalAddress = store.shopAddress || store.address || "暫無地址資訊";
-                const storeId = store.id;
-                
-                const cardHtml = `
-                    <a href="menu.html?storeId=${storeId}" class="store-card">
-                        <div class="store-img">🏪</div>
-                        <div class="store-info">
-                            <div class="store-name">${finalName}</div>
-                            <div class="store-meta">${finalAddress}</div>
-                            <div class="store-tags">
-                                <span class="tag-time">外帶自取</span>
-                                <span class="tag-pay">行動支付</span>
-                            </div>
-                        </div>
-                    </a>
-                `;
-                container.innerHTML += cardHtml;
-            });
-        }
-
 
             renderList.forEach(store => {
                 const card = document.createElement('a');

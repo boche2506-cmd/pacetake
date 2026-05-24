@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
 
     <style>
-                /* 全局變數與主題防線 - 完美呼應 Cyber Blue 品牌色 */
+        /* 全局變數與主題防線 - 完美呼應 Cyber Blue 品牌色 */
         :root {
             --bg-global: #F8FAFC;
             --bg-container: #FFFFFF;
             --border-color: #E2E8F0;
             --text-main: #0F172A;
             --text-muted: #64748B;
-            --brand-blue: #0062FF; /* 微調成更深邃、帶點微光科技感的精品藍 */
+            --brand-blue: #0062FF; 
             --brand-green: #10B981;
             --brand-red: #EF4444;
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -29,7 +30,7 @@
             --border-color: #262626;
             --text-main: #F5F5F5;
             --text-muted: #A3A3A3;
-            --brand-blue: #2F80ED; /* 暗黑模式下的極光青藍，完美匹配 Logo */
+            --brand-blue: #2F80ED; 
             --brand-green: #34D399;
             --brand-red: #F87171;
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -67,16 +68,16 @@
             border-right: 1px solid var(--border-color);
             box-shadow: var(--shadow-md);
             position: relative;
-            padding-bottom: 90px; /* 留給底部懸浮欄 */
+            padding-bottom: 90px; 
             display: flex;
             flex-direction: column;
         }
 
-        /* 👑 核心優化：頂部全區常駐吸附天花板 */
+        /* 👑 頂部全區常駐吸附天花板 */
         .sticky-top-group {
             position: sticky;
             top: 0;
-            z-index: 1000; /* 確保在店家列表上方 */
+            z-index: 1000; 
             background-color: var(--blur-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -90,6 +91,23 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+        }
+
+        .brand-title-area {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
         }
 
         .brand-title-area h1 {
@@ -142,7 +160,7 @@
         }
 
         .user-avatar-btn {
-            display: none; /* 初始未登入隱藏 */
+            display: none; 
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 6px 12px;
@@ -195,9 +213,9 @@
             margin: 6px 0;
         }
 
-        .seller-unlock {
-            display: none; /* 賣家專屬功能初始隱藏 */
-        }
+        /* 👑 智慧選單分流區塊 */
+        .seller-unlock { display: none; }
+        .admin-unlock { display: none; }
 
         /* 精品 GPS 定位管理列 */
         .location-bar {
@@ -243,7 +261,7 @@
             cursor: pointer;
         }
 
-        /* 中間：加寬搜尋欄 */
+        /* 中間：搜尋欄 */
         .search-container {
             padding: 8px 20px 4px 20px;
         }
@@ -269,7 +287,7 @@
             outline: none;
         }
 
-        /* 下方：店家列表區 */
+        /* 下方：店家列表區樣式補強面防線 */
         .store-list {
             padding: 16px 20px;
             display: flex;
@@ -279,32 +297,33 @@
 
         .store-card {
             display: flex;
+            align-items: center;
+            gap: 16px;
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 12px;
-            gap: 12px;
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
+            padding: 14px;
             text-decoration: none;
-            transition: transform 0.1s ease;
+            color: inherit;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .store-card:active {
-            transform: scale(0.98);
+        .store-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
         }
 
         .store-img {
-            width: 85px;
-            height: 85px;
-            border-radius: 12px;
+            width: 54px;
+            height: 54px;
             background-color: var(--bg-global);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 28px;
             flex-shrink: 0;
-            object-fit: cover;
         }
 
         .store-info {
@@ -312,6 +331,7 @@
             flex-direction: column;
             justify-content: space-between;
             flex-grow: 1;
+            gap: 6px;
         }
 
         .store-name {
@@ -329,28 +349,27 @@
         .store-tags {
             display: flex;
             gap: 6px;
-            margin-top: 4px;
-            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .store-tags span {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
         }
 
         .tag-time {
-            background-color: rgba(0, 102, 255, 0.08);
+            background-color: rgba(0, 98, 255, 0.08);
             color: var(--brand-blue);
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-weight: 600;
         }
 
         .tag-pay {
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 6px;
+            background-color: rgba(16, 185, 129, 0.08);
+            color: var(--brand-green);
         }
 
-        /* 底部常駐懸浮欄（已鎖定底部防飄移） */
+        /* 底部常駐懸浮欄 */
         .bottom-bar {
             position: fixed;
             bottom: 0;
@@ -378,7 +397,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            cursor: pointer;
             text-decoration: none;
         }
 
@@ -427,7 +445,7 @@
             box-shadow: var(--shadow-sm);
         }
 
-        /* 大頭針及登入共用全螢幕鎖定燈箱 */
+        /* 燈箱樣式 */
         .lightbox-modal {
             display: none;
             position: fixed;
@@ -511,14 +529,17 @@
         }
     </style>
 </head>
-<body>
+<body><div id="buyerView">
 
     <div class="phone-wrapper">
         
         <div class="sticky-top-group">
             <header class="header">
                 <div class="brand-title-area">
-                    <h1>PACE 派思</h1>
+                    <div class="brand-logo-container">
+                        <img src="logo.png" alt="PACE Logo" class="brand-logo">
+                        <h1>PACE 派思</h1>
+                    </div>
                     <div class="brand-subtitle">店內價預約外帶自取 / 內用點單系統</div>
                 </div>
                 
@@ -540,6 +561,12 @@
                             <a href="manage.html" class="nav-fast">⚙️ 後台管理</a>
                             <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
                         </div>
+
+                        <div class="admin-unlock" id="adminMenuBlock">
+                            <div class="menu-divider"></div>
+<a href="javascript:void(0)" onclick="toggleView('admin')" style="color: var(--brand-blue); font-weight: bold;">🔮 派思核心控制台</a>
+<a href="javascript:void(0)" onclick="let code = prompt('請輸入要發行的 VIP 碼:'); if(code) generatePromoCode(code);" style="color: var(--brand-green); font-weight: bold;">🎟️ 戰術邀請碼發行</a>
+                        </div>
                         
                         <div class="menu-divider"></div>
                         <button id="logoutBtn">🚪 登出</button>
@@ -550,7 +577,7 @@
             <div class="location-bar">
                 <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
                 <div class="location-select-group">
-                                        <select class="nav-select" id="citySelect">
+                    <select class="nav-select" id="citySelect">
                         <option value="">選擇縣市</option>
                         <option value="臺北市">臺北市</option>
                         <option value="新北市">新北市</option>
@@ -653,11 +680,54 @@
         </div>
 
     </div>
+<div id="adminView" style="display: none; padding: 30px; background: #121212; color: #e0e0e0; min-height: 100vh; font-family: sans-serif;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
+        <h1 style="color: #4dadff; margin: 0; font-size: 28px;">🔮 派思最高意志控制台</h1>
+        <button onclick="toggleView('buyer')" style="padding: 10px 20px; background: #ff4d4d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;">
+            🧑‍💼 返回一般買家視圖
+        </button>
+    </div>
 
+    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #2d2d2d;">
+        <h3 style="color: #ffca28; margin-top: 0;">➕ 新增全新店家</h3>
+        <p style="color: #aaa; font-size: 13px;">請輸入店家資訊，新增後將同步至 Firebase 雲端資料庫。</p>
+        <div style="color: #666; font-style: italic; padding: 10px; border: 1px dashed #444; text-align: center;">
+            [表單輸入框預留位置：店名、地址、電話、經緯度...]
+        </div>
+    </div>
+
+    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d;">
+        <h3 style="color: #4da5ff; margin-top: 0;">📋 目前雲端店家總覽</h3>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 14px;">
+            <thead>
+                <tr style="background: #2d2d2d; color: #fff;">
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">店家名稱</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">詳細地址</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">聯絡電話</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">核心操作</th>
+                </tr>
+            </thead>
+            <tbody id="adminStoreTableBody">
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #3a3a3a; color: #ffca28;">範例店家（測試用）</td>
+                    <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">基隆市七堵區光明路 X 號</td>
+                    <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">02-245X-XXXX</td>
+                    <td style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">
+                        <button style="padding: 5px 10px; background: #2196f3; color: white; border: none; border-radius: 4px; margin-right: 5px; cursor: pointer;">修改</button>
+                        <button style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">刪除</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
         // Firebase 雲端金鑰
         const firebaseConfig = {
@@ -682,8 +752,7 @@
         let currentBuyerAddress = "正在獲取定位中...";
         let currentUserId = null;
 
-        // 台灣區域數據
-               // 🇹🇼 全台灣 22 縣市、368 區完美制霸數據防線
+        // 🇹🇼 22縣市區域防線數據
         const areaData = {
             "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
             "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -699,7 +768,7 @@
             "嘉義市": ["東區", "西區"],
             "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
             "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
-            "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區", "內門區"],
+            "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區"],
             "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
             "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
             "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
@@ -725,7 +794,7 @@
         }
         initTheme();
 
-        // 🪪 控制台元素
+        // DOM 元素獲取
         const loginTriggerBtn = document.getElementById('loginTriggerBtn');
         const userAvatarBtn = document.getElementById('avatarMenuBtn');
         const userDropdown = document.getElementById('userDropdown');
@@ -733,9 +802,8 @@
         const googleLoginAction = document.getElementById('googleLoginAction');
         const logoutBtn = document.getElementById('logoutBtn');
         const sellerMenuBlock = document.getElementById('sellerMenuBlock');
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
-        const orderBadgeCount = document.getElementById('orderBadgeCount');
+        const adminMenuBlock = document.getElementById('adminMenuBlock');
+        const storeContainer = document.getElementById('store-container');
         
         const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
         const emailFormSection = document.getElementById('emailFormSection');
@@ -744,15 +812,22 @@
         const loginPasswordInput = document.getElementById('loginPassword');
         const emailLoginAction = document.getElementById('emailLoginAction');
 
-        // 定位元素
         const citySelect = document.getElementById('citySelect');
         const districtSelect = document.getElementById('districtSelect');
         const gpsPinBtn = document.getElementById('gpsPinBtn');
         const addressDetailLightbox = document.getElementById('addressDetailLightbox');
         const modalAddressText = document.getElementById('modalAddressText');
         const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
+        const globalSearchInput = document.getElementById('globalSearchInput');
 
-        // 縣市連動
+        // 下拉選單點擊開關
+        userAvatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', () => { userDropdown.style.display = 'none'; });
+
+        // 縣市連動邏輯
         citySelect.addEventListener('change', () => {
             const selectedCity = citySelect.value;
             districtSelect.innerHTML = '<option value="">選擇區域</option>';
@@ -767,359 +842,240 @@
             filterAndRenderStores();
         });
         districtSelect.addEventListener('change', filterAndRenderStores);
+        globalSearchInput.addEventListener('input', filterAndRenderStores);
 
-        // 點擊大頭針
+        // 點擊大頭針彈出定位
         gpsPinBtn.addEventListener('click', () => {
             modalAddressText.innerText = currentBuyerAddress;
             addressDetailLightbox.style.display = 'flex';
         });
-        closeAddressModalBtn.addEventListener('click', () => {
-            addressDetailLightbox.style.display = 'none';
-        });
+        closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
 
         // 燈箱控制
-        if(loginTriggerBtn) {
-            loginTriggerBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
-        }
-        function resetAndCloseLightbox() {
-            if (googleLoginAction) googleLoginAction.style.display = 'flex';
-            if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'flex';
-            if (emailFormSection) emailFormSection.style.display = 'none';
-            if (loginLightbox) loginLightbox.style.display = 'none';
-        }
-        if(toggleEmailFormBtn) {
-            toggleEmailFormBtn.addEventListener('click', () => {
-                if (googleLoginAction) googleLoginAction.style.display = 'none';
-                if (toggleEmailFormBtn) toggleEmailFormBtn.style.display = 'none';
-                if (emailFormSection) emailFormSection.style.display = 'block';
-            });
-        }
-        if(customReturnBtn) {
-            customReturnBtn.addEventListener('click', resetAndCloseLightbox);
-        }
-
-        // 密碼眼睛
-        const togglePasswordBtn = document.getElementById('togglePasswordVisibility');
-        if (togglePasswordBtn && loginPasswordInput) {
-            togglePasswordBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (loginPasswordInput.type === 'password') {
-                    loginPasswordInput.type = 'text';
-                    togglePasswordBtn.innerText = '🙈';
-                } else {
-                    loginPasswordInput.type = 'password';
-                    togglePasswordBtn.innerText = '👁️';
-                }
-            });
-        }
-
-        function executeEmailAuth() {
-            const emailValue = loginEmailInput ? loginEmailInput.value.trim() : '';
-            const passwordValue = loginPasswordInput ? loginPasswordInput.value : '';
-            if (!emailValue || !passwordValue) { alert("請完整填寫電子郵件與密碼喔！"); return; }
-            if (passwordValue.length < 6) { alert("為了安全，密碼長度至少需要 6 個字元喔！"); return; }
-
-            signInWithEmailAndPassword(auth, emailValue, passwordValue)
-                .then(() => { alert("登入成功！"); resetAndCloseLightbox(); })
-                .catch((error) => {
-                    createUserWithEmailAndPassword(auth, emailValue, passwordValue)
-                        .then(() => { alert("偵測到新帳號，已自動為您註冊並登入成功！"); resetAndCloseLightbox(); })
-                        .catch((regError) => {
-                            if (regError.code === 'auth/email-already-in-use' || error.code === 'auth/invalid-login-credentials') {
-                                alert("【PACE 提示】此電子郵件已被註冊。如果是密碼打錯請重新輸入；若您曾用 Google 登入，請直接點擊上方的「Google 一鍵登入」按鈕喔！");
-                            } else { alert("登入/註冊失敗：" + regError.message); }
-                        });
-                });
-        }
-
-        if(emailLoginAction) emailLoginAction.addEventListener('click', executeEmailAuth);
-        if(loginPasswordInput) {
-            loginPasswordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); executeEmailAuth(); } });
-        }
-        if(loginEmailInput && loginPasswordInput) {
-            loginEmailInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); loginPasswordInput.focus(); } });
-        }
-
-        if(googleLoginAction) {
-            googleLoginAction.addEventListener('click', () => {
-                signInWithPopup(auth, provider).then(() => { resetAndCloseLightbox(); }).catch((err) => console.warn(err.message));
-            });
-        }
-
-        if(logoutBtn) {
-            logoutBtn.addEventListener('click', () => { signOut(auth).then(() => { if(userDropdown) userDropdown.style.display = 'none'; }); });
-        }
-
-        // 📡 全局監聽登入狀態與真實訂單紅點
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUserId = user.uid;
-                if(loginTriggerBtn) loginTriggerBtn.style.display = 'none';
-                if(userAvatarBtn) userAvatarBtn.style.display = 'flex';
-                checkRealOrderStatus(user.uid, user.displayName || user.email);
-            } else {
-                currentUserId = null;
-                if(loginTriggerBtn) loginTriggerBtn.style.display = 'block';
-                if(userAvatarBtn) userAvatarBtn.style.display = 'none';
-                if(statusDot) statusDot.classList.remove('active');
-                if(orderBadgeCount) orderBadgeCount.style.display = 'none';
-                if(statusText) statusText.innerText = "您目前沒有進行中的訂單喔！";
-            }
+        loginTriggerBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
+        customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
+        
+        toggleEmailFormBtn.addEventListener('click', () => {
+            emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
         });
 
-        async function checkRealOrderStatus(uid, name) {
-            try {
-                const querySnapshot = await getDocs(collection(db, "orders"));
-                let activeOrderCount = 0;
-                querySnapshot.forEach((doc) => {
-                    const order = doc.data();
-                    if (order.buyerUid === uid && order.status !== "completed" && order.status !== "cancelled") {
-                        activeOrderCount++;
-                    }
-                });
-
-                if (activeOrderCount > 0) {
-                    if(statusDot) statusDot.classList.add('active');
-                    if(orderBadgeCount) {
-                        orderBadgeCount.innerText = activeOrderCount;
-                        orderBadgeCount.style.display = 'flex';
-                    }
-                    if(statusText) statusText.innerText = `您有 ${activeOrderCount} 筆自取訂單處理中！點擊查看`;
-                } else {
-                    if(statusDot) statusDot.classList.remove('active');
-                    if(orderBadgeCount) orderBadgeCount.style.display = 'none';
-                    if(statusText) statusText.innerText = `歡迎，${name}！快去搜尋商圈美味小吃吧！`;
-                }
-            } catch (error) {
-                console.error("訂單狀態抓取失敗:", error);
-            }
-        }
-
-        if(userAvatarBtn) {
-            userAvatarBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
-            });
-        }
-        document.addEventListener('click', (e) => {
-            if (userDropdown && !userDropdown.contains(e.target) && e.target !== userAvatarBtn) userDropdown.style.display = 'none';
+        // 👁️ 密碼可見度切換
+        document.getElementById('togglePasswordVisibility').addEventListener('click', function() {
+            const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            loginPasswordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
         });
 
-        // 📐 哈弗辛數學大圓公式
-        function getDistanceKm(lat1, lon1, lat2, lon2) {
-            if (!lat1 || !lon1 || !lat2 || !lon2) return null;
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
+        // 👑 核心防線：登入成功後的「雲端自動同步存檔與三層權限判定」
+        async function handleUserSyncAndRoleRouting(user) {
+            if (!user) return;
+            currentUserId = user.uid;
 
-        // 👑 核心改裝：帶有 30 分鐘 localStorage 快取記憶體的智慧 GPS 定位系統
-        function initLocation防線(forceRefresh = false) {
-            const cacheKey = "pace-location-cache";
-            const cachedData = localStorage.getItem(cacheKey);
-            const now = Date.now();
+            const userDocRef = doc(db, "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
 
-            // 如果不是強制刷新，且有 30 分鐘內的存檔，直接秒讀記憶體
-            if (!forceRefresh && cachedData) {
-                try {
-                    const parsed = JSON.parse(cachedData);
-                    if (now - parsed.timestamp < 1800000) { // 30 分鐘 = 1800000 毫秒
-                        buyerLat = parsed.lat;
-                        buyerLng = parsed.lng;
-                        currentBuyerAddress = parsed.address;
-                        
-                        // 同步選單狀態
-                        applyAddressToSelects(parsed.city, parsed.district);
-                        return;
-                    }
-                } catch(e) {
-                    localStorage.removeItem(cacheKey);
-                }
-            }
+            let currentRole = "buyer"; // 預設權限是買家
 
-            // 沒有快取或過期，啟動真實 GPS 探測
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    buyerLat = position.coords.latitude;
-                    buyerLng = position.coords.longitude;
-                    
-                    try {
-                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${buyerLat}&lon=${buyerLng}&accept-language=zh-TW`, {
-                            headers: { 'User-Agent': 'pacetake_client_v1_contact_boche2506@gmail.com' }
-                        });
-                        const data = await response.json();
-                        if (data && data.display_name) {
-                            currentBuyerAddress = data.display_name;
-                            
-                            const addr = data.address;
-                            let detectedCity = addr.city || addr.county || "";
-                            let detectedDistrict = addr.suburb || addr.town || addr.district || "";
-                            
-                            if(detectedCity.includes("臺北") || detectedCity.includes("台北")) detectedCity = "臺北市";
-                            if(detectedCity.includes("台中")) detectedCity = "台中市";
-
-                            // 寫入快取防線
-                            localStorage.setItem(cacheKey, JSON.stringify({
-                                timestamp: now,
-                                lat: buyerLat,
-                                lng: buyerLng,
-                                address: currentBuyerAddress,
-                                city: detectedCity,
-                                district: detectedDistrict
-                            }));
-
-                            applyAddressToSelects(detectedCity, detectedDistrict);
-                        }
-                    } catch (e) {
-                        currentBuyerAddress = `定位成功！座標：(${buyerLat.toFixed(4)}, ${buyerLng.toFixed(4)})`;
-                        filterAndRenderStores();
-                    }
-                }, (err) => {
-                    currentBuyerAddress = "暫時無法取得您的 GPS 位置。可能原因：\n1. 尚未允許定位授權\n2. 手機系統的「隱私權 -> 定位服務」未開啟\n\n您可以先手動選擇上方的縣市區域進行瀏覽喔！";
-                    filterAndRenderStores();
-                }, { enableHighAccuracy: true, timeout: 6000 });
-            } else {
-                currentBuyerAddress = "您的瀏覽器不支援 GPS 定位，請使用手動選單。";
-                filterAndRenderStores();
-            }
-        }
-
-        // 輔助函式：將定位結果注入下拉選單並觸發渲染
-        function applyAddressToSelects(city, district) {
-            if (areaData[city]) {
-                citySelect.value = city;
-                citySelect.dispatchEvent(new Event('change'));
-                setTimeout(() => {
-                    if (areaData[city].includes(district)) {
-                        districtSelect.value = district;
-                    }
-                    filterAndRenderStores();
-                }, 150);
-            } else {
-                filterAndRenderStores();
-            }
-        }
-
-        // 點擊大頭針時，買家通常是想手動更新位置，這時「強制清除快取重新定位」
-        gpsPinBtn.addEventListener('click', () => {
-            initLocation防線(true); // 傳入 true 強制重刷
-        });
-
-        // 📥 真實 Firestore 店家同步
-        async function fetchStores() {
-            try {
-                const snapshot = await getDocs(collection(db, "stores"));
-                allStores = [];
-                snapshot.forEach((doc) => {
-                    allStores.push({ id: doc.id, ...doc.data() });
-                });
-                // 啟動智慧位置偵測
-                initLocation防線(false);
-            } catch (error) {
-                document.getElementById('store-container').innerHTML = `<div class="loading-spinner" style="color:var(--brand-red);">雲端連線失敗: ${error.message}</div>`;
-            }
-        }
-
-        // 🧠 智慧雙軌搜尋引擎
-        function filterAndRenderStores() {
-            const searchText = document.getElementById('globalSearchInput').value.trim().toLowerCase();
-            const selectedCity = citySelect.value;
-            const selectedDistrict = districtSelect.value;
-            
-            let scoredList = allStores.map(store => {
-                let dist = null;
-                if (store.lat && store.lng && buyerLat && buyerLng) {
-                    dist = getDistanceKm(buyerLat, buyerLng, parseFloat(store.lat), parseFloat(store.lng));
-                }
+            if (userDocSnap.exists()) {
+                // 老用戶：絕對尊重資料庫現有的最高意志（尤其是天神你的 admin 皇冠，絕不覆蓋）
+                const data = userDocSnap.data();
+                currentRole = data.role || "buyer";
                 
-                let score = 0;
-                if (selectedCity && (store.shopAddress?.includes(selectedCity) || store.city === selectedCity)) score += 50;
-                if (selectedDistrict && (store.shopAddress?.includes(selectedDistrict) || store.district === selectedDistrict)) score += 50;
-
-                if (searchText !== "") {
-                    const tokens = searchText.split(/\s+/);
-                    let matched = 0;
-                    tokens.forEach(tk => {
-                        let tokenMatch = false;
-                        if (store.shopName?.toLowerCase().includes(tk)) tokenMatch = true;
-                        if (store.shopAddress?.toLowerCase().includes(tk)) tokenMatch = true;
-                        if (store.menuList && Array.isArray(store.menuList)) {
-                            store.menuList.forEach(item => { if(item.name?.toLowerCase().includes(tk)) tokenMatch = true; });
-                        }
-                        if (tokenMatch) matched++;
-                    });
-
-                    if (matched === tokens.length) {
-                        score += 500;
-                    } else if (matched > 0) {
-                        score += matched * 100;
-                    } else {
-                        score -= 200;
-                    }
-                }
-                return { ...store, distance: dist, matchScore: score };
-            });
-
-            scoredList.sort((a, b) => {
-                if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
-                if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
-                return 0;
-            });
-
-            const container = document.getElementById('store-container');
-            container.innerHTML = "";
-
-            let renderList = scoredList;
-            if (searchText !== "") {
-                renderList = scoredList.filter(s => s.matchScore > 0);
+                // 順手幫老用戶補強最新資訊
+                await updateDoc(userDocRef, {
+                    lastLogin: new Date().toISOString(),
+                    email: user.email || data.email,
+                    displayName: user.displayName || data.displayName || "PACE用戶"
+                });
+            } else {
+                // 新用戶：自動走高規格建檔流水線，初始化為 buyer
+                await setDoc(userDocRef, {
+                    uid: user.uid,
+                    email: user.email || "",
+                    displayName: user.displayName || "PACE用戶",
+                    role: "buyer",
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString()
+                });
             }
 
-            if (renderList.length === 0) {
-                container.innerHTML = `<div class="loading-spinner">🔍 報告 CEO，全台目前沒有任何符合條件的店家喔。</div>`;
+            // 👑 三層智慧權限分流選單動態解鎖
+            loginTriggerBtn.style.display = 'none';
+            userAvatarBtn.style.display = 'flex';
+            loginLightbox.style.display = 'none';
+
+            if (currentRole === "admin") {
+                // 第一層：天神管理員 (你) ➡️ 雙選單全開，皇冠加冕
+                sellerMenuBlock.style.display = 'block';
+                adminMenuBlock.style.display = 'block';
+                userAvatarBtn.innerHTML = `<span>👑 總管：${user.displayName || '天神'}</span>`;
+            } else if (currentRole === "seller") {
+                // 第二層：進駐商家的老闆 ➡️ 開啟接單與後台管理
+                sellerMenuBlock.style.display = 'block';
+                adminMenuBlock.style.display = 'none';
+                userAvatarBtn.innerHTML = `<span>🏪 店家老闆</span>`;
+            } else {
+                // 第三層：一般普羅大眾消費者 ➡️ 乾淨選單，維持買家身分
+                sellerMenuBlock.style.display = 'none';
+                adminMenuBlock.style.display = 'none';
+                userAvatarBtn.innerHTML = `<span>🧑‍💼 一般買家</span>`;
+            }
+        }
+
+        // 🚀 Google 登入超能力啟動
+        googleLoginAction.addEventListener('click', async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                await handleUserSyncAndRoleRouting(result.user);
+            } catch (error) {
+                console.error("Google 登入失敗：", error);
+                alert("連線失敗，請檢查網路防線！");
+            }
+        });
+
+        // ✉️ Email 登入 / 註冊自動合流機制
+        emailLoginAction.addEventListener('click', async () => {
+            const email = loginEmailInput.value.trim();
+            const password = loginPasswordInput.value;
+
+            if (!email || !password) {
+                alert("密碼或 Email 欄位不可為空！");
                 return;
             }
 
-            renderList.forEach(store => {
-                const card = document.createElement('a');
-                card.href = `store.html?id=${store.id}`;
-                card.className = "store-card";
-
-                let imgHtml = `🏪`;
-                if (store.menuList && store.menuList[0] && store.menuList[0].image) {
-                    imgHtml = `<img src="${store.menuList[0].image}" class="store-img" alt="store">`;
+            try {
+                // 先嘗試直接登入
+                const result = await signInWithEmailAndPassword(auth, email, password);
+                await handleUserSyncAndRoleRouting(result.user);
+            } catch (loginError) {
+                // 密碼錯就擋下，如果是帳號不存在，直接原地自動升級成註冊
+                if (loginError.code === "auth/user-not-found" || loginError.code === "auth/invalid-credential") {
+                    try {
+                        const result = await createUserWithEmailAndPassword(auth, email, password);
+                        await handleUserSyncAndRoleRouting(result.user);
+                    } catch (regError) {
+                        alert("註冊密碼強度不足，或帳號已被佔用！");
+                    }
                 } else {
-                    imgHtml = `<div class="store-img">🏪</div>`;
+                    alert("登入密碼有誤，請再確認一次！");
                 }
+            }
+        });
 
-                const distText = store.distance ? `📍 距離您 ${store.distance.toFixed(1)} km` : `📍 台灣自取街`;
-                const prepText = store.prepareTime ? `⏱️ 現場取餐約 ${store.prepareTime} 分鐘` : `⏱️ 即時現做自取`;
+        // 🚪 安全登出防線
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+            location.reload();
+        });
 
+        // 🔄 全域認證狀態動態監視器
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                handleUserSyncAndRoleRouting(user);
+            } else {
+                loginTriggerBtn.style.display = 'block';
+                userAvatarBtn.style.display = 'none';
+                sellerMenuBlock.style.display = 'none';
+                adminMenuBlock.style.display = 'none';
+            }
+        });
+
+        // 📥 讀取雲端店家並渲染 (萬用搜尋功能)
+        async function fetchStoresFromFirebase() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "stores"));
+                allStores = [];
+                querySnapshot.forEach((doc) => {
+                    allStores.push({ id: doc.id, ...doc.data() });
+                });
+                filterAndRenderStores();
+            } catch (error) {
+                console.error("讀取店家失敗：", error);
+                storeContainer.innerHTML = '<div class="loading-spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
+            }
+        }
+
+        function filterAndRenderStores() {
+            const selectedCity = citySelect.value;
+            const selectedDist = districtSelect.value;
+            const searchKeyword = globalSearchInput.value.toLowerCase().trim();
+
+            const filtered = allStores.filter(store => {
+                const matchCity = !selectedCity || store.city === selectedCity;
+                const matchDist = !selectedDist || store.district === selectedDist;
+                const matchKeyword = !searchKeyword || 
+                                     (store.name && store.name.toLowerCase().includes(searchKeyword)) ||
+                                     (store.category && store.category.toLowerCase().includes(searchKeyword));
+                return matchCity && matchDist && matchKeyword;
+            });
+
+            if (filtered.length === 0) {
+                storeContainer.innerHTML = '<div class="loading-spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
+                return;
+            }
+
+            storeContainer.innerHTML = "";
+            filtered.forEach(store => {
+                const card = document.createElement('a');
+                card.href = `menu.html?storeId=${store.id}`;
+                card.className = 'store-card';
                 card.innerHTML = `
-                    ${imgHtml}
+                    <div class="store-img">${store.emoji || '🏪'}</div>
                     <div class="store-info">
                         <div>
-                            <div class="store-name">${store.shopName || '未命名店鋪'}</div>
-                            <div class="store-meta">${store.shopAddress || '尚未填寫地址'}</div>
+                            <div class="store-name">${store.name || '未命名店家'}</div>
+                            <div class="store-meta">📍 ${store.city || ''}${store.district || ''} · ${store.category || '美食'}</div>
                         </div>
                         <div class="store-tags">
-                            <span class="tag-time">${prepText}</span>
-                            <span class="tag-pay" style="color:var(--brand-blue); font-weight:600;">${distText}</span>
+                            <span class="tag-time">⏱️ 店內價外帶</span>
+                            <span class="tag-pay">💳 支援行動支付</span>
                         </div>
                     </div>
                 `;
-                container.appendChild(card);
+                storeContainer.appendChild(card);
             });
         }
 
-        document.getElementById('globalSearchInput').addEventListener('input', filterAndRenderStores);
+        // 📍 原生高精度 HTML5 瀏覽器定位獲取
+        function getBrowserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        buyerLat = position.coords.latitude;
+                        buyerLng = position.coords.longitude;
+                        currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
+                        gpsPinBtn.innerText = "📍 已獲取核心定位";
+                    },
+                    (error) => {
+                        currentBuyerAddress = "瀏覽器定位遭拒，請手動選擇下方下拉選單縣市。";
+                        gpsPinBtn.innerText = "📍 定位受阻";
+                    }
+                );
+            } else {
+                currentBuyerAddress = "您的裝置不支援 GPS 定位裝置。";
+            }
+        }
 
-        // 啟動地基
-        fetchStores();
-    </script>
+     // 初始化啟動
+        fetchStoresFromFirebase();
+        getBrowserLocation();
+
+        // 🔓 真正安全的切換視圖掛載
+        window.toggleView = function(viewRole) {
+            console.log("成功觸發視圖切換，目標權限：", viewRole);
+            const adminEl = document.getElementById('adminView');
+            const buyerEl = document.getElementById('buyerView');
+            
+            if (viewRole === 'admin') {
+                if (adminEl) adminEl.style.display = 'block';
+                if (buyerEl) buyerEl.style.display = 'none';
+            } else {
+                if (adminEl) adminEl.style.display = 'none';
+                if (buyerEl) buyerEl.style.display = 'block';
+            }
+        };
+
+// 💡 注意：這裡完全不加任何額外的 }); 讓瀏覽器自己順著原來的結構走完
+</script>
 </body>
 </html>

@@ -293,8 +293,11 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    flex-grow: 1; /* 這是關鍵：強制讓這個區塊佔滿中間所有剩餘空間 */
-    overflow-y: auto; /* 若內容過長，在區塊內滾動，不會讓整個畫面亂跳 */
+    
+    /* 核心修改在這裡 */
+    flex: 1;             /* 佔滿剩餘高度 */
+    overflow-y: auto;    /* 超出高度才產生捲動 */
+    min-height: 50vh;    /* 關鍵：給它一個最低高度，確保資料沒出來前盒子就不會塌陷 */
 }
 
         .store-card {

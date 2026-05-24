@@ -994,22 +994,28 @@ onAuthStateChanged(auth, (user) => {
         }
     });
 
-    onAuthStateChanged(auth, (user) => {
+    // ==========================================
+// 【獨立登入狀態管理區塊】
+// 請將此段完整貼入，確保不會被後續代碼覆蓋
+// ==========================================
+onAuthStateChanged(auth, (user) => {
     const statusDot = document.getElementById('loginStatusDot');
-    
+    const loginBtn = document.getElementById('loginBtn');
+    const avatarBtn = document.getElementById('avatarBtn');
+
     if (user) {
-        // 已登入的邏輯
-        handleUserSyncAndRoleRouting(user);
-        statusDot.style.backgroundColor = '#2ecc71'; // 綠色
+        // 已登入
+        if (statusDot) statusDot.style.backgroundColor = '#2ecc71';
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (avatarBtn) avatarBtn.style.display = 'block';
     } else {
-        // 未登入的邏輯
-        loginBtn.style.display = 'block';
-        avatarBtn.style.display = 'none';
-        dropdownMenu.style.display = 'none';
-        dropdownMenu.innerHTML = '';
-        statusDot.style.backgroundColor = '#e74c3c'; // 紅色
+        // 未登入
+        if (statusDot) statusDot.style.backgroundColor = '#e74c3c';
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (avatarBtn) avatarBtn.style.display = 'none';
     }
 });
+// ==========================================
 
     // 📥 讀取雲端店家 (買家列表 & 後台列表 同時更新)
     async function fetchStoresFromFirebase() {

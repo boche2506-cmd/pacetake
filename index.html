@@ -1012,7 +1012,15 @@
             }
 
             storeContainer.innerHTML = "";
+                        storeContainer.innerHTML = "";
             filtered.forEach(store => {
+                // 👑 萬用兼容指名防線：自動辨認 shopName 與 name，店名和地址再也不會變空白
+                const finalName = store.shopName || store.name || '未命名店家';
+                const finalAddress = store.shopAddress || store.address || '';
+                const finalCity = store.city || '';
+                const finalDistrict = store.district || '';
+                const finalCategory = store.category || '美食';
+
                 const card = document.createElement('a');
                 card.href = `menu.html?storeId=${store.id}`;
                 card.className = 'store-card';
@@ -1020,8 +1028,8 @@
                     <div class="store-img">${store.emoji || '🏪'}</div>
                     <div class="store-info">
                         <div>
-                            <div class="store-name">${store.name || '未命名店家'}</div>
-                            <div class="store-meta">📍 ${store.city || ''}${store.district || ''} · ${store.category || '美食'}</div>
+                            <div class="store-name">${finalName}</div>
+                            <div class="store-meta">📍 ${finalCity}${finalDistrict} ${finalAddress} · ${finalCategory}</div>
                         </div>
                         <div class="store-tags">
                             <span class="tag-time">⏱️ 店內價外帶</span>

@@ -795,38 +795,37 @@
     initTheme();
 
     // 監聽登入狀態並更新 UI
+// 監聽登入狀態並統一管理 UI
 onAuthStateChanged(auth, (user) => {
-    // 1. 先抓取必要的 DOM 元素
-    const statusDot = document.getElementById('loginStatusDot');
+    console.log("當前登入狀態:", user ? "已登入" : "未登入");
+
+    const statusDot = document.getElementById('loginStatusDot'); // 這是你 footer 左下角的燈號
     const loginBtn = document.getElementById('loginBtn');
     const avatarBtn = document.getElementById('avatarBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
 
-    // 2. 判斷登入狀態並執行對應邏輯
     if (user) {
-        // --- 已登入 ---
+        // --- 已登入時的 UI ---
         if (typeof handleUserSyncAndRoleRouting === 'function') {
             handleUserSyncAndRoleRouting(user);
         }
         
-        // 更新燈號為綠色
+        // 燈號綠色
         if (statusDot) statusDot.style.backgroundColor = '#2ecc71';
         
-        // 切換按鈕顯示：隱藏登入，顯示頭像
+        // 切換按鈕
         if (loginBtn) loginBtn.style.display = 'none';
         if (avatarBtn) avatarBtn.style.display = 'block';
     } else {
-        // --- 未登入 ---
-        // 更新燈號為紅色
+        // --- 未登入時的 UI ---
+        // 燈號紅色
         if (statusDot) statusDot.style.backgroundColor = '#e74c3c';
         
-        // 切換按鈕顯示：顯示登入，隱藏頭像
-        if (loginBtn) {
-            loginBtn.style.display = 'block'; 
-        }
+        // 切換按鈕
+        if (loginBtn) loginBtn.style.display = 'block';
         if (avatarBtn) avatarBtn.style.display = 'none';
         
-        // 清除個人化選單
+        // 清除個人化
         if (dropdownMenu) {
             dropdownMenu.style.display = 'none';
             dropdownMenu.innerHTML = '';

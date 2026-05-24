@@ -587,9 +587,7 @@
                         <option value="">選擇區域</option>
                     </select>
                 </select>
-                <select class="nav-select" id="districtSelect">
-                    <option value="">選擇區域</option>
-                </select>
+               
             </div>
         </div>
             
@@ -618,6 +616,9 @@
     </footer>
 </div>
 
+<!-- ========================================== -->
+<!-- 🔮 派思核心控制台 (Admin 視圖) -->
+<!-- ========================================== -->
 <div id="adminView" style="display: none; padding: 30px; background: #121212; color: #e0e0e0; min-height: 100vh; font-family: sans-serif;">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
         <h1 style="color: #4dadff; margin: 0; font-size: 28px;">🔮 派思最高意志控制台</h1>
@@ -626,14 +627,26 @@
         </button>
     </div>
 
+    <!-- 真正接通 Firebase 的新增店家表單 -->
     <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #2d2d2d;">
         <h3 style="color: #ffca28; margin-top: 0;">➕ 新增全新店家</h3>
-        <p style="color: #aaa; font-size: 13px;">請輸入店家資訊，新增後將同步至 Firebase 雲端資料庫。</p>
-        <div style="color: #666; font-style: italic; padding: 10px; border: 1px dashed #444; text-align: center;">
-            [表單輸入框預留位置：店名、地址、電話、經緯度...]
+        <p style="color: #aaa; font-size: 13px; margin-bottom: 15px;">請輸入店家資訊，新增後將立即同步至 Firebase 雲端資料庫。</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
+            <input type="text" id="adminNewStoreName" placeholder="店家名稱 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+            <input type="text" id="adminNewStorePhone" placeholder="聯絡電話" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+            <select id="adminNewStoreCity" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+                <option value="臺北市">臺北市</option>
+                <option value="基隆市">基隆市</option>
+            </select>
+            <input type="text" id="adminNewStoreDistrict" placeholder="區域 (如: 七堵區) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+            <input type="text" id="adminNewStoreAddress" placeholder="詳細地址 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">
+            <input type="text" id="adminNewStoreCategory" placeholder="分類 (如: 台式小吃, 飲料)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">
         </div>
+        <button id="adminSubmitStoreBtn" style="width: 100%; padding: 12px; background: #059669; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;">✅ 確認新增店家至雲端</button>
     </div>
 
+    <!-- 即時連線 Firebase 的店家總覽表格 -->
     <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d;">
         <h3 style="color: #4da5ff; margin-top: 0;">📋 目前雲端店家總覽</h3>
         <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 14px;">
@@ -646,20 +659,15 @@
                 </tr>
             </thead>
             <tbody id="adminStoreTableBody">
-                <tr>
-                    <td style="padding: 12px; border: 1px solid #3a3a3a; color: #ffca28;">範例店家（測試用）</td>
-                    <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">基隆市七堵區光明路 X 號</td>
-                    <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">02-245X-XXXX</td>
-                    <td style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">
-                        <button style="padding: 5px 10px; background: #2196f3; color: white; border: none; border-radius: 4px; margin-right: 5px; cursor: pointer;">修改</button>
-                        <button style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">刪除</button>
-                    </td>
-                </tr>
+                <tr><td colspan="4" style="text-align: center; padding: 15px; color: #888;">正在載入雲端資料...</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- 💡 燈箱模組區 (Lightboxes) -->
+<!-- ========================================== -->
 <div class="lightbox-modal" id="loginLightbox" style="display: none;">
     <div class="modal-card">
         <div class="modal-title" style="font-weight: 700; margin-bottom: 25px; color: #1f2937;">加入PACE 派思</div>
@@ -707,12 +715,15 @@
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- 🚀 核心控制區：Firebase 與所有交互邏輯 -->
+<!-- ========================================== -->
 <script type="module">
+    // 💡 已經幫你加入了 addDoc (新增) 和 deleteDoc (刪除) 模組
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // Firebase 雲端金鑰 (你的設定)
     const firebaseConfig = {
         apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
         authDomain: "pacetake-c6e1e.firebaseapp.com",
@@ -735,33 +746,32 @@
     let currentBuyerAddress = "正在獲取定位中...";
     let currentUserId = null;
 
-    // 🇹🇼 22縣市區域防線數據
     const areaData = {
-            "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
-            "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
-            "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
-            "桃園市": ["桃園區", "中壢區", "大溪區", "楊梅區", "蘆竹區", "大園區", "龜山區", "八德區", "龍潭區", "平鎮區", "新屋區", "觀音區", "復興區"],
-            "新竹市": ["東區", "北區", "香山區"],
-            "新竹縣": ["竹北市", "竹東鎮", "新埔鎮", "關西鎮", "湖口鄉", "新豐鄉", "芎林鄉", "橫山鄉", "北埔鄉", "寶山鄉", "峨眉鄉", "尖石鄉", "五峰鄉"],
-            "苗栗縣": ["苗栗市", "頭份市", "竹南鎮", "後龍鎮", "通霄鎮", "苑裡鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "公館鄉", "銅鑼鄉", "三義鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "南庄鄉", "泰安鄉"],
-            "台中市": ["中區", "東區", "南區", "西區", "北區", "西屯區", "南屯區", "北屯區", "豐原區", "東勢區", "大甲區", "清水區", "沙鹿區", "梧棲區", "后里區", "神岡區", "潭子區", "大雅區", "新社區", "石岡區", "外埔區", "大安區", "烏日區", "大肚區", "龍井區", "霧峰區", "太平區", "大里區", "和平區"],
-            "彰化縣": ["彰化市", "員林市", "鹿港鎮", "和美鎮", "北斗鎮", "溪湖鎮", "田中鎮", "二林鎮", "線西鄉", "伸港鄉", "福興鄉", "秀水鄉", "花壇鄉", "芬園鄉", "大村鄉", "埔鹽鄉", "埔心鄉", "永靖鄉", "社頭鄉", "二水鄉", "田尾鄉", "埤頭鄉", "芳苑鄉", "大城鄉", "竹塘鄉", "溪州鄉"],
-            "南投縣": ["南投市", "埔里鎮", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
-            "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "西螺鎮", "土庫鎮", "北港鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "東勢鄉", "褒忠鄉", "臺西鄉", "元長鄉", "四湖鄉", "口湖鄉", "水林鄉"],
-            "嘉義市": ["東區", "西區"],
-            "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
-            "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
-            "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區"],
-            "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
-            "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
-            "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
-            "臺東縣": ["臺東市", "成功鎮", "關山鎮", "卑南鄉", "大武鄉", "太麻里鄉", "東河鄉", "長濱鄉", "鹿野鄉", "池上鄉", "綠島鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉"],
-            "澎湖縣": ["馬公市", "湖西鄉", "白沙鄉", "西嶼鄉", "望安鄉", "七美鄉"],
-            "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
-            "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
-        };
+        "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
+        "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
+        "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
+        "桃園市": ["桃園區", "中壢區", "大溪區", "楊梅區", "蘆竹區", "大園區", "龜山區", "八德區", "龍潭區", "平鎮區", "新屋區", "觀音區", "復興區"],
+        "新竹市": ["東區", "北區", "香山區"],
+        "新竹縣": ["竹北市", "竹東鎮", "新埔鎮", "關西鎮", "湖口鄉", "新豐鄉", "芎林鄉", "橫山鄉", "北埔鄉", "寶山鄉", "峨眉鄉", "尖石鄉", "五峰鄉"],
+        "苗栗縣": ["苗栗市", "頭份市", "竹南鎮", "後龍鎮", "通霄鎮", "苑裡鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "公館鄉", "銅鑼鄉", "三義鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "南庄鄉", "泰安鄉"],
+        "台中市": ["中區", "東區", "南區", "西區", "北區", "西屯區", "南屯區", "北屯區", "豐原區", "東勢區", "大甲區", "清水區", "沙鹿區", "梧棲區", "后里區", "神岡區", "潭子區", "大雅區", "新社區", "石岡區", "外埔區", "大安區", "烏日區", "大肚區", "龍井區", "霧峰區", "太平區", "大里區", "和平區"],
+        "彰化縣": ["彰化市", "員林市", "鹿港鎮", "和美鎮", "北斗鎮", "溪湖鎮", "田中鎮", "二林鎮", "線西鄉", "伸港鄉", "福興鄉", "秀水鄉", "花壇鄉", "芬園鄉", "大村鄉", "埔鹽鄉", "埔心鄉", "永靖鄉", "社頭鄉", "二水鄉", "田尾鄉", "埤頭鄉", "芳苑鄉", "大城鄉", "竹塘鄉", "溪州鄉"],
+        "南投縣": ["南投市", "埔里鎮", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
+        "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "西螺鎮", "土庫鎮", "北港鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "東勢鄉", "褒忠鄉", "臺西鄉", "元長鄉", "四湖鄉", "口湖鄉", "水林鄉"],
+        "嘉義市": ["東區", "西區"],
+        "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
+        "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
+        "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區", "內門區"],
+        "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
+        "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
+        "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
+        "臺東縣": ["臺東市", "成功鎮", "關山鎮", "卑名鄉", "大武鄉", "太麻里鄉", "東河鄉", "長濱鄉", "鹿野鄉", "池上鄉", "綠島鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉"],
+        "澎湖縣": ["馬公市", "湖西鄉", "白沙鄉", "西嶼鄉", "望安鄉", "七美鄉"],
+        "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
+        "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
+    };
 
-    // 🌓 網頁膚色切換功能
+
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     function initTheme() {
         const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
@@ -779,14 +789,12 @@
     }
     initTheme();
 
-    // 獲取 DOM 元素 (已與 HTML 對齊)
     const loginBtn = document.getElementById('loginBtn');
     const avatarBtn = document.getElementById('avatarBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
     const userNameDisplay = document.getElementById('userNameDisplay');
     const storeContainer = document.getElementById('store-container');
     
-    // 燈箱與表單元素
     const loginLightbox = document.getElementById('loginLightbox');
     const googleLoginAction = document.getElementById('googleLoginAction');
     const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
@@ -796,7 +804,6 @@
     const loginPasswordInput = document.getElementById('loginPassword');
     const emailLoginAction = document.getElementById('emailLoginAction');
 
-    // 搜尋與定位元素
     const citySelect = document.getElementById('citySelect');
     const districtSelect = document.getElementById('districtSelect');
     const gpsPinBtn = document.getElementById('gpsPinBtn');
@@ -805,10 +812,6 @@
     const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
     const globalSearchInput = document.getElementById('globalSearchInput');
 
-    // ------------------------------------
-    // UI 交互控制
-    // ------------------------------------
-    
     // 下拉選單點擊開關
     avatarBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -820,28 +823,24 @@
         }
     });
 
-    // 燈箱控制
     loginBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
     customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
     toggleEmailFormBtn.addEventListener('click', () => {
         emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
     });
 
-    // 👁️ 密碼可見度切換
     document.getElementById('togglePasswordVisibility').addEventListener('click', function() {
         const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
         loginPasswordInput.setAttribute('type', type);
         this.textContent = type === 'password' ? '👁️' : '🙈';
     });
 
-    // 點擊大頭針彈出定位
     gpsPinBtn.addEventListener('click', () => {
         modalAddressText.innerText = currentBuyerAddress;
         addressDetailLightbox.style.display = 'flex';
     });
     closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
 
-    // 縣市連動邏輯
     citySelect.addEventListener('change', () => {
         const selectedCity = citySelect.value;
         districtSelect.innerHTML = '<option value="">選擇區域</option>';
@@ -858,12 +857,7 @@
     districtSelect.addEventListener('change', filterAndRenderStores);
     globalSearchInput.addEventListener('input', filterAndRenderStores);
 
-
-    // ------------------------------------
-    // Firebase 認證與權限核心
-    // ------------------------------------
-
-    // 👑 核心防線：依據權限渲染「動態選單」(取代舊的 display:none 寫法)
+    // 👑 渲染動態選單 (已將邀請碼功能綁定至 window.issuePromoCode)
     function renderDynamicMenu(role) {
         let menuHTML = `
             <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
@@ -887,7 +881,7 @@
             menuHTML += `
                 <div class="menu-divider"></div>
                 <a href="javascript:void(0)" onclick="window.toggleView('admin')" style="color: var(--brand-blue); font-weight: bold;">🔮 派思核心控制台</a>
-                <a href="javascript:void(0)" onclick="let code = prompt('請輸入要發行的 VIP 碼:'); if(code) alert('發行成功: ' + code);" style="color: var(--brand-green); font-weight: bold;">🎟️ 戰術邀請碼發行</a>
+                <a href="javascript:void(0)" onclick="window.issuePromoCode()" style="color: var(--brand-green); font-weight: bold;">🎟️ 戰術邀請碼發行</a>
             `;
         }
 
@@ -897,22 +891,18 @@
         `;
 
         dropdownMenu.innerHTML = menuHTML;
-
-        // 重新綁定動態生成的登出按鈕
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await signOut(auth);
             location.reload();
         });
     }
 
-    // 👑 處理登入並判斷權限
     async function handleUserSyncAndRoleRouting(user) {
         if (!user) return;
         currentUserId = user.uid;
 
         const userDocRef = doc(db, "users", user.uid);
         const userDocSnap = await getDoc(userDocRef);
-
         let currentRole = "buyer"; 
 
         if (userDocSnap.exists()) {
@@ -934,7 +924,6 @@
             });
         }
 
-        // 更新介面狀態
         loginBtn.style.display = 'none';
         avatarBtn.style.display = 'flex';
         loginLightbox.style.display = 'none';
@@ -946,12 +935,9 @@
         } else {
             userNameDisplay.innerHTML = `🧑‍💼 一般買家`;
         }
-
-        // 渲染對應身分的選單
         renderDynamicMenu(currentRole);
     }
 
-    // 🚀 Google 登入
     googleLoginAction.addEventListener('click', async () => {
         try {
             const result = await signInWithPopup(auth, provider);
@@ -962,11 +948,9 @@
         }
     });
 
-    // ✉️ Email 登入 / 註冊自動合流
     emailLoginAction.addEventListener('click', async () => {
         const email = loginEmailInput.value.trim();
         const password = loginPasswordInput.value;
-
         if (!email || !password) {
             alert("密碼或 Email 欄位不可為空！");
             return;
@@ -989,7 +973,6 @@
         }
     });
 
-    // 🔄 全域認證狀態動態監視器
     onAuthStateChanged(auth, (user) => {
         if (user) {
             handleUserSyncAndRoleRouting(user);
@@ -997,15 +980,11 @@
             loginBtn.style.display = 'block';
             avatarBtn.style.display = 'none';
             dropdownMenu.style.display = 'none';
-            dropdownMenu.innerHTML = ''; // 未登入清空選單
+            dropdownMenu.innerHTML = '';
         }
     });
 
-    // ------------------------------------
-    // 店家資料與定位核心
-    // ------------------------------------
-
-    // 📥 讀取雲端店家並渲染
+    // 📥 讀取雲端店家 (買家列表 & 後台列表 同時更新)
     async function fetchStoresFromFirebase() {
         try {
             const querySnapshot = await getDocs(collection(db, "stores"));
@@ -1014,6 +993,7 @@
                 allStores.push({ id: doc.id, ...doc.data() });
             });
             filterAndRenderStores();
+            renderAdminTable(); // 🚀 同步更新後台的店家表格
         } catch (error) {
             console.error("讀取店家失敗：", error);
             storeContainer.innerHTML = '<div class="loading-spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
@@ -1068,7 +1048,6 @@
         });
     }
 
-    // 📍 HTML5 定位獲取
     function getBrowserLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -1088,32 +1067,146 @@
         }
     }
 
-    // 初始化啟動
+    // 啟動資料庫與定位抓取
     fetchStoresFromFirebase();
     getBrowserLocation();
 
-    // 🔓 真正安全的切換視圖掛載 (綁定在 window 上才能被 HTML 裡的 onclick 呼叫)
+    // ==========================================
+    // 🔥 後台控制台專屬功能區 (新增/刪除店家、發行邀請碼)
+    // ==========================================
+
+    // 1. 後台渲染店家表格
+    function renderAdminTable() {
+        const tbody = document.getElementById('adminStoreTableBody');
+        if(!tbody) return;
+        
+        tbody.innerHTML = '';
+        if(allStores.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">目前雲端尚無店家資料</td></tr>';
+            return;
+        }
+
+        allStores.forEach(store => {
+            const finalName = store.shopName || store.name || '未命名店家';
+            const finalAddress = store.shopAddress || store.address || '';
+            const phone = store.phone || '無資料';
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="padding: 12px; border: 1px solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
+                <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
+                <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">${phone}</td>
+                <td style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">
+                    <button onclick="window.deleteStore('${store.id}')" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">刪除</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // 2. 雲端新增店家邏輯
+    const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
+    if (adminSubmitStoreBtn) {
+        adminSubmitStoreBtn.addEventListener('click', async () => {
+            const name = document.getElementById('adminNewStoreName').value.trim();
+            const phone = document.getElementById('adminNewStorePhone').value.trim();
+            const city = document.getElementById('adminNewStoreCity').value;
+            const district = document.getElementById('adminNewStoreDistrict').value.trim();
+            const address = document.getElementById('adminNewStoreAddress').value.trim();
+            const category = document.getElementById('adminNewStoreCategory').value.trim();
+
+            if (!name || !district || !address) {
+                alert("⚠️ 店名、區域、詳細地址為必填項目！");
+                return;
+            }
+
+            adminSubmitStoreBtn.innerText = "⏳ 正在同步至雲端...";
+            try {
+                // 將資料寫入 Firebase 的 stores 集合
+                await addDoc(collection(db, "stores"), {
+                    name: name,
+                    shopName: name, // 兼容前端不同寫法
+                    phone: phone,
+                    city: city,
+                    district: district,
+                    address: address,
+                    shopAddress: address, // 兼容寫法
+                    category: category,
+                    createdAt: new Date().toISOString()
+                });
+                
+                alert("✅ 店家已成功新增至雲端！");
+                
+                // 清空輸入框
+                document.getElementById('adminNewStoreName').value = '';
+                document.getElementById('adminNewStorePhone').value = '';
+                document.getElementById('adminNewStoreDistrict').value = '';
+                document.getElementById('adminNewStoreAddress').value = '';
+                document.getElementById('adminNewStoreCategory').value = '';
+                
+                // 重新讀取 Firebase 更新畫面
+                fetchStoresFromFirebase();
+            } catch (error) {
+                console.error("新增店家失敗:", error);
+                alert("新增失敗，請檢查網路或資料庫權限！");
+            } finally {
+                adminSubmitStoreBtn.innerText = "✅ 確認新增店家至雲端";
+            }
+        });
+    }
+
+    // 3. 雲端刪除店家邏輯 (掛載到 window 供 HTML 呼叫)
+    window.deleteStore = async function(storeId) {
+        if (confirm("⚠️ 確定要從 Firebase 徹底刪除這個店家嗎？(刪除後無法恢復)")) {
+            try {
+                await deleteDoc(doc(db, "stores", storeId));
+                alert("🗑️ 店家已成功刪除！");
+                fetchStoresFromFirebase(); // 重新讀取畫面
+            } catch (error) {
+                console.error("刪除失敗:", error);
+                alert("刪除失敗，請確認你的 Admin 權限！");
+            }
+        }
+    };
+
+    // 4. 戰術邀請碼寫入 Firebase 邏輯
+    window.issuePromoCode = async function() {
+        const code = prompt('請輸入要發行的戰術 VIP 邀請碼 (例如: PACE2026):');
+        if (!code || code.trim() === "") return;
+        
+        try {
+            // 在 promoCodes 集合中建立一份新文件，ID 就是邀請碼本身
+            await setDoc(doc(db, "promoCodes", code.trim()), {
+                code: code.trim(),
+                createdBy: currentUserId,
+                createdAt: new Date().toISOString(),
+                isActive: true,
+                usedBy: null // 預留給未來記錄誰使用了這個碼
+            });
+            alert(`🎟️ 戰術邀請碼「${code}」已成功寫入 Firebase！買家現在可以使用它了。`);
+        } catch (error) {
+            console.error("邀請碼發行失敗:", error);
+            alert("發行失敗，請檢查您的系統權限配置！");
+        }
+    };
+
+    // 5. 視圖切換
     window.toggleView = function(viewRole) {
-        console.log("成功觸發視圖切換，目標權限：", viewRole);
         const adminEl = document.getElementById('adminView');
         const buyerEl = document.getElementById('buyerView');
-        
         if (viewRole === 'admin') {
             if (adminEl) adminEl.style.display = 'block';
             if (buyerEl) buyerEl.style.display = 'none';
-            window.scrollTo(0, 0); // 切換到後台時回到頂部
+            window.scrollTo(0, 0);
         } else {
             if (adminEl) adminEl.style.display = 'none';
             if (buyerEl) buyerEl.style.display = 'block';
         }
     };
 
-    // 強制在頁面載入時，直接把 buyerView 打開
     document.addEventListener("DOMContentLoaded", () => {
         const buyerView = document.getElementById('buyerView');
-        if (buyerView) {
-            buyerView.style.display = 'block';
-        }
+        if (buyerView) buyerView.style.display = 'block';
     });
 </script>
 </body>

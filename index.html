@@ -6,23 +6,22 @@
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
-    
+
     <style>
-        /* ==========================================================================
-           1. 全局變數與白天黑夜主題防線 (鎖定不動)
-           ========================================================================== */
+        /* 全局變數與主題防線 - 完美呼應 Cyber Blue 品牌色 */
         :root {
             --bg-global: #F8FAFC;
             --bg-container: #FFFFFF;
             --border-color: #E2E8F0;
             --text-main: #0F172A;
             --text-muted: #64748B;
-            --brand-red: #EF4444;
-            --brand-blue: #0066FF;
+            --brand-blue: #0062FF; 
             --brand-green: #10B981;
-            --card-bg: #FFFFFF;
+            --brand-red: #EF4444;
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
             --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
+            --card-bg: #FFFFFF;
+            --blur-bg: rgba(255, 255, 255, 0.95);
         }
 
         [data-theme="dark"] {
@@ -31,39 +30,41 @@
             --border-color: #262626;
             --text-main: #F5F5F5;
             --text-muted: #A3A3A3;
-            --brand-blue: #3B82F6;
-            --card-bg: #1C1C1E;
+            --brand-blue: #2F80ED; 
+            --brand-green: #34D399;
+            --brand-red: #F87171;
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
             --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
+            --card-bg: #1C1C1E;
+            --blur-bg: rgba(17, 17, 17, 0.95);
         }
 
+        /* 基礎重設 */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
+                body {
             background-color: var(--bg-global);
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: stretch;
+            align-items: stretch; /* 🌟 關鍵修正：強迫大盒子上下拉滿螢幕高度，不准縮水！ */
             min-height: 100vh;
             margin: 0;
             padding: 0;
             transition: background-color 0.15s ease;
         }
 
-        /* ==========================================================================
-           2. 手機直屏精品大外框佈局防線 (鎖定不動)
-           ========================================================================== */
+        /* 手機直屏精品大外框 - 已全面針對電腦寬螢幕浮動與高度進行優化對齊 */
         .phone-wrapper {
             width: 100%;
             max-width: 430px;
-            height: 100vh;
+            height: 100vh;         /* 🌟 關鍵修正：在電腦上直接鎖定 100% 螢幕滿高度，不准被卡片壓扁！ */
             background-color: var(--bg-container);
             border-left: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
@@ -71,54 +72,61 @@
             position: relative;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;      /* 🌟 關鍵修正：讓只有中間的店家可以像 App 一樣在裡面滾動，上下排死死卡住不动！ */
         }
 
-        /* 📌 固定上排：吸附天花板群組 */
+        /* 👑 頂部全區常駐吸附天花板 */
         .sticky-top-group {
             position: sticky;
             top: 0;
-            z-index: 1000;
-            background-color: var(--bg-container);
+            z-index: 1000; 
+            background-color: var(--blur-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
         }
 
+        /* 頂部高級大字留白區 */
         .header {
-            padding: 20px 20px 12px 20px;
+            padding: 24px 20px 12px 20px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
         }
 
         .brand-title-area {
             display: flex;
             flex-direction: column;
-            gap: 2px;
         }
 
         .brand-logo-container {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .brand-logo {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
         }
 
-        .brand-logo-container h1 {
-            font-size: 20px;
+        .brand-title-area h1 {
+            font-size: 28px;
             font-weight: 800;
             letter-spacing: -0.5px;
+            color: var(--text-main);
         }
 
         .brand-subtitle {
-            font-size: 11px;
-            font-weight: 700;
+            font-size: 12px;
             color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 500;
         }
 
+        /* 右上角一體化控制台 */
         .control-panel {
             display: flex;
             align-items: center;
@@ -129,117 +137,110 @@
         .theme-toggle {
             background: none;
             border: 1px solid var(--border-color);
-            font-size: 15px;
-            width: 34px;
-            height: 34px;
+            font-size: 16px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: var(--card-bg);
             color: var(--text-main);
+            background-color: var(--card-bg);
         }
 
         .login-btn {
             background-color: var(--brand-blue);
-            color: white;
+            color: #FFFFFF;
             border: none;
-            padding: 0 12px;
-            height: 34px;
-            border-radius: 17px;
-            font-size: 12px;
-            font-weight: 700;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             box-shadow: var(--shadow-sm);
         }
 
         .user-avatar-btn {
-            display: none;
-            background: none;
+            display: none; 
+            background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            padding: 0 12px;
-            height: 34px;
-            border-radius: 17px;
-            font-size: 12px;
-            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
             color: var(--text-main);
             cursor: pointer;
-            background-color: var(--card-bg);
+            align-items: center;
+            gap: 4px;
         }
 
-        /* 下拉選單 */
+        /* 下拉選單面板 */
         .dropdown-menu {
             display: none;
             position: absolute;
             top: 42px;
             right: 0;
-            background-color: var(--bg-container);
+            width: 200px;
+            background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
-            width: 180px;
-            padding: 6px;
+            border-radius: 12px;
             box-shadow: var(--shadow-md);
             z-index: 1100;
+            padding: 6px;
         }
 
-        .nav-fast {
-            display: block;
+        .dropdown-menu a, .dropdown-menu button {
+            display: flex;
+            align-items: center;
+            width: 100%;
             padding: 10px 12px;
             color: var(--text-main);
             text-decoration: none;
             font-size: 13px;
-            font-weight: 600;
+            border: none;
+            background: none;
+            text-align: left;
             border-radius: 8px;
+            cursor: pointer;
         }
 
-        .nav-fast:hover {
+        .dropdown-menu a:hover, .dropdown-menu button:hover {
             background-color: var(--bg-global);
         }
 
         .menu-divider {
             height: 1px;
             background-color: var(--border-color);
-            margin: 4px 6px;
+            margin: 6px 0;
         }
 
-        .seller-unlock, .admin-unlock {
-            display: none;
-        }
+        /* 👑 智慧選單分流區塊 */
+        .seller-unlock { display: none; }
+        .admin-unlock { display: none; }
 
-        #logoutBtn {
-            width: 100%;
-            text-align: left;
-            background: none;
-            border: none;
-            padding: 10px 12px;
-            color: var(--brand-red);
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            border-radius: 8px;
-        }
-        #logoutBtn:hover { background-color: var(--bg-global); }
-
-        /* 定位列與搜尋框 */
+        /* 精品 GPS 定位管理列 */
         .location-bar {
-            padding: 0 20px 10px 20px;
+            padding: 4px 20px 8px 20px;
             display: flex;
-            gap: 8px;
             align-items: center;
+            gap: 8px;
         }
 
         .gps-trigger-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            padding: 6px 10px;
-            border-radius: 14px;
-            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
             font-weight: 700;
-            color: var(--text-main);
-            cursor: pointer;
+            color: var(--brand-blue);
             background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
             white-space: nowrap;
+            box-shadow: var(--shadow-sm);
         }
 
         .location-select-group {
@@ -250,30 +251,31 @@
 
         .nav-select {
             flex: 1;
-            height: 28px;
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
+            height: 32px;
             border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-global);
             color: var(--text-main);
+            font-size: 12px;
+            font-weight: 600;
             padding: 0 4px;
             outline: none;
+            cursor: pointer;
         }
 
+        /* 中間：搜尋欄 */
         .search-container {
-            padding: 0 20px 14px 20px;
+            padding: 8px 20px 4px 20px;
         }
 
         .search-box {
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            height: 40px;
-            border-radius: 12px;
             display: flex;
             align-items: center;
-            padding: 0 12px;
-            gap: 8px;
+            background-color: var(--bg-global);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0 14px;
+            height: 46px;
         }
 
         .search-box input {
@@ -281,19 +283,18 @@
             background: none;
             width: 100%;
             height: 100%;
-            font-size: 13px;
+            margin-left: 8px;
+            font-size: 14px;
             color: var(--text-main);
             outline: none;
         }
 
-        /* 🛒 中間：店家滑動列表區 */
+        /* 下方：店家列表區樣式補強面防線 */
         .store-list {
             padding: 16px 20px;
             display: flex;
             flex-direction: column;
             gap: 16px;
-            flex: 1;
-            overflow-y: auto;
         }
 
         .store-card {
@@ -308,105 +309,113 @@
             color: inherit;
             box-shadow: var(--shadow-sm);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            
+            /* 🌟 核心防線：強制限制卡片寬度，絕對不准擠歪大外框 */
             width: 100%; 
         }
-
         .store-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0,0,0,0.06);
         }
 
         .store-img {
-            width: 58px;
-            height: 58px;
+            width: 54px;
+            height: 54px;
             background-color: var(--bg-global);
-            border-radius: 14px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
+            font-size: 28px;
             flex-shrink: 0;
-            border: 1px solid var(--border-color);
         }
 
         .store-info {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            height: 58px;
             flex-grow: 1;
-            min-width: 0;
+            gap: 6px;
         }
 
         .store-name {
-            font-size: 15px;
-            font-weight: 800;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
         }
 
         .store-meta {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-muted);
-            font-weight: 600;
             margin-top: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
+
         .store-tags {
             display: flex;
-            gap: 4px;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
-        .tag-time, .tag-pay {
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 6px;
+        .store-tags span {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 8px;
             border-radius: 6px;
-            background-color: var(--bg-global);
+        }
+
+        .tag-time {
+            background-color: rgba(0, 98, 255, 0.08);
             color: var(--brand-blue);
         }
-        .tag-pay { color: var(--brand-green); }
 
-        .loading-spinner {
-            text-align: center;
-            padding: 30px 0;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-muted);
+        .tag-pay {
+            background-color: rgba(16, 185, 129, 0.08);
+            color: var(--brand-green);
         }
 
-        /* 📌 固定下排：常駐底部導覽列 */
+        /* 底部常駐懸浮欄 */
         .bottom-bar {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 72px;
-            background-color: var(--bg-container);
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            height: 76px;
+            background-color: var(--blur-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
-            z-index: 1000;
+            padding: 0 20px 10px 20px;
+            z-index: 999;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
         }
 
         .status-msg {
+            font-size: 12px;
+            color: var(--text-muted);
+            max-width: 200px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             text-decoration: none;
-            color: var(--text-main);
-            min-width: 0;
-            flex-grow: 1;
         }
 
         .status-indicator {
-            width: 8px; height: 8px;
-            background-color: #CBD5E1;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
+            background-color: var(--text-muted);
             flex-shrink: 0;
+            position: relative;
+        }
+
+        .status-indicator.active {
+            background-color: var(--brand-green);
+            box-shadow: 0 0 8px var(--brand-green);
         }
 
         .order-badge-count {
@@ -414,40 +423,36 @@
             color: white;
             font-size: 10px;
             font-weight: 800;
-            padding: 1px 5px;
-            border-radius: 10px;
+            min-width: 15px;
+            height: 15px;
+            border-radius: 8px;
             display: none;
-        }
-
-        #statusText {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 1px solid var(--bg-container);
         }
 
         .cart-status-btn {
             background-color: var(--brand-blue);
             color: white;
-            padding: 0 16px;
-            height: 40px;
+            border: none;
+            padding: 10px 16px;
             border-radius: 20px;
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 600;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 4px;
             text-decoration: none;
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
-            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
         }
 
-        /* 🔲 全螢幕標準安全燈箱防線 */
-        .lightbox-modal {
+        /* 燈箱樣式 */
+                .lightbox-modal {
             display: none;
-            position: fixed;
+            position: fixed; /* 🌟 核心防線：死死鎖定在全螢幕，絕不跟開店頁打架 */
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(4px);
@@ -458,39 +463,76 @@
             padding: 20px;
         }
 
-        .lightbox-card {
+        .modal-card {
             background-color: var(--bg-container);
             border: 1px solid var(--border-color);
-            border-radius: 24px;
+            border-radius: 20px;
             width: 100%;
-            max-width: 330px;
+            max-width: 320px;
             padding: 24px;
             box-shadow: var(--shadow-md);
-            position: relative;
+            text-align: center;
         }
 
-        .lightbox-close-btn {
-            position: absolute;
-            top: 16px; right: 16px;
-            background: none; border: none;
-            font-size: 16px; cursor: pointer;
-            color: var(--text-muted);
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
         }
 
-        .lightbox-title {
-            font-size: 18px; font-weight: 800;
-            text-align: center; margin-bottom: 20px;
+        .modal-desc-address {
+            font-size: 13px;
+            color: var(--text-main);
+            line-height: 1.5;
+            margin-bottom: 20px;
+            word-break: break-all;
+            background-color: var(--bg-global);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: left;
         }
 
-        #adminView {
-            display: none;
+        .modal-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             width: 100%;
-            max-width: 430px;
-            background-color: var(--bg-container);
-            padding: 20px;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        .modal-btn.google {
+            background-color: #FFFFFF !important;
+            color: #374151 !important;
+            border-color: #E2E8F0 !important;
+        }
+
+        .modal-close {
+            font-size: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            margin-top: 12px;
+            display: inline-block;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
         }
     </style>
-</head>
+    </head>
 <body>
 
     <!-- 🔮 核心分流開關 A：管理員控制台 -->

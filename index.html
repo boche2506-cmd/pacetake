@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* 全域微調與平滑動畫 */
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #f8fafc; }
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -109,7 +108,6 @@
             </div>
         </section>
 
-
         <section class="bg-white rounded-2xl p-6 shadow-md mb-8">
             <div class="text-center max-w-xl mx-auto my-6">
                 <h1 class="text-2xl font-black text-gray-900 sm:text-3xl">跨縣市智慧商圈快搜</h1>
@@ -127,13 +125,12 @@
     </main>
 
     <script type="module">
-        // 這裡封裝你的 Firebase Config (依照你原來的設定放入)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const firebaseConfig = {
-            // ⚠️ 這裡請保留或換成你原本貼進去的 Firebase 密鑰與參數
+            // ⚠️ 這裡請換成你原本貼進去的 Firebase 實際密鑰與參數
             apiKey: "YOUR_API_KEY",
             authDomain: "pacetake.firebaseapp.com",
             projectId: "pacetake",
@@ -165,29 +162,26 @@
             const loggedInDiv = document.getElementById('auth-logged-in');
             const displayNameSpan = document.getElementById('user-display-name');
             
-            // 權限區塊
             const adminMenuGroup = document.getElementById('menu-group-admin');
             const sellerMenuGroup = document.getElementById('menu-group-seller');
             const btnBecomeSeller = document.getElementById('btn-become-seller');
 
             if (user) {
-                // 已登入狀態切換
                 loggedOutDiv.classList.add('hidden');
                 loggedInDiv.classList.remove('hidden');
                 displayNameSpan.innerText = user.displayName || user.email || "會員";
 
-                // 👑 讀取 Firestore 使用者角色
                 const userDocRef = doc(db, "users", user.uid);
                 const userDocSnap = await getDoc(userDocRef);
 
-                let userRole = "buyer"; // 預設給予買家權限
+                let userRole = "buyer"; 
 
                 if (userDocSnap.exists()) {
-                    // 🔒 天神皇冠防線：偵測到已有資料（特別是你的 admin 鋼印），絕對不覆蓋，直接沿用角色！
+                    // 🔒 天神皇冠防線
                     const userData = userDocSnap.data();
                     userRole = userData.role || "buyer";
                 } else {
-                    // 📥 新帳號首登：資料庫無資料，自動幫新用戶建立 users 基礎結構，預設為 buyer
+                    // 📥 新帳號首登
                     await setDoc(userDocRef, {
                         uid: user.uid,
                         name: user.displayName || "新用戶",
@@ -199,35 +193,30 @@
 
                 // 🔮 三層智慧分流選單動態顯示
                 if (userRole === "admin") {
-                    adminMenuGroup.classList.remove('hidden');  // 解鎖天神暗道選單
-                    sellerMenuGroup.classList.remove('hidden'); // 管理員權限全開
-                    btnBecomeSeller.classList.add('hidden');    // 天神不需要看開店按鈕
-                    fetchTotalUsersCount();                     // 順便載入核心數據
+                    adminMenuGroup.classList.remove('hidden');  
+                    sellerMenuGroup.classList.remove('hidden'); 
+                    btnBecomeSeller.classList.add('hidden');    
+                    fetchTotalUsersCount();                     
                 } else if (userRole === "seller") {
-                    sellerMenuGroup.classList.remove('hidden'); // 解鎖老闆後台
-                    btnBecomeSeller.classList.add('hidden');    // 已經是老闆了，隱藏開店按鈕
+                    sellerMenuGroup.classList.remove('hidden'); 
+                    btnBecomeSeller.classList.add('hidden');    
                     adminMenuGroup.classList.add('hidden');
                 } else {
-                    // 一般買家 Buyer
                     adminMenuGroup.classList.add('hidden');
                     sellerMenuGroup.classList.add('hidden');
                     btnBecomeSeller.classList.remove('hidden');
                 }
 
             } else {
-                // 未登入狀態
                 loggedOutDiv.classList.remove('hidden');
                 loggedInDiv.classList.add('hidden');
                 adminMenuGroup.classList.add('hidden');
                 sellerMenuGroup.classList.add('hidden');
-                // 隱藏原地展開的控制台面板
-                document.getElementById('admin-panel-dashboard').classAddHidden();
-                document.getElementById('admin-panel-promo').classAddHidden();
+                // ✨【完美排毒修復】：改為標準原生的 classList.add('hidden')
+                document.getElementById('admin-panel-dashboard').classList.add('hidden');
+                document.getElementById('admin-panel-promo').classList.add('hidden');
             }
         });
-
-        // 헬幫忙補上 classList 精簡控制
-        Element.prototype.classAddHidden = function() { this.classList.add('hidden'); };
 
         // --- 門派 A 原地展開面板控制函數 (修復 404 核心) ---
         window.switchAdminSection = function(type) {
@@ -243,11 +232,10 @@
                 dashPanel.classList.add('hidden');
                 promoPanel.scrollIntoView({ behavior: 'smooth' });
             }
-            // 點完後自動收起下拉選單
             document.getElementById('dropdown-menu').classList.add('hidden');
         };
 
-        // --- 讀取 Firebase 總會員人數 (實務優化版) ---
+        // --- 讀取 Firebase 總會員人數 ---
         async function fetchTotalUsersCount() {
             try {
                 const querySnapshot = await getDocs(collection(db, "users"));

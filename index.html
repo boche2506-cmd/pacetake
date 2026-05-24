@@ -608,11 +608,12 @@
     </main>
 
     <footer class="bottom-bar">
-        <a href="orders.html" class="status-msg" id="bottomStatusMsg">
-            <div class="status-indicator active" id="statusDot"></div>
-            <div class="order-badge-count" id="orderBadgeCount">0</div>
-            <span id="statusText">您目前沒有進行中的訂單喔！</span>
-        </a>
+    <a href="orders.html" class="status-msg" id="bottomStatusMsg">
+        <span id="loginStatusDot" style="width: 12px; height: 12px; background-color: red; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
+        <div class="status-indicator active" id="statusDot"></div>
+        <div class="order-badge-count" id="orderBadgeCount">0</div>
+        <span id="statusText">您目前沒有進行中的訂單喔！</span>
+    </a>
         <a href="cart.html" class="cart-status-btn nav-fast">
             <span>🛒 購物車</span>
             <span id="cartCount">(0)</span>
@@ -793,28 +794,45 @@
     }
     initTheme();
 
+    // 監聽登入狀態並更新 UI
+onAuthStateChanged(auth, (user) => {
+    // 1. 先抓取必要的 DOM 元素
+    const statusDot = document.getElementById('loginStatusDot');
     const loginBtn = document.getElementById('loginBtn');
     const avatarBtn = document.getElementById('avatarBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
-    const userNameDisplay = document.getElementById('userNameDisplay');
-    const storeContainer = document.getElementById('store-container');
-    
-    const loginLightbox = document.getElementById('loginLightbox');
-    const googleLoginAction = document.getElementById('googleLoginAction');
-    const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
-    const emailFormSection = document.getElementById('emailFormSection');
-    const customReturnBtn = document.getElementById('customReturnBtn');
-    const loginEmailInput = document.getElementById('loginEmail');
-    const loginPasswordInput = document.getElementById('loginPassword');
-    const emailLoginAction = document.getElementById('emailLoginAction');
 
-    const citySelect = document.getElementById('citySelect');
-    const districtSelect = document.getElementById('districtSelect');
-    const gpsPinBtn = document.getElementById('gpsPinBtn');
-    const addressDetailLightbox = document.getElementById('addressDetailLightbox');
-    const modalAddressText = document.getElementById('modalAddressText');
-    const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
-    const globalSearchInput = document.getElementById('globalSearchInput');
+    // 2. 判斷登入狀態並執行對應邏輯
+    if (user) {
+        // --- 已登入 ---
+        if (typeof handleUserSyncAndRoleRouting === 'function') {
+            handleUserSyncAndRoleRouting(user);
+        }
+        
+        // 更新燈號為綠色
+        if (statusDot) statusDot.style.backgroundColor = '#2ecc71';
+        
+        // 切換按鈕顯示：隱藏登入，顯示頭像
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (avatarBtn) avatarBtn.style.display = 'block';
+    } else {
+        // --- 未登入 ---
+        // 更新燈號為紅色
+        if (statusDot) statusDot.style.backgroundColor = '#e74c3c';
+        
+        // 切換按鈕顯示：顯示登入，隱藏頭像
+        if (loginBtn) {
+            loginBtn.style.display = 'block'; 
+        }
+        if (avatarBtn) avatarBtn.style.display = 'none';
+        
+        // 清除個人化選單
+        if (dropdownMenu) {
+            dropdownMenu.style.display = 'none';
+            dropdownMenu.innerHTML = '';
+        }
+    }
+});
 
     // 下拉選單點擊開關
     avatarBtn.addEventListener('click', (e) => {

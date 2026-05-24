@@ -680,11 +680,49 @@
         </div>
 
     </div>
-</div>
+<div id="adminView" style="display: none; padding: 30px; background: #121212; color: #e0e0e0; min-height: 100vh; font-family: sans-serif;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
+        <h1 style="color: #4dadff; margin: 0; font-size: 28px;">🔮 派思最高意志控制台</h1>
+        <button onclick="toggleView('buyer')" style="padding: 10px 20px; background: #ff4d4d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;">
+            🧑‍💼 返回一般買家視圖
+        </button>
+    </div>
 
-<div id="adminView" style="display: none; padding: 20px; background: #1a1a1a; color: #fff;">
-    <h1>🔮 派思核心控制台</h1>
-    <p>後台運作中...</p>
+    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #2d2d2d;">
+        <h3 style="color: #ffca28; margin-top: 0;">➕ 新增全新店家</h3>
+        <p style="color: #aaa; font-size: 13px;">請輸入店家資訊，新增後將同步至 Firebase 雲端資料庫。</p>
+        <div style="color: #666; font-style: italic; padding: 10px; border: 1px dashed #444; text-align: center;">
+            [表單輸入框預留位置：店名、地址、電話、經緯度...]
+        </div>
+    </div>
+
+    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d;">
+        <h3 style="color: #4da5ff; margin-top: 0;">📋 目前雲端店家總覽</h3>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 14px;">
+            <thead>
+                <tr style="background: #2d2d2d; color: #fff;">
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">店家名稱</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">詳細地址</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">聯絡電話</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">核心操作</th>
+                </tr>
+            </thead>
+            <tbody id="adminStoreTableBody">
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #3a3a3a; color: #ffca28;">範例店家（測試用）</td>
+                    <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">基隆市七堵區光明路 X 號</td>
+                    <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">02-245X-XXXX</td>
+                    <td style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">
+                        <button style="padding: 5px 10px; background: #2196f3; color: white; border: none; border-radius: 4px; margin-right: 5px; cursor: pointer;">修改</button>
+                        <button style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">刪除</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";

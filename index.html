@@ -49,14 +49,14 @@
         }
 
         body {
-            background-color: var(--bg-global);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            transition: background-color 0.15s ease;
-        }
+    background-color: var(--bg-global);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    transition: background-color 0.15s ease;
+}
 
         /* 手機直屏精品大外框與細邊界 */
         .phone-wrapper {
@@ -289,11 +289,16 @@
 
         /* 下方：店家列表區樣式補強面防線 */
         .store-list {
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    /* 核心修改在這裡 */
+    flex: 1;             /* 佔滿剩餘高度 */
+    overflow-y: auto;    /* 超出高度才產生捲動 */
+    min-height: 50vh;    /* 關鍵：給它一個最低高度，確保資料沒出來前盒子就不會塌陷 */
+}
 
         .store-card {
             display: flex;
@@ -616,7 +621,7 @@
             </div>
         </div>
 
-        <main class="store-list" id="store-container">
+        <main class="store-list" id="buyerView" style="display: block !important; visibility: visible !important;">
             <div class="loading-spinner">⚡ 正在安全連線雲端資料庫...</div>
         </main>
 
@@ -803,7 +808,7 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const sellerMenuBlock = document.getElementById('sellerMenuBlock');
         const adminMenuBlock = document.getElementById('adminMenuBlock');
-        const storeContainer = document.getElementById('store-container');
+        const storeContainer = document.getElementById('buyerView');
         
         const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
         const emailFormSection = document.getElementById('emailFormSection');
@@ -1076,6 +1081,12 @@
         };
 
 // 💡 注意：這裡完全不加任何額外的 }); 讓瀏覽器自己順著原來的結構走完
+        // 強制在頁面載入時，直接把 buyerView 打開
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("網頁結構已就緒，開始載入資料...");
+    fetchStoresFromFirebase();
+    getBrowserLocation();
+});
 </script>
 </body>
 </html>

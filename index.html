@@ -791,18 +791,24 @@
     // 監聽登入狀態並更新 UI
 // 監聽登入狀態並統一管理 UI
 onAuthStateChanged(auth, (user) => {
-    console.log("當前登入狀態:", user ? "已登入" : "未登入");
-
-    const statusDot = document.getElementById('loginStatusDot'); // 這是你 footer 左下角的燈號
-    const loginBtn = document.getElementById('loginBtn');
-    const avatarBtn = document.getElementById('avatarBtn');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-
-    if (user) {
-        // --- 已登入時的 UI ---
-        if (typeof handleUserSyncAndRoleRouting === 'function') {
-            handleUserSyncAndRoleRouting(user);
+    // 抓取元素
+    const statusDot = document.getElementById('loginStatusDot');
+    
+    // 如果找到了燈號元素，才開始執行邏輯
+    if (statusDot) {
+        if (user) {
+            // 已登入：變綠色
+            statusDot.style.backgroundColor = '#2ecc71';
+            console.log("偵測到登入，燈號已設為綠色");
+        } else {
+            // 未登入：變紅色
+            statusDot.style.backgroundColor = '#e74c3c';
+            console.log("偵測到未登入，燈號已設為紅色");
         }
+    } else {
+        console.error("找不到 loginStatusDot 元素！請檢查 ID 是否正確。");
+    }
+});
         
         // 燈號綠色
         if (statusDot) statusDot.style.backgroundColor = '#2ecc71';

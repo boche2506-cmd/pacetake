@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <link rel="icon" type="image/png" href="logo.png">
-  <link rel="apple-touch-icon" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
-   
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+
     <style>
         /* 全局變數與主題防線 - 完美呼應 Cyber Blue 品牌色 */
         :root {
@@ -259,10 +259,6 @@
             padding: 0 4px;
             outline: none;
             cursor: pointer;
-            .nav-select {
-    min-width: 120px; /* 給它一個最小寬度，不管幾個字都不會縮 */
-    flex: 0 0 auto;  /* 確保它不會被其他元素擠壓 */
-}
         }
 
         /* 中間：搜尋欄 */
@@ -556,7 +552,6 @@
                 
                 <div class="dropdown-menu" id="dropdownMenu"></div>
             </div>
-            <span id="loginStatusDot" style="width: 12px; height: 12px; background-color: red; border-radius: 50%; display: inline-block; margin-right: 5px;"></span>
         </header>
 
         <div class="location-bar">
@@ -608,12 +603,11 @@
     </main>
 
     <footer class="bottom-bar">
-    <a href="orders.html" class="status-msg" id="bottomStatusMsg">
-        <span id="loginStatusDot" style="width: 12px; height: 12px; background-color: red; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
-        <div class="status-indicator active" id="statusDot"></div>
-        <div class="order-badge-count" id="orderBadgeCount">0</div>
-        <span id="statusText">您目前沒有進行中的訂單喔！</span>
-    </a>
+        <a href="history.html" class="status-msg" id="bottomStatusMsg">
+            <div class="status-indicator active" id="statusDot"></div>
+            <div class="order-badge-count" id="orderBadgeCount">0</div>
+            <span id="statusText">您目前沒有進行中的訂單喔！</span>
+        </a>
         <a href="cart.html" class="cart-status-btn nav-fast">
             <span>🛒 購物車</span>
             <span id="cartCount">(0)</span>
@@ -794,44 +788,28 @@
     }
     initTheme();
 
-    // 監聽登入狀態並更新 UI
-// 監聽登入狀態並統一管理 UI
-onAuthStateChanged(auth, (user) => {
-    console.log("當前登入狀態:", user ? "已登入" : "未登入");
-
-    const statusDot = document.getElementById('loginStatusDot'); // 這是你 footer 左下角的燈號
     const loginBtn = document.getElementById('loginBtn');
     const avatarBtn = document.getElementById('avatarBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const storeContainer = document.getElementById('store-container');
+    
+    const loginLightbox = document.getElementById('loginLightbox');
+    const googleLoginAction = document.getElementById('googleLoginAction');
+    const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
+    const emailFormSection = document.getElementById('emailFormSection');
+    const customReturnBtn = document.getElementById('customReturnBtn');
+    const loginEmailInput = document.getElementById('loginEmail');
+    const loginPasswordInput = document.getElementById('loginPassword');
+    const emailLoginAction = document.getElementById('emailLoginAction');
 
-    if (user) {
-        // --- 已登入時的 UI ---
-        if (typeof handleUserSyncAndRoleRouting === 'function') {
-            handleUserSyncAndRoleRouting(user);
-        }
-        
-        // 燈號綠色
-        if (statusDot) statusDot.style.backgroundColor = '#2ecc71';
-        
-        // 切換按鈕
-        if (loginBtn) loginBtn.style.display = 'none';
-        if (avatarBtn) avatarBtn.style.display = 'block';
-    } else {
-        // --- 未登入時的 UI ---
-        // 燈號紅色
-        if (statusDot) statusDot.style.backgroundColor = '#e74c3c';
-        
-        // 切換按鈕
-        if (loginBtn) loginBtn.style.display = 'block';
-        if (avatarBtn) avatarBtn.style.display = 'none';
-        
-        // 清除個人化
-        if (dropdownMenu) {
-            dropdownMenu.style.display = 'none';
-            dropdownMenu.innerHTML = '';
-        }
-    }
-});
+    const citySelect = document.getElementById('citySelect');
+    const districtSelect = document.getElementById('districtSelect');
+    const gpsPinBtn = document.getElementById('gpsPinBtn');
+    const addressDetailLightbox = document.getElementById('addressDetailLightbox');
+    const modalAddressText = document.getElementById('modalAddressText');
+    const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
+    const globalSearchInput = document.getElementById('globalSearchInput');
 
     // 下拉選單點擊開關
     avatarBtn.addEventListener('click', (e) => {
@@ -995,21 +973,15 @@ onAuthStateChanged(auth, (user) => {
     });
 
     onAuthStateChanged(auth, (user) => {
-    const statusDot = document.getElementById('loginStatusDot');
-    
-    if (user) {
-        // 已登入的邏輯
-        handleUserSyncAndRoleRouting(user);
-        statusDot.style.backgroundColor = '#2ecc71'; // 綠色
-    } else {
-        // 未登入的邏輯
-        loginBtn.style.display = 'block';
-        avatarBtn.style.display = 'none';
-        dropdownMenu.style.display = 'none';
-        dropdownMenu.innerHTML = '';
-        statusDot.style.backgroundColor = '#e74c3c'; // 紅色
-    }
-});
+        if (user) {
+            handleUserSyncAndRoleRouting(user);
+        } else {
+            loginBtn.style.display = 'block';
+            avatarBtn.style.display = 'none';
+            dropdownMenu.style.display = 'none';
+            dropdownMenu.innerHTML = '';
+        }
+    });
 
     // 📥 讀取雲端店家 (買家列表 & 後台列表 同時更新)
     async function fetchStoresFromFirebase() {
@@ -1093,35 +1065,7 @@ onAuthStateChanged(auth, (user) => {
             currentBuyerAddress = "您的裝置不支援 GPS 定位裝置。";
         }
     }
-// 確保 DOM 載入後才執行
-const citySelect = document.getElementById('citySelect');
-const districtSelect = document.getElementById('districtSelect');
 
-// 縣市變更時的連動邏輯
-if (citySelect && districtSelect) {
-    citySelect.addEventListener('change', () => {
-        const selectedCity = citySelect.value;
-        
-        // 清空舊的區域選單
-        districtSelect.innerHTML = '<option value="">選擇區域</option>';
-        
-        // 如果有對應的區域資料，就把它們放進去
-        if (areaData[selectedCity]) {
-            areaData[selectedCity].forEach(dist => {
-                const opt = document.createElement('option');
-                opt.value = dist;
-                opt.innerText = dist;
-                districtSelect.appendChild(opt);
-            });
-        }
-        
-        // 選完縣市後，自動觸發搜尋邏輯
-        filterAndRenderStores();
-    });
-
-    // 區域變更時，也要觸發搜尋
-    districtSelect.addEventListener('change', filterAndRenderStores);
-}
     // 啟動資料庫與定位抓取
     fetchStoresFromFirebase();
     getBrowserLocation();

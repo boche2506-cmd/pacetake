@@ -60,18 +60,22 @@
 
         /* 手機直屏精品大外框與細邊界 */
         .phone-wrapper {
-            width: 100%;
-            max-width: 430px;
-            min-height: 100vh;
-            background-color: var(--bg-container);
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md);
-            position: relative;
-            padding-bottom: 90px; 
-            display: flex;
-            flex-direction: column;
-        }
+    width: 100%;
+    max-width: 430px;
+    height: 100vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--bg-container);
+    
+    /* 你提到的視覺效果 */
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    padding-bottom: 90px; /* 給底部騰出空間 */
+}
 
         /* 👑 頂部全區常駐吸附天花板 */
         .sticky-top-group {
@@ -83,6 +87,7 @@
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 10px;
+            flex-shrink: 0;
         }
 
         /* 頂部高級大字留白區 */
@@ -391,6 +396,7 @@
             padding: 0 20px 10px 20px;
             z-index: 999;
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
         }
 
         .status-msg {
@@ -530,6 +536,11 @@
             font-size: 14px;
             font-weight: 600;
         }
+        .scrollable-content {
+    flex: 1;          /* 自動吃掉剩下的高度空間 */
+    overflow-y: auto; /* 只有這裡會滾動 */
+    padding: 16px;
+         }
     </style>
 </head>
 <body>

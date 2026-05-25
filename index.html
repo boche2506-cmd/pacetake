@@ -22,7 +22,11 @@
             --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
             --card-bg: #FFFFFF;
             --blur-bg: rgba(255, 255, 255, 0.95);
-        }
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+              user-select: none;
+}
 
         [data-theme="dark"] {
             --bg-global: #0A0A0A;
@@ -112,6 +116,12 @@
             flex-direction: column;
             align-items: flex-end;
             gap: 3px;
+/* 這裡設為你兩個按鈕「最大那個」的高度與寬度 */
+    min-height: 80px; 
+    min-width: 120px; 
+    
+    /* 防止內容過多導致變形 */
+    overflow: hidden;
         }
 
         .brand-logo-container {
@@ -566,6 +576,22 @@ img, .card {
     height: auto;           /* 高度等比例縮放 */
     box-sizing: border-box; /* 確保 padding 不會把容器撐開 */
 }
+
+input, textarea {
+    -webkit-user-select: text; /* 確保輸入框可以選取文字 */
+    user-select: text;         /* 這是重點：這行保證了輸入框依然可以正常打字 */
+}
+
+#avatarBtn, #themeToggleBtn {
+    /* 確保它們不要有預設的奇怪外距 */
+    margin: 0;
+    padding: 8px 12px;
+    /* 強制設定一致的寬度或高度，避免因為文字長度不同而伸縮 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
     </style>
 </head>
 <body>

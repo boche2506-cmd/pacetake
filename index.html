@@ -790,33 +790,26 @@
     // 確保只宣告一次抓取
 const statusDot = document.getElementById('loginStatusDot');
 
+// 統一的登入狀態監聽器 (確保這整份代碼在檔案中只有一份)
 onAuthStateChanged(auth, (user) => {
-    // 檢查是否有抓到，且只有一個地方在控制它
-    if (statusDot) {
-        statusDot.style.backgroundColor = user ? '#2ecc71' : '#e74c3c';
-    }
-});
-        
-        // 燈號綠色
-        if (statusDot) statusDot.style.backgroundColor = '#2ecc71';
-        
-        // 切換按鈕
+    // 1. 抓取所有需要的元素
+    const statusDot = document.getElementById('loginStatusDot');
+    const loginBtn = document.getElementById('loginBtn');
+    const avatarBtn = document.getElementById('avatarBtn');
+
+    // 2. 檢查登入狀態並統一處理
+    if (user) {
+        // --- 已登入時的邏輯 ---
+        console.log("偵測到登入，更新 UI...");
+        if (statusDot) statusDot.style.backgroundColor = '#2ecc71'; // 綠色
         if (loginBtn) loginBtn.style.display = 'none';
         if (avatarBtn) avatarBtn.style.display = 'block';
     } else {
-        // --- 未登入時的 UI ---
-        // 燈號紅色
-        if (statusDot) statusDot.style.backgroundColor = '#e74c3c';
-        
-        // 切換按鈕
+        // --- 未登入時的邏輯 ---
+        console.log("偵測到未登入，更新 UI...");
+        if (statusDot) statusDot.style.backgroundColor = '#e74c3c'; // 紅色
         if (loginBtn) loginBtn.style.display = 'block';
         if (avatarBtn) avatarBtn.style.display = 'none';
-        
-        // 清除個人化
-        if (dropdownMenu) {
-            dropdownMenu.style.display = 'none';
-            dropdownMenu.innerHTML = '';
-        }
     }
 });
 
@@ -981,28 +974,7 @@ onAuthStateChanged(auth, (user) => {
         }
     });
 
-    // ==========================================
-// 【獨立登入狀態管理區塊】
-// 請將此段完整貼入，確保不會被後續代碼覆蓋
-// ==========================================
-onAuthStateChanged(auth, (user) => {
-    const statusDot = document.getElementById('loginStatusDot');
-    const loginBtn = document.getElementById('loginBtn');
-    const avatarBtn = document.getElementById('avatarBtn');
-
-    if (user) {
-        // 已登入
-        if (statusDot) statusDot.style.backgroundColor = '#2ecc71';
-        if (loginBtn) loginBtn.style.display = 'none';
-        if (avatarBtn) avatarBtn.style.display = 'block';
-    } else {
-        // 未登入
-        if (statusDot) statusDot.style.backgroundColor = '#e74c3c';
-        if (loginBtn) loginBtn.style.display = 'block';
-        if (avatarBtn) avatarBtn.style.display = 'none';
-    }
-});
-// ==========================================
+  // ==========================================
 
     // 📥 讀取雲端店家 (買家列表 & 後台列表 同時更新)
     async function fetchStoresFromFirebase() {

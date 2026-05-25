@@ -60,22 +60,18 @@
 
         /* 手機直屏精品大外框與細邊界 */
         .phone-wrapper {
-    width: 100%;
-    max-width: 430px;
-    height: 100vh;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background-color: var(--bg-container);
-    
-    /* 你提到的視覺效果 */
-    border-left: 1px solid var(--border-color);
-    border-right: 1px solid var(--border-color);
-    box-shadow: var(--shadow-md);
-    position: relative;
-    padding-bottom: 90px; /* 給底部騰出空間 */
-}
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background-color: var(--bg-container);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            padding-bottom: 90px; 
+            display: flex;
+            flex-direction: column;
+        }
 
         /* 👑 頂部全區常駐吸附天花板 */
         .sticky-top-group {
@@ -87,7 +83,6 @@
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 10px;
-            flex-shrink: 0;
         }
 
         /* 頂部高級大字留白區 */
@@ -396,7 +391,6 @@
             padding: 0 20px 10px 20px;
             z-index: 999;
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-            flex-shrink: 0;
         }
 
         .status-msg {
@@ -536,78 +530,265 @@
             font-size: 14px;
             font-weight: 600;
         }
-        .scrollable-content {
-    flex: 1;          /* 自動吃掉剩下的高度空間 */
-    overflow-y: auto; /* 只有這裡會滾動 */
-    padding: 16px;
-         }
     </style>
 </head>
-<body>
-    <div class="phone-wrapper">
-        
-        <div class="sticky-top-group">
-            <header class="header">
-                <div class="brand-title-area">
-                    <div class="brand-logo-container">
-                        <div>
-                            <h1>PACE</h1>
-                            <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
-                        </div>
+<body><div id="buyerView" style="display: block;">
+    <div class="sticky-top-group">
+        <header class="header">
+            <div class="brand-title-area">
+                <div class="brand-logo-container">
+                    <div>
+                        <h1>PACE</h1>
+                        <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
                     </div>
                 </div>
+            </div>
 
-                <div class="control-panel">
-                    <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
-                        <span class="avatar-icon">👤</span>
-                        <span class="user-name" id="userNameDisplay">載入中...</span>
-                    </button>
-                    <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
-                    <button class="login-btn" id="loginBtn">登入 / 註冊</button>
-                    <div class="dropdown-menu" id="dropdownMenu"></div>
-                </div>
-            </header>
+            <div class="control-panel">
+                 <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+                    <span class="avatar-icon">👤</span>
+                    <span class="user-name" id="userNameDisplay">載入中...</span>
+                </button>
+                <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+                <button class="login-btn" id="loginBtn">登入 / 註冊</button>
+               
+                
+                <div class="dropdown-menu" id="dropdownMenu"></div>
+            </div>
+        </header>
 
-            <div class="location-bar">
-                <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
-                <div class="location-select-group">
-                    <select class="nav-select" id="citySelect">
+        <div class="location-bar">
+            <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
+            <div class="location-select-group">
+                <select class="nav-select" id="citySelect">
                         <option value="">選擇縣市</option>
                         <option value="臺北市">臺北市</option>
                         <option value="新北市">新北市</option>
                         <option value="基隆市">基隆市</option>
-                        </select>
+                        <option value="桃園市">桃園市</option>
+                        <option value="新竹市">新竹市</option>
+                        <option value="新竹縣">新竹縣</option>
+                        <option value="苗栗縣">苗栗縣</option>
+                        <option value="台中市">台中市</option>
+                        <option value="彰化縣">彰化縣</option>
+                        <option value="南投縣">南投縣</option>
+                        <option value="雲林縣">雲林縣</option>
+                        <option value="嘉義市">嘉義市</option>
+                        <option value="嘉義縣">嘉義縣</option>
+                        <option value="台南市">台南市</option>
+                        <option value="高雄市">高雄市</option>
+                        <option value="屏東縣">屏東縣</option>
+                        <option value="宜蘭縣">宜蘭縣</option>
+                        <option value="花蓮縣">花蓮縣</option>
+                        <option value="臺東縣">臺東縣</option>
+                        <option value="澎湖縣">澎湖縣</option>
+                        <option value="金門縣">金門縣</option>
+                        <option value="連江縣">連江縣</option>
+                    </select>
                     <select class="nav-select" id="districtSelect">
                         <option value="">選擇區域</option>
                     </select>
-                </div>
-            </div>
-                
-            <div class="search-container">
-                <div class="search-box">
-                    <span>🔍</span>
-                    <input type="text" id="globalSearchInput" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
-                </div>
+                </select>
+               
             </div>
         </div>
-
-        <main class="scrollable-content" id="store-container">
-            <div class="loading-spinner" id="loadingSpinner">⚡ 正在安全連線雲端資料庫...</div>
-            </main>
-
-        <footer class="bottom-bar">
-            <a href="history.html" class="status-msg" id="bottomStatusMsg">
-                <div class="status-indicator active" id="statusDot"></div>
-                <div class="order-badge-count" id="orderBadgeCount">0</div>
-                <span id="statusText">您目前沒有進行中的訂單喔！</span>
-            </a>
-            <a href="cart.html" class="cart-status-btn nav-fast">
-                <span>🛒 購物車</span>
-                <span id="cartCount">(0)</span>
-            </a>
-        </footer>
-
+            
+        <div class="search-container">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="globalSearchInput" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
+            </div>
+        </div>
     </div>
+
+    <main class="store-list" id="store-container">
+        <div class="loading-spinner" id="loadingSpinner">⚡ 正在安全連線雲端資料庫...</div>
+    </main>
+
+    <footer class="bottom-bar">
+        <a href="history.html" class="status-msg" id="bottomStatusMsg">
+            <div class="status-indicator active" id="statusDot"></div>
+            <div class="order-badge-count" id="orderBadgeCount">0</div>
+            <span id="statusText">您目前沒有進行中的訂單喔！</span>
+        </a>
+        <a href="cart.html" class="cart-status-btn nav-fast">
+            <span>🛒 購物車</span>
+            <span id="cartCount">(0)</span>
+        </a>
+    </footer>
+</div>
+
+<!-- ========================================== -->
+<!-- 🔮 派思核心控制台 (Admin 視圖) -->
+<!-- ========================================== -->
+<div id="adminView" style="display: none; padding: 30px; background: #121212; color: #e0e0e0; min-height: 100vh; font-family: sans-serif;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
+        <h1 style="color: #4dadff; margin: 0; font-size: 28px;">🔮 派思最高意志控制台</h1>
+        <button onclick="window.toggleView('buyer')" style="padding: 10px 20px; background: #ff4d4d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;">
+            🧑‍💼 返回一般買家視圖
+        </button>
+    </div>
+
+    <!-- 真正接通 Firebase 的新增店家表單 -->
+    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #2d2d2d;">
+        <h3 style="color: #ffca28; margin-top: 0;">➕ 新增全新店家</h3>
+        <p style="color: #aaa; font-size: 13px; margin-bottom: 15px;">請輸入店家資訊，新增後將立即同步至 Firebase 雲端資料庫。</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
+            <input type="text" id="adminNewStoreName" placeholder="店家名稱 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+            <input type="text" id="adminNewStorePhone" placeholder="聯絡電話" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+            <select id="adminNewStoreCity" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+                <option value="臺北市">臺北市</option>
+                <option value="基隆市">基隆市</option>
+            </select>
+            <input type="text" id="adminNewStoreDistrict" placeholder="區域 (如: 七堵區) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+            <input type="text" id="adminNewStoreAddress" placeholder="詳細地址 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">
+            <input type="text" id="adminNewStoreCategory" placeholder="分類 (如: 台式小吃, 飲料)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">
+        </div>
+        <button id="adminSubmitStoreBtn" style="width: 100%; padding: 12px; background: #059669; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;">✅ 確認新增店家至雲端</button>
+    </div>
+
+    <!-- 即時連線 Firebase 的店家總覽表格 -->
+    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d;">
+        <h3 style="color: #4da5ff; margin-top: 0;">📋 目前雲端店家總覽</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 14px;">
+            <thead>
+                <tr style="background: #2d2d2d; color: #fff;">
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">店家名稱</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">詳細地址</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">聯絡電話</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">核心操作</th>
+                </tr>
+            </thead>
+            <tbody id="adminStoreTableBody">
+                <tr><td colspan="4" style="text-align: center; padding: 15px; color: #888;">正在載入雲端資料...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 💡 燈箱模組區 (Lightboxes) -->
+<!-- ========================================== -->
+<div class="lightbox-modal" id="loginLightbox" style="display: none;">
+    <div class="modal-card">
+        <div class="modal-title" style="font-weight: 700; margin-bottom: 25px; color: #1f2937;">加入PACE 派思</div>
+        <button class="modal-btn google" id="googleLoginAction" style="box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+            <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:12px; flex-shrink: 0;">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            Google 一鍵登入
+        </button>
+
+        <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 100%; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; margin-top: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:12px; flex-shrink: 0;">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            使用電子郵件登入
+        </button>
+
+        <div id="emailFormSection" style="display: none; margin-top: 20px; text-align: left; width: 100%;">
+            <div style="margin-bottom: 12px;">
+                <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">電子郵件</label>
+                <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb; color: #111111;">
+            </div>
+            <div style="margin-bottom: 20px; position: relative;">
+                <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">密碼</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input type="password" id="loginPassword" placeholder="請輸入密碼" style="width:100%; padding:10px 40px 10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb; color: #111111;">
+                    <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
+                </div>
+            </div>
+            <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15);">電子郵件登入 / 註冊</button>
+        </div>
+        <span class="modal-close" id="customReturnBtn" style="margin-top: 20px; text-decoration: underline; cursor: pointer; display: block; text-align: center;">暫時返回</span>
+    </div>
+</div>
+
+<div class="lightbox-modal" id="addressDetailLightbox" style="display: none;">
+    <div class="modal-card">
+        <div class="modal-title" style="color: var(--brand-blue);">📍 系統目前探測位置</div>
+        <div class="modal-desc-address" id="modalAddressText" style="margin-bottom: 20px;">尚未獲取定位，請開啟 GPS。</div>
+        <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; border: none; width: 100%; height: 42px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">確認</button>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 🚀 核心控制區：Firebase 與所有交互邏輯 -->
+<!-- ========================================== -->
+<script type="module">
+    // 💡 已經幫你加入了 addDoc (新增) 和 deleteDoc (刪除) 模組
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
+        authDomain: "pacetake-c6e1e.firebaseapp.com",
+        projectId: "pacetake-c6e1e",
+        storageBucket: "pacetake-c6e1e.firebasestorage.app",
+        messagingSenderId: "1052980235056",
+        appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
+        measurementId: "G-888XL8JTHW",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // 全域核心變數
+    let allStores = [];
+    let buyerLat = null;
+    let buyerLng = null;
+    let currentBuyerAddress = "正在獲取定位中...";
+    let currentUserId = null;
+
+    const areaData = {
+        "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
+        "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
+        "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
+        "桃園市": ["桃園區", "中壢區", "大溪區", "楊梅區", "蘆竹區", "大園區", "龜山區", "八德區", "龍潭區", "平鎮區", "新屋區", "觀音區", "復興區"],
+        "新竹市": ["東區", "北區", "香山區"],
+        "新竹縣": ["竹北市", "竹東鎮", "新埔鎮", "關西鎮", "湖口鄉", "新豐鄉", "芎林鄉", "橫山鄉", "北埔鄉", "寶山鄉", "峨眉鄉", "尖石鄉", "五峰鄉"],
+        "苗栗縣": ["苗栗市", "頭份市", "竹南鎮", "後龍鎮", "通霄鎮", "苑裡鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "公館鄉", "銅鑼鄉", "三義鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "南庄鄉", "泰安鄉"],
+        "台中市": ["中區", "東區", "南區", "西區", "北區", "西屯區", "南屯區", "北屯區", "豐原區", "東勢區", "大甲區", "清水區", "沙鹿區", "梧棲區", "后里區", "神岡區", "潭子區", "大雅區", "新社區", "石岡區", "外埔區", "大安區", "烏日區", "大肚區", "龍井區", "霧峰區", "太平區", "大里區", "和平區"],
+        "彰化縣": ["彰化市", "員林市", "鹿港鎮", "和美鎮", "北斗鎮", "溪湖鎮", "田中鎮", "二林鎮", "線西鄉", "伸港鄉", "福興鄉", "秀水鄉", "花壇鄉", "芬園鄉", "大村鄉", "埔鹽鄉", "埔心鄉", "永靖鄉", "社頭鄉", "二水鄉", "田尾鄉", "埤頭鄉", "芳苑鄉", "大城鄉", "竹塘鄉", "溪州鄉"],
+        "南投縣": ["南投市", "埔里鎮", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
+        "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "西螺鎮", "土庫鎮", "北港鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "東勢鄉", "褒忠鄉", "臺西鄉", "元長鄉", "四湖鄉", "口湖鄉", "水林鄉"],
+        "嘉義市": ["東區", "西區"],
+        "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
+        "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
+        "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區", "內門區"],
+        "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
+        "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
+        "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
+        "臺東縣": ["臺東市", "成功鎮", "關山鎮", "卑名鄉", "大武鄉", "太麻里鄉", "東河鄉", "長濱鄉", "鹿野鄉", "池上鄉", "綠島鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉"],
+        "澎湖縣": ["馬公市", "湖西鄉", "白沙鄉", "西嶼鄉", "望安鄉", "七美鄉"],
+        "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
+        "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
+    };
+
+
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    function initTheme() {
+        const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        if(themeToggleBtn) themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    }
+    if(themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('pacetake-theme', newTheme);
+            themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        });
+    }
     initTheme();
 
     const loginBtn = document.getElementById('loginBtn');

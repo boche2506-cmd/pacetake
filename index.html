@@ -716,31 +716,42 @@
 <!-- ========================================== -->
 <!-- 🚀 核心控制區：Firebase 與所有交互邏輯 -->
 <!-- ========================================== -->
-<script type="module">
-  <script type="module">
-    // ... 原本的 import 都在這裡 ...
+// --- 貼在 import 之後，確保這些函數都能被調用 ---
 
-    // --- 把這整段貼在這裡，就在 script 區塊的下方，確保它在最後執行 ---
-    window.onload = function() {
-        const loginActionBtn = document.getElementById('googleLoginAction');
-        
-        if (loginActionBtn) {
-            loginActionBtn.addEventListener('click', async () => {
-                console.log("嘗試觸發 Google 登入...");
-                try {
-                    const provider = new GoogleAuthProvider();
-                    const result = await signInWithPopup(auth, provider);
-                    console.log("登入成功，使用者:", result.user.email);
-                } catch (error) {
-                    console.error("【登入失敗詳情】:", error.code, error.message);
-                    alert("登入失敗: " + error.message);
-                }
-            });
-            console.log("登入按鈕已成功綁定！");
-        } else {
-            console.error("找不到 ID 為 googleLoginAction 的按鈕！");
-        }
-    };
+// 1. 統一登入監聽（這就是我們剛剛修好的燈號邏輯）
+onAuthStateChanged(auth, (user) => {
+    const statusDot = document.getElementById('loginStatusDot');
+    const loginBtn = document.getElementById('loginBtn');
+    const avatarBtn = document.getElementById('avatarBtn');
+
+    if (user) {
+        if (statusDot) statusDot.style.backgroundColor = '#2ecc71';
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (avatarBtn) avatarBtn.style.display = 'block';
+    } else {
+        if (statusDot) statusDot.style.backgroundColor = '#e74c3c';
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (avatarBtn) avatarBtn.style.display = 'none';
+    }
+});
+
+// 2. Google 登入按鈕綁定（這就是剛剛修好的按鈕邏輯）
+document.addEventListener('DOMContentLoaded', () => {
+    const loginActionBtn = document.getElementById('googleLoginAction');
+    
+    if (loginActionBtn) {
+        loginActionBtn.addEventListener('click', async () => {
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+                console.log("登入成功！");
+            } catch (error) {
+                console.error("【登入失敗詳情】:", error);
+                alert("登入失敗，請查看 Console 錯誤訊息");
+            }
+        });
+    }
+});
     // -----------------------------------------------------------
 </script>
     // 💡 已經幫你加入了 addDoc (新增) 和 deleteDoc (刪除) 模組

@@ -157,6 +157,8 @@
             font-weight: 600;
             cursor: pointer;
             box-shadow: var(--shadow-sm);
+            margin-top: -5px;
+            margin-bottom: 5px;
         }
 
         .user-avatar-btn {
@@ -537,18 +539,19 @@
                 <div class="brand-logo-container">
                     <div>
                         <h1>PACE</h1>
-                        <div class="brand-subtitle">派思行動點餐</div>
+                        <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
                     </div>
                 </div>
             </div>
 
             <div class="control-panel">
-                <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
-                <button class="login-btn" id="loginBtn">登入 / 註冊</button>
-                <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+                 <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
                     <span class="avatar-icon">👤</span>
                     <span class="user-name" id="userNameDisplay">載入中...</span>
                 </button>
+                <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+                <button class="login-btn" id="loginBtn">登入 / 註冊</button>
+               
                 
                 <div class="dropdown-menu" id="dropdownMenu"></div>
             </div>

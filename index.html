@@ -882,8 +882,9 @@
         if (role === 'admin') {
             menuHTML += `
                 <div class="menu-divider"></div>
-                <a href="javascript:void(0)" onclick="window.toggleView('admin')" style="color: var(--brand-blue); font-weight: bold;">🔮 派思核心控制台</a>
-                <a href="javascript:void(0)" onclick="window.issuePromoCode()" style="color: var(--brand-green); font-weight: bold;">🎟️ 戰術邀請碼發行</a>
+                <a href="javascript:void(0)" onclick="window.toggleView('admin')" style="color: var(--brand-blue); font-weight: bold;">🔮 派思控制台</a>
+                <a href="javascript:void(0)" onclick="window.issuePromoCode()" style="color: var(--brand-green); font-weight: bold;">🎟️ 邀請碼發行</a>
+                <a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>
             `;
         }
 
@@ -1042,7 +1043,7 @@
                     </div>
                     <div class="store-tags">
                         <span class="tag-time">⏱️ 店內價外帶</span>
-                        <span class="tag-pay">💳 支援行動支付</span>
+                        <span class="tag-pay">💳 支援線上支付</span>
                     </div>
                 </div>
             `;
@@ -1171,9 +1172,9 @@
         }
     };
 
-    // 4. 戰術邀請碼寫入 Firebase 邏輯
+    // 4. 邀請碼寫入 Firebase 邏輯
     window.issuePromoCode = async function() {
-        const code = prompt('請輸入要發行的戰術 VIP 邀請碼 (例如: PACE2026):');
+        const code = prompt('請輸入要發行的 VIP 邀請碼 (例如: PACE2026):');
         if (!code || code.trim() === "") return;
         
         try {
@@ -1185,7 +1186,7 @@
                 isActive: true,
                 usedBy: null // 預留給未來記錄誰使用了這個碼
             });
-            alert(`🎟️ 戰術邀請碼「${code}」已成功寫入 Firebase！買家現在可以使用它了。`);
+            alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！買家現在可以使用它了。`);
         } catch (error) {
             console.error("邀請碼發行失敗:", error);
             alert("發行失敗，請檢查您的系統權限配置！");

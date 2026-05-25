@@ -52,11 +52,14 @@
             background-color: var(--bg-global);
             color: var(--text-main);
             display: flex;
+            flex-direction: column;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             min-height: 100vh;
             transition: background-color 0.15s ease;
-        }
+    gap: 20px;              /* 讓這些區塊彼此保持 20px 的間距，才不會黏在一起 */
+    padding: 20px;          /* 邊緣留白 */
+}
 
         /* 手機直屏精品大外框與細邊界 */
         .phone-wrapper {
@@ -597,7 +600,7 @@
                 <span id="cartCount">(0)</span>
                 </a>
         </footer>              
-            </div>
+            
  
 <!-- 🔮 派思核心控制台 (Admin 視圖) -->
 <div id="adminView" style="display: none; padding: 30px; background: #121212; color: #e0e0e0; min-height: 100vh; font-family: sans-serif;">
@@ -766,7 +769,7 @@
             themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         });
     }
-
+</div><script type="module">
     initTheme();
 
     const loginBtn = document.getElementById('loginBtn');

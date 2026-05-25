@@ -61,7 +61,7 @@
         /* 手機直屏精品大外框與細邊界 */
         .phone-wrapper {
             width: 100%;
-            max-width: 430px;
+            max-width: 500px;
             min-height: 100vh;
             background-color: var(--bg-container);
             border-left: 1px solid var(--border-color);
@@ -71,6 +71,7 @@
             padding-bottom: 90px; 
             display: flex;
             flex-direction: column;
+            margin: 0 auto;
         }
 
         /* 👑 頂部全區常駐吸附天花板 */
@@ -530,23 +531,25 @@
             font-size: 14px;
             font-weight: 600;
         }
+         header { background: rgba(255, 0, 0, 0.3) !important; }
+        .location-bar { background: rgba(0, 255, 0, 0.3) !important; }
+        .scrollable-content { background: rgba(0, 0, 255, 0.3) !important; min-height: 200px; }
+         footer { background: rgba(255, 255, 0, 0.3) !important; }
     </style>
 </head>
 <body>
-  <div id="buyerView" style="display: block;">
-     <div class="phone-wrapper">
+    <div class="phone-wrapper">
+      <div id="buyerView" style="display: block;">
         <div class="sticky-top-group">
             <header class="header">
                 <div class="brand-title-area">
-                    <div class="brand-logo-container">
-                        <div>
-                            <h1>PACE</h1>
+                    <div class="brand-logo-container">      
+                        <div><h1>PACE</h1>
                             <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-             </div> 
-                <div class="control-panel">
+                     </div>
+                  <div class="control-panel">
                     <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
                         <span class="avatar-icon">👤</span>
                         <span class="user-name" id="userNameDisplay">載入中...</span>
@@ -555,9 +558,10 @@
                     <button class="login-btn" id="loginBtn">登入 / 註冊</button>
                     <div class="dropdown-menu" id="dropdownMenu"></div>
                 </div>
-            </header>
-
-            <div class="location-bar">
+            </header>      
+          </div>
+        </div>
+         <div class="location-bar">
                 <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
                 <div class="location-select-group">
                     <select class="nav-select" id="citySelect">
@@ -571,31 +575,29 @@
                     </select>
                 </div>
             </div>
-                
-            <div class="search-container">
-                <div class="search-box">
+              <div class="search-container">
+                 <div class="search-box">
                     <span>🔍</span>
                     <input type="text" id="globalSearchInput" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
                 </div>
             </div>
         </div>
-
-        <main class="scrollable-content" id="store-container">
+<main class="scrollable-content" id="store-container">
             <div class="loading-spinner" id="loadingSpinner">⚡ 正在安全連線雲端資料庫...</div>
             </main>
-
         <footer class="bottom-bar">
-            <a href="history.html" class="status-msg" id="bottomStatusMsg">
+                <a href="history.html" class="status-msg" id="bottomStatusMsg">
                 <div class="status-indicator active" id="statusDot"></div>
                 <div class="order-badge-count" id="orderBadgeCount">0</div>
                 <span id="statusText">您目前沒有進行中的訂單喔！</span>
-            </a>
-            <a href="cart.html" class="cart-status-btn nav-fast">
+                </a>
+                <a href="cart.html" class="cart-status-btn nav-fast">
                 <span>🛒 購物車</span>
                 <span id="cartCount">(0)</span>
-            </a>
-        </footer>
-    </div>
+                </a>
+        </footer>              
+            </div>
+ 
 <!-- 🔮 派思核心控制台 (Admin 視圖) -->
 <div id="adminView" style="display: none; padding: 30px; background: #121212; color: #e0e0e0; min-height: 100vh; font-family: sans-serif;">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">

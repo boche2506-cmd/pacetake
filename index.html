@@ -101,6 +101,9 @@
         .brand-title-area {
             display: flex;
             flex-direction: column;
+            padding-top: 5px;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .brand-logo-container {
@@ -116,7 +119,7 @@
         }
 
         .brand-title-area h1 {
-            font-size: 28px;
+            font-size: 3rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             color: var(--text-main);
@@ -132,8 +135,9 @@
         /* 右上角一體化控制台 */
         .control-panel {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
             position: relative;
         }
 
@@ -150,6 +154,8 @@
             justify-content: center;
             color: var(--text-main);
             background-color: var(--card-bg);
+            position: static;
+            margin: 0;
         }
 
         .login-btn {
@@ -271,6 +277,7 @@
         /* 中間：搜尋欄 */
         .search-container {
             padding: 8px 20px 4px 20px;
+            margin-top: 5px;
         }
 
         .search-box {
@@ -677,10 +684,10 @@ img, .card {
     </div>
 
     <!-- 即時連線 Firebase 的店家總覽表格 -->
-    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d;">
-        <h3 style="color: #4da5ff; margin-top: 0;">📋 目前雲端店家總覽</h3>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 14px;">
-            <thead>
+    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d; overflow-x: auto;">
+    <h3 style="color: #4da5ff; margin-top: 0;"> 📋 目前雲端店家總覽</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 14px;">
+        </table>
                 <tr style="background: #2d2d2d; color: #fff;">
                     <th style="padding: 12px; border: 1px solid #3a3a3a;">店家名稱</th>
                     <th style="padding: 12px; border: 1px solid #3a3a3a;">詳細地址</th>
@@ -739,7 +746,7 @@ img, .card {
 
 <div class="lightbox-modal" id="addressDetailLightbox" style="display: none;">
     <div class="modal-card">
-        <div class="modal-title" style="color: var(--brand-blue);">📍 系統目前探測位置</div>
+        <div class="modal-title" style="color: var(--brand-blue);">📍 目前位置</div>
         <div class="modal-desc-address" id="modalAddressText" style="margin-bottom: 20px;">尚未獲取定位，請開啟 GPS。</div>
         <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; border: none; width: 100%; height: 42px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">確認</button>
     </div>
@@ -827,7 +834,8 @@ img, .card {
     
     const loginLightbox = document.getElementById('loginLightbox');
     const googleLoginAction = document.getElementById('googleLoginAction');
-    const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
+    const toggleEmailFormBtn =     
+    document.getElementById('toggleEmailFormBtn');
     const emailFormSection = document.getElementById('emailFormSection');
     const customReturnBtn = document.getElementById('customReturnBtn');
     const loginEmailInput = document.getElementById('loginEmail');

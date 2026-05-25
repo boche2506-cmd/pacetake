@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
 
-    /* 全局變數與主題防線 */
+    <style>
 :root {
     --bg-global: #F8FAFC;
     --bg-container: #FFFFFF;
@@ -38,7 +38,6 @@
     --blur-bg: rgba(17, 17, 17, 0.95);
 }
 
-/* 基礎重設 */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -49,7 +48,7 @@
 
 html, body {
     height: 100%;
-    overflow: hidden; /* 鎖死整個瀏覽器捲軸 */
+    overflow: hidden;
 }
 
 body {
@@ -59,7 +58,6 @@ body {
     justify-content: center;
 }
 
-/* 核心容器：拉霸機結構 */
 .phone-wrapper {
     width: 100%;
     max-width: 430px;
@@ -73,14 +71,12 @@ body {
     overflow: hidden;
 }
 
-/* 中間滑動區塊 */
 .scrollable-content {
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
 
-/* 👑 頂部區塊 (不再使用 sticky) */
 .sticky-top-group {
     background-color: var(--blur-bg);
     backdrop-filter: blur(20px);
@@ -90,14 +86,7 @@ body {
     flex-shrink: 0;
 }
 
-.header {
-    padding: 24px 20px 12px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-
-/* ... (中間維持你原本的控制台與品牌樣式，省略重複代碼) ... */
+.header { padding: 24px 20px 12px 20px; display: flex; justify-content: space-between; align-items: flex-start; }
 .brand-title-area { display: flex; flex-direction: column; }
 .brand-logo-container { display: flex; align-items: center; gap: 10px; }
 .brand-logo { width: 32px; height: 32px; object-fit: contain; }
@@ -105,24 +94,62 @@ body {
 .brand-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
 .control-panel { display: flex; align-items: center; gap: 8px; position: relative; }
 .theme-toggle { background: none; border: 1px solid var(--border-color); font-size: 16px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); background-color: var(--card-bg); }
-.login-btn { background-color: var(--brand-blue); color: #FFFFFF; border: none; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow-sm); }
+.login-btn { background-color: var(--brand-blue); color: #FFFFFF; border: none; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow-sm); margin-top: -5px; margin-bottom: 5px; }
 .user-avatar-btn { display: none; background-color: var(--card-bg); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; color: var(--text-main); cursor: pointer; align-items: center; gap: 4px; }
+.dropdown-menu { display: none; position: absolute; top: 42px; right: 0; width: 200px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--shadow-md); z-index: 1100; padding: 6px; }
+.dropdown-menu a, .dropdown-menu button { display: flex; align-items: center; width: 100%; padding: 10px 12px; color: var(--text-main); text-decoration: none; font-size: 13px; border: none; background: none; text-align: left; border-radius: 8px; cursor: pointer; }
+.dropdown-menu a:hover, .dropdown-menu button:hover { background-color: var(--bg-global); }
+.menu-divider { height: 1px; background-color: var(--border-color); margin: 6px 0; }
+.seller-unlock { display: none; }
+.admin-unlock { display: none; }
+.location-bar { padding: 4px 20px 8px 20px; display: flex; align-items: center; gap: 8px; }
+.gps-trigger-btn { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; color: var(--brand-blue); background-color: var(--card-bg); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 20px; cursor: pointer; white-space: nowrap; box-shadow: var(--shadow-sm); }
+.location-select-group { display: flex; gap: 4px; flex-grow: 1; }
+.nav-select { flex: 1; height: 32px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--bg-global); color: var(--text-main); font-size: 12px; font-weight: 600; padding: 0 4px; outline: none; cursor: pointer; }
+.search-container { padding: 8px 20px 4px 20px; }
+.search-box { display: flex; align-items: center; background-color: var(--bg-global); border: 1px solid var(--border-color); border-radius: 12px; padding: 0 14px; height: 46px; }
+.search-box input { border: none; background: none; width: 100%; height: 100%; margin-left: 8px; font-size: 14px; color: var(--text-main); outline: none; }
+.store-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
+.store-card { display: flex; align-items: center; gap: 16px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 14px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s ease, box-shadow 0.2s ease; width: 100%; }
+.store-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
+.store-img { width: 54px; height: 54px; background-color: var(--bg-global); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+.store-info { display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1; gap: 6px; }
+.store-name { font-size: 16px; font-weight: 700; color: var(--text-main); }
+.store-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.store-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.store-tags span { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
+.tag-time { background-color: rgba(0, 98, 255, 0.08); color: var(--brand-blue); }
+.tag-pay { background-color: rgba(16, 185, 129, 0.08); color: var(--brand-green); }
 
-/* 其他維持原樣的組件樣式 (location-bar, search, store-list 等) */
-/* 記得將原本的 .bottom-bar 的 position: fixed 改為 static 或直接移除定位屬性 */
 .bottom-bar {
     flex-shrink: 0;
     height: 76px;
     background-color: var(--blur-bg);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px 10px 20px;
     z-index: 999;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
 }
-/* ... (其餘原本的樣式保持不變) ... */
+
+.status-msg { font-size: 12px; color: var(--text-muted); max-width: 200px; display: flex; align-items: center; gap: 6px; text-decoration: none; }
+.status-indicator { width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-muted); flex-shrink: 0; position: relative; }
+.status-indicator.active { background-color: var(--brand-green); box-shadow: 0 0 8px var(--brand-green); }
+.order-badge-count { background-color: var(--brand-red); color: white; font-size: 10px; font-weight: 800; min-width: 15px; height: 15px; border-radius: 8px; display: none; align-items: center; justify-content: center; padding: 0 4px; border: 1px solid var(--bg-container); }
+.cart-status-btn { background-color: var(--brand-blue); color: white; border: none; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; text-decoration: none; box-shadow: var(--shadow-sm); }
+.lightbox-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+.modal-card { background-color: var(--bg-container); border: 1px solid var(--border-color); border-radius: 20px; width: 100%; max-width: 320px; padding: 24px; box-shadow: var(--shadow-md); text-align: center; }
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+.modal-desc-address { font-size: 13px; color: var(--text-main); line-height: 1.5; margin-bottom: 20px; word-break: break-all; background-color: var(--bg-global); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); text-align: left; }
+.modal-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 10px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); }
+.modal-btn.google { background-color: #FFFFFF !important; color: #374151 !important; border-color: #E2E8F0 !important; }
+.modal-close { font-size: 12px; color: var(--text-muted); cursor: pointer; margin-top: 12px; display: inline-block; }
+.loading-spinner { text-align: center; padding: 40px; color: var(--text-muted); font-size: 14px; font-weight: 600; }
+</style>
 </head>
 <body><div id="buyerView" style="display: block;">
     <div class="sticky-top-group">

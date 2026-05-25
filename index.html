@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <link rel="icon" type="image/png" href="logo.png">
-  <link rel="apple-touch-icon" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
-   
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+
     <style>
         /* 全局變數與主題防線 - 完美呼應 Cyber Blue 品牌色 */
         :root {
@@ -259,10 +259,6 @@
             padding: 0 4px;
             outline: none;
             cursor: pointer;
-            .nav-select {
-    min-width: 120px; /* 給它一個最小寬度，不管幾個字都不會縮 */
-    flex: 0 0 auto;  /* 確保它不會被其他元素擠壓 */
-}
         }
 
         /* 中間：搜尋欄 */
@@ -539,6 +535,7 @@
         <header class="header">
             <div class="brand-title-area">
                 <div class="brand-logo-container">
+                    <img src="logo.png" alt="PACE Logo" class="brand-logo">
                     <div>
                         <h1>PACE</h1>
                         <div class="brand-subtitle">派思行動點餐</div>
@@ -607,11 +604,16 @@
     </main>
 
     <footer class="bottom-bar">
-    <a href="orders.html" class="status-msg" id="bottomStatusMsg">
-        <span id="loginStatusDot" style="width: 20px; height: 20px; background-color: gray; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
-        <span id="statusText">您目前沒有進行中的訂單喔！</span>
-    </a>
-</footer>
+        <a href="history.html" class="status-msg" id="bottomStatusMsg">
+            <div class="status-indicator active" id="statusDot"></div>
+            <div class="order-badge-count" id="orderBadgeCount">0</div>
+            <span id="statusText">您目前沒有進行中的訂單喔！</span>
+        </a>
+        <a href="cart.html" class="cart-status-btn nav-fast">
+            <span>🛒 購物車</span>
+            <span id="cartCount">(0)</span>
+        </a>
+    </footer>
 </div>
 
 <!-- ========================================== -->
@@ -716,44 +718,7 @@
 <!-- ========================================== -->
 <!-- 🚀 核心控制區：Firebase 與所有交互邏輯 -->
 <!-- ========================================== -->
-// --- 貼在 import 之後，確保這些函數都能被調用 ---
-
-// 1. 統一登入監聽（這就是我們剛剛修好的燈號邏輯）
-onAuthStateChanged(auth, (user) => {
-    const statusDot = document.getElementById('loginStatusDot');
-    const loginBtn = document.getElementById('loginBtn');
-    const avatarBtn = document.getElementById('avatarBtn');
-
-    if (user) {
-        if (statusDot) statusDot.style.backgroundColor = '#2ecc71';
-        if (loginBtn) loginBtn.style.display = 'none';
-        if (avatarBtn) avatarBtn.style.display = 'block';
-    } else {
-        if (statusDot) statusDot.style.backgroundColor = '#e74c3c';
-        if (loginBtn) loginBtn.style.display = 'block';
-        if (avatarBtn) avatarBtn.style.display = 'none';
-    }
-});
-
-// 2. Google 登入按鈕綁定（這就是剛剛修好的按鈕邏輯）
-document.addEventListener('DOMContentLoaded', () => {
-    const loginActionBtn = document.getElementById('googleLoginAction');
-    
-    if (loginActionBtn) {
-        loginActionBtn.addEventListener('click', async () => {
-            try {
-                const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth, provider);
-                console.log("登入成功！");
-            } catch (error) {
-                console.error("【登入失敗詳情】:", error);
-                alert("登入失敗，請查看 Console 錯誤訊息");
-            }
-        });
-    }
-});
-    // -----------------------------------------------------------
-</script>
+<script type="module">
     // 💡 已經幫你加入了 addDoc (新增) 和 deleteDoc (刪除) 模組
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
@@ -824,31 +789,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     initTheme();
 
-    // 確保只宣告一次抓取
-const statusDot = document.getElementById('loginStatusDot');
-
-// 統一的登入狀態監聽器 (確保這整份代碼在檔案中只有一份)
-onAuthStateChanged(auth, (user) => {
-    // 1. 抓取所有需要的元素
-    const statusDot = document.getElementById('loginStatusDot');
     const loginBtn = document.getElementById('loginBtn');
     const avatarBtn = document.getElementById('avatarBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const storeContainer = document.getElementById('store-container');
+    
+    const loginLightbox = document.getElementById('loginLightbox');
+    const googleLoginAction = document.getElementById('googleLoginAction');
+    const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
+    const emailFormSection = document.getElementById('emailFormSection');
+    const customReturnBtn = document.getElementById('customReturnBtn');
+    const loginEmailInput = document.getElementById('loginEmail');
+    const loginPasswordInput = document.getElementById('loginPassword');
+    const emailLoginAction = document.getElementById('emailLoginAction');
 
-    // 2. 檢查登入狀態並統一處理
-    if (user) {
-        // --- 已登入時的邏輯 ---
-        console.log("偵測到登入，更新 UI...");
-        if (statusDot) statusDot.style.backgroundColor = '#2ecc71'; // 綠色
-        if (loginBtn) loginBtn.style.display = 'none';
-        if (avatarBtn) avatarBtn.style.display = 'block';
-    } else {
-        // --- 未登入時的邏輯 ---
-        console.log("偵測到未登入，更新 UI...");
-        if (statusDot) statusDot.style.backgroundColor = '#e74c3c'; // 紅色
-        if (loginBtn) loginBtn.style.display = 'block';
-        if (avatarBtn) avatarBtn.style.display = 'none';
-    }
-});
+    const citySelect = document.getElementById('citySelect');
+    const districtSelect = document.getElementById('districtSelect');
+    const gpsPinBtn = document.getElementById('gpsPinBtn');
+    const addressDetailLightbox = document.getElementById('addressDetailLightbox');
+    const modalAddressText = document.getElementById('modalAddressText');
+    const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
+    const globalSearchInput = document.getElementById('globalSearchInput');
 
     // 下拉選單點擊開關
     avatarBtn.addEventListener('click', (e) => {
@@ -1011,7 +973,16 @@ onAuthStateChanged(auth, (user) => {
         }
     });
 
-  // ==========================================
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            handleUserSyncAndRoleRouting(user);
+        } else {
+            loginBtn.style.display = 'block';
+            avatarBtn.style.display = 'none';
+            dropdownMenu.style.display = 'none';
+            dropdownMenu.innerHTML = '';
+        }
+    });
 
     // 📥 讀取雲端店家 (買家列表 & 後台列表 同時更新)
     async function fetchStoresFromFirebase() {
@@ -1095,35 +1066,7 @@ onAuthStateChanged(auth, (user) => {
             currentBuyerAddress = "您的裝置不支援 GPS 定位裝置。";
         }
     }
-// 確保 DOM 載入後才執行
-const citySelect = document.getElementById('citySelect');
-const districtSelect = document.getElementById('districtSelect');
 
-// 縣市變更時的連動邏輯
-if (citySelect && districtSelect) {
-    citySelect.addEventListener('change', () => {
-        const selectedCity = citySelect.value;
-        
-        // 清空舊的區域選單
-        districtSelect.innerHTML = '<option value="">選擇區域</option>';
-        
-        // 如果有對應的區域資料，就把它們放進去
-        if (areaData[selectedCity]) {
-            areaData[selectedCity].forEach(dist => {
-                const opt = document.createElement('option');
-                opt.value = dist;
-                opt.innerText = dist;
-                districtSelect.appendChild(opt);
-            });
-        }
-        
-        // 選完縣市後，自動觸發搜尋邏輯
-        filterAndRenderStores();
-    });
-
-    // 區域變更時，也要觸發搜尋
-    districtSelect.addEventListener('change', filterAndRenderStores);
-}
     // 啟動資料庫與定位抓取
     fetchStoresFromFirebase();
     getBrowserLocation();

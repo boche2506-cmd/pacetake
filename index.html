@@ -549,6 +549,16 @@
     background-color: #ffffff;/* 關鍵：一定要有背景色，不然下面滑過的東西會透出來 */
     padding-top: 10px;        /* 微調間距，讓它跟邊緣有一點呼吸感 */
 }
+.content-area-or-your-class {
+    flex: 1;                /* 這是靈魂代碼：代表「自動填滿剩餘空間」 */
+    overflow-y: auto;       /* 重要：如果內容太長，這裡就會自動出現捲軸 */
+    padding: 16px;          /* 留一點呼吸空間 */
+}
+img, .card {
+    max-width: 100%;        /* 圖片絕對不能超過父容器寬度 */
+    height: auto;           /* 高度等比例縮放 */
+    box-sizing: border-box; /* 確保 padding 不會把容器撐開 */
+}
     </style>
 </head>
 <body>

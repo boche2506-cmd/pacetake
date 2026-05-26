@@ -134,10 +134,11 @@ img, .card {
    4. 頂部導航區塊 (Header & Brand)
    ========================================================================== */
 .header {
-    padding: 24px 20px 12px 20px;
+    padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    margin-bottom: 10px;
 }
 
 .brand-title-area {
@@ -162,16 +163,19 @@ img, .card {
 
 .brand-title-area h1 {
     font-size: 3rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
+    font-weight: 600;
+    letter-spacing: 3px;
     color: var(--text-main);
+    line-height: 1;
+    margin: 0;
 }
 
 .brand-subtitle {
     font-size: 12px;
     color: var(--text-muted);
-    margin-top: 4px;
-    font-weight: 500;
+    margin-top: 1px;
+    font-weight: 600;
+    line-height: 2;
 }
 
 /* ==========================================================================
@@ -181,10 +185,10 @@ img, .card {
 .control-panel {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 3px;
+    align-items: flex-end;
+    gap: 10px;
     height: auto;
-    min-height: 80px; 
+    min-height: 50px; 
     min-width: 120px; 
     overflow: hidden; /* 防止內容過多導致變形 */
     justify-content: flex-end
@@ -293,7 +297,7 @@ img, .card {
    6. 搜尋與定位列 (Search & Location)
    ========================================================================== */
 .location-bar {
-    padding: 4px 20px 8px 20px;
+    padding: 10px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -627,7 +631,7 @@ select {
             <div class="brand-title-area">
                 <div class="brand-logo-container">
                     <div>
-                        <h1>PACE</h1>
+                        <h1>PACE派思</h1>
                         <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
                     </div>
                 </div>
@@ -970,7 +974,7 @@ select {
             menuHTML += `
                 <div class="menu-divider"></div>
                 <a href="javascript:void(0)" onclick="window.toggleView('admin')" style="color: var(--brand-blue); font-weight: bold;">🔮 派思核心控制台</a>
-                <a href="javascript:void(0)" onclick="window.issuePromoCode()" style="color: var(--brand-green); font-weight: bold;">🎟️ 戰術邀請碼發行</a>
+                <a href="javascript:void(0)" onclick="window.issuePromoCode()" style="color: var(--brand-green); font-weight: bold;">🎟️ 邀請碼發行</a>
             `;
         }
 
@@ -1033,7 +1037,7 @@ select {
             await handleUserSyncAndRoleRouting(result.user);
         } catch (error) {
             console.error("Google 登入失敗：", error);
-            alert("連線失敗，請檢查網路防線！");
+            alert("連線失敗，請檢查網路服務！");
         }
     });
 
@@ -1144,11 +1148,11 @@ select {
                     buyerLat = position.coords.latitude;
                     buyerLng = position.coords.longitude;
                     currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
-                    gpsPinBtn.innerText = "📍 已獲取核心定位";
+                    gpsPinBtn.innerText = "📍 已獲取定位";
                 },
                 (error) => {
-                    currentBuyerAddress = "瀏覽器定位遭拒，請手動選擇下方下拉選單縣市。";
-                    gpsPinBtn.innerText = "📍 定位受阻";
+                    currentBuyerAddress = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
+                    gpsPinBtn.innerText = "📍 無法定位";
                 }
             );
         } else {
@@ -1272,7 +1276,7 @@ select {
                 isActive: true,
                 usedBy: null // 預留給未來記錄誰使用了這個碼
             });
-            alert(`🎟️ 戰術邀請碼「${code}」已成功寫入 Firebase！買家現在可以使用它了。`);
+            alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！買家現在可以使用它了。`);
         } catch (error) {
             console.error("邀請碼發行失敗:", error);
             alert("發行失敗，請檢查您的系統權限配置！");

@@ -108,28 +108,32 @@ img, .card {
 }
 
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
-.sticky-top-group, 
-.sticky-header-container {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 1000; 
-}
-
 .sticky-top-group {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    max-width: 430px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000; 
+    
+    /* 這裡保留原 CTO 寫的毛玻璃特效，其實蠻高級的，如果喜歡就留著 */
     background-color: var(--blur-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border-color);
+    
+    /* 🎨 這就是你要的「紅線」上下分割線！ */
+    /* 這裡直接把原本的 border-bottom 改成你要的紅色 (例如 #ff4d4f) */
+    border-bottom: 2px solid #ff4d4f; 
+    
     padding-bottom: 10px;
     flex-shrink: 0;
 }
 
+/* 2. 底下這段點綴用的隱形容器，把它的 sticky 拿掉，當作一般純調整間距的框框就好 */
 .sticky-header-container {
-    background-color: #ffffff;
     padding-top: 10px;
 }
-
 /* ==========================================================================
    4. 頂部導航區塊 (Header & Brand)
    ========================================================================== */

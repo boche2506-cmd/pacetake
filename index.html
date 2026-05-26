@@ -86,52 +86,50 @@ img, .card {
 .phone-wrapper {
     width: 100%;
     max-width: 430px;
+    height: 100vh;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     background-color: var(--bg-container);
     border-left: 1px solid var(--border-color);
     border-right: 1px solid var(--border-color);
     box-shadow: var(--shadow-md);
     position: relative;
-    padding-bottom: 90px; 
+    padding-bottom: 90px; /* 給底部騰出空間 */
 }
 
 /* 內容滾動區 (自動填滿剩餘空間) */
 .scrollable-content, 
 .content-area-or-your-class {
     flex: 1;
-/* ❌ 狠狠砍掉這一行，不要讓它在裡面自己滾！ */
-    /* overflow-y: auto; */
+    overflow-y: auto;
     padding: 16px;
 }
 
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
-.sticky-top-group {
-    position: fixed;
+.sticky-top-group, 
+.sticky-header-container {
+    position: -webkit-sticky;
+    position: sticky;
     top: 0;
-    width: 100%;
-    max-width: 430px;
-    left: 50%;
-    transform: translateX(-50%);
     z-index: 1000; 
-    
+}
+
+.sticky-top-group {
     background-color: var(--blur-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    
-    /* 🟢 陰影跟紅線完美共存！後面絕對不要加任何斜線或星號！ */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
-    border-bottom: 2px solid #ff4d4f; 
-    
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
     flex-shrink: 0;
 }
 
-/* 2. 底下這段點綴用的隱形容器，把它的 sticky 拿掉，當作一般純調整間距的框框就好 */
 .sticky-header-container {
+    background-color: #ffffff;
     padding-top: 10px;
 }
+
 /* ==========================================================================
    4. 頂部導航區塊 (Header & Brand)
    ========================================================================== */
@@ -192,8 +190,8 @@ img, .card {
     height: auto;
     min-height: 50px; 
     min-width: 120px; 
-    overflow: hidden; 
-    justify-content: flex-end; /* 🟢 補上分號了 */
+    overflow: hidden; /* 防止內容過多導致變形 */
+    justify-content: flex-end
     padding: 10px;
 }
 
@@ -622,9 +620,6 @@ select {
     font-size: 16px;   /* 關鍵：調整字體大小，使其比例協調 */
     line-height: 1.5;  /* 讓文字垂直置中 */
 }
-#storeContainer {
-    margin-top: 240px; /* 數字可以根據你畫面實際狀況自己微調 */
-}
 
 </style>
 </head>
@@ -685,8 +680,9 @@ select {
                     </select>
                     <select class="nav-select" id="districtSelect">
                         <option value="">選擇區域</option>
-                    </select> 
-                    </select>                   
+                    </select>
+                </select>
+               
             </div>
         </div>
             
@@ -961,7 +957,7 @@ select {
             <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
         `;
 
-        if (role === 'buyer'|| role === 'admin') {
+        if (role === 'buyer') {
             menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
         } 
         

@@ -86,17 +86,15 @@ img, .card {
 .phone-wrapper {
     width: 100%;
     max-width: 430px;
-   /* ❌ 砍掉這行height: 100vh;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    /* ❌ 砍掉這行overflow: hidden;
     background-color: var(--bg-container);
     border-left: 1px solid var(--border-color);
     border-right: 1px solid var(--border-color);
     box-shadow: var(--shadow-md);
     position: relative;
-    padding-bottom: 90px; /* 給底部騰出空間 */
+    padding-bottom: 90px; 
 }
 
 /* 內容滾動區 (自動填滿剩餘空間) */
@@ -118,14 +116,13 @@ img, .card {
     transform: translateX(-50%);
     z-index: 1000; 
     
-    /* 這裡保留原 CTO 寫的毛玻璃特效，其實蠻高級的，如果喜歡就留著 */
     background-color: var(--blur-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     
-    /* 🎨 這就是你要的「紅線」上下分割線！ */
-    /* 這裡直接把原本的 border-bottom 改成你要的紅色 (例如 #ff4d4f) */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); */ 
+    /* 🟢 陰影跟紅線完美共存！後面絕對不要加任何斜線或星號！ */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+    border-bottom: 2px solid #ff4d4f; 
     
     padding-bottom: 10px;
     flex-shrink: 0;
@@ -195,8 +192,8 @@ img, .card {
     height: auto;
     min-height: 50px; 
     min-width: 120px; 
-    overflow: hidden; /* 防止內容過多導致變形 */
-    justify-content: flex-end
+    overflow: hidden; 
+    justify-content: flex-end; /* 🟢 補上分號了 */
     padding: 10px;
 }
 

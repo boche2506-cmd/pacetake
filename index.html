@@ -181,11 +181,14 @@ img, .card {
 .control-panel {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: center;
     gap: 3px;
+    height: auto;
     min-height: 80px; 
     min-width: 120px; 
     overflow: hidden; /* 防止內容過多導致變形 */
+    justify-content: flex-end
+    padding: 10px;
 }
 
 /* 通用按鈕基礎 */
@@ -469,7 +472,7 @@ img, .card {
 
 .status-msg {
     font-size: 12px;
-    color: var(--text-muted);
+    color: #555(--text-muted);
     max-width: 200px;
     display: flex;
     align-items: center;
@@ -606,6 +609,14 @@ img, .card {
     font-size: 14px;
     font-weight: 600;
 }
+
+select {
+    height: auto;      /* 關鍵：拿掉固定高度，讓文字撐開框框 */
+    padding: 8px 12px; /* 關鍵：給予上下左右內距，讓框框看起來舒適 */
+    font-size: 16px;   /* 關鍵：調整字體大小，使其比例協調 */
+    line-height: 1.5;  /* 讓文字垂直置中 */
+}
+
 </style>
 </head>
 <body>
@@ -900,39 +911,19 @@ img, .card {
             dropdownMenu.style.display = 'none'; 
         }
     });
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // --- 1. UI 互動監聽 ---
-    // 登入按鈕：只負責打開燈箱
-    const loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
-    }
 
-    // 關閉按鈕與其他 UI
-    const customReturnBtn = document.getElementById('customReturnBtn');
-    if (customReturnBtn) {
-        customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
-    }
+    loginBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
+    customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
+    toggleEmailFormBtn.addEventListener('click', () => {
+        emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
+    });
 
-    const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
-    if (toggleEmailFormBtn) {
-        toggleEmailFormBtn.addEventListener('click', () => {
-            emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
-        });
-    }
+    document.getElementById('togglePasswordVisibility').addEventListener('click', function() {
+        const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        loginPasswordInput.setAttribute('type', type);
+        this.textContent = type === 'password' ? '👁️' : '🙈';
+    });
 
-    // 密碼顯示切換
-    const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
-    if (togglePasswordVisibility) {
-        togglePasswordVisibility.addEventListener('click', function() {
-            const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            loginPasswordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🙈';
-        });
-    }
-
-    // 地圖定位與地址選單
     gpsPinBtn.addEventListener('click', () => {
         modalAddressText.innerText = currentBuyerAddress;
         addressDetailLightbox.style.display = 'flex';
@@ -955,7 +946,7 @@ document.addEventListener('DOMContentLoaded', () => {
     districtSelect.addEventListener('change', filterAndRenderStores);
     globalSearchInput.addEventListener('input', filterAndRenderStores);
 
-    // --- 2. 功能函數 (渲染與同步) ---
+    // 👑 渲染動態選單 (已將邀請碼功能綁定至 window.issuePromoCode)
     function renderDynamicMenu(role) {
         let menuHTML = `
             <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
@@ -1036,7 +1027,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderDynamicMenu(currentRole);
     }
 
-    // --- 3. Google 登入執行 (只保留這裡一個) ---
     googleLoginAction.addEventListener('click', async () => {
         try {
             const result = await signInWithPopup(auth, provider);
@@ -1047,7 +1037,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-}); // 這裡關閉整個 DOMContentLoaded
     emailLoginAction.addEventListener('click', async () => {
         const email = loginEmailInput.value.trim();
         const password = loginPasswordInput.value;

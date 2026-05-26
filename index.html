@@ -7,63 +7,83 @@
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
 
-    <style>
-        /* 全局變數與主題防線 - 完美呼應 Cyber Blue 品牌色 */
-        :root {
-            --bg-global: #F8FAFC;
-            --bg-container: #FFFFFF;
-            --border-color: #E2E8F0;
-            --text-main: #0F172A;
-            --text-muted: #64748B;
-            --brand-blue: #0062FF; 
-            --brand-green: #10B981;
-            --brand-red: #EF4444;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
-            --card-bg: #FFFFFF;
-            --blur-bg: rgba(255, 255, 255, 0.95);
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-              user-select: none;
+<style>
+/* ==========================================================================
+   1. 全局變數與主題防線 (Cyber Blue)
+   ========================================================================== */
+:root {
+    --bg-global: #F8FAFC;
+    --bg-container: #FFFFFF;
+    --border-color: #E2E8F0;
+    --text-main: #0F172A;
+    --text-muted: #64748B;
+    --brand-blue: #0062FF; 
+    --brand-green: #10B981;
+    --brand-red: #EF4444;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
+    --card-bg: #FFFFFF;
+    --blur-bg: rgba(255, 255, 255, 0.95);
+    
+    /* 預設防選取 */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
-        [data-theme="dark"] {
-            --bg-global: #0A0A0A;
-            --bg-container: #111111;
-            --border-color: #262626;
-            --text-main: #F5F5F5;
-            --text-muted: #A3A3A3;
-            --brand-blue: #2F80ED; 
-            --brand-green: #34D399;
-            --brand-red: #F87171;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
-            --card-bg: #1C1C1E;
-            --blur-bg: rgba(17, 17, 17, 0.95);
-        }
+[data-theme="dark"] {
+    --bg-global: #0A0A0A;
+    --bg-container: #111111;
+    --border-color: #262626;
+    --text-main: #F5F5F5;
+    --text-muted: #A3A3A3;
+    --brand-blue: #2F80ED; 
+    --brand-green: #34D399;
+    --brand-red: #F87171;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
+    --card-bg: #1C1C1E;
+    --blur-bg: rgba(17, 17, 17, 0.95);
+}
 
-        /* 基礎重設 */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+/* ==========================================================================
+   2. 基礎重設與全域元素 (Reset & Globals)
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
 
-        body {
-            background-color: var(--bg-global);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            transition: background-color 0.15s ease;
-        }
+body {
+    background-color: var(--bg-global);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    transition: background-color 0.15s ease;
+}
 
-        /* 手機直屏精品大外框與細邊界 */
-        .phone-wrapper {
+input, textarea {
+    -webkit-user-select: text;
+    user-select: text; /* 解除輸入框鎖定，保證可正常打字與選取 */
+}
+
+img, .card {
+    max-width: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
+    height: auto;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   3. 核心佈局架構 (Layout)
+   ========================================================================== */
+/* 手機直屏精品大外框 */
+.phone-wrapper {
     width: 100%;
     max-width: 430px;
     height: 100vh;
@@ -72,8 +92,6 @@
     flex-direction: column;
     overflow: hidden;
     background-color: var(--bg-container);
-    
-    /* 你提到的視覺效果 */
     border-left: 1px solid var(--border-color);
     border-right: 1px solid var(--border-color);
     box-shadow: var(--shadow-md);
@@ -81,518 +99,514 @@
     padding-bottom: 90px; /* 給底部騰出空間 */
 }
 
-        /* 👑 頂部全區常駐吸附天花板 */
-        .sticky-top-group {
-            position: sticky;
-            top: 0;
-            z-index: 1000; 
-            background-color: var(--blur-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            flex-shrink: 0;
-        }
+/* 內容滾動區 (自動填滿剩餘空間) */
+.scrollable-content, 
+.content-area-or-your-class {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
 
-        /* 頂部高級大字留白區 */
-        .header {
-            padding: 24px 20px 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
+/* 👑 頂部全區常駐吸附天花板 (Sticky) */
+.sticky-top-group, 
+.sticky-header-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1000; 
+}
 
-        .brand-title-area {
-            display: flex;
-            flex-direction: column;
-            padding-top: 3px;
-            justify-content: space-between;
-            align-items: center;
-        }
+.sticky-top-group {
+    background-color: var(--blur-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    flex-shrink: 0;
+}
 
-        /* 右上角一體化控制台 */
-        .control-panel {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 3px;
-/* 這裡設為你兩個按鈕「最大那個」的高度與寬度 */
+.sticky-header-container {
+    background-color: #ffffff;
+    padding-top: 10px;
+}
+
+/* ==========================================================================
+   4. 頂部導航區塊 (Header & Brand)
+   ========================================================================== */
+.header {
+    padding: 24px 20px 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.brand-title-area {
+    display: flex;
+    flex-direction: column;
+    padding-top: 3px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.brand-title-area h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text-main);
+}
+
+.brand-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   5. 控制台與按鈕 (Controls & Buttons)
+   ========================================================================== */
+/* 右上角一體化控制台 */
+.control-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
     min-height: 80px; 
     min-width: 120px; 
-    
-    /* 防止內容過多導致變形 */
-    overflow: hidden;
-        }
-
-        .brand-logo-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand-logo {
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
-        }
-
-        .brand-title-area h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--text-main);
-        }
-
-        .brand-subtitle {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 4px;
-            font-weight: 500;
-        }
-
-
-        .theme-toggle {
-            background: none;
-            border: 1px solid var(--border-color);
-            font-size: 16px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-            background-color: var(--card-bg);
-            position: static;
-            margin: 0;
-        }
-
-        .login-btn {
-            background-color: var(--brand-blue);
-            color: #FFFFFF;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
-            margin-top: -5px;
-            margin-bottom: 5px;
-        }
-
-        .user-avatar-btn {
-            display: none; 
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-main);
-            cursor: pointer;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* 下拉選單面板 */
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 42px;
-            right: 0;
-            width: 200px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            box-shadow: var(--shadow-md);
-            z-index: 1100;
-            padding: 6px;
-        }
-
-        .dropdown-menu a, .dropdown-menu button {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            padding: 10px 12px;
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 13px;
-            border: none;
-            background: none;
-            text-align: left;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .dropdown-menu a:hover, .dropdown-menu button:hover {
-            background-color: var(--bg-global);
-        }
-
-        .menu-divider {
-            height: 1px;
-            background-color: var(--border-color);
-            margin: 6px 0;
-        }
-
-        /* 👑 智慧選單分流區塊 */
-        .seller-unlock { display: none; }
-        .admin-unlock { display: none; }
-
-        /* 精品 GPS 定位管理列 */
-        .location-bar {
-            padding: 4px 20px 8px 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .gps-trigger-btn {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--brand-blue);
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            white-space: nowrap;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .location-select-group {
-            display: flex;
-            gap: 4px;
-            flex-grow: 1;
-        }
-
-        .nav-select {
-            flex: 1;
-            height: 32px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-global);
-            color: var(--text-main);
-            font-size: 12px;
-            font-weight: 600;
-            padding: 0 4px;
-            outline: none;
-            cursor: pointer;
-        }
-
-        /* 中間：搜尋欄 */
-        .search-container {
-            padding: 8px 20px 4px 20px;
-            margin-top: 5px;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0 14px;
-            height: 46px;
-        }
-
-        .search-box input {
-            border: none;
-            background: none;
-            width: 100%;
-            height: 100%;
-            margin-left: 8px;
-            font-size: 14px;
-            color: var(--text-main);
-            outline: none;
-        }
-
-        /* 下方：店家列表區樣式補強面防線 */
-        .store-list {
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .store-card {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 14px;
-            text-decoration: none;
-            color: inherit;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-          /* 🌟 關鍵補強防線：強迫卡片指名服從手機大外框的 100% 寬度限制，絕對不准擠破框架！ */
-            width: 100%; 
-        }
-        .store-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-        }
-
-        .store-img {
-            width: 54px;
-            height: 54px;
-            background-color: var(--bg-global);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            flex-shrink: 0;
-        }
-
-        .store-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            flex-grow: 1;
-            gap: 6px;
-        }
-
-        .store-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .store-meta {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .store-tags {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .store-tags span {
-            font-size: 10px;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 6px;
-        }
-
-        .tag-time {
-            background-color: rgba(0, 98, 255, 0.08);
-            color: var(--brand-blue);
-        }
-
-        .tag-pay {
-            background-color: rgba(16, 185, 129, 0.08);
-            color: var(--brand-green);
-        }
-
-        /* 底部常駐懸浮欄 */
-        .bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 430px;
-            height: 76px;
-            background-color: var(--blur-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px 10px 20px;
-            z-index: 999;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-            flex-shrink: 0;
-        }
-
-        .status-msg {
-            font-size: 12px;
-            color: var(--text-muted);
-            max-width: 200px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            text-decoration: none;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--text-muted);
-            flex-shrink: 0;
-            position: relative;
-        }
-
-        .status-indicator.active {
-            background-color: var(--brand-green);
-            box-shadow: 0 0 8px var(--brand-green);
-        }
-
-        .order-badge-count {
-            background-color: var(--brand-red);
-            color: white;
-            font-size: 10px;
-            font-weight: 800;
-            min-width: 15px;
-            height: 15px;
-            border-radius: 8px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 0 4px;
-            border: 1px solid var(--bg-container);
-        }
-
-        .cart-status-btn {
-            background-color: var(--brand-blue);
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            text-decoration: none;
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* 燈箱樣式 */
-        .lightbox-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-card {
-            background-color: var(--bg-container);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 320px;
-            padding: 24px;
-            box-shadow: var(--shadow-md);
-            text-align: center;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .modal-desc-address {
-            font-size: 13px;
-            color: var(--text-main);
-            line-height: 1.5;
-            margin-bottom: 20px;
-            word-break: break-all;
-            background-color: var(--bg-global);
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            text-align: left;
-        }
-
-        .modal-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 10px;
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-main);
-        }
-
-        .modal-btn.google {
-            background-color: #FFFFFF !important;
-            color: #374151 !important;
-            border-color: #E2E8F0 !important;
-        }
-
-        .modal-close {
-            font-size: 12px;
-            color: var(--text-muted);
-            cursor: pointer;
-            margin-top: 12px;
-            display: inline-block;
-        }
-
-        .loading-spinner {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 600;
-        }
-         .scrollable-content {
-    flex: 1;          /* 自動吃掉剩下的高度空間 */
-    overflow-y: auto; /* 只有這裡會滾動 */
-    padding: 16px;
-         }
-.sticky-header-container { /* 這是你那塊區域的 class 名稱 */
-    position: -webkit-sticky; /* 支援 Safari */
-    position: sticky;         /* 關鍵：黏性定位 */
-    top: 0;                   /* 黏在網頁的最頂端 */
-    z-index: 1000;            /* 關鍵：確保它浮在所有卡片上方，不會被蓋住 */
-    background-color: #ffffff;/* 關鍵：一定要有背景色，不然下面滑過的東西會透出來 */
-    padding-top: 10px;        /* 微調間距，讓它跟邊緣有一點呼吸感 */
-}
-.content-area-or-your-class {
-    flex: 1;                /* 這是靈魂代碼：代表「自動填滿剩餘空間」 */
-    overflow-y: auto;       /* 重要：如果內容太長，這裡就會自動出現捲軸 */
-    padding: 16px;          /* 留一點呼吸空間 */
-}
-img, .card {
-    max-width: 100%;        /* 圖片絕對不能超過父容器寬度 */
-    height: auto;           /* 高度等比例縮放 */
-    box-sizing: border-box; /* 確保 padding 不會把容器撐開 */
+    overflow: hidden; /* 防止內容過多導致變形 */
 }
 
-input, textarea {
-    -webkit-user-select: text; /* 確保輸入框可以選取文字 */
-    user-select: text;         /* 這是重點：這行保證了輸入框依然可以正常打字 */
-}
-
+/* 通用按鈕基礎 */
 #avatarBtn, #themeToggleBtn {
-    /* 確保它們不要有預設的奇怪外距 */
     margin: 0;
     padding: 8px 12px;
-    /* 強制設定一致的寬度或高度，避免因為文字長度不同而伸縮 */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-    </style>
+.theme-toggle {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    font-size: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-main);
+}
+
+.login-btn {
+    background-color: var(--brand-blue);
+    color: #FFFFFF;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    margin-top: -5px;
+    margin-bottom: 5px;
+}
+
+.user-avatar-btn {
+    display: none; 
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    align-items: center;
+    gap: 4px;
+}
+
+/* 下拉選單面板 */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 42px;
+    right: 0;
+    width: 200px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    z-index: 1100;
+    padding: 6px;
+}
+
+.dropdown-menu a, 
+.dropdown-menu button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px 12px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 13px;
+    border: none;
+    background: none;
+    text-align: left;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.dropdown-menu a:hover, 
+.dropdown-menu button:hover {
+    background-color: var(--bg-global);
+}
+
+.menu-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 6px 0;
+}
+
+/* 👑 智慧選單分流區塊 */
+.seller-unlock, .admin-unlock { 
+    display: none; 
+}
+
+/* ==========================================================================
+   6. 搜尋與定位列 (Search & Location)
+   ========================================================================== */
+.location-bar {
+    padding: 4px 20px 8px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gps-trigger-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--brand-blue);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+}
+
+.location-select-group {
+    display: flex;
+    gap: 4px;
+    flex-grow: 1;
+}
+
+.nav-select {
+    flex: 1;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-global);
+    color: var(--text-main);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 0 4px;
+    outline: none;
+    cursor: pointer;
+}
+
+.search-container {
+    padding: 8px 20px 4px 20px;
+    margin-top: 5px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-global);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 0 14px;
+    height: 46px;
+}
+
+.search-box input {
+    border: none;
+    background: none;
+    width: 100%;
+    height: 100%;
+    margin-left: 8px;
+    font-size: 14px;
+    color: var(--text-main);
+    outline: none;
+}
+
+/* ==========================================================================
+   7. 店家列表 (Store List)
+   ========================================================================== */
+.store-list {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.store-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 14px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%; /* 強迫卡片指名服從手機大外框的限制，絕不擠破框架 */
+}
+
+.store-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+
+.store-img {
+    width: 54px;
+    height: 54px;
+    background-color: var(--bg-global);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.store-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+    gap: 6px;
+}
+
+.store-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.store-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.store-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.store-tags span {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.tag-time {
+    background-color: rgba(0, 98, 255, 0.08);
+    color: var(--brand-blue);
+}
+
+.tag-pay {
+    background-color: rgba(16, 185, 129, 0.08);
+    color: var(--brand-green);
+}
+
+/* ==========================================================================
+   8. 底部懸浮列 (Bottom Bar)
+   ========================================================================== */
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    height: 76px;
+    background-color: var(--blur-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px 10px 20px;
+    z-index: 999;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    flex-shrink: 0;
+}
+
+.status-msg {
+    font-size: 12px;
+    color: var(--text-muted);
+    max-width: 200px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-muted);
+    flex-shrink: 0;
+    position: relative;
+}
+
+.status-indicator.active {
+    background-color: var(--brand-green);
+    box-shadow: 0 0 8px var(--brand-green);
+}
+
+.order-badge-count {
+    background-color: var(--brand-red);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    min-width: 15px;
+    height: 15px;
+    border-radius: 8px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 1px solid var(--bg-container);
+}
+
+.cart-status-btn {
+    background-color: var(--brand-blue);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================================================
+   9. 燈箱模態框與通用組件 (Modals & Utilities)
+   ========================================================================== */
+.lightbox-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-card {
+    background-color: var(--bg-container);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 320px;
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.modal-desc-address {
+    font-size: 13px;
+    color: var(--text-main);
+    line-height: 1.5;
+    margin-bottom: 20px;
+    word-break: break-all;
+    background-color: var(--bg-global);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.modal-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-main);
+}
+
+.modal-btn.google {
+    background-color: #FFFFFF !important;
+    color: #374151 !important;
+    border-color: #E2E8F0 !important;
+}
+
+.modal-close {
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    margin-top: 12px;
+    display: inline-block;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 600;
+}
+</style>
 </head>
 <body>
 <div class="phone-wrapper">
@@ -886,19 +900,39 @@ input, textarea {
             dropdownMenu.style.display = 'none'; 
         }
     });
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- 1. UI 互動監聽 ---
+    // 登入按鈕：只負責打開燈箱
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
+    }
 
-    loginBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
-    customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
-    toggleEmailFormBtn.addEventListener('click', () => {
-        emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
-    });
+    // 關閉按鈕與其他 UI
+    const customReturnBtn = document.getElementById('customReturnBtn');
+    if (customReturnBtn) {
+        customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
+    }
 
-    document.getElementById('togglePasswordVisibility').addEventListener('click', function() {
-        const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        loginPasswordInput.setAttribute('type', type);
-        this.textContent = type === 'password' ? '👁️' : '🙈';
-    });
+    const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
+    if (toggleEmailFormBtn) {
+        toggleEmailFormBtn.addEventListener('click', () => {
+            emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
+        });
+    }
 
+    // 密碼顯示切換
+    const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
+    if (togglePasswordVisibility) {
+        togglePasswordVisibility.addEventListener('click', function() {
+            const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            loginPasswordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+    }
+
+    // 地圖定位與地址選單
     gpsPinBtn.addEventListener('click', () => {
         modalAddressText.innerText = currentBuyerAddress;
         addressDetailLightbox.style.display = 'flex';
@@ -921,7 +955,7 @@ input, textarea {
     districtSelect.addEventListener('change', filterAndRenderStores);
     globalSearchInput.addEventListener('input', filterAndRenderStores);
 
-    // 👑 渲染動態選單 (已將邀請碼功能綁定至 window.issuePromoCode)
+    // --- 2. 功能函數 (渲染與同步) ---
     function renderDynamicMenu(role) {
         let menuHTML = `
             <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
@@ -1002,6 +1036,7 @@ input, textarea {
         renderDynamicMenu(currentRole);
     }
 
+    // --- 3. Google 登入執行 (只保留這裡一個) ---
     googleLoginAction.addEventListener('click', async () => {
         try {
             const result = await signInWithPopup(auth, provider);
@@ -1012,6 +1047,7 @@ input, textarea {
         }
     });
 
+}); // 這裡關閉整個 DOMContentLoaded
     emailLoginAction.addEventListener('click', async () => {
         const email = loginEmailInput.value.trim();
         const password = loginPasswordInput.value;

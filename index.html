@@ -480,18 +480,18 @@ img, .card {
     text-decoration: none;
 }
 
-.status-indicator {
+footer .status-indicator {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: var(--text-muted);
+    background-color: #ff4d4f !important;
     flex-shrink: 0;
     position: relative;
 }
 
-.status-indicator.active {
-    background-color: var(--brand-green);
-    box-shadow: 0 0 8px var(--brand-green);
+footer .status-indicator.active {
+    background-color: #52c41a !important;
+    box-shadow: 0 0 8px #52c41a;
 }
 
 .order-badge-count {
@@ -696,7 +696,7 @@ select {
 
     <footer class="bottom-bar">
         <a href="history.html" class="status-msg" id="bottomStatusMsg">
-            <div class="status-indicator active" id="statusDot"></div>
+            <div class="status-indicator" id="statusDot"></div>
             <div class="order-badge-count" id="orderBadgeCount">0</div>
             <span id="statusText">您目前沒有進行中的訂單喔！</span>
         </a>

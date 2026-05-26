@@ -66,7 +66,6 @@ body {
     align-items: flex-start;
     min-height: 100vh;
     transition: background-color 0.15s ease;
-    margin: 0;
 }
 
 input, textarea {
@@ -111,40 +110,35 @@ img, .card {
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
 .sticky-top-group, 
 .sticky-header-container {
-    position: fixed;
+    position: -webkit-sticky;
     position: sticky;
     top: 0;
-    width: 100%;
-    max-width: 430px;
-    left: 50%;
-    transform: translateX(-50%);
     z-index: 1000; 
-    
-    /* 這裡保留原 CTO 寫的毛玻璃特效，其實蠻高級的，如果喜歡就留著 */
+}
+
+.sticky-top-group {
     background-color: var(--blur-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    
-    /* 🎨 這就是你要的「紅線」上下分割線！ */
-    /* 這裡直接把原本的 border-bottom 改成你要的紅色 (例如 #ff4d4f) */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
-    
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
     flex-shrink: 0;
 }
 
-/* 2. 底下這段點綴用的隱形容器，把它的 sticky 拿掉，當作一般純調整間距的框框就好 */
 .sticky-header-container {
+    background-color: #ffffff;
     padding-top: 10px;
 }
+
 /* ==========================================================================
    4. 頂部導航區塊 (Header & Brand)
    ========================================================================== */
 .header {
-    padding: 24px 20px 12px 20px;
+    padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    margin-bottom: 10px;
 }
 
 .brand-title-area {
@@ -303,7 +297,7 @@ img, .card {
    6. 搜尋與定位列 (Search & Location)
    ========================================================================== */
 .location-bar {
-    padding: 4px 20px 8px 20px;
+    padding: 10px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -490,18 +484,18 @@ img, .card {
     text-decoration: none;
 }
 
-.status-indicator {
+footer .status-indicator {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: var(--text-muted);
+    background-color: #ff4d4f !important;
     flex-shrink: 0;
     position: relative;
 }
 
-.status-indicator.active {
-    background-color: var(--brand-green);
-    box-shadow: 0 0 8px var(--brand-green);
+footer .status-indicator.active {
+    background-color: #52c41a !important;
+    box-shadow: 0 0 8px #52c41a;
 }
 
 .order-badge-count {
@@ -687,6 +681,8 @@ select {
                     <select class="nav-select" id="districtSelect">
                         <option value="">選擇區域</option>
                     </select>
+                </select>
+               
             </div>
         </div>
             
@@ -704,7 +700,7 @@ select {
 
     <footer class="bottom-bar">
         <a href="history.html" class="status-msg" id="bottomStatusMsg">
-            <div class="status-indicator active" id="statusDot"></div>
+            <div class="status-indicator" id="statusDot"></div>
             <div class="order-badge-count" id="orderBadgeCount">0</div>
             <span id="statusText">您目前沒有進行中的訂單喔！</span>
         </a>

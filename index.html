@@ -103,7 +103,8 @@ img, .card {
 .scrollable-content, 
 .content-area-or-your-class {
     flex: 1;
-    overflow-y: auto;
+/* ❌ 狠狠砍掉這一行，不要讓它在裡面自己滾！ */
+    /* overflow-y: auto; */
     padding: 16px;
 }
 
@@ -124,7 +125,7 @@ img, .card {
     
     /* 🎨 這就是你要的「紅線」上下分割線！ */
     /* 這裡直接把原本的 border-bottom 改成你要的紅色 (例如 #ff4d4f) */
-    border-bottom: 2px solid #ff4d4f; 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); */ 
     
     padding-bottom: 10px;
     flex-shrink: 0;
@@ -962,7 +963,7 @@ select {
             <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
         `;
 
-        if (role === 'buyer') {
+        if (role === 'buyer'|| role === 'admin') {
             menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
         } 
         

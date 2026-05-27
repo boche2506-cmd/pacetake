@@ -134,48 +134,78 @@ img, .card {
    4. 頂部導航區塊 (Header & Brand)
    ========================================================================== */
 .header {
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 10px;
+    display: flex; /* 開啟彈性排隊功能 */
+    justify-content: space-between; /* 讓左邊文字和右邊按鈕分別貼靠在最左與最右側 */
+    align-items: stretch;
+    padding: 0px 10px;  /* 給大盒子上下左右留一點舒適的綠色空間 */
 }
 
+
+/* ========================================================
+   1. 最外層的左側大盒子
+   ======================================================== */
 .brand-title-area {
     display: flex;
-    flex-direction: column;
-    padding-top: 3px;
-    justify-content: space-between;
-    align-items: center;
+    align-items: stretch; /* 關鍵：強制讓內部的「左分欄」與「右分欄（派思）」高度與底部完美相同 */
+    height: auto;          /* 接收 header 的 100% 高度 */
+    gap: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
 }
 
-.brand-logo-container {
+/* ========================================================
+   2. 左區塊（控制 PACE 與小字的垂直排列）
+   ======================================================== */
+.brand-left-column {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    justify-content: space-between; /* 核心：PACE 自動衝到最頂，小字自動衝到最底 */
 }
 
-.brand-logo {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
+/* 設定 PACE 英文標題 */
+.pace-logo {
+    font-size: 52px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
+    font-weight: 900;       /* 用最粗的字體 */
+    line-height: 0.9;       /* 稍微縮減字體上下的虛浮空間，讓它更緊湊 */
+    margin-top: 10px;       /* 維持你最自豪的 10px 上方間距 */
 }
 
-.brand-title-area h1 {
-    font-size: 3rem;
+/* 設定副標題小字 */
+.brand-subtitle {
+    font-size: 11.5px;     /* 💡 精準調整到大約 11.5px 或 12px，這樣它的寬度就會剛好跟 52px 的 PACE 站在同一條垂直線上！ */
+    color: var(--text-muted);
     font-weight: 600;
-    letter-spacing: 3px;
-    color: var(--text-main);
-    line-height: 1;
+    line-height: 1.0;
+    white-space: nowrap;
     margin: 0;
 }
 
-.brand-subtitle {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 1px;
-    font-weight: 600;
-    line-height: 2;
+/* ========================================================
+   3. 右區塊（控制 派思 大字的垂直對齊與高度）
+   ======================================================== */
+/* 右區塊（單獨裝派思的家） */
+.brand-right-column {
+    display: flex;
+    
+    /* 1. 控制上下：改成 flex-end（死死貼齊最底部） */
+    align-items: flex-end; 
+    
+    /* 2. 控制左右：加上 flex-start（死死貼齊最左邊） */
+    justify-content: flex-start; 
+}
+
+/* 設定 派思 中文標題 */
+/* 3. 中文商標 (超級巨大化！完美塞滿右邊整棟樓的高度) */
+.paisi-logo {
+    font-size: 76px;       
+    font-weight: 900;       
+    line-height: 0.85;      
+    font-family: "Songti TC", "Noto Serif TC", "Apple LiSung", "微軟新細明體", serif;
+    white-space: nowrap;    
+    
+    /* 💡 直接加上這一行大絕招！ */
+    /* 寫「負數」就是強行縮減左邊的隱形地盤，直接把字體往左邊拉過去、削掉紫色空間！ */
+    margin-left: -10px; 
+    margin-bottom: 10px;
 }
 
 /* ==========================================================================
@@ -189,10 +219,10 @@ img, .card {
     gap: 10px;
     height: auto;
     min-height: 50px; 
-    min-width: 120px; 
+    min-width: 100px; 
     overflow: hidden; /* 防止內容過多導致變形 */
-    justify-content: flex-end
-    padding: 10px;
+    justify-content: flex-end;
+    padding: 10px 0px 0px 0px; 
 }
 
 /* 通用按鈕基礎 */
@@ -228,8 +258,8 @@ img, .card {
     font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-sm);
-    margin-top: -5px;
-    margin-bottom: 5px;
+    margin-top: 0px ; /* 強制將上方外距歸零，徹底取消黃色空間 */
+    margin-bottom: 0px;
 }
 
 .user-avatar-btn {
@@ -296,6 +326,10 @@ img, .card {
 /* ==========================================================================
    6. 搜尋與定位列 (Search & Location)
    ========================================================================== */
+.search-container, .location-bar {
+    margin-top: 10px; /* 這裡的 20px 可以根據你的需求放大或縮小 */
+}
+
 .location-bar {
     padding: 10px;
     display: flex;
@@ -629,12 +663,15 @@ select {
     <div class="sticky-top-group">
         <header class="header">
             <div class="brand-title-area">
-                <div class="brand-logo-container">
-                    <div>
-                        <h1>PACE派思</h1>
-                        <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
-                    </div>
-                </div>
+                    <!-- 1. 左區塊：負責裝「PACE」與「副標題」 -->
+    <div class="brand-left-column">
+        <span class="pace-logo">PACE</span>
+        <span class="brand-subtitle">店內價外帶自取/點餐系統</span>
+    </div>
+        <!-- 2. 右區塊：負責裝「派思」這兩個大字 -->
+    <div class="brand-right-column">
+        <span class="paisi-logo">派思</span>
+    </div>
             </div>
 
             <div class="control-panel">

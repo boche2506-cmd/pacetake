@@ -4,14 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
-    <link rel="icon" type="image/png" href="logo.png">
-    <link rel="apple-touch-icon" href="logo.png">
+<!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
+<link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+<link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
+<link rel="apple-touch-icon" sizes="180x180" href="logo.png">
 
 <style>
 /* ==========================================================================
    1. 全局變數與主題防線 (Cyber Blue)
    ========================================================================== */
-:root {
+html {
+    /* ⭕ 讓字體回歸正常的標準大小，在 9:16 手機殼內絕對不會暴走破圖 */
+    font-size: 16px; 
+}
+   :root {
     --bg-global: #F8FAFC;
     --bg-container: #FFFFFF;
     --border-color: #E2E8F0;
@@ -56,16 +63,23 @@
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
+
 
 body {
     background-color: var(--bg-global);
     color: var(--text-main);
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;     /* 強制裡面的手機盒子「上下絕對置中」 */
     min-height: 100vh;
+    width: 100vw;
     transition: background-color 0.15s ease;
+    background-color: var(--bg-main); 
 }
 
 input, textarea {
@@ -84,19 +98,33 @@ img, .card {
    ========================================================================== */
 /* 手機直屏精品大外框 */
 .phone-wrapper {
-    width: 100%;
-    max-width: 430px;
+    /* 🔴 第一步：不管螢幕多大，強制鎖死 9:16 比例 */
+    aspect-ratio: 9 / 16;
+
+    /* 🔴 第二步：最核心！用這四行互相牽制。
+       寬螢幕時，高度會卡住，左右自動留黑；
+       長螢幕時，寬度會卡住，上下自動留黑！ */
+    width: 100vw;
     height: 100vh;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    max-width: calc(100vh * 9 / 16);  /* 根據高度逆推最大寬度 */
+    max-height: calc(100vw * 16 / 9); /* 根據寬度逆推最大高度 */
+
+    /* 🔴 第三步：這三行神陣，保證不管是上下留黑還是左右留黑，永遠「絕對正中央」 */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    /* 🔴 第四步：死不准滑動（你要求的鐵律） */
+    overflow: hidden; 
+
+    /* 🔴 第五步：立體手機殼裝飾（邊框與陰影） */
     background-color: var(--bg-container);
-    border-left: 1px solid var(--border-color);
-    border-right: 1px solid var(--border-color);
-    box-shadow: var(--shadow-md);
-    position: relative;
-    padding-bottom: 90px; /* 給底部騰出空間 */
+    border: 4px solid #222; /* 給它一個扎實的手機黑色外框 */
+    border-radius: 20px;    /* 稍微帶點圓角更像手機 */
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5); /* 超立體陰影 */
+    
+    /* 原本的設定保留 */
 }
 
 /* 內容滾動區 (自動填滿剩餘空間) */
@@ -108,70 +136,76 @@ img, .card {
 }
 
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
-.sticky-top-group, 
-.sticky-header-container {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 1000; 
-}
-
 .sticky-top-group {
     background-color: var(--blur-bg);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
     flex-shrink: 0;
 }
-
-.sticky-header-container {
-    background-color: #ffffff;
-    padding-top: 10px;
-}
-
 /* ==========================================================================
    4. 頂部導航區塊 (Header & Brand)
    ========================================================================== */
 .header {
-    padding: 24px 20px 12px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    display: flex; /* 開啟彈性排隊功能 */
+    justify-content: space-between; /* 讓左邊文字和右邊按鈕分別貼靠在最左與最右側 */
+    align-items: stretch;
+    padding: 0px 10px;  /* 給大盒子上下左右留一點舒適的綠色空間 */
 }
 
+
+/* ========================================================
+   1. 最外層的左側大盒子
+   ======================================================== */
 .brand-title-area {
     display: flex;
-    flex-direction: column;
-    padding-top: 3px;
-    justify-content: space-between;
-    align-items: center;
+    align-items: stretch; /* 關鍵：強制讓內部的「左分欄」與「右分欄（派思）」高度與底部完美相同 */
+    height: auto;          /* 接收 header 的 100% 高度 */
+    gap: 0px;
+    padding: 0px;
 }
 
-.brand-logo-container {
+
+/* ========================================================
+   2. 左區塊（控制 PACE 與小字的垂直排列）
+   ======================================================== */
+.brand-left-column {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    justify-content: space-between; /* 核心：PACE 自動衝到最頂，小字自動衝到最底 */
 }
 
-.brand-logo {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
+/* 設定 PACE 英文標題 */
+.pace-logo {
+    font-size: 24px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
+    font-weight: 600;       /* 用最粗的字體 */
+    margin-top: 0px;       /* 維持你最自豪的 0px 上方間距 */
 }
 
-.brand-title-area h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--text-main);
-}
-
+/* 設定副標題小字 */
 .brand-subtitle {
     font-size: 12px;
     color: var(--text-muted);
-    margin-top: 4px;
-    font-weight: 500;
+    font-weight: 200;
+}
+
+/* ========================================================
+   3. 右區塊（控制 派思 大字的垂直對齊與高度）
+   ======================================================== */
+/* 右區塊（單獨裝派思的家） */
+.brand-right-column {
+    display: flex;
+    align-items: flex-end;     /* 1. 控制上下：死死貼齊最底部 */
+    justify-content: flex-start;/* 2. 控制左右：死死貼齊最左邊 */
+    
+    white-space: nowrap;       /* 3. 防止文字或內容強制換行 */
+    margin-left: -10px;        /* 4. 強行往左拉 10px */
+    margin-bottom: 10px;       /* 5. 把下方元件往下推 10px */
+}
+
+/* 精準控制內部圖片的大小 */
+.paisi-logo img {
+    height: 48px;           /* 💡 核心：直接設定圖片高度（可根據畫面自由調整 px 值） */
+    width: auto;            /* 💡 核心：寬度自動等比例縮放，圖片才不會扁掉或變形 */
 }
 
 /* ==========================================================================
@@ -182,10 +216,13 @@ img, .card {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 3px;
-    min-height: 80px; 
-    min-width: 120px; 
+    gap: 0px;
+    height: auto;
+    min-height: 50px; 
+    min-width: 100px; 
     overflow: hidden; /* 防止內容過多導致變形 */
+    justify-content: flex-end;
+    padding: 10px 0px 0px 0px; 
 }
 
 /* 通用按鈕基礎 */
@@ -221,8 +258,8 @@ img, .card {
     font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-sm);
-    margin-top: -5px;
-    margin-bottom: 5px;
+    margin-top: 0px ; /* 強制將上方外距歸零，徹底取消黃色空間 */
+    margin-bottom: 0px;
 }
 
 .user-avatar-btn {
@@ -289,8 +326,12 @@ img, .card {
 /* ==========================================================================
    6. 搜尋與定位列 (Search & Location)
    ========================================================================== */
+.search-container, .location-bar {
+    margin-top: 10px; /* 這裡的 20px 可以根據你的需求放大或縮小 */
+}
+
 .location-bar {
-    padding: 4px 20px 8px 20px;
+    padding: 10px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -448,10 +489,11 @@ img, .card {
    ========================================================================== */
 .bottom-bar {
     position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
+    bottom: 20px; 
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 90%;
     max-width: 430px;
     height: 76px;
     background-color: var(--blur-bg);
@@ -477,19 +519,19 @@ img, .card {
     text-decoration: none;
 }
 
-.status-indicator {
+footer .status-indicator {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: var(--text-muted);
+    background-color: #ff4d4f;
     flex-shrink: 0;
-    position: relative;
 }
 
-.status-indicator.active {
-    background-color: var(--brand-green);
-    box-shadow: 0 0 8px var(--brand-green);
+footer .status-indicator.active{
+    background-color: #52c41a;
+    box-shadow: 0 0 8px #52c41a;
 }
+
 
 .order-badge-count {
     background-color: var(--brand-red);
@@ -586,9 +628,9 @@ img, .card {
 }
 
 .modal-btn.google {
-    background-color: #FFFFFF !important;
-    color: #374151 !important;
-    border-color: #E2E8F0 !important;
+    background-color: #FFFFFF;
+    color: #374151;
+    border-color: #E2E8F0;
 }
 
 .modal-close {
@@ -606,6 +648,14 @@ img, .card {
     font-size: 14px;
     font-weight: 600;
 }
+
+select {
+    height: auto;      /* 關鍵：拿掉固定高度，讓文字撐開框框 */
+    padding: 8px 12px; /* 關鍵：給予上下左右內距，讓框框看起來舒適 */
+    font-size: 16px;   /* 關鍵：調整字體大小，使其比例協調 */
+    line-height: 1.5;  /* 讓文字垂直置中 */
+}
+
 </style>
 </head>
 <body>
@@ -614,12 +664,18 @@ img, .card {
     <div class="sticky-top-group">
         <header class="header">
             <div class="brand-title-area">
-                <img src="pace.png" alt="派思" class="brand-right-column">
-                    <div>
-                        <h1>PACE</h1>
-                        <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
-                    </div>
-                </div>
+                    <!-- 1. 左區塊：負責裝「PACE」與「副標題」 -->
+    <div class="brand-left-column">
+        <div class="paisi-logo">
+</div>
+        <div class="brand-subtitle">店內價外帶自取<br>/點餐系統</div>
+    </div>
+        <!-- 2. 右區塊：負責裝「派思」這兩個大字 -->
+    <div class="brand-right-column">
+        <div class="paisi-logo">
+    <img src="pace.png" alt="派思" class="brand-right-column">
+</div>
+    </div>
             </div>
 
             <div class="control-panel">
@@ -900,39 +956,19 @@ img, .card {
             dropdownMenu.style.display = 'none'; 
         }
     });
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // --- 1. UI 互動監聽 ---
-    // 登入按鈕：只負責打開燈箱
-    const loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
-    }
 
-    // 關閉按鈕與其他 UI
-    const customReturnBtn = document.getElementById('customReturnBtn');
-    if (customReturnBtn) {
-        customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
-    }
+    loginBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
+    customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
+    toggleEmailFormBtn.addEventListener('click', () => {
+        emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
+    });
 
-    const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
-    if (toggleEmailFormBtn) {
-        toggleEmailFormBtn.addEventListener('click', () => {
-            emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
-        });
-    }
+    document.getElementById('togglePasswordVisibility').addEventListener('click', function() {
+        const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        loginPasswordInput.setAttribute('type', type);
+        this.textContent = type === 'password' ? '👁️' : '🙈';
+    });
 
-    // 密碼顯示切換
-    const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
-    if (togglePasswordVisibility) {
-        togglePasswordVisibility.addEventListener('click', function() {
-            const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            loginPasswordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🙈';
-        });
-    }
-
-    // 地圖定位與地址選單
     gpsPinBtn.addEventListener('click', () => {
         modalAddressText.innerText = currentBuyerAddress;
         addressDetailLightbox.style.display = 'flex';
@@ -955,7 +991,7 @@ document.addEventListener('DOMContentLoaded', () => {
     districtSelect.addEventListener('change', filterAndRenderStores);
     globalSearchInput.addEventListener('input', filterAndRenderStores);
 
-    // --- 2. 功能函數 (渲染與同步) ---
+    // 👑 渲染動態選單 (已將邀請碼功能綁定至 window.issuePromoCode)
     function renderDynamicMenu(role) {
         let menuHTML = `
             <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
@@ -979,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', () => {
             menuHTML += `
                 <div class="menu-divider"></div>
                 <a href="javascript:void(0)" onclick="window.toggleView('admin')" style="color: var(--brand-blue); font-weight: bold;">🔮 派思核心控制台</a>
-                <a href="javascript:void(0)" onclick="window.issuePromoCode()" style="color: var(--brand-green); font-weight: bold;">🎟️ 戰術邀請碼發行</a>
+                <a href="javascript:void(0)" onclick="window.issuePromoCode()" style="color: var(--brand-green); font-weight: bold;">🎟️ 邀請碼發行</a>
             `;
         }
 
@@ -1036,18 +1072,16 @@ document.addEventListener('DOMContentLoaded', () => {
         renderDynamicMenu(currentRole);
     }
 
-    // --- 3. Google 登入執行 (只保留這裡一個) ---
     googleLoginAction.addEventListener('click', async () => {
         try {
             const result = await signInWithPopup(auth, provider);
             await handleUserSyncAndRoleRouting(result.user);
         } catch (error) {
             console.error("Google 登入失敗：", error);
-            alert("連線失敗，請檢查網路防線！");
+            alert("連線失敗，請檢查網路服務！");
         }
     });
 
-}); // 這裡關閉整個 DOMContentLoaded
     emailLoginAction.addEventListener('click', async () => {
         const email = loginEmailInput.value.trim();
         const password = loginPasswordInput.value;
@@ -1073,16 +1107,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, (user) => {
         if (user) {
             handleUserSyncAndRoleRouting(user);
+            
+            // === 【新增】登入成功：亮綠燈、顯示有訂單文字 ===
+            document.getElementById('statusDot')?.classList.add('active');
+            document.getElementById('statusText').innerText = "您目前沒有進行中的訂單喔！";
+            
         } else {
             loginBtn.style.display = 'block';
             avatarBtn.style.display = 'none';
             dropdownMenu.style.display = 'none';
             dropdownMenu.innerHTML = '';
+            
+            // === 【新增】登出/未登入：熄滅綠燈變紅燈、顯示提示登入文字 ===
+            document.getElementById('statusDot')?.classList.remove('active');
+            document.getElementById('statusText').innerText = "您尚未登入，請使用電子郵件或連結google帳號登入";
         }
-    });
+    }); // 記得原本後面應該還有一個大括號和右括號喔！
 
     // 📥 讀取雲端店家 (買家列表 & 後台列表 同時更新)
     async function fetchStoresFromFirebase() {
@@ -1155,11 +1198,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     buyerLat = position.coords.latitude;
                     buyerLng = position.coords.longitude;
                     currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
-                    gpsPinBtn.innerText = "📍 已獲取核心定位";
+                    gpsPinBtn.innerText = "📍 已獲取定位";
                 },
                 (error) => {
-                    currentBuyerAddress = "瀏覽器定位遭拒，請手動選擇下方下拉選單縣市。";
-                    gpsPinBtn.innerText = "📍 定位受阻";
+                    currentBuyerAddress = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
+                    gpsPinBtn.innerText = "📍 無法定位";
                 }
             );
         } else {
@@ -1283,7 +1326,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 isActive: true,
                 usedBy: null // 預留給未來記錄誰使用了這個碼
             });
-            alert(`🎟️ 戰術邀請碼「${code}」已成功寫入 Firebase！買家現在可以使用它了。`);
+            alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！買家現在可以使用它了。`);
         } catch (error) {
             console.error("邀請碼發行失敗:", error);
             alert("發行失敗，請檢查您的系統權限配置！");

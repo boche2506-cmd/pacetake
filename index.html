@@ -149,7 +149,7 @@ img, .card {
     display: flex; /* 開啟彈性排隊功能 */
     justify-content: space-between; /* 讓左邊文字和右邊按鈕分別貼靠在最左與最右側 */
     align-items: stretch;
-    padding: 0px 10px;  /* 給大盒子上下左右留一點舒適的綠色空間 */
+    padding: 5px 5px;  /* 給大盒子上下左右留一點舒適的綠色空間 */
 }
 
 
@@ -176,9 +176,9 @@ img, .card {
 
 /* 設定 PACE 英文標題 */
 .pace-logo {
-    font-size: 24px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
-    font-weight: 600;       /* 用最粗的字體 */
-    margin-top: 0px;       /* 維持你最自豪的 0px 上方間距 */
+    font-size: 36px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
+    font-weight: 900;       /* 用最粗的字體 */
+    margin-top: 5px;       /* 維持你最自豪的 0px 上方間距 */
 }
 
 /* 設定副標題小字 */
@@ -196,15 +196,14 @@ img, .card {
     display: flex;
     align-items: flex-end;     /* 1. 控制上下：死死貼齊最底部 */
     justify-content: flex-start;/* 2. 控制左右：死死貼齊最左邊 */
-    
     white-space: nowrap;       /* 3. 防止文字或內容強制換行 */
-    margin-left: -10px;        /* 4. 強行往左拉 10px */
-    margin-bottom: 10px;       /* 5. 把下方元件往下推 10px */
+    margin-top: 10px;
 }
+
 
 /* 精準控制內部圖片的大小 */
 .paisi-logo img {
-    height: 48px;           /* 💡 核心：直接設定圖片高度（可根據畫面自由調整 px 值） */
+    height: 56px;           /* 💡 核心：直接設定圖片高度（可根據畫面自由調整 px 值） */
     width: auto;            /* 💡 核心：寬度自動等比例縮放，圖片才不會扁掉或變形 */
 }
 
@@ -214,32 +213,23 @@ img, .card {
 /* 右上角一體化控制台 */
 .control-panel {
     display: flex;
+    justify-content: space-between;
     flex-direction: column;
     align-items: flex-end;
-    gap: 0px;
+    gap: 5px;
     height: auto;
     min-height: 50px; 
     min-width: 100px; 
-    overflow: hidden; /* 防止內容過多導致變形 */
-    justify-content: flex-end;
-    padding: 10px 0px 0px 0px; 
+    margin-top: 15px; 
 }
 
 /* 通用按鈕基礎 */
-#avatarBtn, #themeToggleBtn {
-    margin: 0;
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .theme-toggle {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    font-size: 16px;
-    width: 36px;
-    height: 36px;
+    font-size: 14px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -252,9 +242,9 @@ img, .card {
     background-color: var(--brand-blue);
     color: #FFFFFF;
     border: none;
-    padding: 8px 14px;
+    padding: 6px 8px;
     border-radius: 20px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-sm);
@@ -327,14 +317,15 @@ img, .card {
    6. 搜尋與定位列 (Search & Location)
    ========================================================================== */
 .search-container, .location-bar {
-    margin-top: 10px; /* 這裡的 20px 可以根據你的需求放大或縮小 */
+    margin-top: 0px; /* 這裡的 20px 可以根據你的需求放大或縮小 */
 }
 
 .location-bar {
-    padding: 10px;
+    padding: 0px;
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-top: 5px;
 }
 
 .gps-trigger-btn {
@@ -663,30 +654,21 @@ select {
 <div id="buyerView" style="display: block;">
     <div class="sticky-top-group">
         <header class="header">
-            <div class="brand-title-area">
-                    <!-- 1. 左區塊：負責裝「PACE」與「副標題」 -->
-    <div class="brand-left-column">
-        <div class="paisi-logo">
-</div>
-        <div class="brand-subtitle">店內價外帶自取<br>/點餐系統</div>
+            <div class="brand-title-area"><!-- 1. 左區塊：負責裝「PACE」與「副標題」 -->
+          <div class="brand-left-column">
+        <div class="pace-logo">PACE</div>
+      <div class="brand-subtitle">店內價外帶自取<br>/點餐系統</div>
     </div>
-        <!-- 2. 右區塊：負責裝「派思」這兩個大字 -->
-    <div class="brand-right-column">
-        <div class="paisi-logo">
-    <img src="pace.png" alt="派思" class="brand-right-column">
-</div>
-    </div>
-            </div>
-
+        <div class="brand-right-column">
+    <img src="pace.png" alt="派思" class="paisi-logo"></div>
+          </div>
             <div class="control-panel">
-                 <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+                <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+                <button class="login-btn" id="loginBtn">登入 / 註冊</button>
+                <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
                     <span class="avatar-icon">👤</span>
                     <span class="user-name" id="userNameDisplay">載入中...</span>
                 </button>
-                <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
-                <button class="login-btn" id="loginBtn">登入 / 註冊</button>
-               
-                
                 <div class="dropdown-menu" id="dropdownMenu"></div>
             </div>
         </header>

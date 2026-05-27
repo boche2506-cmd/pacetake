@@ -534,10 +534,11 @@ footer .status-indicator {
     position: relative;
 }
 
-footer .status-indicator.active {
+footer .status-indicator.active{
     background-color: #52c41a;
     box-shadow: 0 0 8px #52c41a;
 }
+
 
 .order-badge-count {
     background-color: var(--brand-red);
@@ -744,7 +745,7 @@ select {
 
     <footer class="bottom-bar">
         <a href="history.html" class="status-msg" id="bottomStatusMsg">
-            <div class="status-indicator" id="statusDot"></div>
+            <div class="status-indicator active" id="statusDot"></div>
             <div class="order-badge-count" id="orderBadgeCount">0</div>
             <span id="statusText">您目前沒有進行中的訂單喔！</span>
         </a>

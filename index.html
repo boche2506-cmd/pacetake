@@ -517,7 +517,7 @@ img, .card {
 
 .status-msg {
     font-size: 12px;
-    color: #555(--text-muted);
+    color: var(--text-muted);
     max-width: 200px;
     display: flex;
     align-items: center;
@@ -1111,16 +1111,25 @@ select {
         }
     });
 
-    onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, (user) => {
         if (user) {
             handleUserSyncAndRoleRouting(user);
+            
+            // === 【新增】登入成功：亮綠燈、顯示有訂單文字 ===
+            document.getElementById('statusDot')?.classList.add('active');
+            document.getElementById('statusText').innerText = "您目前沒有進行中的訂單喔！";
+            
         } else {
             loginBtn.style.display = 'block';
             avatarBtn.style.display = 'none';
             dropdownMenu.style.display = 'none';
             dropdownMenu.innerHTML = '';
+            
+            // === 【新增】登出/未登入：熄滅綠燈變紅燈、顯示提示登入文字 ===
+            document.getElementById('statusDot')?.classList.remove('active');
+            document.getElementById('statusText').innerText = "您尚未登入，點擊此處前往登入";
         }
-    });
+    }); // 記得原本後面應該還有一個大括號和右括號喔！
 
     // 📥 讀取雲端店家 (買家列表 & 後台列表 同時更新)
     async function fetchStoresFromFirebase() {

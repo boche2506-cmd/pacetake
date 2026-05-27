@@ -15,7 +15,7 @@ html {
     /* 讓整個網頁的基準字體大小，隨著螢幕寬度自動呼吸縮放 */
     font-size: calc(100vw / 448 * 16); 
 }
-    :root {
+   :root {
     --bg-global: #F8FAFC;
     --bg-container: #FFFFFF;
     --border-color: #E2E8F0;
@@ -67,9 +67,11 @@ body {
     color: var(--text-main);
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;     /* 強制裡面的手機盒子「上下絕對置中」 */
     min-height: 100vh;
+    width: 100vw;
     transition: background-color 0.15s ease;
+    background-color: var(--bg-main); 
 }
 
 input, textarea {
@@ -90,8 +92,8 @@ img, .card {
 .phone-wrapper {
     width: 100%;
     max-width: 430px;
-    height: 100vh;
-    margin: 0 auto;
+    aspect-ratio: 9 / 16; /* 強制這個手機大盒子鎖死在 9:16 的黃金長寬比！ */
+    margin: 40px auto;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -114,8 +116,7 @@ img, .card {
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
 .sticky-top-group, 
 .sticky-header-container {
-    position: -webkit-sticky;
-    position: sticky;
+    position: fixed;
     top: 0;
     z-index: 1000; 
 }
@@ -153,8 +154,9 @@ img, .card {
     align-items: stretch; /* 關鍵：強制讓內部的「左分欄」與「右分欄（派思）」高度與底部完美相同 */
     height: auto;          /* 接收 header 的 100% 高度 */
     gap: 12px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+    padding: 10px 0px 0px 0px;
 }
+
 
 /* ========================================================
    2. 左區塊（控制 PACE 與小字的垂直排列）
@@ -170,7 +172,7 @@ img, .card {
     font-size: 52px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
     font-weight: 900;       /* 用最粗的字體 */
     line-height: 0.9;       /* 稍微縮減字體上下的虛浮空間，讓它更緊湊 */
-    margin-top: 10px;       /* 維持你最自豪的 10px 上方間距 */
+    margin-top: 0px;       /* 維持你最自豪的 0px 上方間距 */
 }
 
 /* 設定副標題小字 */
@@ -493,10 +495,11 @@ img, .card {
    ========================================================================== */
 .bottom-bar {
     position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
+    bottom: 20px; 
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 90%;
     max-width: 430px;
     height: 76px;
     background-color: var(--blur-bg);
@@ -526,7 +529,7 @@ footer .status-indicator {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: #ff4d4f !important;
+    background-color: #ff4d4f ;
     flex-shrink: 0;
     position: relative;
 }
@@ -669,12 +672,12 @@ select {
             <div class="brand-title-area">
                     <!-- 1. 左區塊：負責裝「PACE」與「副標題」 -->
     <div class="brand-left-column">
-        <span class="pace-logo">PACE</span>
-        <span class="brand-subtitle">店內價外帶自取/點餐系統</span>
+        <div class="pace-logo">PACE</div>
+        <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
     </div>
         <!-- 2. 右區塊：負責裝「派思」這兩個大字 -->
     <div class="brand-right-column">
-        <span class="paisi-logo">派思</span>
+        <div class="paisi-logo">派思</div>
     </div>
             </div>
 
@@ -741,7 +744,7 @@ select {
 
     <footer class="bottom-bar">
         <a href="history.html" class="status-msg" id="bottomStatusMsg">
-            <div class="status-indicator" id="statusDot"></div>
+            <div class="status-indicator.active" id="statusDot"></div>
             <div class="order-badge-count" id="orderBadgeCount">0</div>
             <span id="statusText">您目前沒有進行中的訂單喔！</span>
         </a>

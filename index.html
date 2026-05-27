@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
-    <link rel="icon" type="image/png" href="logo.png">
-    <link rel="apple-touch-icon" href="logo.png">
+<!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
+<link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+<link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
+<link rel="apple-touch-icon" sizes="180x180" href="logo.png">
 
 <style>
 /* ==========================================================================
@@ -133,27 +136,12 @@ img, .card {
 }
 
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
-.sticky-top-group, 
-.sticky-header-container {
-    position: fixed;
-    top: 0;
-    z-index: 1000; 
-}
-
 .sticky-top-group {
     background-color: var(--blur-bg);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
     flex-shrink: 0;
 }
-
-.sticky-header-container {
-    background-color: #ffffff;
-    padding-top: 10px;
-}
-
 /* ==========================================================================
    4. 頂部導航區塊 (Header & Brand)
    ========================================================================== */
@@ -172,8 +160,8 @@ img, .card {
     display: flex;
     align-items: stretch; /* 關鍵：強制讓內部的「左分欄」與「右分欄（派思）」高度與底部完美相同 */
     height: auto;          /* 接收 header 的 100% 高度 */
-    gap: 12px;
-    padding: 10px 0px 0px 0px;
+    gap: 0px;
+    padding: 0px;
 }
 
 
@@ -188,20 +176,16 @@ img, .card {
 
 /* 設定 PACE 英文標題 */
 .pace-logo {
-    font-size: 52px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
-    font-weight: 900;       /* 用最粗的字體 */
-    line-height: 0.9;       /* 稍微縮減字體上下的虛浮空間，讓它更緊湊 */
+    font-size: 24px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
+    font-weight: 600;       /* 用最粗的字體 */
     margin-top: 0px;       /* 維持你最自豪的 0px 上方間距 */
 }
 
 /* 設定副標題小字 */
 .brand-subtitle {
-    font-size: 12px;     /* 💡 精準調整到大約 11.5px 或 12px，這樣它的寬度就會剛好跟 52px 的 PACE 站在同一條垂直線上！ */
+    font-size: 12px;
     color: var(--text-muted);
-    font-weight: 600;
-    line-height: 1.0;
-    white-space: nowrap;
-    margin: 0;
+    font-weight: 200;
 }
 
 /* ========================================================
@@ -221,16 +205,17 @@ img, .card {
 /* 設定 派思 中文標題 */
 /* 3. 中文商標 (超級巨大化！完美塞滿右邊整棟樓的高度) */
 .paisi-logo {
-    font-size: 76px;       
-    font-weight: 900;       
-    line-height: 0.85;      
-    font-family: "Songti TC", "Noto Serif TC", "Apple LiSung", "微軟新細明體", serif;
+    display: flex;
+    align-items: center;    /* 讓圖片垂直居中 */
     white-space: nowrap;    
-    
-    /* 💡 直接加上這一行大絕招！ */
-    /* 寫「負數」就是強行縮減左邊的隱形地盤，直接把字體往左邊拉過去、削掉紫色空間！ */
-    margin-left: -10px; 
-    margin-bottom: 10px;
+    margin-left: -10px;     /* 保留原本強行往左拉 10px 的設定 */
+    margin-bottom: 10px;    /* 保留原本把下方元件往下推 10px 的設定 */
+}
+
+/* 精準控制內部圖片的大小 */
+.paisi-logo img {
+    height: 48px;           /* 💡 核心：直接設定圖片高度（可根據畫面自由調整 px 值） */
+    width: auto;            /* 💡 核心：寬度自動等比例縮放，圖片才不會扁掉或變形 */
 }
 
 /* ==========================================================================
@@ -550,7 +535,6 @@ footer .status-indicator {
     border-radius: 50%;
     background-color: #ff4d4f;
     flex-shrink: 0;
-    position: relative;
 }
 
 footer .status-indicator.active{
@@ -692,8 +676,10 @@ select {
             <div class="brand-title-area">
                     <!-- 1. 左區塊：負責裝「PACE」與「副標題」 -->
     <div class="brand-left-column">
-        <div class="pace-logo">PACE</div>
-        <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
+        <div class="paisi-logo">
+    <img src="你的圖片路徑.png" alt="派思 Logo">
+</div>
+        <div class="brand-subtitle">店內價外帶自取<br>/點餐系統</div>
     </div>
         <!-- 2. 右區塊：負責裝「派思」這兩個大字 -->
     <div class="brand-right-column">

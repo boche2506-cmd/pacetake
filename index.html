@@ -1232,56 +1232,69 @@ function renderAdminTable() {
 }
 
     // 2. 雲端新增店家邏輯
-    const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
-    if (adminSubmitStoreBtn) {
-        adminSubmitStoreBtn.addEventListener('click', async () => {
-            const name = document.getElementById('adminNewStoreName').value.trim();
-            const phone = document.getElementById('adminNewStorePhone').value.trim();
-            const city = document.getElementById('adminNewStoreCity').value;
-            const district = document.getElementById('adminNewStoreDistrict').value.trim();
-            const address = document.getElementById('adminNewStoreAddress').value.trim();
-            const category = document.getElementById('adminNewStoreCategory').value.trim();
+const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
+if (adminSubmitStoreBtn) {
+    adminSubmitStoreBtn.addEventListener('click', async () => {
+        const nameEl = document.getElementById('adminNewStoreName');
+        const phoneEl = document.getElementById('adminNewStorePhone');
+        const cityEl = document.getElementById('adminNewStoreCity'); 
+        const districtEl = document.getElementById('adminNewStoreDistrict');
+        const addressEl = document.getElementById('adminNewStoreAddress');
+        const categoryEl = document.getElementById('adminNewStoreCategory');
 
-            if (!name || !district || !address) {
-                alert("⚠️ 店名、區域、詳細地址為必填項目！");
-                return;
-            }
+        if (!nameEl || !addressEl) {
+            alert("⚠️ 網頁欄位結構有誤，找不到店名或地址的輸入框！");
+            return;
+        }
 
-            adminSubmitStoreBtn.innerText = "⏳ 正在同步至雲端...";
-            try {
-                // 將資料寫入 Firebase 的 stores 集合
-                await addDoc(collection(db, "stores"), {
-                    name: name,
-                    shopName: name, // 兼容前端不同寫法
-                    phone: phone,
-                    city: city,
-                    district: district,
-                    address: address,
-                    shopAddress: address, // 兼容寫法
-                    category: category,
-                    createdAt: new Date().toISOString()
-                });
-                
-                alert("✅ 店家已成功新增至雲端！");
-                
-                // 清空輸入框
-                document.getElementById('adminNewStoreName').value = '';
-                document.getElementById('adminNewStorePhone').value = '';
-                document.getElementById('adminNewStoreDistrict').value = '';
-                document.getElementById('adminNewStoreAddress').value = '';
-                document.getElementById('adminNewStoreCategory').value = '';
-                
-                // 重新讀取 Firebase 更新畫面
-                fetchStoresFromFirebase();
-            } catch (error) {
-                console.error("新增店家失敗:", error);
-                alert("新增失敗，請檢查網路或資料庫權限！");
-            } finally {
-                adminSubmitStoreBtn.innerText = "✅ 確認新增店家至雲端";
-            }
-        });
-    }
+        const name = nameEl.value.trim();
+        const phone = phoneEl ? phoneEl.value.trim() : '';
+        const city = cityEl ? cityEl.value : '基隆市'; 
+        const district = districtEl ? districtEl.value.trim() : '';
+        const address = addressEl.value.trim();
+        const category = categoryEl ? categoryEl.value.trim() : '';
 
+        if (!name || !address) {
+            alert("⚠️ 店名與詳細地址為必填項目！");
+            return;
+        }
+
+        adminSubmitStoreBtn.innerText = "⏳ 正在同步至雲端...";
+        adminSubmitStoreBtn.disabled = true;
+        
+        try {
+            await addDoc(collection(db, "stores"), {
+                name: name,
+                shopName: name, 
+                phone: phone,
+                city: city, 
+                district: district,
+                address: address,
+                shopAddress: address, 
+                category: category,
+                createdAt: new Date().toISOString()
+            });
+            
+            alert("✅ 店家已成功新增至雲端！");
+            
+            nameEl.value = '';
+            if(phoneEl) phoneEl.value = '';
+            if(cityEl) cityEl.value = '';
+            if(districtEl) districtEl.value = '';
+            if(addressEl) addressEl.value = '';
+            if(categoryEl) categoryEl.value = '';
+            
+            location.reload(); 
+
+        } catch (error) {
+            console.error("新增店家失敗:", error);
+            alert("新增失敗，請確認 Firebase Rules 是否開啟！");
+        } finally {
+            adminSubmitStoreBtn.innerText = "✅ 確認新增店家至雲端";
+            adminSubmitStoreBtn.disabled = false;
+        }
+    });
+}
     // 3. 雲端刪除店家邏輯 (掛載到 window 供 HTML 呼叫)
     window.deleteStore = async function(storeId) {
         if (confirm("⚠️ 確定要從 Firebase 徹底刪除這個店家嗎？(刪除後無法恢復)")) {

@@ -139,31 +139,19 @@ img, .card {
 .sticky-top-group {
     background-color: var(--blur-bg);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px); 
     border-bottom: 1px solid var(--border-color);
     flex-shrink: 0;
+    margin: 10px 10px;     
 }
 /* ==========================================================================
    4. 頂部導航區塊 (Header & Brand)
    ========================================================================== */
 .header {
-    display: flex; /* 開啟彈性排隊功能 */
-    justify-content: space-between; /* 讓左邊文字和右邊按鈕分別貼靠在最左與最右側 */
-    align-items: stretch;
-    padding: 5px 5px;  /* 給大盒子上下左右留一點舒適的綠色空間 */
-}
-
-
-/* ========================================================
-   1. 最外層的左側大盒子
-   ======================================================== */
-.brand-title-area {
     display: flex;
-    align-items: stretch; /* 關鍵：強制讓內部的「左分欄」與「右分欄（派思）」高度與底部完美相同 */
-    height: auto;          /* 接收 header 的 100% 高度 */
-    gap: 0px;
-    padding: 0px;
+    justify-content: space-between; /* 讓左邊欄位和右邊控制面板各自靠兩端 */
+    align-items: center;            /* 關鍵：讓左右兩邊的內容物「垂直居中」對齊 */
 }
-
 
 /* ========================================================
    2. 左區塊（控制 PACE 與小字的垂直排列）
@@ -171,41 +159,27 @@ img, .card {
 .brand-left-column {
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* 核心：PACE 自動衝到最頂，小字自動衝到最底 */
+    justify-content: flex-start;
+    height: 100%;
 }
 
 /* 設定 PACE 英文標題 */
 .pace-logo {
-    font-size: 34px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
-    font-weight: 800;       /* 用最粗的字體 */
-    margin-top: 5px;       /* 維持你最自豪的 0px 上方間距 */
+    font-size: 32px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
+    font-weight: 600;       /* 用最粗的字體 */
+    margin-top: 0px;       /* 維持你最自豪的 0px 上方間距 */
 }
 
+.brand-logo-img {
+    height: 32px;
+    width: 100%;
+}    
 /* 設定副標題小字 */
 .brand-subtitle {
     font-size: 12px;
     color: var(--text-muted);
-    font-weight: 200;
-}
-
-/* ========================================================
-   3. 右區塊（控制 派思 大字的垂直對齊與高度）
-   ======================================================== */
-/* 右區塊（單獨裝派思的家） */
-.brand-right-column {
-    display: flex;
-    align-items: flex-end;     /* 1. 控制上下：死死貼齊最底部 */
-    justify-content: flex-start;/* 2. 控制左右：死死貼齊最左邊 */
-    white-space: nowrap;       /* 3. 防止文字或內容強制換行 */
-    margin-top: 10px;
-     transform: translateX(-10px); 
-}
-
-
-/* 精準控制內部圖片的大小 */
-.paisi-logo img {
-    height: 56px;           /* 💡 核心：直接設定圖片高度（可根據畫面自由調整 px 值） */
-    width: auto;            /* 💡 核心：寬度自動等比例縮放，圖片才不會扁掉或變形 */
+    font-weight: 300;
+    text-align: left;
 }
 
 /* ==========================================================================
@@ -214,16 +188,17 @@ img, .card {
 /* 右上角一體化控制台 */
 .control-panel {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
-    height: auto;
-    margin-top: 15px; 
-    justify-content: flex-end;
-    align-items: flex-end;
+    flex-direction: column; /* 關鍵：讓按鈕由上往下垂直排列 */
+    align-items: flex-end;  /* 關鍵：讓兩顆按鈕都向右邊靠齊對齊 */
+    gap: 5px;               /* 設定上下兩顆按鈕之間的間距（可依喜好調整） */
 }
+
 
 /* 通用按鈕基礎 */
 .theme-toggle {
+    display: flex;
+    justify-content: center; /* 修改：讓月亮圖示「水平置中」 */
+    align-items: center;     /* 新增：讓月亮圖示「垂直置中」 */
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     font-size: 12px;
@@ -231,20 +206,19 @@ img, .card {
     height: 30px;
     border-radius: 50%;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     color: var(--text-main);
 }
 
 .login-btn {
+    display: flex;
+    justify-content: flex-end;
     background-color: var(--brand-blue);
     color: #FFFFFF;
     border: none;
     padding: 6px 8px;
     border-radius: 20px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     box-shadow: var(--shadow-sm);
     margin-top: 0px ; /* 強制將上方外距歸零，徹底取消黃色空間 */
@@ -651,31 +625,31 @@ select {
 <body>
 <div class="phone-wrapper">
 <div id="buyerView" style="display: block;">
-    <div class="sticky-top-group">
-        <header class="header">
-            <div class="brand-title-area"><!-- 1. 左區塊：負責裝「PACE」與「副標題」 -->
-          <div class="brand-left-column">
-        <div class="pace-logo">PACE</div>
-      <div class="brand-subtitle">店內價外帶自取<br>/點餐系統</div>
+<div class="sticky-top-group">
+<header class="header">
+    <div class="brand-left-column">
+    <!-- 你的小框框：裡面包含圖片與英文橫排 -->
+    <div class="pace-logo">
+    <img src="pace2.png" alt="派思" class="brand-logo-img">
+    <span>PACE</span> <!-- 💡 注意：英文用 <span> 包起來，方便單獨單獨設定字體大小 -->
     </div>
-        <div class="brand-right-column">
-    <img src="pace.png" alt="派思" class="paisi-logo"></div>
-          </div>
-            <div class="control-panel">
-                <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
-                <button class="login-btn" id="loginBtn">登入 / 註冊</button>
-                <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
-                    <span class="avatar-icon">👤</span>
-                    <span class="user-name" id="userNameDisplay">載入中...</span>
-                </button>
-                <div class="dropdown-menu" id="dropdownMenu"></div>
-            </div>
+    <!-- 下面那排：中文副標題 -->
+    <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
+    </div> 
+        <div class="control-panel">
+        <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+        <button class="login-btn" id="loginBtn">登入 / 註冊</button>
+        <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+        <span class="avatar-icon">👤</span>
+        <span class="user-name" id="userNameDisplay">載入中...</span>
+        </button>
+        <div class="dropdown-menu" id="dropdownMenu"></div>
+        </div>
         </header>
-
-        <div class="location-bar">
+            <div class="location-bar">
             <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
             <div class="location-select-group">
-                <select class="nav-select" id="citySelect">
+            <select class="nav-select" id="citySelect">
                         <option value="">選擇縣市</option>
                         <option value="臺北市">臺北市</option>
                         <option value="新北市">新北市</option>
@@ -704,18 +678,15 @@ select {
                         <option value="">選擇區域</option>
                     </select>
                 </select>
-               
             </div>
         </div>
-            
         <div class="search-container">
             <div class="search-box">
                 <span>🔍</span>
                 <input type="text" id="globalSearchInput" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
             </div>
+          </div>
         </div>
-    </div>
-
     <main class="store-list" id="store-container">
         <div class="loading-spinner" id="loadingSpinner">⚡ 正在安全連線雲端資料庫...</div>
     </main>
@@ -731,8 +702,8 @@ select {
             <span id="cartCount">(0)</span>
         </a>
     </footer>
+  </div>
 </div>
-
 <!-- ========================================== -->
 <!-- 🔮 派思核心控制台 (Admin 視圖) -->
 <!-- ========================================== -->

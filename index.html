@@ -1355,151 +1355,159 @@ window.toggleView = function(viewRole) {
     // 🚀 強制在網頁開好時，重新幫登入按鈕綁定靈魂
 // 🟢 1. 將登入邏輯綁定到 window 全域，這樣任何地方都叫得到它
 // 🟢 1. 先把全域大絕招掛在最外面，誰都叫得到它
-window.executeGoogleLogin = async function() {
-    try {
-        const currentAuth = typeof auth !== 'undefined' ? auth : (window.auth || window.firebaseAuth);
-        const currentProvider = typeof provider !== 'undefined' ? provider : (window.provider || window.googleProvider);
-        const loginFunc = typeof signInWithPopup === 'function' ? signInWithPopup : window.signInWithPopup;
-
-        if (!currentAuth || !loginFunc) {
-            alert("⚠️ Firebase Auth 尚未初始化完成，請重新整理試試！");
-            return;
-        }
-
-        console.log("🚀 開始執行 Google 彈窗登入...");
-        const result = await loginFunc(currentAuth, currentProvider);
-        
-        if (typeof handleUserSyncAndRoleRouting === 'function') {
-            await handleUserSyncAndRoleRouting(result.user);
-        }
-    } catch (error) {
-        console.error("Google 登入失敗詳細原因：", error);
-        alert("連線失敗，請檢查網路或 Firebase 彈窗設定！");
-    }
-};
-
-// 🟢 2. 確保網頁 HTML 元素全部生出來之後，才執行裡面的綁定
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("網頁元素載入完畢，開始安全綁定功能...");
-
-    // 抓取所有按鈕元素
-    const loginBtn = document.getElementById('loginBtn');
-    const avatarBtn = document.getElementById('avatarBtn');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const userNameDisplay = document.getElementById('userNameDisplay');
-    const storeContainer = document.getElementById('store-container');
-    
-    const loginLightbox = document.getElementById('loginLightbox');
-    const googleLoginAction = document.getElementById('googleLoginAction');
-    const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
-    const emailFormSection = document.getElementById('emailFormSection');
-    const customReturnBtn = document.getElementById('customReturnBtn');
-    const loginEmailInput = document.getElementById('loginEmail');
-    const loginPasswordInput = document.getElementById('loginPassword');
-    const emailLoginAction = document.getElementById('emailLoginAction');
-
-    const citySelect = document.getElementById('citySelect');
-    const districtSelect = document.getElementById('districtSelect');
-    const gpsPinBtn = document.getElementById('gpsPinBtn');
-    const addressDetailLightbox = document.getElementById('addressDetailLightbox');
-    const modalAddressText = document.getElementById('modalAddressText');
-    const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
-    const globalSearchInput = document.getElementById('globalSearchInput');
-
-    // 💡 安全防呆檢查：如果最基本的按鈕都不在，提示錯誤
-    if (!loginBtn || !loginLightbox) {
-        console.error("❌ 嚴重錯誤：網頁找不到 loginBtn 或 loginLightbox 元素，請檢查 HTML 的 ID！");
-        return; 
-    }
-
-    // === 下拉選單點擊開關 ===
-    if (avatarBtn && dropdownMenu) {
-        avatarBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-        });
-        document.addEventListener('click', (e) => { 
-            if (!avatarBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.style.display = 'none'; 
-            }
-        });
-    }
-
-    // === 彈窗開關控制 ===
-    loginBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
-    if (customReturnBtn) customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
-    if (toggleEmailFormBtn && emailFormSection) {
-        toggleEmailFormBtn.addEventListener('click', () => {
-            emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
-        });
-    }
-
-    // === 密碼眼睛開關 ===
-    const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
-    if (togglePasswordVisibility && loginPasswordInput) {
-        togglePasswordVisibility.addEventListener('click', function() {
-            const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            loginPasswordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🙈';
-        });
-    }
-
-    // === GPS 與選單事件 ===
-    if (gpsPinBtn && modalAddressText && addressDetailLightbox) {
-        gpsPinBtn.addEventListener('click', () => {
-            modalAddressText.innerText = typeof currentBuyerAddress !== 'undefined' ? currentBuyerAddress : "定位中...";
-            addressDetailLightbox.style.display = 'flex';
-        });
-    }
-    if (closeAddressModalBtn && addressDetailLightbox) {
-        closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
-    }
-
-    if (citySelect) citySelect.addEventListener('change', filterAndRenderStores);
-    if (districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
-    if (globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
-
-    // === 👑 綁定 Google 登入按鈕（徹底清洗舊怨魂） ===
-    if (googleLoginAction) {
-        const newGBtn = googleLoginAction.cloneNode(true);
-        googleLoginAction.parentNode.replaceChild(newGBtn, googleLoginAction);
-        newGBtn.addEventListener('click', window.executeGoogleLogin);
-    }
-
-    // === Email 登入與註冊邏輯 ===
-    if (emailLoginAction) {
-        emailLoginAction.addEventListener('click', async () => {
-            if (!loginEmailInput || !loginPasswordInput) return;
-            const email = loginEmailInput.value.trim();
-            const password = loginPasswordInput.value;
-            if (!email || !password) {
-                alert("密碼或 Email 欄位不可為空！");
-                return;
-            }
+<script>
+        // 🟢 1. 全域大絕招：掛在最外面，讓 HTML 隨時叫得到
+        window.executeGoogleLogin = async function() {
             try {
                 const currentAuth = typeof auth !== 'undefined' ? auth : (window.auth || window.firebaseAuth);
-                const result = await signInWithEmailAndPassword(currentAuth, email, password);
-                await handleUserSyncAndRoleRouting(result.user);
-            } catch (loginError) {
-                if (loginError.code === "auth/user-not-found" || loginError.code === "auth/invalid-credential") {
-                    try {
-                        const currentAuth = typeof auth !== 'undefined' ? auth : (window.auth || window.firebaseAuth);
-                        const result = await createUserWithEmailAndPassword(currentAuth, email, password);
-                        await handleUserSyncAndRoleRouting(result.user);
-                    } catch (regError) {
-                        alert("註冊密碼強度不足，或帳號已被佔用！");
-                    }
-                } else {
-                    alert("登入密碼有誤，請再確認一次！");
+                const currentProvider = typeof provider !== 'undefined' ? provider : (window.provider || window.googleProvider);
+                const loginFunc = typeof signInWithPopup === 'function' ? signInWithPopup : window.signInWithPopup;
+
+                if (!currentAuth || !loginFunc) {
+                    alert("⚠️ Firebase 模組尚未準備就緒，請重新整理網頁！");
+                    return;
+                }
+
+                console.log("🚀 PACE 核心：開始執行 Google 彈窗登入...");
+                const result = await loginFunc(currentAuth, currentProvider);
+                
+                if (typeof handleUserSyncAndRoleRouting === 'function') {
+                    await handleUserSyncAndRoleRouting(result.user);
+                }
+            } catch (error) {
+                console.error("Google 登入失敗詳細原因：", error);
+                alert("連線失敗，請檢查網路或 Firebase 彈窗授權網域設定！");
+            }
+        };
+
+        // 🟢 2. 主程式：等待網頁按鈕都長齊了，才開始靈魂綁定
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("🚀 PACE 系統：大腦已啟動！網頁元素載入完畢，開始全自動功能綁定...");
+
+            // 抓取所有按鈕與燈箱元素
+            const loginBtn = document.getElementById('loginBtn');
+            const avatarBtn = document.getElementById('avatarBtn');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            
+            const loginLightbox = document.getElementById('loginLightbox');
+            const googleLoginAction = document.getElementById('googleLoginAction');
+            const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
+            const emailFormSection = document.getElementById('emailFormSection');
+            const customReturnBtn = document.getElementById('customReturnBtn');
+            const loginEmailInput = document.getElementById('loginEmail');
+            const loginPasswordInput = document.getElementById('loginPassword');
+            const emailLoginAction = document.getElementById('emailLoginAction');
+
+            const citySelect = document.getElementById('citySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            const gpsPinBtn = document.getElementById('gpsPinBtn');
+            const addressDetailLightbox = document.getElementById('addressDetailLightbox');
+            const modalAddressText = document.getElementById('modalAddressText');
+            const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
+            const globalSearchInput = document.getElementById('globalSearchInput');
+
+            // 💡 安全防護：如果找不到外層的登入按鈕或彈窗，跳過綁定不讓程式崩潰
+            if (!loginBtn || !loginLightbox) {
+                console.warn("⚠️ 提示：目前畫面上不包含 loginBtn 或 loginLightbox。");
+            } else {
+                // === 藍色「登入/註冊」大門點擊開關 ===
+                loginBtn.addEventListener('click', () => { 
+                    console.log("🎯 點擊了登入大門，開啟彈窗！");
+                    loginLightbox.style.display = 'flex'; 
+                });
+                if (customReturnBtn) {
+                    customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
                 }
             }
-        });
-    }
 
-    // 啟動初始資料抓取
-    if (typeof fetchStoresFromFirebase === 'function') fetchStoresFromFirebase();
-    if (typeof getBrowserLocation === 'function') getBrowserLocation();
-});
-</script>
+            // === 頭像與下拉選單安全開關 ===
+            if (avatarBtn && dropdownMenu) {
+                avatarBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+                });
+                document.addEventListener('click', (e) => { 
+                    if (!avatarBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownMenu.style.display = 'none'; 
+                    }
+                });
+            }
+
+            // === 展開 Email 表單按鈕 ===
+            if (toggleEmailFormBtn && emailFormSection) {
+                toggleEmailFormBtn.addEventListener('click', () => {
+                    emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
+                });
+            }
+
+            // === 密碼眼睛小工具 ===
+            const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
+            if (togglePasswordVisibility && loginPasswordInput) {
+                togglePasswordVisibility.addEventListener('click', function() {
+                    const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    loginPasswordInput.setAttribute('type', type);
+                    this.textContent = type === 'password' ? '👁️' : '🙈';
+                });
+            }
+
+            // === GPS 定位展示燈箱 ===
+            if (gpsPinBtn && modalAddressText && addressDetailLightbox) {
+                gpsPinBtn.addEventListener('click', () => {
+                    modalAddressText.innerText = typeof currentBuyerAddress !== 'undefined' ? currentBuyerAddress : "定位抓取中...";
+                    addressDetailLightbox.style.display = 'flex';
+                });
+            }
+            if (closeAddressModalBtn && addressDetailLightbox) {
+                closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
+            }
+
+            // === 篩選商圈店家連動 ===
+            if (citySelect) citySelect.addEventListener('change', () => { if (typeof filterAndRenderStores === 'function') filterAndRenderStores(); });
+            if (districtSelect) districtSelect.addEventListener('change', () => { if (typeof filterAndRenderStores === 'function') filterAndRenderStores(); });
+            if (globalSearchInput) globalSearchInput.addEventListener('input', () => { if (typeof filterAndRenderStores === 'function') filterAndRenderStores(); });
+
+            // === 👑 重新清洗並強制綁定 Google 登入按鈕 ===
+            if (googleLoginAction) {
+                const newGBtn = googleLoginAction.cloneNode(true);
+                googleLoginAction.parentNode.replaceChild(newGBtn, googleLoginAction);
+                newGBtn.addEventListener('click', window.executeGoogleLogin);
+                console.log("✅ Google 登入按鈕靈魂綁定成功！");
+            }
+
+            // === Email 登入驗證發送 ===
+            if (emailLoginAction) {
+                emailLoginAction.addEventListener('click', async () => {
+                    if (!loginEmailInput || !loginPasswordInput) return;
+                    const email = loginEmailInput.value.trim();
+                    const password = loginPasswordInput.value;
+                    if (!email || !password) {
+                        alert("密碼或 Email 欄位不可為空！");
+                        return;
+                    }
+                    try {
+                        const currentAuth = typeof auth !== 'undefined' ? auth : (window.auth || window.firebaseAuth);
+                        const result = await signInWithEmailAndPassword(currentAuth, email, password);
+                        if (typeof handleUserSyncAndRoleRouting === 'function') await handleUserSyncAndRoleRouting(result.user);
+                    } catch (loginError) {
+                        if (loginError.code === "auth/user-not-found" || loginError.code === "auth/invalid-credential") {
+                            try {
+                                const currentAuth = typeof auth !== 'undefined' ? auth : (window.auth || window.firebaseAuth);
+                                const result = await createUserWithEmailAndPassword(currentAuth, email, password);
+                                if (typeof handleUserSyncAndRoleRouting === 'function') await handleUserSyncAndRoleRouting(result.user);
+                            } catch (regError) {
+                                alert("註冊密碼強度不足，或帳號已被佔用！");
+                            }
+                        } else {
+                            alert("登入密碼有誤，請再確認一次！");
+                        }
+                    }
+                });
+            }
+
+            // 自動觸發初始雲端店家與 GPS
+            if (typeof fetchStoresFromFirebase === 'function') fetchStoresFromFirebase();
+            if (typeof getBrowserLocation === 'function') getBrowserLocation();
+        });
+    </script>
 </body>
 </html>

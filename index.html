@@ -1,10 +1,4 @@
-// 🚀 強制在網頁開好時，重新幫登入按鈕綁定靈魂
-document.addEventListener('DOMContentLoaded', () => {
-    const gBtn = document.getElementById('googleLoginAction');
-    const eBtn = document.getElementById('emailLoginAction');
-
-    if (gBtn) {
-        gBtn.replaceWith(gBtn.cloneNode(true)); // 先清除舊的監聽防卡死<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -1397,33 +1391,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-        document.getElementById('googleLoginAction').addEventListener('click', async () => {
-            try {
-                const result = await signInWithPopup(auth, provider);
-                await handleUserSyncAndRoleRouting(result.user);
-            } catch (error) {
-                console.error("Google 登入失敗：", error);
-                alert("連線失敗，請檢查網路服務！");
-            }
-        });
-    }
-
-    if (eBtn) {
-        eBtn.replaceWith(eBtn.cloneNode(true)); // 先清除舊的監聽
-        document.getElementById('emailLoginAction').addEventListener('click', async () => {
-            const email = loginEmailInput.value.trim();
-            const password = loginPasswordInput.value;
-            if (!email || !password) {
-                alert("密碼或 Email 欄位不可為空！");
-                return;
-            }
-            try {
-                const result = await signInWithEmailAndPassword(auth, email, password);
-                await handleUserSyncAndRoleRouting(result.user);
-            } catch (loginError) {
-                // ... 你原本的註冊/登入邏輯 ...
-                alert("登入失敗，請確認帳密！");
-            }
-        });
-    }
-});

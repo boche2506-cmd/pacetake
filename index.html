@@ -165,13 +165,13 @@ img, .card {
 
 /* 設定 PACE 英文標題 */
 .pace-logo {
-    font-size: 32px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
-    font-weight: 600;       /* 用最粗的字體 */
+    font-size: 26px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
+    font-weight: 500;       /* 用最粗的字體 */
     margin-top: 0px;       /* 維持你最自豪的 0px 上方間距 */
 }
 
 .brand-logo-img {
-    height: 32px;
+    height: 30px;
     width: 100%;
 }    
 /* 設定副標題小字 */
@@ -180,6 +180,7 @@ img, .card {
     color: var(--text-muted);
     font-weight: 300;
     text-align: left;
+    margin-bottom: 0px;
 }
 
 /* ==========================================================================
@@ -338,8 +339,8 @@ img, .card {
 }
 
 .search-container {
-    padding: 8px 20px 4px 20px;
-    margin-top: 5px;
+    padding: 8px 10px 4px;
+    margin-top: 0px;
 }
 
 .search-box {
@@ -348,8 +349,8 @@ img, .card {
     background-color: var(--bg-global);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 0 14px;
-    height: 46px;
+    padding: 0 10px;
+    height: 36px;
 }
 
 .search-box input {
@@ -1015,11 +1016,11 @@ select {
         loginLightbox.style.display = 'none';
 
         if (currentRole === "admin") {
-            userNameDisplay.innerHTML = `👑 總管：${user.displayName || '天神'}`;
+            userNameDisplay.innerHTML = `👑 總管`;
         } else if (currentRole === "seller") {
-            userNameDisplay.innerHTML = `🏪 店家老闆`;
+            userNameDisplay.innerHTML = `🏪 老闆`;
         } else {
-            userNameDisplay.innerHTML = `🧑‍💼 一般買家`;
+            userNameDisplay.innerHTML = `🧑‍💼 買家`;
         }
         renderDynamicMenu(currentRole);
     }
@@ -1065,7 +1066,7 @@ onAuthStateChanged(auth, (user) => {
             
             // === 【新增】登入成功：亮綠燈、顯示有訂單文字 ===
             document.getElementById('statusDot')?.classList.add('active');
-            document.getElementById('statusText').innerText = "您好{user.displayName}~<br>目前沒有進行中的訂單喔！";
+            document.getElementById('statusText').innerText = `您好 ${user.displayName} ~<br>目前沒有進行中的訂單喔！`;
             
         } else {
             loginBtn.style.display = 'block';

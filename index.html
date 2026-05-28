@@ -1373,8 +1373,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (eBtn) {
         eBtn.replaceWith(eBtn.cloneNode(true));
         document.getElementById('emailLoginAction').addEventListener('click', async () => {
-            const email = loginEmailInput.value.trim();
-            const password = loginPasswordInput.value;
+            /* 🟢 這裡改用直接抓取 HTML 元素，防止外部變數沒定義而暴斃 */
+            const emailEl = document.getElementById('loginEmailInput');
+            const passwordEl = document.getElementById('loginPasswordInput');
+            
+            if (!emailEl || !passwordEl) {
+                alert("⚠️ 網頁找不到輸入 Email 或密碼的格子！");
+                return;
+            }
+
+            const email = emailEl.value.trim();
+            const password = passwordEl.value;
+
             if (!email || !password) {
                 alert("密碼或 Email 欄位不可為空！");
                 return;

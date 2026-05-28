@@ -1,40 +1,34 @@
 const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
 if (adminSubmitStoreBtn) {
     adminSubmitStoreBtn.addEventListener('click', async () => {
-        // 🟢 1. 抓取輸入框元素（先抓元素本身，不要直接接 .value，這樣才不會 null 崩潰）
         const nameEl = document.getElementById('adminNewStoreName');
         const phoneEl = document.getElementById('adminNewStorePhone');
-        const cityEl = document.getElementById('adminNewStoreCity'); // 如果這個消失了也沒關係
+        const cityEl = document.getElementById('adminNewStoreCity'); 
         const districtEl = document.getElementById('adminNewStoreDistrict');
         const addressEl = document.getElementById('adminNewStoreAddress');
         const categoryEl = document.getElementById('adminNewStoreCategory');
 
-        // 🟢 2. 基本安全檢查：確保最核心的「店名」跟「地址」格子還活著
         if (!nameEl || !addressEl) {
             alert("⚠️ 網頁欄位結構有誤，找不到店名或地址的輸入框！");
             return;
         }
 
-        // 🟢 3. 提取數值（加上超強防呆：如果 cityEl 抓不到，直接預設為 '基隆市'）
         const name = nameEl.value.trim();
         const phone = phoneEl ? phoneEl.value.trim() : '';
-        const city = cityEl ? cityEl.value : '基隆市'; // 👈 關鍵防呆線！找不到就自動變基隆市
+        const city = cityEl ? cityEl.value : '基隆市'; 
         const district = districtEl ? districtEl.value.trim() : '';
         const address = addressEl.value.trim();
         const category = categoryEl ? categoryEl.value.trim() : '';
 
-        // 🟢 4. 必填驗證（只卡店名、地址、區域，沒有卡城市）
         if (!name || !address) {
             alert("⚠️ 店名與詳細地址為必填項目！");
             return;
         }
 
-        // 改變按鈕狀態，防止重複點擊
         adminSubmitStoreBtn.innerText = "⏳ 正在同步至雲端...";
         adminSubmitStoreBtn.disabled = true;
         
         try {
-            // 🟢 5. 將資料寫入 Firebase 的 stores 集合
             await addDoc(collection(db, "stores"), {
                 name: name,
                 shopName: name, 
@@ -49,7 +43,6 @@ if (adminSubmitStoreBtn) {
             
             alert("✅ 店家已成功新增至雲端！");
             
-            // 🟢 6. 成功後清空所有輸入框
             nameEl.value = '';
             if(phoneEl) phoneEl.value = '';
             if(cityEl) cityEl.value = '';
@@ -57,7 +50,6 @@ if (adminSubmitStoreBtn) {
             if(addressEl) addressEl.value = '';
             if(categoryEl) categoryEl.value = '';
             
-            // 🟢 7. 終極刷新：直接讓網頁自動重新整理，最穩最安全！
             location.reload(); 
 
         } catch (error) {

@@ -734,23 +734,27 @@ select {
     </div>
 
     <!-- 即時連線 Firebase 的店家總覽表格 -->
-    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d; overflow-x: auto;">
-    <h3 style="color: #4da5ff; margin-top: 0;"> 📋 目前雲端店家總覽</h3>
+<div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d; overflow-x: auto; margin-top: 25px;">
+    <h3 style="color: #4da5ff; margin-top: 0;">📋 目前雲端店家總覽</h3>
+    
     <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 14px;">
-        </table>
-                <tr style="background: #2d2d2d; color: #fff;">
-                    <th style="padding: 12px; border: 1px solid #3a3a3a;">店家名稱</th>
-                    <th style="padding: 12px; border: 1px solid #3a3a3a;">詳細地址</th>
-                    <th style="padding: 12px; border: 1px solid #3a3a3a;">聯絡電話</th>
-                    <th style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">核心操作</th>
-                </tr>
-            </thead>
-            <tbody id="adminStoreTableBody">
-                <tr><td colspan="4" style="text-align: center; padding: 15px; color: #888;">正在載入雲端資料...</td></tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+        
+        <thead>
+            <tr style="background: #2d2d2d; color: #fff;">
+                <th style="padding: 12px; border: 1px solid #3a3a3a;">店家名稱</th>
+                <th style="padding: 12px; border: 1px solid #3a3a3a;">詳細地址</th>
+                <th style="padding: 12px; border: 1px solid #3a3a3a;">聯絡電話</th>
+                <th style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">核心操作</th>
+            </tr>
+        </thead>
+        
+        <tbody id="adminStoreTableBody">
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 15px; color: #888;">正在載入雲端資料...</td>
+            </tr>
+        </tbody>
+        
+    </table> </div>
 
 <!-- ========================================== -->
 <!-- 💡 燈箱模組區 (Lightboxes) -->

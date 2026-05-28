@@ -159,21 +159,19 @@ img, .card {
 .brand-left-column {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    height: 100%;
+    justify-content: flex-end; /* 關鍵：讓整塊內容（含副標題）往底部貼齊，跟右邊對齊 */
+    height: 100%;             /* 確保高度有撐滿，才能順利置底 */
 }
 
 /* 設定 PACE 英文標題 */
 .pace-logo {
-    display: flex;       /* 關鍵：啟用彈性排版，讓裡面的圖片和文字並排 */
-    align-items: center; /* 關鍵：讓圖片和文字在水平線上對齊 */
-    gap: 8px;            /* 設定圖片與 PACE 文字之間的左右距離（可依喜好調整） */
+    font-size: 28px;          /* 關鍵：單獨放大 PACE 英文的字體大小 */
+    font-weight: bold;        /* 讓英文加粗，看起來更大氣 */
 }
-
 .brand-logo-img {
-    height: 30px;
-    width: 100%;
-}    
+    height: 40px;             /* 放大派思圖片的高度（原本可能較小，可自行調整數值） */
+    width: auto;
+}  
 /* 設定副標題小字 */
 .brand-subtitle {
     font-size: 12px;

@@ -165,9 +165,9 @@ img, .card {
 
 /* 設定 PACE 英文標題 */
 .pace-logo {
-    font-size: 26px;       /* 💡 從 38px 大幅飆升到 52px！讓它有足夠的份量 */
-    font-weight: 500;       /* 用最粗的字體 */
-    margin-top: 0px;       /* 維持你最自豪的 0px 上方間距 */
+    display: flex;       /* 關鍵：啟用彈性排版，讓裡面的圖片和文字並排 */
+    align-items: center; /* 關鍵：讓圖片和文字在水平線上對齊 */
+    gap: 8px;            /* 設定圖片與 PACE 文字之間的左右距離（可依喜好調整） */
 }
 
 .brand-logo-img {
@@ -1066,7 +1066,7 @@ onAuthStateChanged(auth, (user) => {
             
             // === 【新增】登入成功：亮綠燈、顯示有訂單文字 ===
             document.getElementById('statusDot')?.classList.add('active');
-            document.getElementById('statusText').innerText = `您好 ${user.displayName} ~<br>目前沒有進行中的訂單喔！`;
+            document.getElementById('statusText').innerText = `您好 ${user.displayName} ~\n目前沒有進行中的訂單喔！`;
             
         } else {
             loginBtn.style.display = 'block';

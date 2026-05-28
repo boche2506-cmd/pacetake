@@ -632,14 +632,15 @@ select {
     <div class="brand-left-column">
     <!-- 你的小框框：裡面包含圖片與英文橫排 -->
     <div class="pace-logo">
-    <img src="pace3.png" alt="派思" class="brand-logo-img">
+    <img src="pace2.png" alt="派思" class="brand-logo-img">
+    <span>PACE</span> <!-- 💡 注意：英文用 <span> 包起來，方便單獨單獨設定字體大小 -->
     </div>
     <!-- 下面那排：中文副標題 -->
     <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
     </div> 
         <div class="control-panel">
         <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
-        <button id="loginBtn" onclick="document.getElementById('loginLightbox').style.display='flex'" class="...">登入 / 註冊</button>
+        <button class="login-btn" id="loginBtn">登入 / 註冊</button>
         <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
         <span class="avatar-icon">👤</span>
         <span class="user-name" id="userNameDisplay">載入中...</span>
@@ -733,27 +734,23 @@ select {
     </div>
 
     <!-- 即時連線 Firebase 的店家總覽表格 -->
-<div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d; overflow-x: auto; margin-top: 25px;">
-    <h3 style="color: #4da5ff; margin-top: 0;">📋 目前雲端店家總覽</h3>
-    
+    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d; overflow-x: auto;">
+    <h3 style="color: #4da5ff; margin-top: 0;"> 📋 目前雲端店家總覽</h3>
     <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 14px;">
-        
-        <thead>
-            <tr style="background: #2d2d2d; color: #fff;">
-                <th style="padding: 12px; border: 1px solid #3a3a3a;">店家名稱</th>
-                <th style="padding: 12px; border: 1px solid #3a3a3a;">詳細地址</th>
-                <th style="padding: 12px; border: 1px solid #3a3a3a;">聯絡電話</th>
-                <th style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">核心操作</th>
-            </tr>
-        </thead>
-        
-        <tbody id="adminStoreTableBody">
-            <tr>
-                <td colspan="4" style="text-align: center; padding: 15px; color: #888;">正在載入雲端資料...</td>
-            </tr>
-        </tbody>
-        
-    </table> </div>
+        </table>
+                <tr style="background: #2d2d2d; color: #fff;">
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">店家名稱</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">詳細地址</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">聯絡電話</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">核心操作</th>
+                </tr>
+            </thead>
+            <tbody id="adminStoreTableBody">
+                <tr><td colspan="4" style="text-align: center; padding: 15px; color: #888;">正在載入雲端資料...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <!-- ========================================== -->
 <!-- 💡 燈箱模組區 (Lightboxes) -->
@@ -761,7 +758,7 @@ select {
 <div class="lightbox-modal" id="loginLightbox" style="display: none;">
     <div class="modal-card">
         <div class="modal-title" style="font-weight: 700; margin-bottom: 25px; color: #1f2937;">加入PACE 派思</div>
-        <button class="modal-btn google" id="googleLoginAction" onclick="window.executeGoogleLogin()" style="box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <button class="modal-btn google" id="googleLoginAction" style="box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
             <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:12px; flex-shrink: 0;">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -1176,124 +1173,85 @@ onAuthStateChanged(auth, (user) => {
     // ==========================================
 
     // 1. 後台渲染店家表格
-function renderAdminTable() {
-    const tbody = document.getElementById('adminStoreTableBody');
-    if(!tbody) return;
-    
-    tbody.innerHTML = '';
-    if(allStores.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">目前雲端尚無店家資料</td></tr>';
-        return;
+    function renderAdminTable() {
+        const tbody = document.getElementById('adminStoreTableBody');
+        if(!tbody) return;
+        
+        tbody.innerHTML = '';
+        if(allStores.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">目前雲端尚無店家資料</td></tr>';
+            return;
+        }
+
+        allStores.forEach(store => {
+            const finalName = store.shopName || store.name || '未命名店家';
+            const finalAddress = store.shopAddress || store.address || '';
+            const phone = store.phone || '無資料';
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="padding: 12px; border: 1px solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
+                <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
+                <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">${phone}</td>
+                <td style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">
+                    <button onclick="window.deleteStore('${store.id}')" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">刪除</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
     }
 
-    // 💡 提示：如果想讓「整個表格」不要那麼寬，可以在包裹 <table> 的外層 div 加上 max-width: 1000px; margin: 0 auto;
-    
-    allStores.forEach(store => {
-        const finalName = store.shopName || store.name || '未命名店家';
-        const finalAddress = store.shopAddress || store.address || '';
-        const phone = store.phone || '無資料';
-        
-        const tr = document.createElement('tr');
-        
-        // 🔴 這裡幫你微調了排版：縮小字體、減少內距（padding）、加上圓角按鈕
-        tr.innerHTML = `
-            <td style="padding: 10px 15px; border-bottom: 1px solid #2d2d2d; color: #ffca28; font-weight: bold; font-size: 14px; text-align: left; max-width: 200px;">
-                🏪 ${finalName}
-            </td>
-            
-            <td style="padding: 10px 15px; border-bottom: 1px solid #2d2d2d; color: #bbb; font-size: 13px; text-align: left;">
-                📍 ${store.city || ''}${store.district || ''} ${finalAddress}
-            </td>
-            
-            <td style="padding: 10px 15px; border-bottom: 1px solid #2d2d2d; color: #bbb; font-size: 13px; text-align: center; width: 120px;">
-                📞 ${phone}
-            </td>
-            
-            <td style="padding: 10px 15px; border-bottom: 1px solid #2d2d2d; text-align: center; width: 80px;">
-                <button onclick="window.deleteStore('${store.id}')" style="
-                    padding: 5px 12px; 
-                    background: #ef4444; 
-                    color: white; 
-                    border: none; 
-                    border-radius: 6px; 
-                    cursor: pointer; 
-                    font-weight: bold;
-                    font-size: 12px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-                    transition: 0.2s;
-                " onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
-                    刪除
-                </button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
     // 2. 雲端新增店家邏輯
-const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
-if (adminSubmitStoreBtn) {
-    adminSubmitStoreBtn.addEventListener('click', async () => {
-        const nameEl = document.getElementById('adminNewStoreName');
-        const phoneEl = document.getElementById('adminNewStorePhone');
-        const cityEl = document.getElementById('adminNewStoreCity'); 
-        const districtEl = document.getElementById('adminNewStoreDistrict');
-        const addressEl = document.getElementById('adminNewStoreAddress');
-        const categoryEl = document.getElementById('adminNewStoreCategory');
+    const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
+    if (adminSubmitStoreBtn) {
+        adminSubmitStoreBtn.addEventListener('click', async () => {
+            const name = document.getElementById('adminNewStoreName').value.trim();
+            const phone = document.getElementById('adminNewStorePhone').value.trim();
+            const city = document.getElementById('adminNewStoreCity').value;
+            const district = document.getElementById('adminNewStoreDistrict').value.trim();
+            const address = document.getElementById('adminNewStoreAddress').value.trim();
+            const category = document.getElementById('adminNewStoreCategory').value.trim();
 
-        if (!nameEl || !addressEl) {
-            alert("⚠️ 網頁欄位結構有誤，找不到店名或地址的輸入框！");
-            return;
-        }
+            if (!name || !district || !address) {
+                alert("⚠️ 店名、區域、詳細地址為必填項目！");
+                return;
+            }
 
-        const name = nameEl.value.trim();
-        const phone = phoneEl ? phoneEl.value.trim() : '';
-        const city = cityEl ? cityEl.value : '基隆市'; 
-        const district = districtEl ? districtEl.value.trim() : '';
-        const address = addressEl.value.trim();
-        const category = categoryEl ? categoryEl.value.trim() : '';
+            adminSubmitStoreBtn.innerText = "⏳ 正在同步至雲端...";
+            try {
+                // 將資料寫入 Firebase 的 stores 集合
+                await addDoc(collection(db, "stores"), {
+                    name: name,
+                    shopName: name, // 兼容前端不同寫法
+                    phone: phone,
+                    city: city,
+                    district: district,
+                    address: address,
+                    shopAddress: address, // 兼容寫法
+                    category: category,
+                    createdAt: new Date().toISOString()
+                });
+                
+                alert("✅ 店家已成功新增至雲端！");
+                
+                // 清空輸入框
+                document.getElementById('adminNewStoreName').value = '';
+                document.getElementById('adminNewStorePhone').value = '';
+                document.getElementById('adminNewStoreDistrict').value = '';
+                document.getElementById('adminNewStoreAddress').value = '';
+                document.getElementById('adminNewStoreCategory').value = '';
+                
+                // 重新讀取 Firebase 更新畫面
+                fetchStoresFromFirebase();
+            } catch (error) {
+                console.error("新增店家失敗:", error);
+                alert("新增失敗，請檢查網路或資料庫權限！");
+            } finally {
+                adminSubmitStoreBtn.innerText = "✅ 確認新增店家至雲端";
+            }
+        });
+    }
 
-        if (!name || !address) {
-            alert("⚠️ 店名與詳細地址為必填項目！");
-            return;
-        }
-
-        adminSubmitStoreBtn.innerText = "⏳ 正在同步至雲端...";
-        adminSubmitStoreBtn.disabled = true;
-        
-        try {
-            await addDoc(collection(db, "stores"), {
-                name: name,
-                shopName: name, 
-                phone: phone,
-                city: city, 
-                district: district,
-                address: address,
-                shopAddress: address, 
-                category: category,
-                createdAt: new Date().toISOString()
-            });
-            
-            alert("✅ 店家已成功新增至雲端！");
-            
-            nameEl.value = '';
-            if(phoneEl) phoneEl.value = '';
-            if(cityEl) cityEl.value = '';
-            if(districtEl) districtEl.value = '';
-            if(addressEl) addressEl.value = '';
-            if(categoryEl) categoryEl.value = '';
-            
-            location.reload(); 
-
-        } catch (error) {
-            console.error("新增店家失敗:", error);
-            alert("新增失敗，請確認 Firebase Rules 是否開啟！");
-        } finally {
-            adminSubmitStoreBtn.innerText = "✅ 確認新增店家至雲端";
-            adminSubmitStoreBtn.disabled = false;
-        }
-    });
-}
     // 3. 雲端刪除店家邏輯 (掛載到 window 供 HTML 呼叫)
     window.deleteStore = async function(storeId) {
         if (confirm("⚠️ 確定要從 Firebase 徹底刪除這個店家嗎？(刪除後無法恢復)")) {
@@ -1352,162 +1310,10 @@ window.toggleView = function(viewRole) {
     }
 };
 
-    // 🚀 強制在網頁開好時，重新幫登入按鈕綁定靈魂
-// 🟢 1. 將登入邏輯綁定到 window 全域，這樣任何地方都叫得到它
-// 🟢 1. 先把全域大絕招掛在最外面，誰都叫得到它
-<script>
-        // 🟢 1. 全域大絕招：掛在最外面，讓 HTML 隨時叫得到
-        window.executeGoogleLogin = async function() {
-            try {
-                const currentAuth = typeof auth !== 'undefined' ? auth : (window.auth || window.firebaseAuth);
-                const currentProvider = typeof provider !== 'undefined' ? provider : (window.provider || window.googleProvider);
-                const loginFunc = typeof signInWithPopup === 'function' ? signInWithPopup : window.signInWithPopup;
-
-                if (!currentAuth || !loginFunc) {
-                    alert("⚠️ Firebase 模組尚未準備就緒，請重新整理網頁！");
-                    return;
-                }
-
-                console.log("🚀 PACE 核心：開始執行 Google 彈窗登入...");
-                const result = await loginFunc(currentAuth, currentProvider);
-                
-                if (typeof handleUserSyncAndRoleRouting === 'function') {
-                    await handleUserSyncAndRoleRouting(result.user);
-                }
-            } catch (error) {
-                console.error("Google 登入失敗詳細原因：", error);
-                alert("連線失敗，請檢查網路或 Firebase 彈窗授權網域設定！");
-            }
-        };
-
-        // 🟢 2. 主程式：等待網頁按鈕都長齊了，才開始靈魂綁定
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("🚀 PACE 系統：大腦已啟動！網頁元素載入完畢，開始全自動功能綁定...");
-
-            // 抓取所有按鈕與燈箱元素
-            const loginBtn = document.getElementById('loginBtn');
-            const avatarBtn = document.getElementById('avatarBtn');
-            const dropdownMenu = document.getElementById('dropdownMenu');
-            
-            const loginLightbox = document.getElementById('loginLightbox');
-            const googleLoginAction = document.getElementById('googleLoginAction');
-            const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
-            const emailFormSection = document.getElementById('emailFormSection');
-            const customReturnBtn = document.getElementById('customReturnBtn');
-            const loginEmailInput = document.getElementById('loginEmail');
-            const loginPasswordInput = document.getElementById('loginPassword');
-            const emailLoginAction = document.getElementById('emailLoginAction');
-
-            const citySelect = document.getElementById('citySelect');
-            const districtSelect = document.getElementById('districtSelect');
-            const gpsPinBtn = document.getElementById('gpsPinBtn');
-            const addressDetailLightbox = document.getElementById('addressDetailLightbox');
-            const modalAddressText = document.getElementById('modalAddressText');
-            const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
-            const globalSearchInput = document.getElementById('globalSearchInput');
-
-            // 💡 安全防護：如果找不到外層的登入按鈕或彈窗，跳過綁定不讓程式崩潰
-            if (!loginBtn || !loginLightbox) {
-                console.warn("⚠️ 提示：目前畫面上不包含 loginBtn 或 loginLightbox。");
-            } else {
-                // === 藍色「登入/註冊」大門點擊開關 ===
-                loginBtn.addEventListener('click', () => { 
-                    console.log("🎯 點擊了登入大門，開啟彈窗！");
-                    loginLightbox.style.display = 'flex'; 
-                });
-                if (customReturnBtn) {
-                    customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
-                }
-            }
-
-            // === 頭像與下拉選單安全開關 ===
-            if (avatarBtn && dropdownMenu) {
-                avatarBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-                });
-                document.addEventListener('click', (e) => { 
-                    if (!avatarBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                        dropdownMenu.style.display = 'none'; 
-                    }
-                });
-            }
-
-            // === 展開 Email 表單按鈕 ===
-            if (toggleEmailFormBtn && emailFormSection) {
-                toggleEmailFormBtn.addEventListener('click', () => {
-                    emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
-                });
-            }
-
-            // === 密碼眼睛小工具 ===
-            const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
-            if (togglePasswordVisibility && loginPasswordInput) {
-                togglePasswordVisibility.addEventListener('click', function() {
-                    const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    loginPasswordInput.setAttribute('type', type);
-                    this.textContent = type === 'password' ? '👁️' : '🙈';
-                });
-            }
-
-            // === GPS 定位展示燈箱 ===
-            if (gpsPinBtn && modalAddressText && addressDetailLightbox) {
-                gpsPinBtn.addEventListener('click', () => {
-                    modalAddressText.innerText = typeof currentBuyerAddress !== 'undefined' ? currentBuyerAddress : "定位抓取中...";
-                    addressDetailLightbox.style.display = 'flex';
-                });
-            }
-            if (closeAddressModalBtn && addressDetailLightbox) {
-                closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
-            }
-
-            // === 篩選商圈店家連動 ===
-            if (citySelect) citySelect.addEventListener('change', () => { if (typeof filterAndRenderStores === 'function') filterAndRenderStores(); });
-            if (districtSelect) districtSelect.addEventListener('change', () => { if (typeof filterAndRenderStores === 'function') filterAndRenderStores(); });
-            if (globalSearchInput) globalSearchInput.addEventListener('input', () => { if (typeof filterAndRenderStores === 'function') filterAndRenderStores(); });
-
-            // === 👑 重新清洗並強制綁定 Google 登入按鈕 ===
-            if (googleLoginAction) {
-                const newGBtn = googleLoginAction.cloneNode(true);
-                googleLoginAction.parentNode.replaceChild(newGBtn, googleLoginAction);
-                newGBtn.addEventListener('click', window.executeGoogleLogin);
-                console.log("✅ Google 登入按鈕靈魂綁定成功！");
-            }
-
-            // === Email 登入驗證發送 ===
-            if (emailLoginAction) {
-                emailLoginAction.addEventListener('click', async () => {
-                    if (!loginEmailInput || !loginPasswordInput) return;
-                    const email = loginEmailInput.value.trim();
-                    const password = loginPasswordInput.value;
-                    if (!email || !password) {
-                        alert("密碼或 Email 欄位不可為空！");
-                        return;
-                    }
-                    try {
-                        const currentAuth = typeof auth !== 'undefined' ? auth : (window.auth || window.firebaseAuth);
-                        const result = await signInWithEmailAndPassword(currentAuth, email, password);
-                        if (typeof handleUserSyncAndRoleRouting === 'function') await handleUserSyncAndRoleRouting(result.user);
-                    } catch (loginError) {
-                        if (loginError.code === "auth/user-not-found" || loginError.code === "auth/invalid-credential") {
-                            try {
-                                const currentAuth = typeof auth !== 'undefined' ? auth : (window.auth || window.firebaseAuth);
-                                const result = await createUserWithEmailAndPassword(currentAuth, email, password);
-                                if (typeof handleUserSyncAndRoleRouting === 'function') await handleUserSyncAndRoleRouting(result.user);
-                            } catch (regError) {
-                                alert("註冊密碼強度不足，或帳號已被佔用！");
-                            }
-                        } else {
-                            alert("登入密碼有誤，請再確認一次！");
-                        }
-                    }
-                });
-            }
-
-            // 自動觸發初始雲端店家與 GPS
-            if (typeof fetchStoresFromFirebase === 'function') fetchStoresFromFirebase();
-            if (typeof getBrowserLocation === 'function') getBrowserLocation();
-        });
-    </script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const buyerView = document.getElementById('buyerView');
+        if (buyerView) buyerView.style.display = 'block';
+    });
+</script>
 </body>
 </html>

@@ -1453,5 +1453,93 @@ window.toggleView = function(viewRole) {
     
     if (isAdmin) window.scrollTo(0, 0);
 };
+import { auth, db } from './firebase-config.js'; // 請確認路徑正確
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore/index.js";
+import { onAuthStateChanged, signOut, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-auth/index.js";
+
+// 等待 HTML 結構完全載入後，才啟動所有邏輯
+window.addEventListener('DOMContentLoaded', () => {
+
+    // ========================================================
+    // 1. 地板監聽：處理所有按鈕點擊 (解決動態元素抓不到問題)
+    // ========================================================
+    document.addEventListener('click', async (e) => {
+        // 頭像選單
+        if (e.target.closest('#avatarBtn')) {
+            const menu = document.getElementById('dropdownMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        // 登入按鈕 -> 開啟燈箱
+        if (e.target.id === 'loginBtn') document.getElementById('loginLightbox').style.display = 'flex';
+        
+        // 關閉燈箱
+        if (e.target.id === 'customReturnBtn') document.getElementById('loginLightbox').style.display = 'none';
+
+        // 登出邏輯
+        if (e.target.id === 'logoutBtn') {
+            await signOut(auth);
+            location.reload();
+        }
+
+        // 新增店家邏輯
+        if (e.target.id === 'adminSubmitStoreBtn') {
+            await handleAdminSubmitStore();
+        }
+    });
+
+    // ========================================================
+    // 2. 登入狀態監控與角色同步
+    // ========================================================
+    onAuthStateChanged(auth, async (user) => {
+        const loginBtn = document.getElementById('loginBtn');
+        const avatarBtn = document.getElementById('avatarBtn');
+        const statusText = document.getElementById('statusText');
+
+        if (user) {
+            await handleUserSyncAndRoleRouting(user); // 同步 DB 角色
+            if(loginBtn) loginBtn.style.display = 'none';
+            if(avatarBtn) avatarBtn.style.display = 'flex';
+        } else {
+            if(loginBtn) loginBtn.style.display = 'block';
+            if(avatarBtn) avatarBtn.style.display = 'none';
+            if(statusText) statusText.innerText = "您尚未登入，請使用電子郵件或 Google 登入";
+        }
+        await fetchStoresFromFirebase();
+    });
+});
+
+// ========================================================
+// 3. 輔助功能區 (非同步函數定義)
+// ========================================================
+async function handleUserSyncAndRoleRouting(user) {
+    const userDocRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userDocRef);
+    let role = "buyer";
+    if (snap.exists()) {
+        role = snap.data().role;
+    } else {
+        await setDoc(userDocRef, { role: "buyer", email: user.email });
+    }
+    // 渲染選單...
+    renderDynamicMenu(role);
+}
+
+async function fetchStoresFromFirebase() {
+    const storeContainer = document.getElementById('storeContainer');
+    if (!storeContainer) return;
+    const querySnapshot = await getDocs(collection(db, "stores"));
+    // 渲染邏輯...
+}
+
+async function handleAdminSubmitStore() {
+    // 這裡放入你之前寫的新增店家邏輯
+    alert("正在執行新增...");
+}
+
+// 將函數暴露給 Window，讓 HTML 裡的 onclick="window.xxx()" 能找到
+window.deleteStore = async (id) => { /* 刪除邏輯 */ };
+window.issuePromoCode = async () => { /* 邀請碼邏輯 */ };
+window.toggleView = (role) => { /* 視圖切換 */ };
 </body>
 </html>

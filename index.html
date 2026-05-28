@@ -123,8 +123,6 @@ img, .card {
     border: 4px solid #222; /* 給它一個扎實的手機黑色外框 */
     border-radius: 20px;    /* 稍微帶點圓角更像手機 */
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5); /* 超立體陰影 */
-    
-    /* 原本的設定保留 */
 }
 
 /* 內容滾動區 (自動填滿剩餘空間) */
@@ -382,7 +380,8 @@ img, .card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    padding: 14px;
+    padding: 6px;         /* 縮小內距，讓格子高度變窄 */
+    margin-bottom: 2px;   /* 縮小外距，讓格子間的間距變小 */
     text-decoration: none;
     color: inherit;
     box-shadow: var(--shadow-sm);
@@ -621,26 +620,17 @@ select {
     font-size: 16px;   /* 關鍵：調整字體大小，使其比例協調 */
     line-height: 1.5;  /* 讓文字垂直置中 */
 }
-#toggleEmailFormBtn {
-    cursor: pointer;
-    z-index: 10000 !important; /* 強制提高層級 */
-    position: relative;
-}
 
 </style>
 </head>
 <body>
 <div class="phone-wrapper">
-<div id="buyerView" style="display: block;">
 <div class="sticky-top-group">
 <header class="header">
     <div class="brand-left-column">
-    <!-- 你的小框框：裡面包含圖片與英文橫排 -->
     <div class="pace-logo">
-    <img src="pace2.png" alt="派思" class="brand-logo-img">
-    <span>PACE</span> <!-- 💡 注意：英文用 <span> 包起來，方便單獨單獨設定字體大小 -->
+    <img src="pace3.png" alt="派思" class="brand-logo-img">
     </div>
-    <!-- 下面那排：中文副標題 -->
     <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
     </div> 
         <div class="control-panel">
@@ -694,10 +684,11 @@ select {
             </div>
           </div>
         </div>
+        <div id="buyerView" style="display: block;">
     <main class="store-list" id="store-container">
         <div class="loading-spinner" id="loadingSpinner">⚡ 正在安全連線雲端資料庫...</div>
     </main>
-
+        </div>
     <footer class="bottom-bar">
         <a href="history.html" class="status-msg" id="bottomStatusMsg">
             <div class="status-indicator active" id="statusDot"></div>
@@ -710,8 +701,6 @@ select {
         </a>
     </footer>
   </div>
-</div>
-</div>
 <!-- ========================================== -->
 <!-- 🔮 派思核心控制台 (Admin 視圖) -->
 <!-- ========================================== -->
@@ -730,7 +719,7 @@ select {
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
             <input type="text" id="adminNewStoreName" placeholder="店家名稱 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
             <input type="text" id="adminNewStorePhone" placeholder="聯絡電話 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
-            <input type="text" id="adminNewStoreCity" placeholder="縣市 (如: 基隆市) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+            <input type="text" id="adminNewStoreDistrict" placeholder="縣市 (如: 基隆市) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
             <input type="text" id="adminNewStoreDistrict" placeholder="區域 (如: 七堵區) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
             <input type="text" id="adminNewStoreAddress" placeholder="詳細地址 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">
             <input type="text" id="adminNewStoreCategory" placeholder="分類 (如: 台式小吃, 飲料)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">
@@ -739,32 +728,23 @@ select {
     </div>
 
     <!-- 即時連線 Firebase 的店家總覽表格 -->
-<div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d; overflow-x: auto; margin-top: 25px;">
-    <h3 style="color: #4da5ff; margin-top: 0;">📋 目前雲端店家總覽</h3>
+    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d; overflow-x: auto;">
+    <h3 style="color: #4da5ff; margin-top: 0;"> 📋 目前雲端店家總覽</h3>
     <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 14px;">
-        <thead>
-            <tr style="background: #2d2d2d; color: #fff;">
-                <th style="padding: 12px; border: 1px solid #3a3a3a;">店家名稱</th>
-                <th style="padding: 12px; border: 1px solid #3a3a3a;">詳細地址</th>
-                <th style="padding: 12px; border: 1px solid #3a3a3a;">聯絡電話</th>
-                <th style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">核心操作</th>
-            </tr>
-        </thead>
-        <tbody id="adminStoreTableBody">
-            <tr>
-                <td colspan="4" style="text-align: center; padding: 15px; color: #888;">正在讀取 Firebase 資料...</td>
-            </tr>
-        </tbody>
-    </table>
+        </table>
+                <tr style="background: #2d2d2d; color: #fff;">
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">店家名稱</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">詳細地址</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a;">聯絡電話</th>
+                    <th style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">核心操作</th>
+                </tr>
+            </thead>
+            <tbody id="adminStoreTableBody">
+                <tr><td colspan="4" style="text-align: center; padding: 15px; color: #888;">正在載入雲端資料...</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
-        
-        <tbody id="adminStoreTableBody">
-            <tr>
-                <td colspan="4" style="text-align: center; padding: 15px; color: #888;">正在載入雲端資料...</td>
-            </tr>
-        </tbody>
-        
-    </table> </div>
 
 <!-- ========================================== -->
 <!-- 💡 燈箱模組區 (Lightboxes) -->
@@ -782,15 +762,13 @@ select {
             Google 登入
         </button>
 
-        <button id="toggleEmailFormBtn" 
-        onclick="window.toggleEmailForm()" 
-        style="display: flex; align-items: center; justify-content: center; width: 100%; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; margin-top: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:12px; flex-shrink: 0;">
-        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-        <polyline points="22,6 12,13 2,6"></polyline>
-    </svg>
-    使用電子郵件登入
-</button>
+        <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 100%; background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 500; color: #374151; margin-top: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:12px; flex-shrink: 0;">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            使用電子郵件登入
+        </button>
 
         <div id="emailFormSection" style="display: none; margin-top: 20px; text-align: left; width: 100%;">
             <div style="margin-bottom: 12px;">
@@ -817,729 +795,6 @@ select {
         <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; border: none; width: 100%; height: 42px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">確認</button>
     </div>
 </div>
-<script>
-// 這段函數會掛在全域 window 下，確保 HTML 的 onclick 找得到它
-window.toggleEmailForm = function() {
-    const emailForm = document.getElementById('emailFormSection');
-    
-    // 檢查目前狀態，進行切換
-    if (!emailForm) {
-        console.error("找不到 emailFormSection 這個元素，請檢查 HTML ID！");
-        return;
-    }
-    
-    if (emailForm.style.display === 'none' || emailForm.style.display === '') {
-        emailForm.style.display = 'block';
-    } else {
-        emailForm.style.display = 'none';
-    }
-};
-</script>
-<script>
-// 1. 切換密碼顯示 (👁️ 按鈕)
-document.getElementById('togglePasswordVisibility').addEventListener('click', function() {
-    const pwdInput = document.getElementById('loginPassword');
-    if (pwdInput.type === 'password') {
-        pwdInput.type = 'text';
-    } else {
-        pwdInput.type = 'password';
-    }
-});
-
-// 2. 處理電子郵件登入 (這裡寫入你的 Firebase 邏輯)
-document.getElementById('emailLoginAction').addEventListener('click', function() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    
-    console.log("正在嘗試登入，帳號:", email);
-    // 在此呼叫你的 signInWithEmailAndPassword(auth, email, password)...
-});
-
-// 3. 關閉彈窗功能 (暫時返回 & 確認按鈕)
-document.getElementById('customReturnBtn').addEventListener('click', function() {
-    document.getElementById('loginLightbox').style.display = 'none';
-});
-
-document.getElementById('closeAddressModalBtn').addEventListener('click', function() {
-    document.getElementById('addressDetailLightbox').style.display = 'none';
-});
-</script>
-<!-- ========================================== -->
-<!-- 🚀 核心控制區：Firebase 與所有交互邏輯 -->
-<!-- ========================================== -->
-<script type="module">
-    // 💡 已經幫你加入了 addDoc (新增) 和 deleteDoc (刪除) 模組
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
-        authDomain: "pacetake-c6e1e.firebaseapp.com",
-        projectId: "pacetake-c6e1e",
-        storageBucket: "pacetake-c6e1e.firebasestorage.app",
-        messagingSenderId: "1052980235056",
-        appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
-        measurementId: "G-888XL8JTHW",
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
-
-    // 全域核心變數
-    let allStores = [];
-    let buyerLat = null;
-    let buyerLng = null;
-    let currentBuyerAddress = "正在獲取定位中...";
-    let currentUserId = null;
-
-    const areaData = {
-        "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
-        "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
-        "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
-        "桃園市": ["桃園區", "中壢區", "大溪區", "楊梅區", "蘆竹區", "大園區", "龜山區", "八德區", "龍潭區", "平鎮區", "新屋區", "觀音區", "復興區"],
-        "新竹市": ["東區", "北區", "香山區"],
-        "新竹縣": ["竹北市", "竹東鎮", "新埔鎮", "關西鎮", "湖口鄉", "新豐鄉", "芎林鄉", "橫山鄉", "北埔鄉", "寶山鄉", "峨眉鄉", "尖石鄉", "五峰鄉"],
-        "苗栗縣": ["苗栗市", "頭份市", "竹南鎮", "後龍鎮", "通霄鎮", "苑裡鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "公館鄉", "銅鑼鄉", "三義鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "南庄鄉", "泰安鄉"],
-        "台中市": ["中區", "東區", "南區", "西區", "北區", "西屯區", "南屯區", "北屯區", "豐原區", "東勢區", "大甲區", "清水區", "沙鹿區", "梧棲區", "后里區", "神岡區", "潭子區", "大雅區", "新社區", "石岡區", "外埔區", "大安區", "烏日區", "大肚區", "龍井區", "霧峰區", "太平區", "大里區", "和平區"],
-        "彰化縣": ["彰化市", "員林市", "鹿港鎮", "和美鎮", "北斗鎮", "溪湖鎮", "田中鎮", "二林鎮", "線西鄉", "伸港鄉", "福興鄉", "秀水鄉", "花壇鄉", "芬園鄉", "大村鄉", "埔鹽鄉", "埔心鄉", "永靖鄉", "社頭鄉", "二水鄉", "田尾鄉", "埤頭鄉", "芳苑鄉", "大城鄉", "竹塘鄉", "溪州鄉"],
-        "南投縣": ["南投市", "埔里鎮", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
-        "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "西螺鎮", "土庫鎮", "北港鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "東勢鄉", "褒忠鄉", "臺西鄉", "元長鄉", "四湖鄉", "口湖鄉", "水林鄉"],
-        "嘉義市": ["東區", "西區"],
-        "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
-        "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
-        "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區", "內門區"],
-        "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
-        "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
-        "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
-        "臺東縣": ["臺東市", "成功鎮", "關山鎮", "卑名鄉", "大武鄉", "太麻里鄉", "東河鄉", "長濱鄉", "鹿野鄉", "池上鄉", "綠島鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉"],
-        "澎湖縣": ["馬公市", "湖西鄉", "白沙鄉", "西嶼鄉", "望安鄉", "七美鄉"],
-        "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
-        "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
-    };
-
-
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
-    function initTheme() {
-        const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        if(themeToggleBtn) themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-    }
-    if(themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('pacetake-theme', newTheme);
-            themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-        });
-    }
-    initTheme();
-
-    const loginBtn = document.getElementById('loginBtn');
-    const avatarBtn = document.getElementById('avatarBtn');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const userNameDisplay = document.getElementById('userNameDisplay');
-    const storeContainer = document.getElementById('store-container');
-    
-    const loginLightbox = document.getElementById('loginLightbox');
-    const googleLoginAction = document.getElementById('googleLoginAction');
-    const toggleEmailFormBtn =     
-    document.getElementById('toggleEmailFormBtn');
-    const emailFormSection = document.getElementById('emailFormSection');
-    const customReturnBtn = document.getElementById('customReturnBtn');
-    const loginEmailInput = document.getElementById('loginEmail');
-    const loginPasswordInput = document.getElementById('loginPassword');
-    const emailLoginAction = document.getElementById('emailLoginAction');
-
-    const citySelect = document.getElementById('citySelect');
-    const districtSelect = document.getElementById('districtSelect');
-    const gpsPinBtn = document.getElementById('gpsPinBtn');
-    const addressDetailLightbox = document.getElementById('addressDetailLightbox');
-    const modalAddressText = document.getElementById('modalAddressText');
-    const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
-    const globalSearchInput = document.getElementById('globalSearchInput');
-
-    // 下拉選單點擊開關
-    // ========================================================
-// 核心：地板監聽器 (Event Delegation)
-// 用於處理動態按鈕、燈箱開關、密碼顯示等所有點擊動作
-// ========================================================
-document.addEventListener('click', (e) => {
-    
-    // 1. 處理頭像選單 (點頭像開關，點其他地方自動關閉)
-    if (e.target.closest('#avatarBtn')) {
-        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-    } else if (!e.target.closest('#dropdownMenu')) {
-        dropdownMenu.style.display = 'none';
-    }
-
-    // 2. 登入/註冊按鈕
-    if (e.target.closest('#loginBtn')) {
-        loginLightbox.style.display = 'flex';
-    }
-
-    // 3. 返回按鈕
-    if (e.target.id === 'customReturnBtn') {
-        loginLightbox.style.display = 'none';
-    }
-
-    // 4. 電子郵件表單開關
-    if (e.target.id === 'toggleEmailFormBtn') {
-        emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
-    }
-
-    // 5. 密碼顯示切換
-    if (e.target.id === 'togglePasswordVisibility') {
-        const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        loginPasswordInput.setAttribute('type', type);
-        e.target.textContent = type === 'password' ? '👁️' : '🙈';
-    }
-
-    // 6. GPS 定位彈窗
-    if (e.target.id === 'gpsPinBtn') {
-        modalAddressText.innerText = currentBuyerAddress;
-        addressDetailLightbox.style.display = 'flex';
-    }
-    if (e.target.id === 'closeAddressModalBtn') {
-        addressDetailLightbox.style.display = 'none';
-    }
-});
-
-// 選擇器 (Select) 的變化不受影響，維持原本的監聽邏輯即可
-citySelect.addEventListener('change', () => {
-    const selectedCity = citySelect.value;
-    districtSelect.innerHTML = '<option value="">選擇區域</option>';
-    if (areaData && areaData[selectedCity]) {
-        areaData[selectedCity].forEach(dist => {
-            const opt = document.createElement('option');
-            opt.value = dist;
-            opt.innerText = dist;
-            districtSelect.appendChild(opt);
-        });
-    }
-    filterAndRenderStores();
-});
-
-districtSelect.addEventListener('change', filterAndRenderStores);
-globalSearchInput.addEventListener('input', filterAndRenderStores);
-
-    // 👑 渲染動態選單 (已將邀請碼功能綁定至 window.issuePromoCode)
-    // ========================================================
-// 1. 核心地板監聽：處理所有點擊行為 (包含動態產生的元件)
-// ========================================================
-document.addEventListener('click', async (e) => {
-    
-    // 處理頭像選單 (展開/收合)
-    if (e.target.closest('#avatarBtn')) {
-        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-    } else if (!e.target.closest('#dropdownMenu')) {
-        dropdownMenu.style.display = 'none';
-    }
-
-    // 處理登入按鈕
-    if (e.target.closest('#loginBtn')) {
-        loginLightbox.style.display = 'flex';
-    }
-
-    // 處理返回/關閉燈箱
-    if (e.target.id === 'customReturnBtn') loginLightbox.style.display = 'none';
-    if (e.target.id === 'closeAddressModalBtn') addressDetailLightbox.style.display = 'none';
-
-    // 處理電子郵件表單開關
-    if (e.target.id === 'toggleEmailFormBtn') {
-        emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
-    }
-
-    // 處理密碼顯示切換
-    if (e.target.id === 'togglePasswordVisibility') {
-        const input = document.getElementById('loginPassword');
-        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-        input.setAttribute('type', type);
-        e.target.textContent = type === 'password' ? '👁️' : '🙈';
-    }
-
-    // 處理 GPS 定位彈窗
-    if (e.target.id === 'gpsPinBtn') {
-        modalAddressText.innerText = currentBuyerAddress;
-        addressDetailLightbox.style.display = 'flex';
-    }
-
-    // 處理登出邏輯 (將 auth 變數暴露在 window 或確保在同一模組)
-    if (e.target.id === 'logoutBtn') {
-        try {
-            await signOut(auth); // 確保 auth 變數在此模組內可見
-            location.reload();
-        } catch (error) {
-            console.error("登出失敗:", error);
-        }
-    }
-});
-
-// ========================================================
-// 2. 動態渲染選單函數 (保持乾淨，只負責產生 HTML)
-// ========================================================
-function renderDynamicMenu(role) {
-    let menuHTML = `
-        <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
-        <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
-    `;
-
-    if (role === 'buyer' || role === 'admin') {
-        menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
-    } 
-    
-    if (role === 'seller' || role === 'admin') {
-        menuHTML += `
-            <div class="menu-divider"></div>
-            <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
-            <a href="manage.html" class="nav-fast">⚙️ 後台管理</a>
-            <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
-        `;
-    }
-
-    if (role === 'admin') {
-        menuHTML += `
-            <div class="menu-divider"></div>
-            <a href="javascript:void(0)" onclick="window.toggleView('admin')" style="color: var(--brand-blue); font-weight: bold;">🔮 派思核心控制台</a>
-            <a href="javascript:void(0)" onclick="window.issuePromoCode()" style="color: var(--brand-green); font-weight: bold;">🎟️ 邀請碼發行</a>
-        `;
-    }
-
-    menuHTML += `
-        <div class="menu-divider"></div>
-        <button id="logoutBtn" style="color: var(--brand-red);">🚪 登出</button>
-    `;
-
-    dropdownMenu.innerHTML = menuHTML;
-}
-
-    // ========================================================
-// 角色路由與 Firebase 用戶同步核心
-// ========================================================
-async function handleUserSyncAndRoleRouting(user) {
-    if (!user) return;
-    currentUserId = user.uid;
-
-    const userDocRef = doc(db, "users", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    let currentRole = "buyer"; 
-
-    // 1. 同步用戶資料到 Firestore
-    if (userDocSnap.exists()) {
-        const data = userDocSnap.data();
-        currentRole = data.role || "buyer";
-        await updateDoc(userDocRef, {
-            lastLogin: new Date().toISOString(),
-            email: user.email || data.email,
-            displayName: user.displayName || data.displayName || "PACE用戶"
-        });
-    } else {
-        await setDoc(userDocRef, {
-            uid: user.uid,
-            email: user.email || "",
-            displayName: user.displayName || "PACE用戶",
-            role: "buyer",
-            createdAt: new Date().toISOString(),
-            lastLogin: new Date().toISOString()
-        });
-    }
-
-    // 2. 更新 UI 介面 (加入防呆，避免元素尚未載入導致報錯)
-    try {
-        const loginBtn = document.getElementById('loginBtn');
-        const avatarBtn = document.getElementById('avatarBtn');
-        const loginLightbox = document.getElementById('loginLightbox');
-        const userNameDisplay = document.getElementById('userNameDisplay');
-
-        if (loginBtn) loginBtn.style.display = 'none';
-        if (avatarBtn) avatarBtn.style.display = 'flex';
-        if (loginLightbox) loginLightbox.style.display = 'none';
-
-        if (userNameDisplay) {
-            if (currentRole === "admin") userNameDisplay.innerHTML = `👑 總管`;
-            else if (currentRole === "seller") userNameDisplay.innerHTML = `🏪 老闆`;
-            else userNameDisplay.innerHTML = `🧑‍💼 買家`;
-        }
-    } catch (e) {
-        console.warn("更新介面元素時發生錯誤，跳過 UI 更新", e);
-    }
-
-    // 3. 渲染權限選單
-    renderDynamicMenu(currentRole);
-}
-            
-            // === 【新增】登入成功：亮綠燈、顯示有訂單文字 ===
-            // ========================================================
-// 1. 登入狀態監控 (核心生命週期)
-// ========================================================
-onAuthStateChanged(auth, async (user) => {
-    // 定義 UI 元件
-    const loginBtn = document.getElementById('loginBtn');
-    const avatarBtn = document.getElementById('avatarBtn');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const statusDot = document.getElementById('statusDot');
-    const statusText = document.getElementById('statusText');
-
-    if (user) {
-        // --- 登入成功 ---
-        await handleUserSyncAndRoleRouting(user);
-        
-        if (statusDot) statusDot.classList.add('active');
-        if (statusText) statusText.innerText = `您好 ${user.displayName} ~\n目前沒有進行中的訂單喔！`;
-    } else {
-        // --- 登出/未登入 ---
-        if (loginBtn) loginBtn.style.display = 'block';
-        if (avatarBtn) avatarBtn.style.display = 'none';
-        if (dropdownMenu) {
-            dropdownMenu.style.display = 'none';
-            dropdownMenu.innerHTML = '';
-        }
-        
-        if (statusDot) statusDot.classList.remove('active');
-        if (statusText) statusText.innerText = "您尚未登入，請使用電子郵件或連結google帳號登入";
-    }
-
-    // 無論登入與否，載入店家列表
-    await fetchStoresFromFirebase();
-});
-
-// ========================================================
-// 2. 雲端店家讀取與渲染
-// ========================================================
-async function fetchStoresFromFirebase() {
-    if (!storeContainer) return; // 確保容器存在
-    
-    try {
-        const querySnapshot = await getDocs(collection(db, "stores"));
-        allStores = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        // 渲染畫面
-        filterAndRenderStores();
-        if (typeof renderAdminTable === 'function') renderAdminTable();
-    } catch (error) {
-        console.error("讀取店家失敗：", error);
-        storeContainer.innerHTML = '<div style="color:var(--brand-red); padding:20px;">❌ 無法取得雲端店家資料，請檢查網路。</div>';
-    }
-}
-
-    async function getBrowserLocation() {
-    if (!navigator.geolocation) {
-        currentBuyerAddress = "您的裝置不支援 GPS 定位裝置。";
-        return;
-    }
-
-    // 將定位包裝成 Promise，這樣你可以用 await 等待它
-    return new Promise((resolve) => {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                buyerLat = position.coords.latitude;
-                buyerLng = position.coords.longitude;
-                currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 精準定位)`;
-                
-                const btn = document.getElementById('gpsPinBtn');
-                if (btn) btn.innerText = "📍 已獲取定位";
-                
-                // 如果地址彈窗已經開著，自動更新上面的字
-                const modal = document.getElementById('modalAddressText');
-                if (modal) modal.innerText = currentBuyerAddress;
-                
-                resolve(true);
-            },
-            (error) => {
-                currentBuyerAddress = "瀏覽器定位遭拒，請手動選擇縣市。";
-                const btn = document.getElementById('gpsPinBtn');
-                if (btn) btn.innerText = "📍 無法定位";
-                resolve(false);
-            }
-        );
-    });
-}
-
-    // ==========================================
-    // 🔥 後台控制台專屬功能區 (新增/刪除店家、發行邀請碼)
-    // ==========================================
-
-    // 1. 後台渲染店家表格
-// ========================================================
-// 1. 核心地板監聽 (統一管理所有按鈕，不怕動態元件失效)
-// ========================================================
-document.addEventListener('click', async (e) => {
-    // 頭像選單
-    if (e.target.closest('#avatarBtn')) {
-        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-    } else if (!e.target.closest('#dropdownMenu')) {
-        dropdownMenu.style.display = 'none';
-    }
-
-    // 燈箱與表單開關
-    if (e.target.closest('#loginBtn')) loginLightbox.style.display = 'flex';
-    if (e.target.id === 'customReturnBtn') loginLightbox.style.display = 'none';
-    if (e.target.id === 'toggleEmailFormBtn') {
-        emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
-    }
-
-    // 密碼顯示切換
-    if (e.target.id === 'togglePasswordVisibility') {
-        const input = document.getElementById('loginPassword');
-        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-        input.setAttribute('type', type);
-        e.target.textContent = type === 'password' ? '👁️' : '🙈';
-    }
-
-    // GPS 定位彈窗
-    if (e.target.id === 'gpsPinBtn') {
-        modalAddressText.innerText = currentBuyerAddress;
-        addressDetailLightbox.style.display = 'flex';
-    }
-    if (e.target.id === 'closeAddressModalBtn') addressDetailLightbox.style.display = 'none';
-
-    // 登出邏輯
-    if (e.target.id === 'logoutBtn') {
-        await signOut(auth);
-        location.reload();
-    }
-});
-
-// ========================================================
-// 2. 角色權限與 UI 同步
-// ========================================================
-async function handleUserSyncAndRoleRouting(user) {
-    if (!user) return;
-    currentUserId = user.uid;
-
-    const userDocRef = doc(db, "users", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    let currentRole = "buyer";
-
-    if (userDocSnap.exists()) {
-        const data = userDocSnap.data();
-        currentRole = data.role || "buyer";
-        await updateDoc(userDocRef, { lastLogin: new Date().toISOString() });
-    } else {
-        await setDoc(userDocRef, { uid: user.uid, email: user.email, role: "buyer", createdAt: new Date().toISOString() });
-    }
-
-    // 更新 UI
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('avatarBtn').style.display = 'flex';
-    document.getElementById('loginLightbox').style.display = 'none';
-    
-    const roleMap = { admin: "👑 總管", seller: "🏪 老闆", buyer: "🧑‍💼 買家" };
-    document.getElementById('userNameDisplay').innerHTML = roleMap[currentRole] || "🧑‍💼 買家";
-    
-    renderDynamicMenu(currentRole);
-}
-
-// ========================================================
-// 3. 監聽登入狀態 (onAuthStateChanged)
-// ========================================================
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        await handleUserSyncAndRoleRouting(user);
-        document.getElementById('statusDot')?.classList.add('active');
-        document.getElementById('statusText').innerText = `您好 ${user.displayName} ~\n目前沒有進行中的訂單喔！`;
-    } else {
-        document.getElementById('loginBtn').style.display = 'block';
-        document.getElementById('avatarBtn').style.display = 'none';
-        document.getElementById('statusDot')?.classList.remove('active');
-        document.getElementById('statusText').innerText = "您尚未登入，請使用電子郵件或連結google帳號登入";
-    }
-    await fetchStoresFromFirebase();
-});
-
-// ========================================================
-// 4. 刪除店家功能 (掛載到 window 供 onclick 使用)
-// ========================================================
-window.deleteStore = async function(storeId) {
-    if (!confirm("確定要刪除這家店嗎？")) return;
-    await deleteDoc(doc(db, "stores", storeId));
-    fetchStoresFromFirebase();
-};
-    // 2. 雲端新增店家邏輯
-// 在你的 document.addEventListener('click', ...) 裡面加入：
-
-if (e.target.id === 'adminSubmitStoreBtn') {
-    const btn = e.target; // 這是你的按鈕
-    const nameEl = document.getElementById('adminNewStoreName');
-    const addressEl = document.getElementById('adminNewStoreAddress');
-    
-    // 檢查欄位
-    if (!nameEl?.value.trim() || !addressEl?.value.trim()) {
-        alert("⚠️ 店名與詳細地址為必填項目！");
-        return;
-    }
-
-    // 取得資料
-    const storeData = {
-        name: nameEl.value.trim(),
-        shopName: nameEl.value.trim(),
-        phone: document.getElementById('adminNewStorePhone')?.value.trim() || '',
-        city: document.getElementById('adminNewStoreCity')?.value || '基隆市',
-        district: document.getElementById('adminNewStoreDistrict')?.value.trim() || '',
-        address: addressEl.value.trim(),
-        shopAddress: addressEl.value.trim(),
-        category: document.getElementById('adminNewStoreCategory')?.value.trim() || '',
-        createdAt: new Date().toISOString()
-    };
-
-    // 執行寫入
-    btn.innerText = "⏳ 正在同步...";
-    btn.disabled = true;
-
-    try {
-        await addDoc(collection(db, "stores"), storeData);
-        alert("✅ 店家已成功新增！");
-        location.reload(); // 重新整理以刷新列表
-    } catch (error) {
-        console.error("新增失敗:", error);
-        alert("新增失敗，請檢查網路！");
-    } finally {
-        btn.innerText = "✅ 確認新增店家至雲端";
-        btn.disabled = false;
-    }
-}
-    // 3. 雲端刪除店家邏輯 (掛載到 window 供 HTML 呼叫)
-    // ========================================================
-// 管理員操作核心 (刪除、邀請碼、視圖切換)
-// ========================================================
-
-// 1. 刪除店家
-window.deleteStore = async function(storeId) {
-    if (!confirm("⚠️ 確定要從 Firebase 徹底刪除這個店家嗎？")) return;
-    
-    try {
-        await deleteDoc(doc(db, "stores", storeId));
-        alert("🗑️ 店家已成功刪除！");
-        await fetchStoresFromFirebase(); // 確保資料更新同步
-    } catch (error) {
-        console.error("刪除失敗:", error);
-        alert("❌ 刪除失敗，請檢查你的 Admin 權限配置。");
-    }
-};
-
-// 2. 發行邀請碼
-window.issuePromoCode = async function() {
-    const code = prompt('請輸入要發行的戰術 VIP 邀請碼 (例如: PACE2026):');
-    if (!code?.trim()) return;
-    
-    try {
-        await setDoc(doc(db, "promoCodes", code.trim()), {
-            code: code.trim(),
-            createdBy: currentUserId || "unknown",
-            createdAt: new Date().toISOString(),
-            isActive: true
-        });
-        alert(`🎟️ 邀請碼「${code}」已成功發行！`);
-    } catch (error) {
-        console.error("發行邀請碼失敗:", error);
-        alert("❌ 發行失敗，請檢查權限。");
-    }
-};
-
-// 3. 視圖切換 (顯示 Admin 還是 Buyer)
-window.toggleView = function(viewRole) {
-    const adminEl = document.getElementById('adminView');
-    const buyerEl = document.getElementById('buyerView');
-    const phoneWrapper = document.querySelector('.phone-wrapper');
-
-    const isAdmin = viewRole === 'admin';
-    
-    if (adminEl) adminEl.style.display = isAdmin ? 'block' : 'none';
-    if (buyerEl) buyerEl.style.display = isAdmin ? 'none' : 'block';
-    if (phoneWrapper) phoneWrapper.style.display = isAdmin ? 'none' : ''; // 使用 '' 還原 CSS 預設值
-    
-    if (isAdmin) window.scrollTo(0, 0);
-};
-import { auth, db } from './firebase-config.js'; // 請確認路徑正確
-import { doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore/index.js";
-import { onAuthStateChanged, signOut, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-auth/index.js";
-
-// 等待 HTML 結構完全載入後，才啟動所有邏輯
-window.addEventListener('DOMContentLoaded', () => {
-
-    // ========================================================
-    // 1. 地板監聽：處理所有按鈕點擊 (解決動態元素抓不到問題)
-    // ========================================================
-    document.addEventListener('click', async (e) => {
-        // 頭像選單
-        if (e.target.closest('#avatarBtn')) {
-            const menu = document.getElementById('dropdownMenu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-        }
-        
-        // 登入按鈕 -> 開啟燈箱
-        if (e.target.id === 'loginBtn') document.getElementById('loginLightbox').style.display = 'flex';
-        
-        // 關閉燈箱
-        if (e.target.id === 'customReturnBtn') document.getElementById('loginLightbox').style.display = 'none';
-
-        // 登出邏輯
-        if (e.target.id === 'logoutBtn') {
-            await signOut(auth);
-            location.reload();
-        }
-
-        // 新增店家邏輯
-        if (e.target.id === 'adminSubmitStoreBtn') {
-            await handleAdminSubmitStore();
-        }
-    });
-
-    // ========================================================
-    // 2. 登入狀態監控與角色同步
-    // ========================================================
-    onAuthStateChanged(auth, async (user) => {
-        const loginBtn = document.getElementById('loginBtn');
-        const avatarBtn = document.getElementById('avatarBtn');
-        const statusText = document.getElementById('statusText');
-
-        if (user) {
-            await handleUserSyncAndRoleRouting(user); // 同步 DB 角色
-            if(loginBtn) loginBtn.style.display = 'none';
-            if(avatarBtn) avatarBtn.style.display = 'flex';
-        } else {
-            if(loginBtn) loginBtn.style.display = 'block';
-            if(avatarBtn) avatarBtn.style.display = 'none';
-            if(statusText) statusText.innerText = "您尚未登入，請使用電子郵件或 Google 登入";
-        }
-        await fetchStoresFromFirebase();
-    });
-});
-
-// ========================================================
-// 3. 輔助功能區 (非同步函數定義)
-// ========================================================
-async function handleUserSyncAndRoleRouting(user) {
-    const userDocRef = doc(db, "users", user.uid);
-    const snap = await getDoc(userDocRef);
-    let role = "buyer";
-    if (snap.exists()) {
-        role = snap.data().role;
-    } else {
-        await setDoc(userDocRef, { role: "buyer", email: user.email });
-    }
-    // 渲染選單...
-    renderDynamicMenu(role);
-}
-
-async function fetchStoresFromFirebase() {
-    const storeContainer = document.getElementById('storeContainer');
-    if (!storeContainer) return;
-    const querySnapshot = await getDocs(collection(db, "stores"));
-    // 渲染邏輯...
-}
-
-async function handleAdminSubmitStore() {
-    // 這裡放入你之前寫的新增店家邏輯
-    alert("正在執行新增...");
-}
-
-// 將函數暴露給 Window，讓 HTML 裡的 onclick="window.xxx()" 能找到
-window.deleteStore = async (id) => { /* 刪除邏輯 */ };
-window.issuePromoCode = async () => { /* 邀請碼邏輯 */ };
-window.toggleView = (role) => { /* 視圖切換 */ };
+<script type="module" src="app.js"></script>
 </body>
 </html>

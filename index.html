@@ -390,8 +390,8 @@ img, .card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    padding: 5px;         /* 縮小內距，讓格子高度變窄 */
-    margin-bottom: 2px;   /* 縮小外距，讓格子間的間距變小 */
+    padding: 10px;         /* 縮小內距，讓格子高度變窄 */
+    margin-bottom: 5px;   /* 縮小外距，讓格子間的間距變小 */
     text-decoration: none;
     color: inherit;
     box-shadow: var(--shadow-sm);
@@ -717,7 +717,7 @@ select {
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
             <input type="text" id="adminNewStoreName" placeholder="店家名稱 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
             <input type="text" id="adminNewStorePhone" placeholder="聯絡電話 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
-            <input type="text" id="adminNewStoreDistrict" placeholder="縣市 (如: 基隆市) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+            <input type="text" id="adminNewStoreStoreCity" placeholder="縣市 (如: 基隆市) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
             <input type="text" id="adminNewStoreDistrict" placeholder="區域 (如: 七堵區) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
             <input type="text" id="adminNewStoreAddress" placeholder="詳細地址 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">
             <input type="text" id="adminNewStoreCategory" placeholder="分類 (如: 台式小吃, 飲料)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">
@@ -767,13 +767,13 @@ select {
 
         <div id="emailFormSection" style="display: none; margin-top: 20px; text-align: left; width: 100%;">
             <div style="margin-bottom: 12px;">
-                <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">電子郵件</label>
-                <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb; color: #111111;">
+                <label for="loginEmail" style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">電子郵件</label>
+<input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb; color: #111111;">
             </div>
             <div style="margin-bottom: 20px; position: relative;">
-                <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">密碼</label>
+                <label for="loginPassword" style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">密碼</label>
                 <div style="position: relative; display: flex; align-items: center;">
-                    <input type="password" id="loginPassword" placeholder="請輸入密碼" style="width:100%; padding:10px 40px 10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb; color: #111111;">
+                    <input type="password" id="loginPassword" placeholder="請輸入密碼" autocomplete="current-password" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb; color: #111111;">
                     <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
                 </div>
             </div>

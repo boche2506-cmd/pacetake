@@ -137,12 +137,11 @@ img, .card {
 }
 
 /* 商家名單容器（承接你原有的 padding 設定） */
-.store-list {
-    width: 100%;
-    padding: 16px;
-}
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
 .sticky-top-group {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
     background-color: var(--blur-bg);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px); 
@@ -723,6 +722,7 @@ select {
             <span id="cartCount">(0)</span>
         </a>
     </footer>
+  </div>
 <!-- ========================================== -->
 <!-- 🔮 派思核心控制台 (Admin 視圖) -->
 <!-- ========================================== -->
@@ -817,7 +817,6 @@ select {
         <div class="modal-title" style="color: var(--brand-blue);">📍 目前位置</div>
         <div class="modal-desc-address" id="modalAddressText" style="margin-bottom: 20px;">尚未獲取定位，請開啟 GPS。</div>
         <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; border: none; width: 100%; height: 42px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">確認</button>
-       </div>
     </div>
   </div>
 </div>

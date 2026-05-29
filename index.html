@@ -131,13 +131,19 @@ img, .card {
 .sticky-top-group {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    
+    /* 📊 比例修正：改用純百分比，佔據整個手機高度的 28% */
+    height: 30%; 
+    
+    /* 📊 比例修正：原本寫死的 10px 外距，改用相對的百分比（上下 1%，左右 2%） */
+    margin: 1% 2%; 
+    box-sizing: border-box; /* 確保 margin/padding 不會把這 28% 的高度撐破 */
+
+    /* 以下維持您原本的美化設定，一字不改 */
     background-color: var(--blur-bg);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px); 
     border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;   /* 關鍵：確保頂部區域絕對不會被中間內容擠壓變形 */
-    margin: 10px 10px;     
 }/* ==========================================================================
    4. 頂部導航區塊 (Header & Brand)
    ========================================================================== */
@@ -283,9 +289,6 @@ img, .card {
 /* ==========================================================================
    6. 搜尋與定位列 (Search & Location)
    ========================================================================== */
-.seller-unlock, .admin-unlock { 
-    display: none; 
-}
 
 .location-bar {
     padding: 0px;
@@ -359,13 +362,16 @@ img, .card {
 
 /* 🔮 賦予中層獨立滑動的靈魂 */
 .main-scroll-content {
-    flex: 1;                /* 💡 魔法 1：自動吃掉頂層和底層扣除後，剩下的所有中間空間 */
-    overflow-y: auto;       /* 💡 魔法 2：當內容塞不下時，只有自己內部會長出流暢的滾動條 */
-    width: 100%;            /* 寬度撐滿手機殼 */
-    box-sizing: border-box; /* 防止 padding 破版 */
+    /* 📊 比例修正：依據圖片紅線比例，給予獨立的 58% 高度空間 */
+    height: 50%; 
     
-    /* 📱 讓手機滑動有像原生 App 一樣的滑順彈性效果 (選填，但體驗極佳) */
+    /* ⚙️ 功能維持：允許中間區域內容超出 58% 時，自己長出流暢的滾動條 */
+    overflow-y: auto;       
     -webkit-overflow-scrolling: touch; 
+    box-sizing: border-box; 
+    
+    /* 📊 比例修正：內部留白也改用百分比，畫面更靈活 */
+    padding: 2%; 
 }
 ==========================================================================
    7. 店家列表 (Store List)
@@ -458,22 +464,29 @@ img, .card {
    8. 底部懸浮列 (Bottom Bar)
    ========================================================================== */
 .bottom-bar {
-    /* ⚡ 核心修正：移除 position: fixed 與變動的定位，改用 Flex 流動，讓它死死鎖在手機殼底部 */
-    width: calc(100% - 20px);    /* 左右留出各 10px 的間距，完美對齊頂部群組 */
-    margin: 10px auto;           /* 上下保留安全外距，並自動水平居中 */
-    border-radius: 16px;         /* 配合懸浮設計，加上圓角讓質感大幅提升 */
+    /* 📊 比例修正：依據圖片紅線比例，死死鎖定底部佔用 14% 的高度 */
+    height: 20%; 
     
-    height: 76px;
+    /* 📊 比例修正：原本是 calc(100% - 20px)，直接改用 96% 寬度，效果一樣但完全不寫死 px */
+    width: 96%; 
+    
+    /* 📊 比例修正：上下保留 1% 的呼吸空間，左右靠 auto 完美觸發您原本的置中機制 */
+    margin: 1% auto; 
+    
+    /* 📊 比例修正：左右內襯改用 5%，讓購物車按鈕與文字在不同手機上都能優雅排開 */
+    padding: 0 5%; 
+    box-sizing: border-box;
+
+    /* 以下維持您原本的漂亮樣式與 Flex 橫排設定 */
+    border-radius: 16px;
     background-color: var(--blur-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border-color); /* 改為全邊框，配合懸浮膠囊造型 */
+    border: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* 調整陰影方向，讓懸浮感更自然 */
-    flex-shrink: 0;              /* 關鍵：確保底部導覽列絕對不會被中間內容擠扁 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .status-msg {

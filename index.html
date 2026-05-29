@@ -126,17 +126,12 @@ img, .card {
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5); /* 超立體陰影 */
 }
 
-/* 商家名單容器（承接你原有的 padding 設定） */
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
 .sticky-top-group {
     display: flex;
     flex-direction: column;
-    
-    /* 📊 比例修正：改用純百分比，佔據整個手機高度的 28% */
-    height: 30%; 
-    
-    /* 📊 比例修正：原本寫死的 10px 外距，改用相對的百分比（上下 1%，左右 2%） */
-    margin: 1% 2%; 
+    height: 30%;
+    margin: 10px ;
     box-sizing: border-box; /* 確保 margin/padding 不會把這 28% 的高度撐破 */
 
     /* 以下維持您原本的美化設定，一字不改 */
@@ -282,9 +277,6 @@ img, .card {
 }
 
 /* 👑 智慧選單分流區塊 */
-.seller-unlock, .admin-unlock { 
-    display: none; 
-}
 
 /* ==========================================================================
    6. 搜尋與定位列 (Search & Location)
@@ -364,16 +356,13 @@ img, .card {
 .main-scroll-content {
     /* 📊 比例修正：依據圖片紅線比例，給予獨立的 58% 高度空間 */
     height: 50%; 
-    
+    margin: 10px ;
     /* ⚙️ 功能維持：允許中間區域內容超出 58% 時，自己長出流暢的滾動條 */
     overflow-y: auto;       
     -webkit-overflow-scrolling: touch; 
     box-sizing: border-box; 
-    
-    /* 📊 比例修正：內部留白也改用百分比，畫面更靈活 */
-    padding: 2%; 
 }
-==========================================================================
+/*==========================================================================
    7. 店家列表 (Store List)
    ========================================================================== */
 .store-list {
@@ -381,7 +370,6 @@ img, .card {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    width: 100%; /* 確保容器寬度填滿 parent */
 }
 
 .store-card {
@@ -464,29 +452,19 @@ img, .card {
    8. 底部懸浮列 (Bottom Bar)
    ========================================================================== */
 .bottom-bar {
-    /* 📊 比例修正：依據圖片紅線比例，死死鎖定底部佔用 14% 的高度 */
-    height: 20%; 
-    
-    /* 📊 比例修正：原本是 calc(100% - 20px)，直接改用 96% 寬度，效果一樣但完全不寫死 px */
-    width: 96%; 
-    
-    /* 📊 比例修正：上下保留 1% 的呼吸空間，左右靠 auto 完美觸發您原本的置中機制 */
-    margin: 1% auto; 
-    
-    /* 📊 比例修正：左右內襯改用 5%，讓購物車按鈕與文字在不同手機上都能優雅排開 */
-    padding: 0 5%; 
+    display: flex;
+    height: 20%;
+    width: 100%; 
+    margin: 10px ;
     box-sizing: border-box;
-
-    /* 以下維持您原本的漂亮樣式與 Flex 橫排設定 */
-    border-radius: 16px;
     background-color: var(--blur-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border-color);
-    display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    padding: 0 16px;
 }
 
 .status-msg {
@@ -500,8 +478,8 @@ img, .card {
 }
 
 footer .status-indicator {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background-color: #ff4d4f;
     flex-shrink: 0;
@@ -731,9 +709,7 @@ select {
         <button onclick="window.toggleView('buyer')" style="padding: 8px 16px; background: #ff4d4d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; flex-shrink: 0;">返回</button>
     </div>
 --------（這裡放你原本控制台底下的其他內容...）-------
-    </div>
-
-    <!-- 真正接通 Firebase 的新增店家表單 -->
+      <!-- 真正接通 Firebase 的新增店家表單 -->
     <div style="background: #1e1e1e; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #2d2d2d; box-sizing: border-box; width: 100%;">
     <h3 style="color: #ffca28; margin-top: 0; font-size: 16px;">➕ 新增全新店家</h3>
     <p style="color: #aaa; font-size: 13px; margin-bottom: 15px;">請輸入店家資訊，新增後將立即同步至 Firebase 雲端資料庫。</p>
@@ -817,6 +793,7 @@ select {
         <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; border: none; width: 100%; height: 42px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">確認</button>
     </div>
   </div>
+ </div>
 </div>
 <script type="module" src="app.js"></script>
 </body>

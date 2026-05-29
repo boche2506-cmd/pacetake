@@ -117,6 +117,8 @@ img, .card {
 
     /* 🔴 第四步：死不准滑動（你要求的鐵律） */
     overflow: hidden; 
+    display: flex;
+    flex-direction: column;
 
     /* 🔴 第五步：立體手機殼裝飾（邊框與陰影） */
     background-color: var(--bg-container);
@@ -135,12 +137,16 @@ img, .card {
 
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
 .sticky-top-group {
+    display: flex;
+    flex-direction: column;
+    height: 30%;
+    margin: 10px ;
+    box-sizing: border-box; /* 確保 margin/padding 不會把這 28% 的高度撐破 */
     background-color: var(--blur-bg);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px); 
     border-bottom: 1px solid var(--border-color);
     flex-shrink: 0;
-    margin: 10px 10px;     
 }
 /* ==========================================================================
    4. 頂部導航區塊 (Header & Brand)
@@ -250,7 +256,6 @@ img, .card {
     border: 1px solid var(--border-color);
     border-radius: 12px;
     box-shadow: var(--shadow-md);
-    z-index: 1100;
     padding: 3px;
 }
 
@@ -367,6 +372,11 @@ img, .card {
    7. 店家列表 (Store List)
    ========================================================================== */
 .store-list {
+    height: 50%;
+    overflow-y: auto;       
+    -webkit-overflow-scrolling: touch; 
+    box-sizing: border-box; 
+    margin: 10px;
     padding: 16px 20px;
     display: flex;
     flex-direction: column;
@@ -453,25 +463,16 @@ img, .card {
    8. 底部懸浮列 (Bottom Bar)
    ========================================================================== */
 .bottom-bar {
-    position: fixed;
-    bottom: 20px; 
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    width: 90%;
-    max-width: 430px;
-    height: 76px;
-    background-color: var(--blur-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border-color);
     display: flex;
+    margin: 10px;
+    height: 20%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    background-color: var(--blur-bg);
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px 10px 20px;
-    z-index: 999;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-    flex-shrink: 0;
+    border-top: 1px solid var(--border-color);
+    padding: 10px;
 }
 
 .status-msg {
@@ -485,8 +486,8 @@ img, .card {
 }
 
 footer .status-indicator {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background-color: #ff4d4f;
     flex-shrink: 0;
@@ -539,7 +540,6 @@ footer .status-indicator.active{
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    z-index: 2000;
     justify-content: center;
     align-items: center;
     padding: 20px;
@@ -625,6 +625,7 @@ select {
 </head>
 <body>
 <div class="phone-wrapper">
+<div id="buyerView" style="display: flex; flex-direction: column; width: 100%; height: 100%;">
 <div class="sticky-top-group">
 <header class="header">
     <div class="brand-left-column">
@@ -674,21 +675,18 @@ select {
                     <select class="nav-select" id="districtSelect">
                         <option value="">選擇區域</option>
                     </select>
-                </select>
-            </div>
-        </div>
+                 </div>
+              </div>
         <div class="search-container">
             <div class="search-box">
                 <span>🔍</span>
                 <input type="text" id="globalSearchInput" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
-            </div>
           </div>
         </div>
-        <div id="buyerView" style="display: block;">
+      </div>
     <main class="store-list" id="store-container">
         <div class="loading-spinner" id="loadingSpinner">⚡ 正在安全連線雲端資料庫...</div>
     </main>
-        </div>
     <footer class="bottom-bar">
         <a href="history.html" class="status-msg" id="bottomStatusMsg">
             <div class="status-indicator active" id="statusDot"></div>
@@ -731,21 +729,17 @@ select {
     <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d; overflow-x: auto;">
     <h3 style="color: #4da5ff; margin-top: 0;"> 📋 目前雲端店家總覽</h3>
     <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 14px;">
-        </table>
                 <tr style="background: #2d2d2d; color: #fff;">
                     <th style="padding: 12px; border: 1px solid #3a3a3a;">店家名稱</th>
                     <th style="padding: 12px; border: 1px solid #3a3a3a;">詳細地址</th>
                     <th style="padding: 12px; border: 1px solid #3a3a3a;">聯絡電話</th>
                     <th style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">核心操作</th>
                 </tr>
-            </thead>
             <tbody id="adminStoreTableBody">
                 <tr><td colspan="4" style="text-align: center; padding: 15px; color: #888;">正在載入雲端資料...</td></tr>
             </tbody>
         </table>
-    </div>
-</div>
-
+     </div>
 <!-- ========================================== -->
 <!-- 💡 燈箱模組區 (Lightboxes) -->
 <!-- ========================================== -->
@@ -785,16 +779,18 @@ select {
             <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15);">電子郵件登入 / 註冊</button>
         </div>
         <span class="modal-close" id="customReturnBtn" style="margin-top: 20px; text-decoration: underline; cursor: pointer; display: block; text-align: center;">暫時返回</span>
+      </div>
     </div>
-</div>
 
 <div class="lightbox-modal" id="addressDetailLightbox" style="display: none;">
     <div class="modal-card">
         <div class="modal-title" style="color: var(--brand-blue);">📍 目前位置</div>
         <div class="modal-desc-address" id="modalAddressText" style="margin-bottom: 20px;">尚未獲取定位，請開啟 GPS。</div>
         <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; border: none; width: 100%; height: 42px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">確認</button>
+          </div>
+       </div>
     </div>
-</div>
+ </div>
 <script type="module" src="app.js"></script>
 </body>
 </html>

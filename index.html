@@ -277,7 +277,9 @@ img, .card {
 }
 
 /* 👑 智慧選單分流區塊 */
-
+.seller-unlock, .admin-unlock { 
+    display: none; 
+}
 /* ==========================================================================
    6. 搜尋與定位列 (Search & Location)
    ========================================================================== */
@@ -370,6 +372,7 @@ img, .card {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 100%; /* 確保容器寬度填滿 parent
 }
 
 .store-card {
@@ -708,7 +711,6 @@ select {
         <h1 style="color: #4dadff; margin: 0; font-size: 22px;">🔮 派思最高意志控制台</h1>
         <button onclick="window.toggleView('buyer')" style="padding: 8px 16px; background: #ff4d4d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; flex-shrink: 0;">返回</button>
     </div>
---------（這裡放你原本控制台底下的其他內容...）-------
       <!-- 真正接通 Firebase 的新增店家表單 -->
     <div style="background: #1e1e1e; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #2d2d2d; box-sizing: border-box; width: 100%;">
     <h3 style="color: #ffca28; margin-top: 0; font-size: 16px;">➕ 新增全新店家</h3>

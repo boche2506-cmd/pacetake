@@ -76,7 +76,6 @@ body {
     align-items: center;     /* 強制裡面的手機盒子「上下絕對置中」 */
     height: 100vh;           /* 改為固定 100vh，搭配 hidden 鎖死外層螢幕 */
     width: 100vw;
-    overflow: hidden;        /* 關鍵：強制整個網頁底層絕不滑動 */
     transition: background-color 0.15s ease;
     background-color: var(--bg-main); 
 }
@@ -125,15 +124,6 @@ img, .card {
     border: 4px solid #222; /* 給它一個扎實的手機黑色外框 */
     border-radius: 20px;    /* 稍微帶點圓角更像手機 */
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5); /* 超立體陰影 */
-}
-
-/* 🔴 關鍵修改：將滾動鐵律直接綁定在你的內容區 #buyerView */
-#buyerView {
-    display: flex;
-    flex-direction: column; /* 讓頂層、中層、底層像積木一樣由上往下乖乖排隊 */
-    width: 100%;
-    height: 100%;           /* 必須鎖死在手機殼的 100% 高度內，不准超生！ */
-    overflow: hidden;       /* 爸爸本身不准滾動，滾動是中層的事 */
 }
 
 /* 商家名單容器（承接你原有的 padding 設定） */
@@ -255,7 +245,6 @@ img, .card {
     border: 1px solid var(--border-color);
     border-radius: 12px;
     box-shadow: var(--shadow-md);
-    z-index: 1100;
     padding: 3px;
 }
 
@@ -483,7 +472,6 @@ img, .card {
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    z-index: 999;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* 調整陰影方向，讓懸浮感更自然 */
     flex-shrink: 0;              /* 關鍵：確保底部導覽列絕對不會被中間內容擠扁 */
 }
@@ -553,7 +541,6 @@ footer .status-indicator.active {
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    z-index: 2000; /* 確保疊在最上層，不被導覽列或卡片遮擋 */
     justify-content: center;
     align-items: center;
     padding: 20px;
@@ -705,12 +692,10 @@ select {
             </div>
           </div>
         </div>
-    <main class="store-list" id="store-container">
+    <main class="main-scroll-content">
+        <div class="store-list" id="store-container"></div>
         <div class="loading-spinner" id="loadingSpinner">⚡ 正在安全連線雲端資料庫...</div>
     </main>
-              <div class="main-scroll-content">
-              <div id="storeList"></div>
-              </div>
     <footer class="bottom-bar">
         <a href="history.html" class="status-msg" id="bottomStatusMsg">
             <div class="status-indicator active" id="statusDot"></div>
@@ -726,7 +711,7 @@ select {
 <!-- ========================================== -->
 <!-- 🔮 派思核心控制台 (Admin 視圖) -->
 <!-- ========================================== -->
-<div id="adminView" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #121212; color: #e0e0e0; z-index: 1500; padding: 20px; font-family: sans-serif; overflow-y: auto; box-sizing: border-box;">
+<div id="adminView" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #121212; color: #e0e0e0; padding: 20px; font-family: sans-serif; overflow-y: auto; box-sizing: border-box;">
     
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
         <h1 style="color: #4dadff; margin: 0; font-size: 22px;">🔮 派思最高意志控制台</h1>
@@ -796,14 +781,14 @@ select {
 
         <div id="emailFormSection" style="display: none; margin-top: 20px; text-align: left; width: 100%;">
             <div style="margin-bottom: 12px;">
-                <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">電子郵件</label>
+                <label for= "loginEmail" style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">電子郵件</label>
                 <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb; color: #111111;">
             </div>
             <div style="margin-bottom: 20px; position: relative;">
-                <label style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">密碼</label>
+                <label for="loginPassword" style="display:block; margin-bottom:6px; font-size:13px; color:#6b7280; font-weight:500;">密碼</label>
                 <div style="position: relative; display: flex; align-items: center;">
                     <input type="password" id="loginPassword" placeholder="請輸入密碼" style="width:100%; padding:10px 40px 10px 14px; border:1px solid #e5e7eb; border-radius:8px; box-sizing:border-box; font-size:14px; background-color:#f9fafb; color: #111111;">
-                    <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
+                    <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; font-size: 16px; padding: 0; color: #6b7280; ">👁️</button>
                 </div>
             </div>
             <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.15);">電子郵件登入 / 註冊</button>

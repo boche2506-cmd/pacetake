@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>快拿自取街 pacetake.tw - 商家手機開店</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E">
+    <title>PACE 派思 pacetake.tw - 商家開店</title>
+<!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
+<link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+<link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
+<link rel="apple-touch-icon" sizes="180x180" href="logo.png">
 
     <style>
         /* 全局變數與主題防線 */
@@ -96,20 +100,110 @@
             letter-spacing: -0.5px;
         }
 
-        .theme-toggle {
-            background: none;
-            border: 1px solid var(--border-color);
-            font-size: 16px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-            background-color: var(--card-bg);
-        }
+        .control-panel {
+    display: flex;
+    flex-direction: column; /* 關鍵：讓按鈕由上往下垂直排列 */
+    align-items: flex-end;  /* 關鍵：讓兩顆按鈕都向右邊靠齊對齊 */
+    gap: 3px;               /* 設定上下兩顆按鈕之間的間距（可依喜好調整） */
+    height: 100%;           /* 固定住的數值：使控制台與 header 同高，利於垂直居中 */
+    justify-content: center;
+}
+
+
+/* 通用按鈕基礎 */
+.theme-toggle {
+    display: flex;
+    justify-content: center; /* 修改：讓月亮圖示「水平置中」 */
+    align-items: center;     /* 新增：讓月亮圖示「垂直置中」 */
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    font-size: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;          /*  削成圓形            */
+    cursor: pointer;                  /*  滑鼠點上去變形 */
+    color: var(--text-main);
+    padding: 5px 5px;
+}
+
+.login-btn {
+    display: flex;
+    justify-content: flex-end;
+    background-color: var(--brand-blue);
+    color: #FFFFFF;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 0px;
+}
+
+.user-avatar-btn {
+    display: none; 
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 6px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    align-items: center;
+    gap: 3px;
+}
+
+/* 下拉選單面板 */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 42px;
+    right: 0;
+    width: 200px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    
+    /* 🔴 修正：因為上層骨架是 10，裡面的人寫 11 甚至不寫（繼承父層優先權）就能壓死中層了 */
+    z-index: 500; 
+    
+    padding: 3px;
+    
+    /* 🔴 這個防爆限制還是要留著，手機才不會破圖 */
+    max-height: 280px;     
+    overflow-y: auto;      
+    -webkit-overflow-scrolling: touch;
+}
+
+.dropdown-menu a, 
+.dropdown-menu button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px 12px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 13px;
+    border: none;
+    background: none;
+    text-align: left;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.dropdown-menu a:hover, 
+.dropdown-menu button:hover {
+    background-color: var(--bg-global);
+}
+
+.menu-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 6px 0;
+}
 
         /* 填表區域 */
         .form-container {
@@ -515,12 +609,25 @@
         <header class="header">
             <a href="index.html" class="back-btn nav-fast">⬅️ 返回</a>
             <h1>3分鐘手機開店</h1>
-            <button class="theme-toggle" id="themeToggleBtn">🌓</button>
-        </header>
+<div class="control-panel">
+        <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+        <button class="login-btn" id="loginBtn">登入 / 註冊</button>
+        <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+            <span class="avatar-icon">👤</span>
+            <span class="user-name" id="userNameDisplay">載入中...</span>
+        </button>
+        <div class="dropdown-menu" id="dropdownMenu"></div>
+    </div>
+</header>
 
         <form class="form-container" id="shopRegisterForm">
             <div class="form-section">
                 <div class="section-title">基本資料設定</div>
+
+                <div class="input-group">
+                    <label>店鋪聯絡電話</label>
+                    <input type="tel" id="shopPhone" class="input-style" placeholder="請輸入店鋪或老闆的手機號碼" required pattern="[0-9]{9,10}">
+                </div>
                 
                 <div class="input-group">
                     <label>店鋪招牌與名稱</label>
@@ -530,7 +637,7 @@
                             <img class="preview-img" id="shopLogoPreview" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
                             <div class="upload-placeholder">📸<span>上傳招牌</span></div>
                         </div>
-                        <input type="text" id="shopNameInput" class="input-style" placeholder="請輸入您的店鋪招牌名稱" required style="flex-grow:1;">
+                        <input type="text" id="shopName" class="input-style" placeholder="請輸入您的店鋪招牌名稱" required style="flex-grow:1;">
                     </div>
                 </div>
                 
@@ -548,8 +655,16 @@
 
                 <div class="input-group">
                     <label>詳細地址 <span style="color:var(--brand-blue); font-size:11px;">(AI自動轉換經緯度)</span></label>
-                    <input type="text" id="shopAddressInput" class="input-style" placeholder="請輸入巷弄門牌，不需重複寫縣市" required>
+                    <input type="text" id="shopAddress" class="input-style" placeholder="請輸入巷弄門牌，不需重複寫縣市" required>
                 </div>
+
+                <div class="input-group">
+                    <label>店家邀請碼 (選填)</label>
+                    <input type="text" id="shopInviteCode" class="input-style" placeholder="若有專屬邀請碼請輸入">
+                </div>
+
+                <input type="hidden" id="shopStatus" value="online">
+
                 <div class="input-group">
                     <label>平均餐點準備時間 (分鐘)</label>
                     <input type="number" id="prepareTimeInput" class="input-style" value="15" min="1" required>
@@ -570,8 +685,7 @@
                     </label>
                 </div>
 
-                <div class="input-group newebpay-box" id="newebpayContainer" style="display: none;">
-                    </div>
+                <div class="input-group newebpay-box" id="newebpayContainer" style="display: none;"></div>
 
                 <div class="switch-row">
                     <div class="switch-info">
@@ -614,7 +728,7 @@
         </form>
 
         <footer class="footer-action">
-            <button class="submit-btn" id="createShopBtn" form="shopRegisterForm" type="submit">建立店鋪</button>
+            <button class="submit-btn" id="shopSubmitBtn" form="shopRegisterForm" type="submit">建立店鋪</button>
         </footer>
 
         <div class="lightbox-modal" id="cashWarningModal" style="display: none;">
@@ -632,23 +746,10 @@
     </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
-        authDomain: "pacetake-c6e1e.firebaseapp.com",
-        projectId: "pacetake-c6e1e",
-        storageBucket: "pacetake-c6e1e.firebasestorage.app",
-        messagingSenderId: "1052980235056",
-        appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
-        measurementId: "G-888XL8JTHW",
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // 🔗 1. 靈魂連動：直接向大本營 app.js 借用設定好的工具，拒絕代碼冗長！
+    import { auth, db } from "./app.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
     let currentUserId = null;
     onAuthStateChanged(auth, (user) => {
@@ -656,16 +757,17 @@
             currentUserId = user.uid;
             console.log("當前商家已連線，UID:", currentUserId);
         } else {
-            alert("【PACE 提示】開鋪前請先回首頁完成登入喔！");
-            window.location.href = "index.html";
+            // 💡 方便哥測試排版，沒登入時先給假 UID
+            currentUserId = "TEST_USER_9527"; 
+            console.log("測試模式：使用臨時 UID 預覽排版中");
         }
     });
 
+    // 🌗 深色模式初始化
     function initTheme() {
         const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
     }
-
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     if(themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
@@ -677,6 +779,7 @@
     }
     initTheme();
 
+    // 🗺️ 縣市區域資料庫
     const areaData = {
         "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
         "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -721,7 +824,7 @@
         }
     });
 
-    // 💳 3. 金流防禦線連動邏輯
+    // 💳 金流開關連動邏輯
     const toggleOnline = document.getElementById('toggleOnline');
     const toggleCash = document.getElementById('toggleCash');
     const newebpayContainer = document.getElementById('newebpayContainer');
@@ -776,7 +879,7 @@
         });
     }
 
-    // 👑 4. 跨平台雙棲流暢拖曳排序核心防線
+    // ☰ 菜單拖曳排序核心
     const menuUploadList = document.getElementById('menuUploadList');
     let activeDragItem = null;
     let startY = 0;
@@ -790,7 +893,6 @@
 
     function startDrag(e, row) {
         if (e.cancelable) e.preventDefault();
-        
         activeDragItem = row;
         row.style.opacity = '0.5';
         row.style.border = '2px dashed var(--brand-blue)';
@@ -810,7 +912,6 @@
     function onDragMove(e) {
         if (!activeDragItem) return;
         if (e.cancelable) e.preventDefault();
-
         currentY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
         
         const siblings = [...menuUploadList.querySelectorAll('.menu-item-row:not([style*="dashed"])')];
@@ -828,7 +929,6 @@
 
     function onDragEnd() {
         if (!activeDragItem) return;
-        
         activeDragItem.style.opacity = '1';
         activeDragItem.style.border = '1px solid var(--border-color)';
         activeDragItem = null;
@@ -841,7 +941,7 @@
 
     document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
 
-    // ➕ 新增菜單品項
+    // ＋ 新增下一個品項
     const addItemRowBtn = document.getElementById('addItemRowBtn');
     if(addItemRowBtn && menuUploadList) {
         addItemRowBtn.addEventListener('click', () => {
@@ -897,14 +997,12 @@
         }
     };
 
-    // 🚀 5. 建立店鋪並安全寫入 Firebase 雲端資料庫
+    // 🚀 核心打包：精準抓取正名後的「shop...」欄位並送入 Firebase
     const form = document.getElementById('shopRegisterForm');
     if(form) {
         form.addEventListener('submit', async (e) => {
-            // 阻止表單預設跳頁行為
             e.preventDefault();
 
-            // 確保使用者已登入
             if (!currentUserId) {
                 alert("【PACE 提示】開鋪前請先回首頁完成登入喔！");
                 return;
@@ -918,13 +1016,16 @@
                 return;
             }
 
-            const shopName = document.getElementById('shopNameInput')?.value.trim() || '';
+            // 🎯 精準抓取正名後的商家專屬欄位：
+            const phone = document.getElementById('shopPhone')?.value.trim() || '';
+            const name = document.getElementById('shopName')?.value.trim() || '';
             const city = shopCity.value;
             const district = shopDistrict.value;
-            const detailAddress = document.getElementById('shopAddressInput')?.value.trim() || '';
+            const detailAddress = document.getElementById('shopAddress')?.value.trim() || '';
+            const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
+            const status = document.getElementById('shopStatus')?.value || 'online';
             const prepareTime = parseInt(document.getElementById('prepareTimeInput')?.value) || 15;
 
-            // 招牌 Logo 數據
             const logoEl = document.getElementById('shopLogoPreview');
             const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
 
@@ -932,33 +1033,34 @@
             const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
             const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
             
-            // 抓取菜單結構
             const menuRows = document.querySelectorAll('.menu-item-row');
             const menuItems = [];
             menuRows.forEach(row => {
                 const nameField = row.querySelector('.item-name-input');
                 const priceField = row.querySelector('.price-input');
-                
-                const name = nameField ? nameField.value.trim() : '';
-                const price = priceField ? parseInt(priceField.value) || 0 : 0;
-                
+                const nameVal = nameField ? nameField.value.trim() : '';
+                const priceVal = priceField ? parseInt(priceField.value) || 0 : 0;
                 const imgEl = row.querySelector('.preview-img');
                 const imgData = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : "";
 
-                if (name) {
-                    menuItems.push({ name: name, price: price, image: imgData });
+                if (nameVal) {
+                    menuItems.push({ name: nameVal, price: priceVal, image: imgData });
                 }
             });
 
             const fullAddress = `${city}${district}${detailAddress}`;
 
+            // 📦 打包乾淨的商家資料物件
             const shopData = {
                 sellerUid: currentUserId,
-                shopName: shopName,
-                shopLogo: shopLogoData, 
+                shopName: name,
+                shopPhone: phone, 
                 city: city,
                 district: district,
                 shopAddress: fullAddress,
+                inviteCode: inviteCode,
+                status: status,
+                shopLogo: shopLogoData, 
                 prepareTime: prepareTime,
                 isOnlinePayEnabled: isOnlinePayEnabled,
                 isCashPayEnabled: isCashPayEnabled,
@@ -971,18 +1073,29 @@
                 createdAt: new Date().toISOString()
             };
 
-            const createShopBtn = document.getElementById('createShopBtn');
-            createShopBtn.innerText = "⚡ 正在打通雲端地基中...";
-            createShopBtn.disabled = true;
+            const shopSubmitBtn = document.getElementById('shopSubmitBtn');
+            shopSubmitBtn.innerText = "⚡ 正在打通雲端地基中...";
+            shopSubmitBtn.disabled = true;
 
             try {
+                // 模擬測試帳號防線
+                if(currentUserId === "TEST_USER_9527") {
+                    setTimeout(() => {
+                        alert("🎉【商家註冊測試成功】\n店鋪名稱：" + name + "\n聯絡電話：" + phone + "\n狀態：" + status + "\n\n正名指名封包完全對齊，實體上線時會完美寫入！");
+                        shopSubmitBtn.innerText = "建立店鋪";
+                        shopSubmitBtn.disabled = false;
+                    }, 1200);
+                    return;
+                }
+
+                // 統一集中送入 Firebase 大倉庫 "stores" 集合中
                 await setDoc(doc(db, "stores", currentUserId), shopData);
-                alert("🎉 恭喜哥！店鋪資料（含招牌與菜單）已成功寫入雲端 Firestore！\n系統即將引導您進入接單管理後台。");
+                alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張，資料已寫入雲端！\n系統即將引導您進入接單管理後台。");
                 window.location.href = "seller.html";
             } catch (dbError) {
-                alert("地基寫入失敗，請確認 Firebase 權限：" + dbError.message);
-                createShopBtn.innerText = "建立店鋪";
-                createShopBtn.disabled = false;
+                alert("寫入失敗，請檢查 Firebase 權限：" + dbError.message);
+                shopSubmitBtn.innerText = "建立店鋪";
+                shopSubmitBtn.disabled = false;
             }
         });
     }

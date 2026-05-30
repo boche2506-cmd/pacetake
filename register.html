@@ -72,140 +72,7 @@
             flex-direction: column;
         }
 
-        /* 頂部導航與大字留白 */
-        .header {
-            padding: 24px 20px 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .back-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-main);
-            cursor: pointer;
-            text-decoration: none;
-            background-color: var(--card-bg);
-        }
-
-        .header h1 {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        .control-panel {
-    display: flex;
-    flex-direction: column; /* 關鍵：讓按鈕由上往下垂直排列 */
-    align-items: flex-end;  /* 關鍵：讓兩顆按鈕都向右邊靠齊對齊 */
-    gap: 3px;               /* 設定上下兩顆按鈕之間的間距（可依喜好調整） */
-    height: 100%;           /* 固定住的數值：使控制台與 header 同高，利於垂直居中 */
-    justify-content: center;
-}
-
-
-/* 通用按鈕基礎 */
-.theme-toggle {
-    display: flex;
-    justify-content: center; /* 修改：讓月亮圖示「水平置中」 */
-    align-items: center;     /* 新增：讓月亮圖示「垂直置中」 */
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    font-size: 12px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;          /*  削成圓形            */
-    cursor: pointer;                  /*  滑鼠點上去變形 */
-    color: var(--text-main);
-    padding: 5px 5px;
-}
-
-.login-btn {
-    display: flex;
-    justify-content: flex-end;
-    background-color: var(--brand-blue);
-    color: #FFFFFF;
-    border: none;
-    padding: 6px 8px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 0px;
-}
-
-.user-avatar-btn {
-    display: none; 
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    padding: 6px 8px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-main);
-    cursor: pointer;
-    align-items: center;
-    gap: 3px;
-}
-
-/* 下拉選單面板 */
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 42px;
-    right: 0;
-    width: 200px;
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: var(--shadow-md);
-    
-    /* 🔴 修正：因為上層骨架是 10，裡面的人寫 11 甚至不寫（繼承父層優先權）就能壓死中層了 */
-    z-index: 500; 
-    
-    padding: 3px;
-    
-    /* 🔴 這個防爆限制還是要留著，手機才不會破圖 */
-    max-height: 280px;     
-    overflow-y: auto;      
-    -webkit-overflow-scrolling: touch;
-}
-
-.dropdown-menu a, 
-.dropdown-menu button {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 10px 12px;
-    color: var(--text-main);
-    text-decoration: none;
-    font-size: 13px;
-    border: none;
-    background: none;
-    text-align: left;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.dropdown-menu a:hover, 
-.dropdown-menu button:hover {
-    background-color: var(--bg-global);
-}
-
-.menu-divider {
-    height: 1px;
-    background-color: var(--border-color);
-    margin: 6px 0;
-}
-
-        /* 填表區域 */
+         /* 填表區域 */
         .form-container {
             padding: 20px;
             display: flex;
@@ -604,27 +471,12 @@
     </style>
 </head>
 <body>
-
-    <div class="phone-wrapper">
-        <header class="header">
-            <a href="index.html" class="back-btn nav-fast">⬅️ 返回</a>
-            <h1>3分鐘手機開店</h1>
-<div class="control-panel">
-        <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
-        <button class="login-btn" id="loginBtn">登入 / 註冊</button>
-        <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
-            <span class="avatar-icon">👤</span>
-            <span class="user-name" id="userNameDisplay">載入中...</span>
-        </button>
-        <div class="dropdown-menu" id="dropdownMenu"></div>
-    </div>
-</header>
-
-        <form class="form-container" id="shopRegisterForm">
-            <div class="form-section">
+     <div class="phone-wrapper">
+        <div id="header-placeholder"></div>
+          <form class="form-container" id="shopRegisterForm">
+             <div class="form-section">
                 <div class="section-title">基本資料設定</div>
-
-                <div class="input-group">
+                 <div class="input-group">
                     <label>店鋪聯絡電話</label>
                     <input type="tel" id="shopPhone" class="input-style" placeholder="請輸入店鋪或老闆的手機號碼" required pattern="[0-9]{9,10}">
                 </div>

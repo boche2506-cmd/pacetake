@@ -206,7 +206,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             document.getElementById('statusDot')?.classList.remove('active');
             const statusText = document.getElementById('statusText');
-            if(statusText) statusText.innerText = "您尚未登入，請使用電子郵件或連結google帳號登入";
+            if(statusText) statusText.innerText = "您尚未登入，請連結google帳號\n或使用電子郵件登入";
         }
     });
 
@@ -351,6 +351,11 @@ function filterAndRenderStores() {
         const finalDistrict = store.district || '';
         const finalCategory = store.category || '美食';
 
+        // 🎯 這裡新增：檢查雲端資料庫。如果不等於 false，預設當作「有支援(亮燈)」
+        // 💡 註：如果你的 Firebase 欄位名稱不同，可以把 store.hasTakeout 改成你後端的名字
+        const takeoutSupported = store.hasTakeout !== false;
+        const paySupported = store.hasPay !== false;
+
         const card = document.createElement('a');
         card.href = `menu.html?storeId=${store.id}`;
         card.className = 'store-card';
@@ -362,15 +367,15 @@ function filterAndRenderStores() {
                     <div class="store-meta">📍 ${finalCity}${finalDistrict} ${finalAddress} · ${finalCategory}</div>
                 </div>
                 <div class="store-tags">
-                    <span class="tag-time">⏱️ 店內價外帶</span>
-                    <span class="tag-pay">💳 支援行動支付</span>
+                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">⏱️ 店內價外帶</span>
+                    
+                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
                 </div>
             </div>
         `;
         storeContainer.appendChild(card);
     });
 }
-
 function getBrowserLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -479,7 +484,7 @@ window.deleteStore = async function(storeId) {
 };
 
 window.issuePromoCode = async function() {
-    const code = prompt('請輸入要發行的戰術 VIP 邀請碼 (例如: PACE2026):');
+    const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
     if (!code || code.trim() === "") return;
     
     try {

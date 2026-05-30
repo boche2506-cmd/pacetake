@@ -116,7 +116,7 @@ img, .card {
     /* 2. 點名搜尋框跟縣市條，在真手機上強制往下推開，拉開比例！ */
     .search-container, 
     .location-bar {
-        margin-top: 15px !important; /* 蓋掉原本的 0px，讓它在手機上長出距離 */
+        margin-top: 12px !important; /* 蓋掉原本的 0px，讓它在手機上長出距離 */
     }
 
 }
@@ -151,6 +151,7 @@ img, .card {
     justify-content: space-between; /* 新增：這行是關鍵！它會嚴格要求上中下三層乖乖各自定位，不管資料有沒有來，絕對不允許任何人往上吸 */
     /* 確保滑動時有 Apple 原生的絲滑回彈手感（Rubber-banding） */
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
     /* 🔴 第五步：立體手機殼裝飾（邊框與陰影） */
     background-color: var(--bg-container);
     border: 4px solid #222; /* 給它一個扎實的手機黑色外框 */
@@ -809,7 +810,7 @@ select {
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
             <input type="text" id="adminNewStoreName" placeholder="店家名稱 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
             <input type="text" id="adminNewStorePhone" placeholder="聯絡電話 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
-            <input type="text" id="adminNewStoreStoreCity" placeholder="縣市 (如: 基隆市) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+            <input type="text" id="adminNewStoreCity" placeholder="縣市 (如: 基隆市) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
             <input type="text" id="adminNewStoreDistrict" placeholder="區域 (如: 七堵區) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
             <input type="text" id="adminNewStoreAddress" placeholder="詳細地址 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">
             <input type="text" id="adminNewStoreCategory" placeholder="分類 (如: 台式小吃, 飲料)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">

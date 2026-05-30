@@ -83,7 +83,7 @@ window.addEventListener('DOMContentLoaded', () => {
     closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
     globalSearchInput = document.getElementById('globalSearchInput');
 
- });   // 初始化主題
+    // 初始化主題
     initTheme();
 
     // 綁定所有按鈕事件
@@ -189,7 +189,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
+});
 // 監聽 Firebase 登入狀態
 onAuthStateChanged(auth, (user) => {
     // 預先抓好元素

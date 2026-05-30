@@ -746,99 +746,11 @@
     </div>
 
 <script type="module">
-    // 🔗 1. 靈魂連動：直接向大本營 app.js 借用設定好的工具
+    // 🔗 核心模組引入
     import { auth, db } from "./app.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
     import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // 🎛️ 頂部控制面板元素指名
-    const loginBtn = document.getElementById('loginBtn');
-    const avatarBtn = document.getElementById('avatarBtn');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const userNameDisplay = document.getElementById('userNameDisplay');
-    let currentUserId = null;
-
-    // 👤 核心：監聽全站登入狀態 (控制面板動態切換)
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUserId = user.uid;
-            console.log("當前商家已連線，UID:", currentUserId);
-            
-            // 已登入：隱藏登入按鈕，顯示頭貼與姓名
-            if(loginBtn) loginBtn.style.display = 'none';
-            if(avatarBtn) avatarBtn.style.display = 'flex';
-            if(userNameDisplay) userNameDisplay.innerText = user.displayName || "老闆您好";
-            
-            // 動態注入下拉選單內容
-            if(dropdownMenu) {
-                dropdownMenu.innerHTML = `
-                    <a href="seller.html">💼 商家中心</a>
-                    <a href="index.html">🏠 返回首頁</a>
-                    <div class="menu-divider"></div>
-                    <button type="button" id="logoutBtn" style="color: var(--brand-red);">🚪 安全登出</button>
-                `;
-                
-                // 綁定登出按鈕功能
-                document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-                    await auth.signOut();
-                    alert("已安全登出！");
-                    window.location.href = "index.html";
-                });
-            }
-        } else {
-            // 未登入：顯示登入按鈕，隱藏頭貼
-            currentUserId = null;
-            if(loginBtn) loginBtn.style.display = 'block';
-            if(avatarBtn) avatarBtn.style.display = 'none';
-            console.log("訪客瀏覽模式");
-        }
-    });
-
-    // ⚡ 控制面板：點擊頭貼切換下拉選單顯示/隱藏
-    if (avatarBtn && dropdownMenu) {
-        avatarBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // 防止點擊事件泡泡蔓延
-            const isShow = dropdownMenu.style.display === 'block';
-            dropdownMenu.style.display = isShow ? 'none' : 'block';
-        });
-    }
-
-    // ⚡ 全局點擊：點擊網頁任意其他地方時，自動收合下拉選單
-    window.addEventListener('click', () => {
-        if (dropdownMenu) dropdownMenu.style.display = 'none';
-    });
-
-    // ⚡ 控制面板：未登入時點擊「登入 / 註冊」按鈕
-    if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
-            // 導回首頁讓中央警衛室（app.js）彈出登入視窗
-            alert("請至首頁點擊登入功能喔！");
-            window.location.href = "index.html";
-        });
-    }
-
-    // 🌗 深色模式初始化與切換
-    function initTheme() {
-        const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        updateThemeIcon(savedTheme);
-    }
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
-    if(themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('pacetake-theme', newTheme);
-            updateThemeIcon(newTheme);
-        });
-    }
-    function updateThemeIcon(theme) {
-        if(themeToggleBtn) themeToggleBtn.innerText = theme === 'dark' ? '☀️' : '🌙';
-    }
-    initTheme();
-
-    // 🗺️ 縣市區域連動選單資料庫
+    // 🗺️ 1. 縣市區域連動選單資料庫
     const areaData = {
         "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
         "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -883,7 +795,7 @@
         }
     });
 
-    // 💳 金流欄位動態渲染
+    // 💳 2. 金流欄位處理
     const toggleOnline = document.getElementById('toggleOnline');
     const toggleCash = document.getElementById('toggleCash');
     const newebpayContainer = document.getElementById('newebpayContainer');
@@ -938,11 +850,9 @@
         });
     }
 
-    // ☰ 菜單拖曳排序核心
+    // ☰ 3. 菜單拖曳排序與操作核心
     const menuUploadList = document.getElementById('menuUploadList');
     let activeDragItem = null;
-    let startY = 0;
-    let currentY = 0;
 
     function makeItemDraggable(row) {
         const handle = row.querySelector('.drag-handle');
@@ -957,8 +867,6 @@
         row.style.border = '2px dashed var(--brand-blue)';
         
         const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-        startY = clientY;
-
         if (e.type.startsWith('touch')) {
             window.addEventListener('touchmove', onDragMove, { passive: false });
             window.addEventListener('touchend', onDragEnd);
@@ -971,19 +879,13 @@
     function onDragMove(e) {
         if (!activeDragItem) return;
         if (e.cancelable) e.preventDefault();
-        currentY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-        
+        const currentY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
         const siblings = [...menuUploadList.querySelectorAll('.menu-item-row:not([style*="dashed"])')];
         const nextSibling = siblings.find(sibling => {
             const box = sibling.getBoundingClientRect();
             return currentY <= box.top + box.height / 2;
         });
-
-        if (nextSibling) {
-            menuUploadList.insertBefore(activeDragItem, nextSibling);
-        } else {
-            menuUploadList.appendChild(activeDragItem);
-        }
+        nextSibling ? menuUploadList.insertBefore(activeDragItem, nextSibling) : menuUploadList.appendChild(activeDragItem);
     }
 
     function onDragEnd() {
@@ -991,7 +893,6 @@
         activeDragItem.style.opacity = '1';
         activeDragItem.style.border = '1px solid var(--border-color)';
         activeDragItem = null;
-
         window.removeEventListener('mousemove', onDragMove);
         window.removeEventListener('mouseup', onDragEnd);
         window.removeEventListener('touchmove', onDragMove);
@@ -1000,7 +901,6 @@
 
     document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
 
-    // ＋ 新增菜單品項
     const addItemRowBtn = document.getElementById('addItemRowBtn');
     if(addItemRowBtn && menuUploadList) {
         addItemRowBtn.addEventListener('click', () => {
@@ -1044,7 +944,6 @@
         const box = input.parentElement;
         const img = box.querySelector('.preview-img');
         const placeholder = box.querySelector('.upload-placeholder');
-        
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -1056,16 +955,13 @@
         }
     };
 
-    // 🚀 表單提交打包
+    // 🚀 4. 表單提交打包
     const form = document.getElementById('shopRegisterForm');
     if(form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            if (!currentUserId) {
-                alert("【PACE 提示】開鋪前請先登入帳號喔！");
-                return;
-            }
+            const user = auth.currentUser;
+            if (!user) { alert("【PACE 提示】開鋪前請先登入帳號喔！"); return; }
             
             const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
             const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
@@ -1075,18 +971,16 @@
                 return;
             }
 
-            const phone = document.getElementById('shopPhone')?.value.trim() || '';
             const name = document.getElementById('shopName')?.value.trim() || '';
+            const phone = document.getElementById('shopPhone')?.value.trim() || '';
             const city = shopCity.value;
             const district = shopDistrict.value;
             const detailAddress = document.getElementById('shopAddress')?.value.trim() || '';
             const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
             const status = document.getElementById('shopStatus')?.value || 'online';
             const prepareTime = parseInt(document.getElementById('prepareTimeInput')?.value) || 15;
-
             const logoEl = document.getElementById('shopLogoPreview');
             const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
-
             const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
             const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
             const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
@@ -1100,34 +994,18 @@
                 const priceVal = priceField ? parseInt(priceField.value) || 0 : 0;
                 const imgEl = row.querySelector('.preview-img');
                 const imgData = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : "";
-
-                if (nameVal) {
-                    menuItems.push({ name: nameVal, price: priceVal, image: imgData });
-                }
+                if (nameVal) menuItems.push({ name: nameVal, price: priceVal, image: imgData });
             });
 
-            const fullAddress = `${city}${district}${detailAddress}`;
-
             const shopData = {
-                sellerUid: currentUserId,
-                shopName: name,
-                shopPhone: phone, 
-                city: city,
-                district: district,
-                shopAddress: fullAddress,
-                inviteCode: inviteCode,
-                status: status,
-                shopLogo: shopLogoData, 
-                prepareTime: prepareTime,
-                isOnlinePayEnabled: isOnlinePayEnabled,
+                sellerUid: user.uid,
+                shopName: name, shopPhone: phone, city: city, district: district,
+                shopAddress: `${city}${district}${detailAddress}`,
+                inviteCode: inviteCode, status: status, shopLogo: shopLogoData,
+                prepareTime: prepareTime, isOnlinePayEnabled: isOnlinePayEnabled,
                 isCashPayEnabled: isCashPayEnabled,
-                newebpayConfig: {
-                    MerchantID: merchantIdValue,
-                    HashKey: hashKeyValue,
-                    HashIV: hashIvValue
-                },
-                menuList: menuItems, 
-                createdAt: new Date().toISOString()
+                newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
+                menuList: menuItems, createdAt: new Date().toISOString()
             };
 
             const shopSubmitBtn = document.getElementById('shopSubmitBtn');
@@ -1135,7 +1013,7 @@
             shopSubmitBtn.disabled = true;
 
             try {
-                await setDoc(doc(db, "stores", currentUserId), shopData);
+                await setDoc(doc(db, "stores", user.uid), shopData);
                 alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張！");
                 window.location.href = "seller.html";
             } catch (dbError) {

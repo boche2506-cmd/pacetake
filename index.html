@@ -15,8 +15,11 @@
    1. 全局變數與主題防線 (Cyber Blue)
    ========================================================================== */
 html {
-    /* ⭕ 讓字體回歸正常的標準大小，在 9:16 手機殼內絕對不會暴走破圖 */
-    font-size: 16px; 
+    font-size: 14px;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden !important;
+    touch-action: none;
 }
 :root {
     --bg-global: #F8FAFC;
@@ -65,17 +68,23 @@ html {
 }
 
 body {
-    background-color: #000000; /* 修改：最高原則！多餘的螢幕範圍一律強制塗黑 */
-    color: var(--text-main);
-    display: flex;
-    justify-content: center;
-    align-items: center;     /* 強制裡面的手機盒子「上下絕對置中」 */
-    height: 100vh;           /* 修改：從 min-height 改為嚴格的固定 100vh，鎖死視窗高度 */
+    /* 🔴 關鍵修正：放棄 width:100% 這種會被父層干擾的寫法，改用絕對視窗維度 */
     width: 100vw;
-    margin: 0;               /* 新增：清除瀏覽器預設邊距，防止畫面歪掉 */
-    padding: 0;              /* 新增：清除預設內距 */
-    overflow: hidden;        /* 新增：最外層大環境死不准滑動 */
-    transition: background-color 0.15s ease;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #000000; /* 外圍黑色沙盒 */
+    
+    /* 鎖死觸控反彈與捲軸 */
+    overscroll-behavior: none;
+    overflow: hidden !important;
+    touch-action: none;
+    
+    /* 👑 強制向下對齊 */
+    display: flex;
+    flex-direction: column;    /* 讓排列方向變成垂直軸 */
+    justify-content: flex-end; /* 🔴 核心關鍵：將所有東西徹底推到最底部 */
+    align-items: center;       /* 橫向依然保持完美置中 */
 }
 
 input, textarea {
@@ -87,6 +96,13 @@ img, .card {
     max-width: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
     height: auto;
     box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+    -webkit-font-smoothing: antialiased;    /* 讓 Mac/iPhone 上的文字更細緻不毛躁 */
+    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;                 /* 順便鎖死所有盒模型的寬度計算，防止破圖 */
 }
 
 /* ==========================================================================
@@ -138,14 +154,22 @@ img, .card {
 .sticky-top-group {
     display: flex;
     flex-direction: column;
-    height: 30%;
-    margin: 10px ;
+    height: 28%;
     box-sizing: border-box; /* 確保 margin/padding 不會把這 30% 的高度撐破 */
     background-color: var(--blur-bg);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px); 
     border-bottom: 1px solid var(--border-color);
     flex-shrink: 0;
+    gap: 5px;
+    padding-top: 10px;
+}
+
+*, *::before, *::after {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+    -webkit-font-smoothing: antialiased;    /* 讓 Mac/iPhone 上的文字更細緻不毛躁 */
+    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;                 /* 順便鎖死所有盒模型的寬度計算，防止破圖 */
 }
 
 /* ==========================================================================
@@ -155,7 +179,6 @@ img, .card {
     display: flex;
     justify-content: space-between; /* 讓左邊欄位和右邊控制面板各自靠兩端 */
     align-items: center;            /* 關鍵：讓左右兩邊的內容物「垂直居中」對齊 */
-    margin-top: 5px;
     height: 54px;                   /* 固定住的數值：鎖定第一排商標與控制台高度 */
     flex-shrink: 0;
 }
@@ -168,6 +191,7 @@ img, .card {
     flex-direction: column;
     justify-content: flex-end; /* 關鍵：讓整塊內容（含副標題）往底部貼齊，跟右邊對齊 */
     height: 100%;              /* 確保高度有撐滿，才能順利置底 */
+    margin-top: 10px;
 }
 
 /* 設定 PACE 英文標題 */
@@ -178,7 +202,7 @@ img, .card {
     transform: translateY(5px);
 }
 .brand-logo-img {
-    height: 48px;              /* 放大派思圖片的高度（原本可能較小，可自行調整數值） */
+    height: 46px;              /* 放大派思圖片的高度（原本可能較小，可自行調整數值） */
     width: auto;
 }  
 /* 設定副標題小字 */
@@ -198,7 +222,7 @@ img, .card {
     display: flex;
     flex-direction: column; /* 關鍵：讓按鈕由上往下垂直排列 */
     align-items: flex-end;  /* 關鍵：讓兩顆按鈕都向右邊靠齊對齊 */
-    gap: 5px;               /* 設定上下兩顆按鈕之間的間距（可依喜好調整） */
+    gap: 3px;               /* 設定上下兩顆按鈕之間的間距（可依喜好調整） */
     height: 100%;           /* 固定住的數值：使控制台與 header 同高，利於垂直居中 */
     justify-content: center;
 }
@@ -214,9 +238,10 @@ img, .card {
     font-size: 12px;
     width: 30px;
     height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
+    border-radius: 50%;          /*  削成圓形            */
+    cursor: pointer;                  /*  滑鼠點上去變形 */
     color: var(--text-main);
+    padding: 5px 5px;
 }
 
 .login-btn {
@@ -310,8 +335,7 @@ img, .card {
     padding: 0px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 5px;
+    gap: 5px;
     height: 36px;                   /* 固定住的數值：鎖定第二排選單高度 */
     flex-shrink: 0;
 }
@@ -353,8 +377,7 @@ img, .card {
 }
 
 .search-container {
-    padding: 8px 10px 4px;
-    margin-top: 0px;
+    margin-bottom: 0px;
     height: 48px;                   /* 固定住的數值：鎖定第三排搜尋框容器高度 */
     flex-shrink: 0;
 }
@@ -365,7 +388,7 @@ img, .card {
     background-color: var(--bg-global);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 0 10px;
+    padding: 0 5px;
     height: 36px;
 }
 
@@ -383,15 +406,13 @@ img, .card {
    7. 店家列表 (Store List)
    ========================================================================== */
 .store-list {
-    height: 50%;
+    height: 57%;
     overflow-y: auto;       
     -webkit-overflow-scrolling: touch; 
     box-sizing: border-box; 
-    margin: 10px;
-    padding: 10px 8px;      /* 修改：縮小內距，讓卡片左右間距不要太大 */
     display: flex;
     flex-direction: column;
-    gap: 8px;               /* 修改：由 16px 縮小至 8px，緊湊卡片間距 */
+    gap: 5px;               /* 修改：由 16px 縮小至 8px，緊湊卡片間距 */
 }
 
 .store-card {
@@ -401,7 +422,6 @@ img, .card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    padding: 10px;          /* 保持：維持原本內距，不用大 padding 頂高，字體不變小 */
     margin-bottom: 0px;     /* 修改：外距歸零，由 list 的 gap 統一控制間距 */
     text-decoration: none;
     color: inherit;
@@ -476,8 +496,7 @@ img, .card {
    ========================================================================== */
 .bottom-bar {
     display: flex;
-    margin: 10px;
-    height: 20%;              /* 保持：分配剩餘的 20% 高度 */
+    height: 15%;              /* 保持：分配剩餘的 20% 高度 */
     flex-shrink: 0;           /* 保持：強制固定，絕不被壓縮 */
     box-sizing: border-box;
     background-color: var(--blur-bg);
@@ -499,8 +518,8 @@ img, .card {
 }
 
 footer .status-indicator {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background-color: #ff4d4f;
     flex-shrink: 0;
@@ -703,7 +722,7 @@ select {
         </div>
       </div>
     <main class="store-list" id="store-container">
-        <div class="loading-spinner" id="loadingSpinner">⚡ 正在安全連線雲端資料庫...</div>
+        <div class="loading-spinner" id="loadingSpinner">⚡ 正在連線雲端資料庫...</div>
     </main>
     <footer class="bottom-bar">
         <a href="history.html" class="status-msg" id="bottomStatusMsg">
@@ -712,7 +731,7 @@ select {
             <span id="statusText">您目前沒有進行中的訂單喔！</span>
         </a>
         <a href="cart.html" class="cart-status-btn nav-fast">
-            <span>🛒 購物車</span>
+            <span>🛒 </span>
             <span id="cartCount">(0)</span>
         </a>
     </footer>

@@ -353,8 +353,8 @@ function filterAndRenderStores() {
 
         // 🎯 這裡新增：檢查雲端資料庫。如果不等於 false，預設當作「有支援(亮燈)」
         // 💡 註：如果你的 Firebase 欄位名稱不同，可以把 store.hasTakeout 改成你後端的名字
-        const takeoutSupported = store.hasTakeout !== false;
-        const paySupported = store.hasPay !== false;
+        const takeoutSupported = store.isCashPayEnabled !== false;
+        const paySupported = store.isOnlinePayEnabled !== false;
 
         const card = document.createElement('a');
         card.href = `menu.html?storeId=${store.id}`;
@@ -367,7 +367,7 @@ function filterAndRenderStores() {
                     <div class="store-meta">📍 ${finalCity}${finalDistrict} ${finalAddress} · ${finalCategory}</div>
                 </div>
                 <div class="store-tags">
-                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">⏱️ 店內價外帶</span>
+                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
                     
                     <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
                 </div>

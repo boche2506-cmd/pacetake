@@ -105,6 +105,16 @@ img, .card {
     box-sizing: border-box;                 /* 順便鎖死所有盒模型的寬度計算，防止破圖 */
 }
 
+@media (max-width: 480px) {
+    
+    .sticky-top-group {
+        /* 🔴 只有手機版才會吃這兩行，電腦版完全不會被影響！ */
+        padding-top: 15px; 
+        box-sizing: border-box;
+    }
+
+}
+
 /* ==========================================================================
    3. 核心佈局架構 (Layout)
    ========================================================================== */
@@ -152,6 +162,7 @@ img, .card {
     left: 0;
     right: 0;
     bottom: 0;
+    padding: 10px !important;;
     
     /* 🔴 關鍵 3：寬高百分之百跟隨手機殼，絕對不會變超大一張 */
     width: 100%;
@@ -164,7 +175,17 @@ img, .card {
     background-color: #ffffff; 
     
     /* 如果控制台裡面的內容很多，允許它在自己的規格內獨立滾動 */
+    overflow-x: hidden;
     overflow-y: auto; 
+    box-sizing: border-box !important;
+}
+
+#adminView input, 
+#adminView select, 
+#adminView button {
+    width: 100% !important;        /* 🔴 核心：強行蓋掉 JS 寫死的固定 px，改成跟著手機殼縮放 */
+    max-width: 100% !important;    /* 絕對不准超過 */
+    box-sizing: border-box !important; /* 防爆公式 */
 }
 
 #buyerView {

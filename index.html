@@ -76,10 +76,7 @@ body {
     background-color: #000000; /* 外圍黑色沙盒 */
     
     /* 鎖死觸控反彈與捲軸 */
-    overscroll-behavior: none;
-    overflow: hidden !important;
-    touch-action: none;
-    
+
     /* 👑 強制向下對齊 */
     display: flex;
     flex-direction: column;    /* 讓排列方向變成垂直軸 */
@@ -116,7 +113,7 @@ img, .card {
     /* 2. 點名搜尋框跟縣市條，在真手機上強制往下推開，拉開比例！ */
     .search-container, 
     .location-bar {
-        margin-top: 12px !important; /* 蓋掉原本的 0px，讓它在手機上長出距離 */
+        margin-top: 10px !important; /* 蓋掉原本的 0px，讓它在手機上長出距離 */
     }
 
 }
@@ -220,6 +217,7 @@ img, .card {
     background-color: var(--bg-container) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    z-index: 100; 
 }
 
 *, *::before, *::after {
@@ -484,7 +482,7 @@ img, .card {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     width: 100%; /* 強迫卡片指名服從手機大外框的限制，絕不擠破框架 */
     box-sizing: border-box; /* 新增：確保寬度計算包含 border 與 padding */
-    padding: 5px 0;
+    padding: 5px;
 }
 
 

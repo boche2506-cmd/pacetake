@@ -163,6 +163,7 @@ img, .card {
     flex-shrink: 0;
     gap: 5px;
     padding-top: 10px;
+    margin-bottom: 10px;
 }
 
 *, *::before, *::after {
@@ -380,6 +381,7 @@ img, .card {
     margin-bottom: 0px;
     height: 48px;                   /* 固定住的數值：鎖定第三排搜尋框容器高度 */
     flex-shrink: 0;
+    padding: 0 10px;
 }
 
 .search-box {
@@ -413,6 +415,7 @@ img, .card {
     display: flex;
     flex-direction: column;
     gap: 5px;               /* 修改：由 16px 縮小至 8px，緊湊卡片間距 */
+    padding: 0 10px;
 }
 
 .store-card {
@@ -429,7 +432,9 @@ img, .card {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     width: 100%; /* 強迫卡片指名服從手機大外框的限制，絕不擠破框架 */
     box-sizing: border-box; /* 新增：確保寬度計算包含 border 與 padding */
+    padding: 5px 0;
 }
+
 
 .store-card:hover {
     transform: translateY(-2px);

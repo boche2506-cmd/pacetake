@@ -83,7 +83,7 @@ window.addEventListener('DOMContentLoaded', () => {
     closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
     globalSearchInput = document.getElementById('globalSearchInput');
 
-    // 初始化主題
+ });   // 初始化主題
     initTheme();
 
     // 綁定所有按鈕事件
@@ -96,7 +96,7 @@ window.addEventListener('DOMContentLoaded', () => {
             themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         });
     }
-});
+
     if(avatarBtn && dropdownMenu) {
         avatarBtn.addEventListener('click', (e) => {
             e.stopPropagation();

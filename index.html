@@ -122,23 +122,49 @@ img, .card {
     max-height: calc(100vw * 16 / 9); /* 根據寬度逆推最大高度 */
 
     /* 🔴 第三步：這三行神陣，保證不管是上下留黑還是左右留黑，永遠「絕對正中央」 */
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 
     /* 🔴 第四步：死不准滑動（你要求的鐵律） */
-    overflow: hidden; 
+    overflow: auto; 
     display: flex;
     flex-direction: column;
     padding: 10px;
     justify-content: space-between; /* 新增：這行是關鍵！它會嚴格要求上中下三層乖乖各自定位，不管資料有沒有來，絕對不允許任何人往上吸 */
-
+    /* 確保滑動時有 Apple 原生的絲滑回彈手感（Rubber-banding） */
+    -webkit-overflow-scrolling: touch;
     /* 🔴 第五步：立體手機殼裝飾（邊框與陰影） */
     background-color: var(--bg-container);
     border: 4px solid #222; /* 給它一個扎實的手機黑色外框 */
     border-radius: 20px;    /* 稍微帶點圓角更像手機 */
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5); /* 超立體陰影 */
+}
+
+#adminView {
+    /* 🔴 關鍵 1：用 absolute，不要用 fixed！
+       這樣它才會乖乖以 `.phone-wrapper` 的身體當作世界邊界 */
+    position: absolute; 
+    
+    /* 🔴 關鍵 2：死死貼住手機殼的四個角落，一吋都不準多 */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    /* 🔴 關鍵 3：寬高百分之百跟隨手機殼，絕對不會變超大一張 */
+    width: 100%;
+    height: 100%;
+    
+    /* 🔴 關鍵 4：層級直接拉到最高，蓋掉原本的店家卡片和底欄黑條 */
+    z-index: 999; 
+    
+    /* 補上底色，切換過去才不會透視看到後面的店家卡片 */
+    background-color: #ffffff; 
+    
+    /* 如果控制台裡面的內容很多，允許它在自己的規格內獨立滾動 */
+    overflow-y: auto; 
 }
 
 #buyerView {

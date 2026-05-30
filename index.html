@@ -82,6 +82,7 @@ body {
     flex-direction: column;    /* 讓排列方向變成垂直軸 */
     justify-content: flex-end; /* 🔴 核心關鍵：將所有東西徹底推到最底部 */
     align-items: center;       /* 橫向依然保持完美置中 */
+    position: sticky
 }
 
 input, textarea {
@@ -210,7 +211,6 @@ img, .card {
     border-bottom: 1px solid var(--border-color);
     flex-shrink: 0;
     gap: 5px;
-    top: 0;
     padding-top: 10px;
     margin-bottom: 10px;
     position: sticky;

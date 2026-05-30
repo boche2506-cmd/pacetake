@@ -15,11 +15,11 @@
    1. 全局變數與主題防線 (Cyber Blue)
    ========================================================================== */
 html {
-    font-size: 14px;
     width: 100vw;
     height: 100vh;
     overflow: hidden !important;
     touch-action: none;
+    font-size: 16px !important;
 }
 :root {
     --bg-global: #F8FAFC;
@@ -106,11 +106,17 @@ img, .card {
 }
 
 @media (max-width: 480px) {
-    
+
+    /* 1. 給大盒子內壁加上緩衝墊，不准黃框貼頂 */
     .sticky-top-group {
-        /* 🔴 只有手機版才會吃這兩行，電腦版完全不會被影響！ */
-        padding-top: 15px; 
-        box-sizing: border-box;
+        padding-top: 15px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 2. 點名搜尋框跟縣市條，在真手機上強制往下推開，拉開比例！ */
+    .search-container, 
+    .location-bar {
+        margin-top: 15px !important; /* 蓋掉原本的 0px，讓它在手機上長出距離 */
     }
 
 }

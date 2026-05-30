@@ -13,10 +13,11 @@ const firebaseConfig = {
     measurementId: "G-888XL8JTHW",
 };
 
+// 🎯 沒錯！就是在這裡補上 export，把通道對外開放！
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const provider = new GoogleAuthProvider(); // 如果其他頁面需要處理 Google 登入，這個也順便送出去
 
 // 2. 全域核心變數
 let allStores = [];

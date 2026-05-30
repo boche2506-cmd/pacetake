@@ -96,7 +96,7 @@ window.addEventListener('DOMContentLoaded', () => {
             themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         });
     }
-
+});
     if(avatarBtn && dropdownMenu) {
         avatarBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -190,40 +190,42 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 監聽 Firebase 登入狀態
-    onAuthStateChanged(auth, (user) => {
-    // 預先抓好這三個元素，等一下要用
+// 監聽 Firebase 登入狀態
+onAuthStateChanged(auth, (user) => {
+    // 預先抓好元素
     const avatarBtn = document.getElementById('avatarBtn');
     const defaultIcon = document.getElementById('defaultIcon');
     const userAvatarImg = document.getElementById('userAvatarImg');
+    const loginBtn = document.getElementById('loginBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const statusText = document.getElementById('statusText');
 
     if (user) {
         // --- 登入狀態 ---
         handleUserSyncAndRoleRouting(user);
         document.getElementById('statusDot')?.classList.add('active');
 
-        // 1. 顯示整個按鈕
+        // 顯示按鈕
         if(avatarBtn) avatarBtn.style.display = 'block';
+        if(loginBtn) loginBtn.style.display = 'none';
 
-        // 2. 判斷要顯示頭貼還是 Icon
+        // 頭像邏輯
         if (user.photoURL && userAvatarImg && defaultIcon) {
             userAvatarImg.src = user.photoURL;
-            userAvatarImg.style.display = 'block'; // 顯示圖片
-            defaultIcon.style.display = 'none';    // 藏掉 Icon
+            userAvatarImg.style.display = 'block';
+            defaultIcon.style.display = 'none';
         } else if (defaultIcon) {
-            // 如果沒照片，確保 Icon 是出現的
             if(userAvatarImg) userAvatarImg.style.display = 'none';
             defaultIcon.style.display = 'block';
         }
 
-        // 你原本的 statusText 邏輯
-        const statusText = document.getElementById('statusText');
+        // 文字狀態
         if(statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
 
     } else {
         // --- 登出狀態 ---
         if(loginBtn) loginBtn.style.display = 'block';
-        if(avatarBtn) avatarBtn.style.display = 'none'; // 沒登入就整個按鈕消失
+        if(avatarBtn) avatarBtn.style.display = 'none';
 
         if(dropdownMenu) {
             dropdownMenu.style.display = 'none';
@@ -231,10 +233,9 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         document.getElementById('statusDot')?.classList.remove('active');
 
-        const statusText = document.getElementById('statusText');
         if(statusText) statusText.innerText = "您尚未登入，請連結google帳號\n或使用電子郵件登入";
     }
-});
+}); // <--
 
 // 4. 獨立功能函數區
 function initTheme() {

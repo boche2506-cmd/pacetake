@@ -518,7 +518,7 @@
             <button class="theme-toggle" id="themeToggleBtn">🌓</button>
         </header>
 
-        <form class="form-container" id="shopRegisterForm" onsubmit="return false;">
+        <form class="form-container" id="shopRegisterForm">
             <div class="form-section">
                 <div class="section-title">基本資料設定</div>
                 
@@ -537,10 +537,10 @@
                 <div class="input-group">
                     <label>店鋪所在區域</label>
                     <div class="select-row">
-                        <select id="shopCity" class="input-style">
+                        <select id="shopCity" class="input-style" required>
                             <option value="">選擇縣市</option>
                         </select>
-                        <select id="shopDistrict" class="input-style">
+                        <select id="shopDistrict" class="input-style" required>
                             <option value="">選擇區域</option>
                         </select>
                     </div>
@@ -570,10 +570,8 @@
                     </label>
                 </div>
 
-                <div class="input-group newebpay-box" id="newebpayContainer">
-                    <label>藍新金流專屬收款網址</label>
-                    <input type="url" class="input-style" placeholder="https://newebpay.com..." id="newebpayUrlInput">
-                </div>
+                <div class="input-group newebpay-box" id="newebpayContainer" style="display: none;">
+                    </div>
 
                 <div class="switch-row">
                     <div class="switch-info">
@@ -598,16 +596,16 @@
                             <div class="upload-placeholder">📷<span>上傳照片</span></div>
                         </div>
                         <div class="item-fields">
-                            <input type="text" class="input-style" style="height:32px; padding: 0 10px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
+                            <input type="text" class="input-style item-name-input" style="height:32px; padding: 0 10px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
                             <div class="price-input-wrapper">
                                 <span class="price-symbol">$</span>
                                 <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
                             </div>
                         </div>
-<div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 6px; justify-content: center;">
-    <div class="drag-handle" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">☰</div>
-    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
-</div>
+                        <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 6px; justify-content: center;">
+                            <div class="drag-handle" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: grab;">☰</div>
+                            <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
+                        </div>
                     </div>
 
                 </div>
@@ -694,7 +692,7 @@
         "嘉義市": ["東區", "西區"],
         "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
         "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
-        "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區", "內門區"],
+        "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區"],
         "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
         "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
         "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
@@ -778,7 +776,7 @@
         });
     }
 
-    // 👑 4. 跨平台雙棲流暢拖曳排序核心防線 (即便移至最右側依然流暢觸控)
+    // 👑 4. 跨平台雙棲流暢拖曳排序核心防線
     const menuUploadList = document.getElementById('menuUploadList');
     let activeDragItem = null;
     let startY = 0;
@@ -843,30 +841,30 @@
 
     document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
 
-    // ➕ 新增菜單品項 (右側並排極簡按鈕版)
+    // ➕ 新增菜單品項
     const addItemRowBtn = document.getElementById('addItemRowBtn');
     if(addItemRowBtn && menuUploadList) {
         addItemRowBtn.addEventListener('click', () => {
             const newRow = document.createElement('div');
             newRow.className = 'menu-item-row';
-newRow.innerHTML = `
-    <div class="img-upload-box" onclick="triggerUpload(this)">
-        <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-        <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-        <div class="upload-placeholder">📷<span>上傳照片</span></div>
-    </div>
-    <div class="item-fields">
-        <input type="text" class="input-style" style="height:32px; padding: 0 10px;" placeholder="品項名稱 (如：香濃起司蛋餅)" required>
-        <div class="price-input-wrapper">
-            <span class="price-symbol">$</span>
-            <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
-        </div>
-    </div>
-    <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 6px; justify-content: center;">
-        <div class="drag-handle" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">☰</div>
-        <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
-    </div>
-`;
+            newRow.innerHTML = `
+                <div class="img-upload-box" onclick="triggerUpload(this)">
+                    <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                    <div class="upload-placeholder">📷<span>上傳照片</span></div>
+                </div>
+                <div class="item-fields">
+                    <input type="text" class="input-style item-name-input" style="height:32px; padding: 0 10px;" placeholder="品項名稱 (如：香濃起司蛋餅)" required>
+                    <div class="price-input-wrapper">
+                        <span class="price-symbol">$</span>
+                        <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
+                    </div>
+                </div>
+                <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 6px; justify-content: center;">
+                    <div class="drag-handle" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: grab;">☰</div>
+                    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
+                </div>
+            `;
             menuUploadList.appendChild(newRow);
             makeItemDraggable(newRow); 
         });
@@ -899,11 +897,18 @@ newRow.innerHTML = `
         }
     };
 
-    // 🚀 5. 真‧建立店鋪並安全寫入 Firebase 雲端資料庫
-    const createShopBtn = document.getElementById('createShopBtn');
-    if(createShopBtn) {
-        createShopBtn.addEventListener('click', async () => {
-            const form = document.getElementById('shopRegisterForm');
+    // 🚀 5. 建立店鋪並安全寫入 Firebase 雲端資料庫
+    const form = document.getElementById('shopRegisterForm');
+    if(form) {
+        form.addEventListener('submit', async (e) => {
+            // 阻止表單預設跳頁行為
+            e.preventDefault();
+
+            // 確保使用者已登入
+            if (!currentUserId) {
+                alert("【PACE 提示】開鋪前請先回首頁完成登入喔！");
+                return;
+            }
             
             const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
             const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
@@ -919,30 +924,23 @@ newRow.innerHTML = `
             const detailAddress = document.getElementById('shopAddressInput')?.value.trim() || '';
             const prepareTime = parseInt(document.getElementById('prepareTimeInput')?.value) || 15;
 
-            // 👑 核心加強：提取招牌 Logo 圖片數據
+            // 招牌 Logo 數據
             const logoEl = document.getElementById('shopLogoPreview');
             const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
-
-            if (!shopName || !city || !district || !detailAddress) {
-                alert("請確認已填寫店鋪名稱、選擇縣市區域、並填入詳細地址喔！");
-                return;
-            }
 
             const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
             const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
             const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
             
-            if (form && !form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
+            // 抓取菜單結構
             const menuRows = document.querySelectorAll('.menu-item-row');
             const menuItems = [];
             menuRows.forEach(row => {
-                const fields = row.querySelectorAll('.item-fields .input-style');
-                const name = fields[0] ? fields[0].value.trim() : '';
-                const price = fields[1] ? parseInt(fields[1].value) || 0 : 0;
+                const nameField = row.querySelector('.item-name-input');
+                const priceField = row.querySelector('.price-input');
+                
+                const name = nameField ? nameField.value.trim() : '';
+                const price = priceField ? parseInt(priceField.value) || 0 : 0;
                 
                 const imgEl = row.querySelector('.preview-img');
                 const imgData = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : "";
@@ -957,7 +955,7 @@ newRow.innerHTML = `
             const shopData = {
                 sellerUid: currentUserId,
                 shopName: shopName,
-                shopLogo: shopLogoData, // 👑 招牌大頭貼強勢進駐資料庫！
+                shopLogo: shopLogoData, 
                 city: city,
                 district: district,
                 shopAddress: fullAddress,
@@ -973,6 +971,7 @@ newRow.innerHTML = `
                 createdAt: new Date().toISOString()
             };
 
+            const createShopBtn = document.getElementById('createShopBtn');
             createShopBtn.innerText = "⚡ 正在打通雲端地基中...";
             createShopBtn.disabled = true;
 

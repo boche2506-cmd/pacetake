@@ -746,27 +746,82 @@
     </div>
 
 <script type="module">
-    // 🔗 1. 靈魂連動：直接向大本營 app.js 借用設定好的工具，拒絕代碼冗長！
+    // 🔗 1. 靈魂連動：直接向大本營 app.js 借用設定好的工具
     import { auth, db } from "./app.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
     import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+    // 🎛️ 頂部控制面板元素指名
+    const loginBtn = document.getElementById('loginBtn');
+    const avatarBtn = document.getElementById('avatarBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const userNameDisplay = document.getElementById('userNameDisplay');
     let currentUserId = null;
+
+    // 👤 核心：監聽全站登入狀態 (控制面板動態切換)
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUserId = user.uid;
             console.log("當前商家已連線，UID:", currentUserId);
+            
+            // 已登入：隱藏登入按鈕，顯示頭貼與姓名
+            if(loginBtn) loginBtn.style.display = 'none';
+            if(avatarBtn) avatarBtn.style.display = 'flex';
+            if(userNameDisplay) userNameDisplay.innerText = user.displayName || "老闆您好";
+            
+            // 動態注入下拉選單內容
+            if(dropdownMenu) {
+                dropdownMenu.innerHTML = `
+                    <a href="seller.html">💼 商家中心</a>
+                    <a href="index.html">🏠 返回首頁</a>
+                    <div class="menu-divider"></div>
+                    <button type="button" id="logoutBtn" style="color: var(--brand-red);">🚪 安全登出</button>
+                `;
+                
+                // 綁定登出按鈕功能
+                document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+                    await auth.signOut();
+                    alert("已安全登出！");
+                    window.location.href = "index.html";
+                });
+            }
         } else {
-            // 💡 方便哥測試排版，沒登入時先給假 UID
-            currentUserId = "TEST_USER_9527"; 
-            console.log("測試模式：使用臨時 UID 預覽排版中");
+            // 未登入：顯示登入按鈕，隱藏頭貼
+            currentUserId = null;
+            if(loginBtn) loginBtn.style.display = 'block';
+            if(avatarBtn) avatarBtn.style.display = 'none';
+            console.log("訪客瀏覽模式");
         }
     });
 
-    // 🌗 深色模式初始化
+    // ⚡ 控制面板：點擊頭貼切換下拉選單顯示/隱藏
+    if (avatarBtn && dropdownMenu) {
+        avatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止點擊事件泡泡蔓延
+            const isShow = dropdownMenu.style.display === 'block';
+            dropdownMenu.style.display = isShow ? 'none' : 'block';
+        });
+    }
+
+    // ⚡ 全局點擊：點擊網頁任意其他地方時，自動收合下拉選單
+    window.addEventListener('click', () => {
+        if (dropdownMenu) dropdownMenu.style.display = 'none';
+    });
+
+    // ⚡ 控制面板：未登入時點擊「登入 / 註冊」按鈕
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            // 導回首頁讓中央警衛室（app.js）彈出登入視窗
+            alert("請至首頁點擊登入功能喔！");
+            window.location.href = "index.html";
+        });
+    }
+
+    // 🌗 深色模式初始化與切換
     function initTheme() {
         const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
     }
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     if(themeToggleBtn) {
@@ -775,11 +830,15 @@
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('pacetake-theme', newTheme);
+            updateThemeIcon(newTheme);
         });
+    }
+    function updateThemeIcon(theme) {
+        if(themeToggleBtn) themeToggleBtn.innerText = theme === 'dark' ? '☀️' : '🌙';
     }
     initTheme();
 
-    // 🗺️ 縣市區域資料庫
+    // 🗺️ 縣市區域連動選單資料庫
     const areaData = {
         "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
         "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -824,7 +883,7 @@
         }
     });
 
-    // 💳 金流開關連動邏輯
+    // 💳 金流欄位動態渲染
     const toggleOnline = document.getElementById('toggleOnline');
     const toggleCash = document.getElementById('toggleCash');
     const newebpayContainer = document.getElementById('newebpayContainer');
@@ -941,7 +1000,7 @@
 
     document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
 
-    // ＋ 新增下一個品項
+    // ＋ 新增菜單品項
     const addItemRowBtn = document.getElementById('addItemRowBtn');
     if(addItemRowBtn && menuUploadList) {
         addItemRowBtn.addEventListener('click', () => {
@@ -954,7 +1013,7 @@
                     <div class="upload-placeholder">📷<span>上傳照片</span></div>
                 </div>
                 <div class="item-fields">
-                    <input type="text" class="input-style item-name-input" style="height:32px; padding: 0 10px;" placeholder="品項名稱 (如：香濃起司蛋餅)" required>
+                    <input type="text" class="input-style item-name-input" style="height:32px; padding: 0 10px;" placeholder="品項名稱" required>
                     <div class="price-input-wrapper">
                         <span class="price-symbol">$</span>
                         <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
@@ -997,14 +1056,14 @@
         }
     };
 
-    // 🚀 核心打包：精準抓取正名後的「shop...」欄位並送入 Firebase
+    // 🚀 表單提交打包
     const form = document.getElementById('shopRegisterForm');
     if(form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             if (!currentUserId) {
-                alert("【PACE 提示】開鋪前請先回首頁完成登入喔！");
+                alert("【PACE 提示】開鋪前請先登入帳號喔！");
                 return;
             }
             
@@ -1012,11 +1071,10 @@
             const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
 
             if (!isOnlinePayEnabled && !isCashPayEnabled) {
-                alert("⚠️ 報告老闆！您的店鋪目前「線上刷卡」與「現場付現」皆未開啟，請至少選擇一種收款方式才能順利開張喔！");
+                alert("⚠️ 請至少選擇一種收款方式（線上刷卡或現場付現）才能順利開張喔！");
                 return;
             }
 
-            // 🎯 精準抓取正名後的商家專屬欄位：
             const phone = document.getElementById('shopPhone')?.value.trim() || '';
             const name = document.getElementById('shopName')?.value.trim() || '';
             const city = shopCity.value;
@@ -1050,7 +1108,6 @@
 
             const fullAddress = `${city}${district}${detailAddress}`;
 
-            // 📦 打包乾淨的商家資料物件
             const shopData = {
                 sellerUid: currentUserId,
                 shopName: name,
@@ -1078,22 +1135,11 @@
             shopSubmitBtn.disabled = true;
 
             try {
-                // 模擬測試帳號防線
-                if(currentUserId === "TEST_USER_9527") {
-                    setTimeout(() => {
-                        alert("🎉【商家註冊測試成功】\n店鋪名稱：" + name + "\n聯絡電話：" + phone + "\n狀態：" + status + "\n\n正名指名封包完全對齊，實體上線時會完美寫入！");
-                        shopSubmitBtn.innerText = "建立店鋪";
-                        shopSubmitBtn.disabled = false;
-                    }, 1200);
-                    return;
-                }
-
-                // 統一集中送入 Firebase 大倉庫 "stores" 集合中
                 await setDoc(doc(db, "stores", currentUserId), shopData);
-                alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張，資料已寫入雲端！\n系統即將引導您進入接單管理後台。");
+                alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張！");
                 window.location.href = "seller.html";
             } catch (dbError) {
-                alert("寫入失敗，請檢查 Firebase 權限：" + dbError.message);
+                alert("寫入失敗：" + dbError.message);
                 shopSubmitBtn.innerText = "建立店鋪";
                 shopSubmitBtn.disabled = false;
             }

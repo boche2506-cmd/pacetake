@@ -190,26 +190,8 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-// 監聽 Firebase 登入狀態
-onAuthStateChanged(auth, (user) => {
-    // 預先抓好元素
-    const avatarBtn = document.getElementById('avatarBtn');
-    const defaultIcon = document.getElementById('defaultIcon');
-    const userAvatarImg = document.getElementById('userAvatarImg');
-    const loginBtn = document.getElementById('loginBtn');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const statusText = document.getElementById('statusText');
-
-    if (user) {
-        // --- 登入狀態 ---
-        handleUserSyncAndRoleRouting(user);
-        document.getElementById('statusDot')?.classList.add('active');
-
-        // 顯示按鈕
-        if(avatarBtn) avatarBtn.style.display = 'block';
-        if(loginBtn) loginBtn.style.display = 'none';
-
-        // 頭像邏輯
+    // 監聽 Firebase 登入狀態
+    onAuthStateChanged(auth, (user) => {
         if (user.photoURL && userAvatarImg && defaultIcon) {
             userAvatarImg.src = user.photoURL;
             userAvatarImg.style.display = 'block';
@@ -351,8 +333,7 @@ function filterAndRenderStores() {
         const matchDist = !selectedDist || store.district === selectedDist;
         const matchKeyword = !searchKeyword || 
                            (store.name && store.name.toLowerCase().includes(searchKeyword)) ||
-                           (store.shopName && store.shopName.toLowerCase().includes(searchKeyword)||
-                           (store.category && store.category.toLowerCase().includes(searchKeyword));
+                           (store.shopName && store.shopName.toLowerCase().includes(searchKeyword));
         return matchCity && matchDist && matchKeyword;
     });
 
@@ -368,8 +349,8 @@ function filterAndRenderStores() {
         const finalCity = store.city || '';
         const finalDistrict = store.district || '';
 
-        const takeoutSupported = store.isCashPayEnabled !== false;
-        const paySupported = store.isOnlinePayEnabled !== false;
+        const takeoutSupported = store.hasTakeout !== false;
+        const paySupported = store.hasPay !== false;
 
         // 如果店家狀態設定為下線，買家首頁直接過濾不顯示
         if (store.status === "offline") return;
@@ -382,7 +363,7 @@ function filterAndRenderStores() {
             <div class="store-info">
                 <div>
                     <div class="store-name">${finalName}</div>
-                    <div class="store-meta">📍 ${finalCity}${finalDistrict} ${finalAddress}</div>
+                    <div class="store-meta">📍 ${finalCity}${finalDistrict} ${finalAddress} · ${finalCategory}</div>
                 </div>
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
@@ -418,7 +399,7 @@ function renderAdminTable() {
     
     tbody.innerHTML = '';
     if(allStores.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:#aaa;">目前雲端尚無店家資料</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">目前雲端尚無店家資料</td></tr>';
         return;
     }
 

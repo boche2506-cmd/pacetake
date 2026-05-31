@@ -544,10 +544,14 @@ async function fetchStoresFromFirebase() {
 }
 
 function filterAndRenderStores() {
-    if(!storeContainer) return;
-    const selectedCity = citySelect ? citySelect.value : '';
-    const selectedDist = districtSelect ? districtSelect.value : '';
-    const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
+    // 💡 加上這三行，我們直接在控制台看看到底哪裡不對
+    console.log("=== 偵錯開始 ===");
+    console.log("目前資料庫所有的店家數量 (allStores)：", allStores?.length, allStores);
+    console.log("此時抓到的縣市欄位值：", citySelect?.value, "，區域欄位值：", districtSelect?.value);
+
+    // ...你原本的篩選跟渲染程式碼...
+}
+globalSearchInput.value.toLowerCase().trim() : '';
 
     const filtered = allStores.filter(store => {
         const matchCity = !selectedCity || store.city === selectedCity;

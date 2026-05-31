@@ -161,6 +161,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     if(districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
     if(globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
+    // 💡 就在這裡！加上這兩行「初始化觸發」，問題直接根治：
+    if(citySelect && citySelect.value) {
+        // 模擬手動切換一次，讓行政區選單在網頁一打開時，就根據預設的「台北市」自動長出來並連動篩選！
+        citySelect.dispatchEvent(new Event('change')); 
+    }
 
     // 登入邏輯
     if(googleLoginAction) {

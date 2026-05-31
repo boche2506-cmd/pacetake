@@ -76,6 +76,45 @@ function initTheme() {
     }
 }
 
+function renderDynamicMenu(role) {
+    let menuHTML = `
+        <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
+        <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
+    `;
+    if (role === 'buyer' || role === 'admin') {
+        menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
+    } 
+    if (role === 'seller' || role === 'admin') {
+        menuHTML += `
+            <div class="menu-divider"></div>
+            <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
+            <a href="manage.html" class="nav-fast">⚙️ 後台管理</a>
+            <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
+        `;
+    }
+    if (role === 'admin') {
+        menuHTML += `
+            <div class="menu-divider"></div>
+            <a href="javascript:void(0)" onclick="window.toggleView('admin')" style="color: var(--brand-blue); font-weight: bold;">🔮 派思核心控制台</a>
+            <a href="javascript:void(0)" onclick="window.issuePromoCode()" style="color: var(--brand-green); font-weight: bold;">🎟️ 邀請碼發行</a>
+        `;
+    }
+    menuHTML += `
+        <div class="menu-divider"></div>
+        <button id="logoutBtn" style="color: var(--brand-red);">🚪 登出</button>
+    `;
+    if(dropdownMenu) {
+        dropdownMenu.innerHTML = menuHTML;
+        const logoutBtn = document.getElementById('logoutBtn');
+        if(logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                await signOut(auth);
+                location.reload();
+            });
+        }
+    }
+}
+
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
     currentUserId = user.uid;

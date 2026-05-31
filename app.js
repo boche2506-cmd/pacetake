@@ -814,23 +814,3 @@ window.toggleView = function(viewRole) {
     }
 };
 
-// 抓取外部的 header.html 並塞入指定的 div 中
-function loadHeader() {
-    fetch('header.html')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('找不到 header.html，請確認檔案路徑！');
-            }
-            return response.text();
-        })
-        .then(htmlData => {
-            // 把抓到的 HTML 塞進我們剛剛命名的 div 裡面
-            document.getElementById('header-container').innerHTML = htmlData;
-        })
-        .catch(error => {
-            console.error('載入 Header 失敗：', error);
-        });
-}
-
-// 執行載入
-loadHeader();

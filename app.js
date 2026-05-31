@@ -163,7 +163,7 @@ function renderDynamicMenu(role) {
         <a href="#" onclick="logout()">登出系統</a>
     `;
     
-    }if (role === "admin") {
+    if (role === "admin") {
         menuHtml = `
             <div style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">管理員功能</div>
             <a href="#" onclick="toggleView('admin')">管理後台</a>
@@ -187,7 +187,7 @@ window.logout = async function() {
     } catch (error) {
         console.error("Logout error:", error);
     }
-};
+}};
 
 // ==========================================
 // 4. 大腦核心：等網頁全部長出來才執行

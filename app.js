@@ -13,11 +13,10 @@ const firebaseConfig = {
     measurementId: "G-888XL8JTHW",
 };
 
-// 🎯 沒錯！就是在這裡補上 export，把通道對外開放！
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const provider = new GoogleAuthProvider(); // 如果其他頁面需要處理 Google 登入，這個也順便送出去
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
 
 // 2. 全域核心變數
 let allStores = [];
@@ -28,30 +27,31 @@ let currentUserId = null;
 
 const areaData = {
     "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
-    "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
-    "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
-    "桃園市": ["桃園區", "中壢區", "大溪區", "楊梅區", "蘆竹區", "大園區", "龜山區", "八德區", "龍潭區", "平鎮區", "新屋區", "觀音區", "復興區"],
-    "新竹市": ["東區", "北區", "香山區"],
-    "新竹縣": ["竹北市", "竹東鎮", "新埔鎮", "關西鎮", "湖口鄉", "新豐鄉", "芎林鄉", "橫山鄉", "北埔鄉", "寶山鄉", "峨眉鄉", "尖石鄉", "五峰鄉"],
-    "苗栗縣": ["苗栗市", "頭份市", "竹南鎮", "後龍鎮", "通霄鎮", "苑裡鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "公館鄉", "銅鑼鄉", "三義鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "南庄鄉", "泰安鄉"],
-    "台中市": ["中區", "東區", "南區", "西區", "北區", "西屯區", "南屯區", "北屯區", "豐原區", "東勢區", "大甲區", "清水區", "沙鹿區", "梧棲區", "后里區", "神岡區", "潭子區", "大雅區", "新社區", "石岡區", "外埔區", "大安區", "烏日區", "大肚區", "龍井區", "霧峰區", "太平區", "大里區", "和平區"],
-    "彰化縣": ["彰化市", "員林市", "鹿港鎮", "和美鎮", "北斗鎮", "溪湖鎮", "田中鎮", "二林鎮", "線西鄉", "伸港鄉", "福興鄉", "秀水鄉", "花壇鄉", "芬園鄉", "大村鄉", "埔鹽鄉", "埔心鄉", "永靖鄉", "社頭鄉", "二水鄉", "田尾鄉", "埤頭鄉", "芳苑鄉", "大城鄉", "竹塘鄉", "溪州鄉"],
-    "南投縣": ["南投市", "埔里鎮", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
-    "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "西螺鎮", "土庫鎮", "北港鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "東勢鄉", "褒忠鄉", "臺西鄉", "元長鄉", "四湖鄉", "口湖鄉", "水林鄉"],
-    "嘉義市": ["東區", "西區"],
-    "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
-    "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
-    "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區", "內門區"],
-    "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
-    "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
-    "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
-    "臺東縣": ["臺東市", "成功鎮", "關山鎮", "卑名鄉", "大武鄉", "太麻里鄉", "東河鄉", "長濱鄉", "鹿野鄉", "池上鄉", "綠島鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉"],
-    "澎湖縣": ["馬公市", "湖西鄉", "白沙鄉", "西嶼鄉", "望安鄉", "七美鄉"],
-    "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
-    "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
-};
+        "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
+        "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
+        "桃園市": ["桃園區", "中壢區", "大溪區", "楊梅區", "蘆竹區", "大園區", "龜山區", "八德區", "龍潭區", "平鎮區", "新屋區", "觀音區", "復興區"],
+        "新竹市": ["東區", "北區", "香山區"],
+        "新竹縣": ["竹北市", "竹東鎮", "新埔鎮", "關西鎮", "湖口鄉", "新豐鄉", "芎林鄉", "橫山鄉", "北埔鄉", "寶山鄉", "峨眉鄉", "尖石鄉", "五峰鄉"],
+        "苗栗縣": ["苗栗市", "頭份市", "竹南鎮", "後龍鎮", "通霄鎮", "苑裡鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "公館鄉", "銅鑼鄉", "三義鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "南庄鄉", "泰安鄉"],
+        "台中市": ["中區", "東區", "南區", "西區", "北區", "西屯區", "南屯區", "北屯區", "豐原區", "東勢區", "大甲區", "清水區", "沙鹿區", "梧棲區", "后里區", "神岡區", "潭子區", "大雅區", "新社區", "石岡區", "外埔區", "大安區", "烏日區", "大肚區", "龍井區", "霧峰區", "太平區", "大里區", "和平區"],
+        "彰化縣": ["彰化市", "員林市", "鹿港鎮", "和美鎮", "北斗鎮", "溪湖鎮", "田中鎮", "二林鎮", "線西鄉", "伸港鄉", "福興鄉", "秀水鄉", "花壇鄉", "芬園鄉", "大村鄉", "埔鹽鄉", "埔心鄉", "永靖鄉", "社頭鄉", "二水鄉", "田尾鄉", "埤頭鄉", "芳苑鄉", "大城鄉", "竹塘鄉", "溪州鄉"],
+        "南投縣": ["南投市", "埔里鎮", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
+        "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "西螺鎮", "土庫鎮", "北港鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "東勢鄉", "褒忠鄉", "臺西鄉", "元長鄉", "四湖鄉", "口湖鄉", "水林鄉"],
+        "嘉義市": ["東區", "西區"],
+        "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
+        "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
+        "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區", "內門區"],
+        "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
+        "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
+        "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
+        "臺東縣": ["臺東市", "成功鎮", "關山鎮", "卑名鄉", "大武鄉", "太麻里鄉", "東河鄉", "長濱鄉", "鹿野鄉", "池上鄉", "綠島鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉"],
+        "澎湖縣": ["馬公市", "湖西鄉", "白沙鄉", "西嶼鄉", "望安鄉", "七美鄉"],
+        "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
+        "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
+    };
 
-// 宣告 UI 變數（防止重複宣告、不撞名）
+
+// 宣告 UI 變數（等等在 DOMContentLoaded 裡面抓取，防止 null 崩潰）
 let themeToggleBtn, loginBtn, avatarBtn, dropdownMenu, userNameDisplay, storeContainer;
 let loginLightbox, googleLoginAction, toggleEmailFormBtn, emailFormSection, customReturnBtn;
 let loginEmailInput, loginPasswordInput, emailLoginAction;
@@ -189,53 +189,35 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // 監聽 Firebase 登入狀態
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            handleUserSyncAndRoleRouting(user);
+            document.getElementById('statusDot')?.classList.add('active');
+            const statusText = document.getElementById('statusText');
+            if(statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
+        } else {
+            if(loginBtn) loginBtn.style.display = 'block';
+            if(avatarBtn) avatarBtn.style.display = 'none';
+            if(dropdownMenu) {
+                dropdownMenu.style.display = 'none';
+                dropdownMenu.innerHTML = '';
+            }
+            document.getElementById('statusDot')?.classList.remove('active');
+            const statusText = document.getElementById('statusText');
+            if(statusText) statusText.innerText = "您尚未登入，請連結google帳號\n或使用電子郵件登入";
+        }
+    });
+
+    // 預設讓買家畫面顯示
+    const buyerView = document.getElementById('buyerView');
+    if (buyerView) buyerView.style.display = 'block';
+
+    // 啟動資料庫與定位抓取
+    fetchStoresFromFirebase();
+    getBrowserLocation();
 });
-// 監聽 Firebase 登入狀態
-onAuthStateChanged(auth, (user) => {
-    // 預先抓好元素
-    const avatarBtn = document.getElementById('avatarBtn');
-    const defaultIcon = document.getElementById('defaultIcon');
-    const userAvatarImg = document.getElementById('userAvatarImg');
-    const loginBtn = document.getElementById('loginBtn');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const statusText = document.getElementById('statusText');
-
-    if (user) {
-        // --- 登入狀態 ---
-        handleUserSyncAndRoleRouting(user);
-        document.getElementById('statusDot')?.classList.add('active');
-
-        // 顯示按鈕
-        if(avatarBtn) avatarBtn.style.display = 'block';
-        if(loginBtn) loginBtn.style.display = 'none';
-
-        // 頭像邏輯
-        if (user.photoURL && userAvatarImg && defaultIcon) {
-            userAvatarImg.src = user.photoURL;
-            userAvatarImg.style.display = 'block';
-            defaultIcon.style.display = 'none';
-        } else if (defaultIcon) {
-            if(userAvatarImg) userAvatarImg.style.display = 'none';
-            defaultIcon.style.display = 'block';
-        }
-
-        // 文字狀態
-        if(statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
-
-    } else {
-        // --- 登出狀態 ---
-        if(loginBtn) loginBtn.style.display = 'block';
-        if(avatarBtn) avatarBtn.style.display = 'none';
-
-        if(dropdownMenu) {
-            dropdownMenu.style.display = 'none';
-            dropdownMenu.innerHTML = '';
-        }
-        document.getElementById('statusDot')?.classList.remove('active');
-
-        if(statusText) statusText.innerText = "您尚未登入，請連結google帳號\n或使用電子郵件登入";
-    }
-}); // <--
 
 // 4. 獨立功能函數區
 function initTheme() {
@@ -351,7 +333,8 @@ function filterAndRenderStores() {
         const matchDist = !selectedDist || store.district === selectedDist;
         const matchKeyword = !searchKeyword || 
                            (store.name && store.name.toLowerCase().includes(searchKeyword)) ||
-                           (store.shopName && store.shopName.toLowerCase().includes(searchKeyword));
+                           (store.shopName && store.shopName.toLowerCase().includes(searchKeyword)) ||
+                           (store.category && store.category.toLowerCase().includes(searchKeyword));
         return matchCity && matchDist && matchKeyword;
     });
 
@@ -366,12 +349,12 @@ function filterAndRenderStores() {
         const finalAddress = store.shopAddress || store.address || '';
         const finalCity = store.city || '';
         const finalDistrict = store.district || '';
+        const finalCategory = store.category || '美食';
 
-        const takeoutSupported = store.isCashPayEnabled !== false;
-        const paySupported = store.isOnlinePayEnabled !== false;
-
-        // 如果店家狀態設定為下線，買家首頁直接過濾不顯示
-        if (store.status === "offline") return;
+        // 🎯 這裡新增：檢查雲端資料庫。如果不等於 false，預設當作「有支援(亮燈)」
+        // 💡 註：如果你的 Firebase 欄位名稱不同，可以把 store.hasTakeout 改成你後端的名字
+        const takeoutSupported = store.hasTakeout !== false;
+        const paySupported = store.hasPay !== false;
 
         const card = document.createElement('a');
         card.href = `menu.html?storeId=${store.id}`;
@@ -381,10 +364,11 @@ function filterAndRenderStores() {
             <div class="store-info">
                 <div>
                     <div class="store-name">${finalName}</div>
-                    <div class="store-meta">📍 ${finalCity}${finalDistrict} ${finalAddress}</div>
+                    <div class="store-meta">📍 ${finalCity}${finalDistrict} ${finalAddress} · ${finalCategory}</div>
                 </div>
                 <div class="store-tags">
-                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
+                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">⏱️ 店內價外帶</span>
+                    
                     <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
                 </div>
             </div>
@@ -417,7 +401,7 @@ function renderAdminTable() {
     
     tbody.innerHTML = '';
     if(allStores.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:#aaa;">目前雲端尚無店家資料</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">目前雲端尚無店家資料</td></tr>';
         return;
     }
 
@@ -425,14 +409,12 @@ function renderAdminTable() {
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
         const phone = store.phone || '無資料';
-        const statusText = store.status === 'offline' ? '🔴 下線' : '🟢 上線';
         
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td style="padding: 12px; border: 1px solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
             <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
             <td style="padding: 12px; border: 1px solid #3a3a3a; color: #bbb;">${phone}</td>
-            <td style="padding: 12px; border: 1px solid #3a3a3a; text-align: center; color: ${store.status === 'offline' ? '#ef4444' : '#10b981'}; font-weight: bold;">${statusText}</td>
             <td style="padding: 12px; border: 1px solid #3a3a3a; text-align: center;">
                 <button onclick="window.deleteStore('${store.id}')" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">刪除</button>
             </td>
@@ -445,18 +427,12 @@ function renderAdminTable() {
 const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
 if (adminSubmitStoreBtn) {
     adminSubmitStoreBtn.addEventListener('click', async () => {
-        // 精準抓取 HTML 上所有的「指名」欄位：
-        const name = document.getElementById('adminNewStoreName')?.value.trim() || '';
-        const phone = document.getElementById('adminNewStorePhone')?.value.trim() || '';
-        const city = document.getElementById('adminNewStoreCity')?.value || '';
-        const district = document.getElementById('adminNewStoreDistrict')?.value.trim() || '';
-        const address = document.getElementById('adminNewStoreAddress')?.value.trim() || '';
-        const inviteCode = document.getElementById('adminNewStoreInviteCode')?.value.trim() || '';
-        const status = document.getElementById('adminNewStoreStatus')?.value || 'online';
-
-        // 判斷打勾狀態：
-        const isCashPayEnabled = document.getElementById('adminNewStoreHasTakeout') ? document.getElementById('adminNewStoreHasTakeout').checked : true;
-        const isOnlinePayEnabled = document.getElementById('adminNewStoreHasPay') ? document.getElementById('adminNewStoreHasPay').checked : true;
+        const name = document.getElementById('adminNewStoreName').value.trim();
+        const phone = document.getElementById('adminNewStorePhone').value.trim();
+        const city = document.getElementById('adminNewStoreCity').value;
+        const district = document.getElementById('adminNewStoreDistrict').value.trim();
+        const address = document.getElementById('adminNewStoreAddress').value.trim();
+        const category = document.getElementById('adminNewStoreCategory').value.trim();
 
         if (!name || !district || !address) {
             alert("⚠️ 店名、區域、詳細地址為必填項目！");
@@ -465,7 +441,6 @@ if (adminSubmitStoreBtn) {
 
         adminSubmitStoreBtn.innerText = "⏳ 正在同步至雲端...";
         try {
-            // 🎯 10個英雄欄位完美打包送進 Firebase 資料庫：
             await addDoc(collection(db, "stores"), {
                 name: name,
                 shopName: name,
@@ -474,22 +449,16 @@ if (adminSubmitStoreBtn) {
                 district: district,
                 address: address,
                 shopAddress: address,
-                isCashPayEnabled: isCashPayEnabled,   // 💵 點燈開關
-                isOnlinePayEnabled: isOnlinePayEnabled, // 💳 點燈開關
-                status: status,                       // 🟢 上下線狀態
-                inviteCode: inviteCode,               // 🎟️ 邀請碼
-                menu: [],                             // 🧑‍🍳 預留菜單陣列
+                category: category,
                 createdAt: new Date().toISOString()
             });
             
             alert("✅ 店家已成功新增至雲端！");
-            
-            // 表單自動清空防呆
-            if(document.getElementById('adminNewStoreName')) document.getElementById('adminNewStoreName').value = '';
-            if(document.getElementById('adminNewStorePhone')) document.getElementById('adminNewStorePhone').value = '';
-            if(document.getElementById('adminNewStoreDistrict')) document.getElementById('adminNewStoreDistrict').value = '';
-            if(document.getElementById('adminNewStoreAddress')) document.getElementById('adminNewStoreAddress').value = '';
-            if(document.getElementById('adminNewStoreInviteCode')) document.getElementById('adminNewStoreInviteCode').value = '';
+            document.getElementById('adminNewStoreName').value = '';
+            document.getElementById('adminNewStorePhone').value = '';
+            document.getElementById('adminNewStoreDistrict').value = '';
+            document.getElementById('adminNewStoreAddress').value = '';
+            document.getElementById('adminNewStoreCategory').value = '';
             
             fetchStoresFromFirebase();
         } catch (error) {

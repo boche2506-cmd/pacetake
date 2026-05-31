@@ -525,7 +525,7 @@ async function fetchStoresFromFirebase() {
             allStores.push({ id: doc.id, ...doc.data() });
         });
         filterAndRenderStores();
-        renderAdminTable(); 
+     //   renderAdminTable(); 
     } catch (error) {
         console.error("讀取店家失敗：", error);
         if(storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';

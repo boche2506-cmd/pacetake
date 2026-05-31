@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
 <!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
 <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
-
+<link rel="stylesheet" href="style.css">
 <style>
 /* a==========================================================================
    1. 全局變數與主題防線 (Cyber Blue)
@@ -726,23 +726,7 @@ select {
 <div class="phone-wrapper">
 <div id="buyerView" style="display: block;">
 <div class="sticky-top-group">
-<header class="header">
-    <div class="brand-left-column">
-    <div class="pace-logo">
-    <img src="pace3.png" alt="派思" class="brand-logo-img">
-    </div>
-    <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
-    </div> 
-        <div class="control-panel">
-        <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
-        <button class="login-btn" id="loginBtn">登入 / 註冊</button>
-        <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
-        <span class="avatar-icon">👤</span>
-        <span class="user-name" id="userNameDisplay">載入中...</span>
-        </button>
-        <div class="dropdown-menu" id="dropdownMenu"></div>
-        </div>
-        </header>
+<div id="header-container"></div>
             <div class="location-bar">
             <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
             <div class="location-select-group">

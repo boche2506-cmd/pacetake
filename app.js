@@ -163,7 +163,7 @@ function renderDynamicMenu(role) {
         <a href="#" onclick="logout()">登出系統</a>
     `;
     
-    if (role === "admin") {
+    }if (role === "admin") {
         menuHtml = `
             <div style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">管理員功能</div>
             <a href="#" onclick="toggleView('admin')">管理後台</a>
@@ -178,7 +178,7 @@ function renderDynamicMenu(role) {
         `;
     }
     dropdownMenu.innerHTML = menuHtml;
-}
+
 
 window.logout = async function() {
     try {
@@ -824,4 +824,3 @@ function loadHeader() {
             console.error('載入 Header 失敗：', error);
         });
 }
-loadHeader();

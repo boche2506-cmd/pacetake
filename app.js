@@ -520,21 +520,21 @@ async function handleUserSyncAndRoleRouting(user) {
 async function fetchStoresFromFirebase() {
     try {
         const querySnapshot = await getDocs(collection(db, "stores"));
-        
-        // 💡 關鍵改動：先宣告一個區域變數 tempStores，不要直接動到全域的 allStores
-        const tempStores = []; 
+        allStores = [];
         querySnapshot.forEach((doc) => {
-            tempStores.push({ id: doc.id, ...doc.data() });
+            allStores.push({ id: doc.id, ...doc.data() });
         });
-        
-        // 💡 當資料全部安全裝完後，再一次性指定給全域變數，這樣絕對不會打架
-        allStores = tempStores; 
 
-        filterAndRenderStores();
-        renderAdminTable(); 
+        // 💡 唯一改動：不要讓它跟別的非同步微任務擠在一起
+        // 用 setTimeout 讓它去排下一輪的巨集任務，這跟 console.log 釋放畫面的效果一模一樣
+        setTimeout(() => {
+            filterAndRenderStores();
+            renderAdminTable(); 
+        }, 0);
+
     } catch (error) {
         console.error("讀取店家失敗：", error);
-        if(storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
+        if(storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner">❌ 無法取得資料</div>';
     }
 }
 

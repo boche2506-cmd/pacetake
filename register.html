@@ -58,39 +58,19 @@
         }
 
         /* 手機直屏精品大外框與細邊界 */
-.phone-wrapper {
-    /* 🔴 第一步：不管螢幕多大，強制鎖死 9:16 比例 */
-    aspect-ratio: 9 / 16;
-
-    /* 🔴 第二步：最核心！用這四行互相牽制。
-       寬螢幕時，高度會卡住，左右自動留黑；
-       長螢幕時，寬度會卡住，上下自動留黑！ */
-    width: 100vw;
-    height: 100vh;
-    max-width: calc(100vh * 9 / 16);  /* 根據高度逆推最大寬度 */
-    max-height: calc(100vw * 16 / 9); /* 根據寬度逆推最大高度 */
-
-    /* 🔴 第三步：這三行神陣，保證不管是上下留黑還是左右留黑，永遠「絕對正中央」 */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    /* 🔴 第四步：死不准滑動（你要求的鐵律） */
-    overflow: auto; 
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    justify-content: space-between; /* 新增：這行是關鍵！它會嚴格要求上中下三層乖乖各自定位，不管資料有沒有來，絕對不允許任何人往上吸 */
-    /* 確保滑動時有 Apple 原生的絲滑回彈手感（Rubber-banding） */
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-    /* 🔴 第五步：立體手機殼裝飾（邊框與陰影） */
-    background-color: var(--bg-container);
-    border: 4px solid #222; /* 給它一個扎實的手機黑色外框 */
-    border-radius: 20px;    /* 稍微帶點圓角更像手機 */
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5); /* 超立體陰影 */
-}
+        .phone-wrapper {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background-color: var(--bg-container);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            padding-bottom: 100px;
+            display: flex;
+            flex-direction: column;
+        }
 
          /* 填表區域 */
         .form-container {
@@ -492,7 +472,7 @@
 </head>
 <body>
      <div class="phone-wrapper">
-           <div id="header.html"></div>
+           <div id="header-container"></div>
                  <div class="input-group">
                     <label>店鋪聯絡電話</label>
                     <input type="tel" id="shopPhone" class="input-style" placeholder="請輸入店鋪或老闆的手機號碼" required pattern="[0-9]{9,10}">

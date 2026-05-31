@@ -68,7 +68,7 @@ let menuUploadList = null;
 // ==========================================
 // 3. 大腦核心：等網頁全部長出來才執行
 // ==========================================
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
     
     // --- 【買家 & 通用 UI 元件抓取】 ---
     themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -88,7 +88,7 @@ window.addEventListener('DOMContentLoaded', () => {
     citySelect = document.getElementById('citySelect');
     districtSelect = document.getElementById('districtSelect');
     gpsPinBtn = document.getElementById('gpsPinBtn');
-    addressDetailLightbox = document.getElementById('addressDetailLightbox');
+    addressDetailLightbox =   document.getElementById('addressDetailLightbox');
     modalAddressText = document.getElementById('modalAddressText');
     closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
     globalSearchInput = document.getElementById('globalSearchInput');

@@ -351,7 +351,8 @@ function filterAndRenderStores() {
         const matchDist = !selectedDist || store.district === selectedDist;
         const matchKeyword = !searchKeyword || 
                            (store.name && store.name.toLowerCase().includes(searchKeyword)) ||
-                           (store.shopName && store.shopName.toLowerCase().includes(searchKeyword));
+                           (store.shopName && store.shopName.toLowerCase().includes(searchKeyword)||
+                           (store.category && store.category.toLowerCase().includes(searchKeyword));
         return matchCity && matchDist && matchKeyword;
     });
 

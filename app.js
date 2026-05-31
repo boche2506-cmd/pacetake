@@ -29,7 +29,6 @@ let buyerLng = null;
 let currentBuyerAddress = "正在獲取定位中...";
 let currentUserId = null;
 
-// 共用的縣市資料庫（買家搜尋、賣家開店共用）
 const areaData = {
     "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
     "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -46,7 +45,7 @@ const areaData = {
     "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
     "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
     "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區"],
-    "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉"],
+    "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
     "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
     "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
     "臺東縣": ["臺東市", "成功鎮", "關山鎮", "卑名鄉", "大武鄉", "太麻里鄉", "東河鄉", "長濱鄉", "鹿野鄉", "池上鄉", "綠島鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉"],
@@ -60,10 +59,8 @@ let themeToggleBtn, loginBtn, avatarBtn, dropdownMenu, userNameDisplay, storeCon
 let loginLightbox, googleLoginAction, toggleEmailFormBtn, emailFormSection, customReturnBtn;
 let loginEmailInput, loginPasswordInput, emailLoginAction;
 let citySelect, districtSelect, gpsPinBtn, addressDetailLightbox, modalAddressText, closeAddressModalBtn, globalSearchInput;
-
-// 菜單拖曳全域變數
-let activeDragItem = null;
 let menuUploadList = null;
+let activeDragItem = null;
 
 // ==========================================
 // 3. 核心功能函式
@@ -77,11 +74,63 @@ function initTheme() {
     }
 }
 
+function renderDynamicMenu(role) {
+    if (!dropdownMenu) return;
+    
+    let menuHTML = '';
+    
+    if (role === 'admin') {
+        menuHTML += `
+            <div class="menu-header" style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">🔮 派思核心控制台</div>
+            <a href="javascript:void(0)" onclick="window.toggleView('admin')" class="nav-fast">⚙️ 管理後台</a>
+            <a href="javascript:void(0)" onclick="window.toggleView('buyer')" class="nav-fast">🧑‍💼 切換買家視角</a>
+            <a href="javascript:void(0)" onclick="window.issuePromoCode()" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
+            <div class="menu-divider"></div>
+        `;
+    }
+
+    menuHTML += `
+        <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
+        <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
+    `;
+
+    if (role === 'buyer' || role === 'admin') {
+        menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
+    } 
+    
+    if (role === 'seller' || role === 'admin') {
+        menuHTML += `
+            <div class="menu-divider"></div>
+            <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
+            <a href="manage.html" class="nav-fast">⚙️ 店舖管理</a>
+            <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
+        `;
+    }
+
+    menuHTML += `
+        <div class="menu-divider"></div>
+        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 10px; background: none; border: none; cursor: pointer; font-size: 14px;">🚪 登出系統</button>
+    `;
+
+    dropdownMenu.innerHTML = menuHTML;
+    
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                location.reload();
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+        });
+    }
+}
+
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
     currentUserId = user.uid;
     
-    // 取得使用者角色，預設為 buyer
     let currentRole = "buyer";
     try {
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -105,7 +154,7 @@ async function handleUserSyncAndRoleRouting(user) {
 
 function updateUIForUser(user, currentRole) {
     if (loginBtn) loginBtn.style.display = 'none';
-    if (avatarBtn) avatarBtn.style.display = 'flex';
+    if (avatarBtn) avatarBtn.style.display = 'block';
     if (loginLightbox) loginLightbox.style.display = 'none';
 
     if (userNameDisplay) {
@@ -117,48 +166,32 @@ function updateUIForUser(user, currentRole) {
             userNameDisplay.innerHTML = `🧑‍💼 買家`;
         }
     }
+
+    const userAvatarImg = document.getElementById('userAvatarImg');
+    const defaultIcon = document.getElementById('defaultIcon');
+    if (user.photoURL && userAvatarImg && defaultIcon) {
+        userAvatarImg.src = user.photoURL;
+        userAvatarImg.style.display = 'block';
+        defaultIcon.style.display = 'none';
+    } else if (defaultIcon) {
+        if (userAvatarImg) userAvatarImg.style.display = 'none';
+        defaultIcon.style.display = 'block';
+    }
+
+    const statusText = document.getElementById('statusText');
+    const statusDot = document.getElementById('statusDot');
+    if (statusDot) statusDot.classList.add('active');
+    if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
+
     renderDynamicMenu(currentRole);
 }
 
-function renderDynamicMenu(role) {
-    if (!dropdownMenu) return;
-    let menuHtml = `
-        <div style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">帳戶設定</div>
-        <a href="#" onclick="logout()">登出系統</a>
-    `;
-    
-    if (role === "admin") {
-        menuHtml = `
-            <div style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">管理員功能</div>
-            <a href="#" onclick="toggleView('admin')">管理後台</a>
-            <a href="#" onclick="toggleView('buyer')">切換至買家視角</a>
-            <a href="#" onclick="logout()">登出系統</a>
-        `;
-    } else if (role === "seller") {
-        menuHtml = `
-            <div style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">賣家功能</div>
-            <a href="seller_dashboard.html">我的店舖</a>
-            <a href="#" onclick="logout()">登出系統</a>
-        `;
-    }
-    dropdownMenu.innerHTML = menuHtml;
-}
-
-window.logout = async function() {
-    try {
-        await signOut(auth);
-        location.reload();
-    } catch (error) {
-        console.error("Logout error:", error);
-    }
-};
-
 // ==========================================
-// 4. 大腦核心：等網頁全部長出來才執行
+// 4. 初始化與事件綁定
 // ==========================================
 window.addEventListener('DOMContentLoaded', async () => {
     
-    // --- 【買家 & 通用 UI 元件抓取】 ---
+    // UI 元件抓取
     themeToggleBtn = document.getElementById('themeToggleBtn');
     loginBtn = document.getElementById('loginBtn');
     avatarBtn = document.getElementById('avatarBtn');
@@ -182,21 +215,29 @@ window.addEventListener('DOMContentLoaded', async () => {
     globalSearchInput = document.getElementById('globalSearchInput');
     menuUploadList = document.getElementById('menuUploadList');
 
-    initTheme(); // 初始化主題
+    initTheme();
 
-    // --- 【監聽 Firebase 登入狀態】 ---
+    // 監聽 Firebase 登入狀態
     onAuthStateChanged(auth, (user) => {
         if (user) {
             handleUserSyncAndRoleRouting(user);
         } else {
             if (loginBtn) loginBtn.style.display = 'block';
             if (avatarBtn) avatarBtn.style.display = 'none';
+            if (dropdownMenu) {
+                dropdownMenu.style.display = 'none';
+                dropdownMenu.innerHTML = '';
+            }
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            if (statusDot) statusDot.classList.remove('active');
+            if (statusText) statusText.innerText = "您尚未登入，請連結google帳號\n或使用電子郵件登入";
             fetchStoresFromFirebase();
         }
     });
 
-    // --- 【買家 UI & 登入事件綁定】 ---
-    if(themeToggleBtn) {
+    // 通用 UI 事件綁定
+    if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -206,7 +247,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    if(avatarBtn && dropdownMenu) {
+    if (avatarBtn && dropdownMenu) {
         avatarBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
@@ -218,16 +259,16 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    if(loginBtn) loginBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
-    if(customReturnBtn) customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
-    if(toggleEmailFormBtn) {
+    if (loginBtn) loginBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
+    if (customReturnBtn) customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
+    if (toggleEmailFormBtn) {
         toggleEmailFormBtn.addEventListener('click', () => {
-            emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
+            if (emailFormSection) emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
         });
     }
 
     const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
-    if(togglePasswordVisibility) {
+    if (togglePasswordVisibility && loginPasswordInput) {
         togglePasswordVisibility.addEventListener('click', function() {
             const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             loginPasswordInput.setAttribute('type', type);
@@ -235,36 +276,35 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    if(gpsPinBtn) {
+    if (gpsPinBtn) {
         gpsPinBtn.addEventListener('click', () => {
             getBrowserLocation();
-            modalAddressText.innerText = currentBuyerAddress;
-            addressDetailLightbox.style.display = 'flex';
+            if (addressDetailLightbox) addressDetailLightbox.style.display = 'flex';
         });
     }
-    if(closeAddressModalBtn) closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
+    if (closeAddressModalBtn) closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
 
-    // 買家：縣市連動
-    if(citySelect) {
+    if (citySelect) {
         citySelect.addEventListener('change', () => {
             const selectedCity = citySelect.value;
-            districtSelect.innerHTML = '<option value="">選擇區域</option>';
-            if (areaData[selectedCity]) {
-                areaData[selectedCity].forEach(dist => {
-                    const opt = document.createElement('option');
-                    opt.value = dist;
-                    opt.innerText = dist;
-                    districtSelect.appendChild(opt);
-                });
+            if (districtSelect) {
+                districtSelect.innerHTML = '<option value="">選擇區域</option>';
+                if (areaData[selectedCity]) {
+                    areaData[selectedCity].forEach(dist => {
+                        const opt = document.createElement('option');
+                        opt.value = dist;
+                        opt.innerText = dist;
+                        districtSelect.appendChild(opt);
+                    });
+                }
             }
             filterAndRenderStores();
         });
     }
-    if(districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
-    if(globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
+    if (districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
+    if (globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
 
-    // 登入邏輯
-    if(googleLoginAction) {
+    if (googleLoginAction) {
         googleLoginAction.addEventListener('click', async () => {
             try {
                 const result = await signInWithPopup(auth, provider);
@@ -276,7 +316,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    if(emailLoginAction) {
+    if (emailLoginAction) {
         emailLoginAction.addEventListener('click', async () => {
             const email = loginEmailInput.value.trim();
             const password = loginPasswordInput.value;
@@ -302,32 +342,28 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // ==========================================
-    // 🏪【賣家專區】開店表單邏輯整合
-    // ==========================================
+    // 賣家註冊專區初始化
     const shopCity = document.getElementById('shopCity');
     const shopDistrict = document.getElementById('shopDistrict');
-
-    // 賣家：縣市連動選單初始化
     if (shopCity) {
         Object.keys(areaData).forEach(city => {
             const opt = document.createElement('option');
             opt.value = city; opt.innerText = city; shopCity.appendChild(opt);
         });
-
         shopCity.addEventListener('change', () => {
             const selectedCity = shopCity.value;
-            shopDistrict.innerHTML = '<option value="">選擇區域</option>';
-            if(areaData[selectedCity]) {
-                areaData[selectedCity].forEach(dist => {
-                    const opt = document.createElement('option');
-                    opt.value = dist; opt.innerText = dist; shopDistrict.appendChild(opt);
-                });
+            if (shopDistrict) {
+                shopDistrict.innerHTML = '<option value="">選擇區域</option>';
+                if (areaData[selectedCity]) {
+                    areaData[selectedCity].forEach(dist => {
+                        const opt = document.createElement('option');
+                        opt.value = dist; opt.innerText = dist; shopDistrict.appendChild(opt);
+                    });
+                }
             }
         });
     }
 
-    // 賣家：金流欄位處理
     const toggleOnline = document.getElementById('toggleOnline');
     const toggleCash = document.getElementById('toggleCash');
     const newebpayContainer = document.getElementById('newebpayContainer');
@@ -335,30 +371,143 @@ window.addEventListener('DOMContentLoaded', async () => {
     const warningConfirmBtn = document.getElementById('warningConfirmBtn');
     const warningCancelBtn = document.getElementById('warningCancelBtn');
 
-    if(toggleOnline) {
-        toggleOnline.addEventListener('change', function() {
-            if(newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
-        });
+    if (newebpayContainer) {
+        newebpayContainer.innerHTML = `
+            <label style="margin-bottom:12px; display:block; font-size:13px; font-weight:700;">🔒 藍新金流 API 開發參數設定</label>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <input type="text" id="merchantIdInput" class="input-style" style="height:38px;" placeholder="請輸入 商店代號 (MerchantID)">
+                <input type="text" id="hashKeyInput" class="input-style" style="height:38px;" placeholder="請輸入 HashKey">
+                <input type="text" id="hashIvInput" class="input-style" style="height:38px;" placeholder="請輸入 HashIV">
+            </div>
+        `;
     }
 
-    if(toggleCash) {
+    if (toggleOnline) {
+        toggleOnline.addEventListener('change', function() {
+            if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+    if (toggleCash) {
         toggleCash.addEventListener('change', function() {
             if (!this.checked && cashWarningModal) {
                 cashWarningModal.style.display = 'flex';
             }
         });
     }
-
-    if(warningConfirmBtn) {
+    if (warningConfirmBtn) {
         warningConfirmBtn.addEventListener('click', () => {
-            if(toggleCash) toggleCash.checked = false;
-            if(cashWarningModal) cashWarningModal.style.display = 'none';
+            if (toggleCash) toggleCash.checked = false;
+            if (cashWarningModal) cashWarningModal.style.display = 'none';
         });
     }
-    if(warningCancelBtn) {
+    if (warningCancelBtn) {
         warningCancelBtn.addEventListener('click', () => {
-            if(toggleCash) toggleCash.checked = true;
-            if(cashWarningModal) cashWarningModal.style.display = 'none';
+            if (toggleCash) toggleCash.checked = true;
+            if (cashWarningModal) cashWarningModal.style.display = 'none';
+        });
+    }
+
+    if (menuUploadList) {
+        document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
+    }
+
+    const addItemRowBtn = document.getElementById('addItemRowBtn');
+    if (addItemRowBtn && menuUploadList) {
+        addItemRowBtn.addEventListener('click', () => {
+            const newRow = document.createElement('div');
+            newRow.className = 'menu-item-row';
+            newRow.innerHTML = `
+                <div class="img-upload-box" onclick="triggerUpload(this)">
+                    <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                    <div class="upload-placeholder">📷<span>上傳照片</span></div>
+                </div>
+                <div class="item-fields">
+                    <input type="text" class="input-style item-name-input" style="height:32px; padding: 0 10px;" placeholder="品項名稱" required>
+                    <div class="price-input-wrapper">
+                        <span class="price-symbol">$</span>
+                        <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
+                    </div>
+                </div>
+                <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 6px; justify-content: center;">
+                    <div class="drag-handle" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: grab;">☰</div>
+                    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
+                </div>
+            `;
+            menuUploadList.appendChild(newRow);
+            makeItemDraggable(newRow); 
+        });
+    }
+
+    const shopRegisterForm = document.getElementById('shopRegisterForm');
+    if (shopRegisterForm) {
+        shopRegisterForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) { alert("【PACE 提示】開鋪前請先登入帳號喔！"); return; }
+            
+            const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
+            const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
+
+            if (!isOnlinePayEnabled && !isCashPayEnabled) {
+                alert("⚠️ 請至少選擇一種收款方式（線上刷卡或現場付現）才能順利開張喔！");
+                return;
+            }
+
+            const name = document.getElementById('shopName')?.value.trim() || '';
+            const phone = document.getElementById('shopPhone')?.value.trim() || '';
+            const city = shopCity ? shopCity.value : '';
+            const district = shopDistrict ? shopDistrict.value : '';
+            const detailAddress = document.getElementById('shopAddress')?.value.trim() || '';
+            const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
+            const status = document.getElementById('shopStatus')?.value || 'online';
+            const prepareTime = parseInt(document.getElementById('prepareTimeInput')?.value) || 15;
+            const logoEl = document.getElementById('shopLogoPreview');
+            const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
+            const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
+            const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
+            const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
+            
+            const menuRows = document.querySelectorAll('.menu-item-row');
+            const menuItems = [];
+            menuRows.forEach(row => {
+                const nameField = row.querySelector('.item-name-input');
+                const priceField = row.querySelector('.price-input');
+                const nameVal = nameField ? nameField.value.trim() : '';
+                const priceVal = priceField ? parseInt(priceField.value) || 0 : 0;
+                const imgEl = row.querySelector('.preview-img');
+                const imgData = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : "";
+                if (nameVal) menuItems.push({ name: nameVal, price: priceVal, image: imgData });
+            });
+
+            const shopData = {
+                sellerUid: user.uid,
+                shopName: name, shopPhone: phone, city: city, district: district,
+                shopAddress: `${city}${district}${detailAddress}`,
+                inviteCode: inviteCode, status: status, shopLogo: shopLogoData,
+                prepareTime: prepareTime, isOnlinePayEnabled: isOnlinePayEnabled,
+                isCashPayEnabled: isCashPayEnabled,
+                newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
+                menuList: menuItems, createdAt: new Date().toISOString()
+            };
+
+            const shopSubmitBtn = document.getElementById('shopSubmitBtn');
+            if (shopSubmitBtn) {
+                shopSubmitBtn.innerText = "⚡ 正在打通雲端地基中...";
+                shopSubmitBtn.disabled = true;
+            }
+
+            try {
+                await setDoc(doc(db, "stores", user.uid), shopData);
+                alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張！");
+                window.location.href = "seller.html";
+            } catch (dbError) {
+                alert("寫入失敗：" + dbError.message);
+                if (shopSubmitBtn) {
+                    shopSubmitBtn.innerText = "建立店鋪";
+                    shopSubmitBtn.disabled = false;
+                }
+            }
         });
     }
 
@@ -380,12 +529,12 @@ async function fetchStoresFromFirebase() {
         renderAdminTable(); 
     } catch (error) {
         console.error("讀取店家失敗：", error);
-        if(storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
+        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
     }
 }
 
 function filterAndRenderStores() {
-    if(!storeContainer) return;
+    if (!storeContainer) return;
     const selectedCity = citySelect ? citySelect.value : '';
     const selectedDist = districtSelect ? districtSelect.value : '';
     const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
@@ -393,9 +542,8 @@ function filterAndRenderStores() {
     const filtered = allStores.filter(store => {
         const matchCity = !selectedCity || store.city === selectedCity;
         const matchDist = !selectedDist || store.district === selectedDist;
-        const matchKeyword = !searchKeyword || 
-                           (store.name && store.name.toLowerCase().includes(searchKeyword)) ||
-                           (store.shopName && store.shopName.toLowerCase().includes(searchKeyword));
+        const nameToSearch = store.shopName || store.name || '';
+        const matchKeyword = !searchKeyword || nameToSearch.toLowerCase().includes(searchKeyword);
         return matchCity && matchDist && matchKeyword;
     });
 
@@ -407,12 +555,10 @@ function filterAndRenderStores() {
     storeContainer.innerHTML = "";
     filtered.forEach(store => {
         if (store.status === "offline") return;
-
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
         const finalCity = store.city || '';
         const finalDistrict = store.district || '';
-
         const takeoutSupported = store.isCashPayEnabled !== false;
         const paySupported = store.isOnlinePayEnabled !== false;
 
@@ -443,13 +589,13 @@ function getBrowserLocation() {
                 buyerLat = position.coords.latitude;
                 buyerLng = position.coords.longitude;
                 currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
-                if(gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
-                if(modalAddressText) modalAddressText.innerText = currentBuyerAddress;
+                if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
+                if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
             },
             (error) => {
                 currentBuyerAddress = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
-                if(gpsPinBtn) gpsPinBtn.innerText = "📍 無法定位";
-                if(modalAddressText) modalAddressText.innerText = currentBuyerAddress;
+                if (gpsPinBtn) gpsPinBtn.innerText = "📍 無法定位";
+                if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
             }
         );
     } else {
@@ -459,20 +605,17 @@ function getBrowserLocation() {
 
 function renderAdminTable() {
     const tbody = document.getElementById('adminStoreTableBody');
-    if(!tbody) return;
-    
+    if (!tbody) return;
     tbody.innerHTML = '';
-    if(allStores.length === 0) {
+    if (allStores.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:#aaa;">目前雲端尚無店家資料</td></tr>';
         return;
     }
-
     allStores.forEach(store => {
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
         const phone = store.phone || '無資料';
         const statusText = store.status === 'offline' ? '🔴 下線' : '🟢 上線';
-        
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td style="padding: 12px; border: 1px solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
@@ -502,7 +645,6 @@ function startDrag(e, row) {
     activeDragItem = row;
     row.style.opacity = '0.5';
     row.style.border = '2px dashed var(--brand-blue)';
-    
     if (e.type.startsWith('touch')) {
         window.addEventListener('touchmove', onDragMove, { passive: false });
         window.addEventListener('touchend', onDragEnd);
@@ -540,9 +682,9 @@ function onDragEnd() {
 // ==========================================
 
 window.deleteRow = function(btn) {
-    if(!menuUploadList) return;
+    if (!menuUploadList) return;
     const rows = menuUploadList.querySelectorAll('.menu-item-row');
-    if(rows.length <= 1) { alert("報告老闆，店裡至少要留一項商品才能開張喔！"); return; }
+    if (rows.length <= 1) { alert("報告老闆，店裡至少要留一項商品才能開張喔！"); return; }
     btn.closest('.menu-item-row').remove();
 };
 
@@ -576,7 +718,6 @@ if (adminSubmitStoreBtn) {
         const address = document.getElementById('adminNewStoreAddress')?.value.trim() || '';
         const inviteCode = document.getElementById('adminNewStoreInviteCode')?.value.trim() || '';
         const status = document.getElementById('adminNewStoreStatus')?.value || 'online';
-
         const isCashPayEnabled = document.getElementById('adminNewStoreHasTakeout') ? document.getElementById('adminNewStoreHasTakeout').checked : true;
         const isOnlinePayEnabled = document.getElementById('adminNewStoreHasPay') ? document.getElementById('adminNewStoreHasPay').checked : true;
 
@@ -588,29 +729,12 @@ if (adminSubmitStoreBtn) {
         adminSubmitStoreBtn.innerText = "⏳ 正在同步至雲端...";
         try {
             await addDoc(collection(db, "stores"), {
-                name: name,
-                shopName: name,
-                phone: phone,
-                city: city,
-                district: district,
-                address: address,
-                shopAddress: address,
-                isCashPayEnabled: isCashPayEnabled,
-                isOnlinePayEnabled: isOnlinePayEnabled, 
-                status: status,                       
-                inviteCode: inviteCode,               
-                menu: [],                             
-                createdAt: new Date().toISOString()
+                name: name, shopName: name, phone: phone, city: city, district: district,
+                address: address, shopAddress: address, isCashPayEnabled: isCashPayEnabled,
+                isOnlinePayEnabled: isOnlinePayEnabled, status: status, inviteCode: inviteCode,               
+                menu: [], createdAt: new Date().toISOString()
             });
-            
             alert("✅ 店家已成功新增至雲端！");
-            
-            if(document.getElementById('adminNewStoreName')) document.getElementById('adminNewStoreName').value = '';
-            if(document.getElementById('adminNewStorePhone')) document.getElementById('adminNewStorePhone').value = '';
-            if(document.getElementById('adminNewStoreDistrict')) document.getElementById('adminNewStoreDistrict').value = '';
-            if(document.getElementById('adminNewStoreAddress')) document.getElementById('adminNewStoreAddress').value = '';
-            if(document.getElementById('adminNewStoreInviteCode')) document.getElementById('adminNewStoreInviteCode').value = '';
-            
             fetchStoresFromFirebase();
         } catch (error) {
             console.error("新增店家失敗:", error);
@@ -637,14 +761,10 @@ window.deleteStore = async function(storeId) {
 window.issuePromoCode = async function() {
     const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
     if (!code || code.trim() === "") return;
-    
     try {
         await setDoc(doc(db, "promoCodes", code.trim()), {
-            code: code.trim(),
-            createdBy: currentUserId,
-            createdAt: new Date().toISOString(),
-            isActive: true,
-            usedBy: null
+            code: code.trim(), createdBy: currentUserId, createdAt: new Date().toISOString(),
+            isActive: true, usedBy: null
         });
         alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！`);
     } catch (error) {
@@ -681,5 +801,3 @@ function loadHeader() {
             console.error('載入 Header 失敗：', error);
         });
 }
-
-console.log("程式修復完畢");

@@ -833,13 +833,3 @@ function loadHeader() {
 }
 
 // 執行載入
-loadHeader();
-function fetchStoresFromFirebase() {
-    console.log("開始抓資料..."); // 看到這一行
-    getDocs(collection(db, "stores")).then((querySnapshot) => {
-        console.log("資料抓到了，共 " + querySnapshot.size + " 筆"); // 看到這一行
-        // ... 原本的渲染邏輯
-    }).catch((error) => {
-        console.error("抓資料出錯了：", error); // 萬一還是沒紅字，這個也會跳出來
-    });
-}

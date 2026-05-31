@@ -68,7 +68,7 @@ let menuUploadList = null;
 // ==========================================
 // 3. 大腦核心：等網頁全部長出來才執行
 // ==========================================
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', () => {
     
     // --- 【買家 & 通用 UI 元件抓取】 ---
     themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -88,7 +88,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     citySelect = document.getElementById('citySelect');
     districtSelect = document.getElementById('districtSelect');
     gpsPinBtn = document.getElementById('gpsPinBtn');
-    addressDetailLightbox =   document.getElementById('addressDetailLightbox');
+    addressDetailLightbox = document.getElementById('addressDetailLightbox');
     modalAddressText = document.getElementById('modalAddressText');
     closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
     globalSearchInput = document.getElementById('globalSearchInput');
@@ -525,9 +525,10 @@ async function fetchStoresFromFirebase() {
             allStores.push({ id: doc.id, ...doc.data() });
         });
         filterAndRenderStores();
+        renderAdminTable(); 
     } catch (error) {
         console.error("讀取店家失敗：", error);
-        if(storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
+        if(storeContainer) storeContainer.innerHTML = '<div class="loading-spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
     }
 }
 
@@ -815,21 +816,21 @@ window.toggleView = function(viewRole) {
 
 // 抓取外部的 header.html 並塞入指定的 div 中
 function loadHeader() {
-    const headerContainer = document.getElementById('header-container');
-    
-    // 💡 關鍵：只有在有 header-container 的時候，才執行載入的動作
-    if (headerContainer) {
-        fetch('header.html')
-            .then(response => {
-                if (!response.ok) throw new Error('找不到 header');
-                return response.text();
-            })
-            .then(htmlData => {
-                headerContainer.innerHTML = htmlData;
-            })
-            .catch(error => console.error('載入 Header 失敗：', error));
-    }
-    
-    // 💡 這一行移出來：不管上面有沒有載入 Header，下面這些程式碼都能繼續跑！
-    // 這樣你的卡片和按鈕就不會因為沒有 header 而死掉了
+    fetch('header.html')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('找不到 header.html，請確認檔案路徑！');
+            }
+            return response.text();
+        })
+        .then(htmlData => {
+            // 把抓到的 HTML 塞進我們剛剛命名的 div 裡面
+            document.getElementById('header-container').innerHTML = htmlData;
+        })
+        .catch(error => {
+            console.error('載入 Header 失敗：', error);
+        });
 }
+
+// 執行載入
+loadHeader();

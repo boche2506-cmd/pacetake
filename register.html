@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
 <!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
 <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
-
+<link rel="stylesheet" href="style.css">
     <style>
         /* 全局變數與主題防線 */
         :root {
@@ -58,19 +58,39 @@
         }
 
         /* 手機直屏精品大外框與細邊界 */
-        .phone-wrapper {
-            width: 100%;
-            max-width: 430px;
-            min-height: 100vh;
-            background-color: var(--bg-container);
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md);
-            position: relative;
-            padding-bottom: 100px;
-            display: flex;
-            flex-direction: column;
-        }
+.phone-wrapper {
+    /* 🔴 第一步：不管螢幕多大，強制鎖死 9:16 比例 */
+    aspect-ratio: 9 / 16;
+
+    /* 🔴 第二步：最核心！用這四行互相牽制。
+       寬螢幕時，高度會卡住，左右自動留黑；
+       長螢幕時，寬度會卡住，上下自動留黑！ */
+    width: 100vw;
+    height: 100vh;
+    max-width: calc(100vh * 9 / 16);  /* 根據高度逆推最大寬度 */
+    max-height: calc(100vw * 16 / 9); /* 根據寬度逆推最大高度 */
+
+    /* 🔴 第三步：這三行神陣，保證不管是上下留黑還是左右留黑，永遠「絕對正中央」 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    /* 🔴 第四步：死不准滑動（你要求的鐵律） */
+    overflow: auto; 
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    justify-content: space-between; /* 新增：這行是關鍵！它會嚴格要求上中下三層乖乖各自定位，不管資料有沒有來，絕對不允許任何人往上吸 */
+    /* 確保滑動時有 Apple 原生的絲滑回彈手感（Rubber-banding） */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    /* 🔴 第五步：立體手機殼裝飾（邊框與陰影） */
+    background-color: var(--bg-container);
+    border: 4px solid #222; /* 給它一個扎實的手機黑色外框 */
+    border-radius: 20px;    /* 稍微帶點圓角更像手機 */
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5); /* 超立體陰影 */
+}
 
          /* 填表區域 */
         .form-container {
@@ -472,10 +492,7 @@
 </head>
 <body>
      <div class="phone-wrapper">
-        <div id="header-placeholder"></div>
-          <form class="form-container" id="shopRegisterForm">
-             <div class="form-section">
-                <div class="section-title">基本資料設定</div>
+           <div id="header.html"></div>
                  <div class="input-group">
                     <label>店鋪聯絡電話</label>
                     <input type="tel" id="shopPhone" class="input-style" placeholder="請輸入店鋪或老闆的手機號碼" required pattern="[0-9]{9,10}">
@@ -520,9 +537,7 @@
                 <div class="input-group">
                     <label>平均餐點準備時間 (分鐘)</label>
                     <input type="number" id="prepareTimeInput" class="input-style" value="15" min="1" required>
-                </div>
-            </div>
-
+                </div>           
             <div class="form-section">
                 <div class="section-title">金流防棄單安全防禦線</div>
                 
@@ -596,285 +611,6 @@
             </div>
         </div>
     </div>
-
-<script type="module">
-    // 🔗 核心模組引入
-    import { auth, db } from "./app.js";
-    import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
-    // 🗺️ 1. 縣市區域連動選單資料庫
-    const areaData = {
-        "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
-        "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
-        "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
-        "桃園市": ["桃園區", "中壢區", "大溪區", "楊梅區", "蘆竹區", "大園區", "龜山區", "八德區", "龍潭區", "平鎮區", "新屋區", "觀音區", "復興區"],
-        "新竹市": ["東區", "北區", "香山區"],
-        "新竹縣": ["竹北市", "竹東鎮", "新埔鎮", "關西鎮", "湖口鄉", "新豐鄉", "芎林鄉", "橫山鄉", "北埔鄉", "寶山鄉", "峨眉鄉", "尖石鄉", "五峰鄉"],
-        "苗栗縣": ["苗栗市", "頭份市", "竹南鎮", "後龍鎮", "通霄鎮", "苑裡鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "公館鄉", "銅鑼鄉", "三義鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "南庄鄉", "泰安鄉"],
-        "台中市": ["中區", "東區", "南區", "西區", "北區", "西屯區", "南屯區", "北屯區", "豐原區", "東勢區", "大甲區", "清水區", "沙鹿區", "梧棲區", "后里區", "神岡區", "潭子區", "大雅區", "新社區", "石岡區", "外埔區", "大安區", "烏日區", "大肚區", "龍井區", "霧峰區", "太平區", "大里區", "和平區"],
-        "彰化縣": ["彰化市", "員林市", "鹿港鎮", "和美鎮", "北斗鎮", "溪湖鎮", "田中鎮", "二林鎮", "線西鄉", "伸港鄉", "福興鄉", "秀水鄉", "花壇鄉", "芬園鄉", "大村鄉", "埔鹽鄉", "埔心鄉", "永靖鄉", "社頭鄉", "二水鄉", "田尾鄉", "埤頭鄉", "芳苑鄉", "大城鄉", "竹塘鄉", "溪州鄉"],
-        "南投縣": ["南投市", "埔里鎮", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
-        "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "西螺鎮", "土庫鎮", "北港鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "東勢鄉", "褒忠鄉", "臺西鄉", "元長鄉", "四湖鄉", "口湖鄉", "水林鄉"],
-        "嘉義市": ["東區", "西區"],
-        "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
-        "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
-        "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區"],
-        "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
-        "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
-        "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
-        "臺東縣": ["臺東市", "成功鎮", "關山鎮", "卑名鄉", "大武鄉", "太麻里鄉", "東河鄉", "長濱鄉", "鹿野鄉", "池上鄉", "綠島鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉"],
-        "澎湖縣": ["馬公市", "湖西鄉", "白沙鄉", "西嶼鄉", "望安鄉", "七美鄉"],
-        "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
-        "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
-    };
-
-    const shopCity = document.getElementById('shopCity');
-    const shopDistrict = document.getElementById('shopDistrict');
-
-    Object.keys(areaData).forEach(city => {
-        const opt = document.createElement('option');
-        opt.value = city; opt.innerText = city; shopCity.appendChild(opt);
-    });
-
-    shopCity.addEventListener('change', () => {
-        const selectedCity = shopCity.value;
-        shopDistrict.innerHTML = '<option value="">選擇區域</option>';
-        if(areaData[selectedCity]) {
-            areaData[selectedCity].forEach(dist => {
-                const opt = document.createElement('option');
-                opt.value = dist; opt.innerText = dist; shopDistrict.appendChild(opt);
-            });
-        }
-    });
-
-    // 💳 2. 金流欄位處理
-    const toggleOnline = document.getElementById('toggleOnline');
-    const toggleCash = document.getElementById('toggleCash');
-    const newebpayContainer = document.getElementById('newebpayContainer');
-    const cashWarningModal = document.getElementById('cashWarningModal');
-    const warningConfirmBtn = document.getElementById('warningConfirmBtn');
-    const warningCancelBtn = document.getElementById('warningCancelBtn');
-
-    if(newebpayContainer) {
-        newebpayContainer.innerHTML = `
-            <label style="margin-bottom:12px; display:block; font-size:13px; font-weight:700;">🔒 藍新金流 API 開發參數設定</label>
-            <div style="display:flex; flex-direction:column; gap:8px;">
-                <input type="text" id="merchantIdInput" class="input-style" style="height:38px;" placeholder="請輸入 商店代號 (MerchantID)">
-                <input type="text" id="hashKeyInput" class="input-style" style="height:38px;" placeholder="請輸入 HashKey">
-                <input type="text" id="hashIvInput" class="input-style" style="height:38px;" placeholder="請輸入 HashIV">
-            </div>
-        `;
-    }
-
-    if(toggleOnline) {
-        toggleOnline.addEventListener('change', () => {
-            const inputs = newebpayContainer.querySelectorAll('input');
-            if(toggleOnline.checked) {
-                newebpayContainer.style.display = 'block';
-                inputs.forEach(i => i.setAttribute('required', 'true'));
-            } else {
-                newebpayContainer.style.display = 'none';
-                inputs.forEach(i => i.removeAttribute('required'));
-            }
-        });
-    }
-
-    if(toggleCash) {
-        toggleCash.addEventListener('change', () => {
-            if(toggleCash.checked) {
-                toggleCash.checked = false;
-                if(cashWarningModal) cashWarningModal.style.display = 'flex';
-            }
-        });
-    }
-
-    if(warningConfirmBtn) {
-        warningConfirmBtn.addEventListener('click', () => {
-            if(toggleCash) toggleCash.checked = true;
-            if(cashWarningModal) cashWarningModal.style.display = 'none';
-        });
-    }
-
-    if(warningCancelBtn) {
-        warningCancelBtn.addEventListener('click', () => {
-            if(toggleCash) toggleCash.checked = false;
-            if(cashWarningModal) cashWarningModal.style.display = 'none';
-        });
-    }
-
-    // ☰ 3. 菜單拖曳排序與操作核心
-    const menuUploadList = document.getElementById('menuUploadList');
-    let activeDragItem = null;
-
-    function makeItemDraggable(row) {
-        const handle = row.querySelector('.drag-handle');
-        handle.addEventListener('mousedown', (e) => startDrag(e, row));
-        handle.addEventListener('touchstart', (e) => startDrag(e, row), { passive: false });
-    }
-
-    function startDrag(e, row) {
-        if (e.cancelable) e.preventDefault();
-        activeDragItem = row;
-        row.style.opacity = '0.5';
-        row.style.border = '2px dashed var(--brand-blue)';
-        
-        const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-        if (e.type.startsWith('touch')) {
-            window.addEventListener('touchmove', onDragMove, { passive: false });
-            window.addEventListener('touchend', onDragEnd);
-        } else {
-            window.addEventListener('mousemove', onDragMove);
-            window.addEventListener('mouseup', onDragEnd);
-        }
-    }
-
-    function onDragMove(e) {
-        if (!activeDragItem) return;
-        if (e.cancelable) e.preventDefault();
-        const currentY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-        const siblings = [...menuUploadList.querySelectorAll('.menu-item-row:not([style*="dashed"])')];
-        const nextSibling = siblings.find(sibling => {
-            const box = sibling.getBoundingClientRect();
-            return currentY <= box.top + box.height / 2;
-        });
-        nextSibling ? menuUploadList.insertBefore(activeDragItem, nextSibling) : menuUploadList.appendChild(activeDragItem);
-    }
-
-    function onDragEnd() {
-        if (!activeDragItem) return;
-        activeDragItem.style.opacity = '1';
-        activeDragItem.style.border = '1px solid var(--border-color)';
-        activeDragItem = null;
-        window.removeEventListener('mousemove', onDragMove);
-        window.removeEventListener('mouseup', onDragEnd);
-        window.removeEventListener('touchmove', onDragMove);
-        window.removeEventListener('touchend', onDragEnd);
-    }
-
-    document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
-
-    const addItemRowBtn = document.getElementById('addItemRowBtn');
-    if(addItemRowBtn && menuUploadList) {
-        addItemRowBtn.addEventListener('click', () => {
-            const newRow = document.createElement('div');
-            newRow.className = 'menu-item-row';
-            newRow.innerHTML = `
-                <div class="img-upload-box" onclick="triggerUpload(this)">
-                    <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                    <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                    <div class="upload-placeholder">📷<span>上傳照片</span></div>
-                </div>
-                <div class="item-fields">
-                    <input type="text" class="input-style item-name-input" style="height:32px; padding: 0 10px;" placeholder="品項名稱" required>
-                    <div class="price-input-wrapper">
-                        <span class="price-symbol">$</span>
-                        <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
-                    </div>
-                </div>
-                <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 6px; justify-content: center;">
-                    <div class="drag-handle" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: grab;">☰</div>
-                    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
-                </div>
-            `;
-            menuUploadList.appendChild(newRow);
-            makeItemDraggable(newRow); 
-        });
-    }
-
-    window.deleteRow = function(btn) {
-        const rows = menuUploadList.querySelectorAll('.menu-item-row');
-        if(rows.length <= 1) { alert("報告老闆，店裡至少要留一項商品才能開張喔！"); return; }
-        btn.closest('.menu-item-row').remove();
-    };
-
-    window.triggerUpload = function(box) {
-        const fileInput = box.querySelector('.image-input');
-        if (fileInput) fileInput.click();
-    };
-
-    window.previewImage = function(input) {
-        const box = input.parentElement;
-        const img = box.querySelector('.preview-img');
-        const placeholder = box.querySelector('.upload-placeholder');
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                img.src = e.target.result;
-                img.style.display = 'block';
-                if (placeholder) placeholder.style.display = 'none';
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    };
-
-    // 🚀 4. 表單提交打包
-    const form = document.getElementById('shopRegisterForm');
-    if(form) {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const user = auth.currentUser;
-            if (!user) { alert("【PACE 提示】開鋪前請先登入帳號喔！"); return; }
-            
-            const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
-            const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
-
-            if (!isOnlinePayEnabled && !isCashPayEnabled) {
-                alert("⚠️ 請至少選擇一種收款方式（線上刷卡或現場付現）才能順利開張喔！");
-                return;
-            }
-
-            const name = document.getElementById('shopName')?.value.trim() || '';
-            const phone = document.getElementById('shopPhone')?.value.trim() || '';
-            const city = shopCity.value;
-            const district = shopDistrict.value;
-            const detailAddress = document.getElementById('shopAddress')?.value.trim() || '';
-            const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
-            const status = document.getElementById('shopStatus')?.value || 'online';
-            const prepareTime = parseInt(document.getElementById('prepareTimeInput')?.value) || 15;
-            const logoEl = document.getElementById('shopLogoPreview');
-            const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
-            const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
-            const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
-            const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
-            
-            const menuRows = document.querySelectorAll('.menu-item-row');
-            const menuItems = [];
-            menuRows.forEach(row => {
-                const nameField = row.querySelector('.item-name-input');
-                const priceField = row.querySelector('.price-input');
-                const nameVal = nameField ? nameField.value.trim() : '';
-                const priceVal = priceField ? parseInt(priceField.value) || 0 : 0;
-                const imgEl = row.querySelector('.preview-img');
-                const imgData = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : "";
-                if (nameVal) menuItems.push({ name: nameVal, price: priceVal, image: imgData });
-            });
-
-            const shopData = {
-                sellerUid: user.uid,
-                shopName: name, shopPhone: phone, city: city, district: district,
-                shopAddress: `${city}${district}${detailAddress}`,
-                inviteCode: inviteCode, status: status, shopLogo: shopLogoData,
-                prepareTime: prepareTime, isOnlinePayEnabled: isOnlinePayEnabled,
-                isCashPayEnabled: isCashPayEnabled,
-                newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
-                menuList: menuItems, createdAt: new Date().toISOString()
-            };
-
-            const shopSubmitBtn = document.getElementById('shopSubmitBtn');
-            shopSubmitBtn.innerText = "⚡ 正在打通雲端地基中...";
-            shopSubmitBtn.disabled = true;
-
-            try {
-                await setDoc(doc(db, "stores", user.uid), shopData);
-                alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張！");
-                window.location.href = "seller.html";
-            } catch (dbError) {
-                alert("寫入失敗：" + dbError.message);
-                shopSubmitBtn.innerText = "建立店鋪";
-                shopSubmitBtn.disabled = false;
-            }
-        });
-    }
-</script>
+<script type="module" src="app.js"></script>
 </body>
 </html>

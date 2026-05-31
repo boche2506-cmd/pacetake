@@ -161,11 +161,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     if(districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
     if(globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
-    // 💡 就在這裡！加上這兩行「初始化觸發」，問題直接根治：
-    if(citySelect && citySelect.value) {
-        // 模擬手動切換一次，讓行政區選單在網頁一打開時，就根據預設的「台北市」自動長出來並連動篩選！
-        citySelect.dispatchEvent(new Event('change')); 
-    }
 
     // 登入邏輯
     if(googleLoginAction) {
@@ -529,9 +524,7 @@ async function fetchStoresFromFirebase() {
         querySnapshot.forEach((doc) => {
             allStores.push({ id: doc.id, ...doc.data() });
         });
-
-        // 💡 唯一改動：不要讓它跟別的非同步微任務擠在一起
-        // 用 setTimeout 讓它去排下一輪的巨集任務，這跟 console.log 釋放畫面的效果一模一樣
+        // 💡 改動這裡：用 setTimeout 稍微推遲渲染，防止與使用者權限更新衝突
         setTimeout(() => {
             filterAndRenderStores();
             renderAdminTable(); 
@@ -539,19 +532,15 @@ async function fetchStoresFromFirebase() {
 
     } catch (error) {
         console.error("讀取店家失敗：", error);
-        if(storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner">❌ 無法取得資料</div>';
+        if(storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
     }
 }
 
 function filterAndRenderStores() {
-    // 💡 加上這三行，我們直接在控制台看看到底哪裡不對
-    console.log("=== 偵錯開始 ===");
-    console.log("目前資料庫所有的店家數量 (allStores)：", allStores?.length, allStores);
-    console.log("此時抓到的縣市欄位值：", citySelect?.value, "，區域欄位值：", districtSelect?.value);
-
-    // ...你原本的篩選跟渲染程式碼...
-}
-globalSearchInput.value.toLowerCase().trim() : '';
+    if(!storeContainer) return;
+    const selectedCity = citySelect ? citySelect.value : '';
+    const selectedDist = districtSelect ? districtSelect.value : '';
+    const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
 
     const filtered = allStores.filter(store => {
         const matchCity = !selectedCity || store.city === selectedCity;
@@ -848,3 +837,4 @@ function loadHeader() {
 }
 
 // 執行載入
+console.log("程式執行完畢");

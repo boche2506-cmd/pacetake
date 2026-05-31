@@ -834,4 +834,3 @@ function loadHeader() {
 
 // 執行載入
 loadHeader();
-console.log("程式執行完畢");

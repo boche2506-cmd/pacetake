@@ -525,7 +525,7 @@ async function fetchStoresFromFirebase() {
             allStores.push({ id: doc.id, ...doc.data() });
         });
         filterAndRenderStores();
-     //   renderAdminTable(); 
+        renderAdminTable(); 
     } catch (error) {
         console.error("讀取店家失敗：", error);
         if(storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
@@ -603,7 +603,7 @@ function getBrowserLocation() {
     }
 }
 
-// function renderAdminTable() {
+function renderAdminTable() {
     const tbody = document.getElementById('adminStoreTableBody');
     if(!tbody) return;
     
@@ -814,23 +814,3 @@ window.toggleView = function(viewRole) {
     }
 };
 
-// 抓取外部的 header.html 並塞入指定的 div 中
-function loadHeader() {
-    const headerContainer = document.getElementById('header-container');
-    
-    // 💡 關鍵：只有在有 header-container 的時候，才執行載入的動作
-    if (headerContainer) {
-        fetch('header.html')
-            .then(response => {
-                if (!response.ok) throw new Error('找不到 header');
-                return response.text();
-            })
-            .then(htmlData => {
-                headerContainer.innerHTML = htmlData;
-            })
-            .catch(error => console.error('載入 Header 失敗：', error));
-    }
-    
-    // 💡 這一行移出來：不管上面有沒有載入 Header，下面這些程式碼都能繼續跑！
-    // 這樣你的卡片和按鈕就不會因為沒有 header 而死掉了
-}

@@ -816,6 +816,14 @@ window.toggleView = function(viewRole) {
 
 // 抓取外部的 header.html 並塞入指定的 div 中
 function loadHeader() {
+    // 1. 先找找看這一頁有沒有 header 的專屬位子
+    const headerContainer = document.getElementById('header-container');
+    
+    // 2. 🎯 最關鍵的煞車：如果沒有位子 (代表這頁不需要 header)，就直接結束，當作沒事發生！
+    if (!headerContainer) {
+        return; 
+    }
+function loadHeader() {
     fetch('header.html')
         .then(response => {
             if (!response.ok) {

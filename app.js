@@ -75,6 +75,7 @@ function initTheme() {
         themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
     }
 }
+
 function renderDynamicMenu(role) {
     let menuHTML = `
         <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
@@ -178,7 +179,7 @@ function renderDynamicMenu(role) {
         `;
     }
     dropdownMenu.innerHTML = menuHtml;
-
+}
 
 window.logout = async function() {
     try {
@@ -187,7 +188,7 @@ window.logout = async function() {
     } catch (error) {
         console.error("Logout error:", error);
     }
-}};
+};
 
 // ==========================================
 // 4. 大腦核心：等網頁全部長出來才執行

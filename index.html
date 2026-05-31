@@ -787,14 +787,13 @@ select {
         <div class="loading-spinner" id="loading-Spinner">⚡ 正在連線雲端資料庫...</div>
     </main>
     <footer class="bottom-bar">
-        <a href="orders.html" class="status-msg" id="bottomStatusMsg">
+        <a href="orders.html" class="status-msg" >
             <div class="status-indicator active" id="statusDot"></div>
             <div class="order-badge-count" id="orderBadgeCount">0</div>
             <span id="statusText">您目前沒有進行中的訂單喔！</span>
         </a>
         <a href="cart.html" class="cart-status-btn nav-fast">
             <span>🛒 </span>
-            <span id="cartCount">(0)</span>
         </a>
     </footer>
   </div>
@@ -818,7 +817,7 @@ select {
             <input type="text" id="adminNewStoreCity" placeholder="縣市 (如: 基隆市) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
             <input type="text" id="adminNewStoreDistrict" placeholder="區域 (如: 七堵區) (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
             <input type="text" id="adminNewStoreAddress" placeholder="詳細地址 (*必填)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">
-            <input type="text" id="adminNewStoreCategory" placeholder="分類 (如: 台式小吃, 飲料)" style="padding: 10px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; grid-column: span 2;">
+
         </div>
         <button id="adminSubmitStoreBtn" style="width: 100%; padding: 12px; background: #059669; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;">✅ 確認新增店家至雲端</button>
     </div> <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; border: 1px solid #2d2d2d; overflow-x: auto;">

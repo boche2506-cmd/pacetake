@@ -75,7 +75,6 @@ function initTheme() {
         themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
     }
 }
-
 function renderDynamicMenu(role) {
     let menuHTML = `
         <a href="orders.html" class="nav-fast">🛒 我的訂單</a>

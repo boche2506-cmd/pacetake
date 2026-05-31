@@ -824,3 +824,4 @@ function loadHeader() {
             console.error('載入 Header 失敗：', error);
         });
 }
+loadHeader();

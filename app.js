@@ -603,7 +603,7 @@ function getBrowserLocation() {
     }
 }
 
-function renderAdminTable() {
+// function renderAdminTable() {
     const tbody = document.getElementById('adminStoreTableBody');
     if(!tbody) return;
     

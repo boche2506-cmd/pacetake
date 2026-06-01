@@ -102,7 +102,7 @@ function renderDynamicMenu(role) {
     if (role === 'admin') {
         menuHTML += `
             <div class="menu-divider"></div>
-            <a href="javascript:void(0)" onclick="window.toggleView('admin')" style="color: var(--brand-blue); font-weight: bold;">🔮 派思核心控制台</a>
+            <a href="javascript:void(0)" onclick="window.toggleView('admin')" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
             <a href="javascript:void(0)" onclick="window.issuePromoCode()" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
             
         `;
@@ -196,7 +196,6 @@ function updateUIForUser(user, currentRole) {
 // 4. 初始化與事件綁定
 // ==========================================
 
-// 【核心修復】將事件綁定邏輯封裝，確保在 Header 載入後執行
 function bindHeaderEvents() {
     themeToggleBtn = document.getElementById('themeToggleBtn');
     loginBtn = document.getElementById('loginBtn');
@@ -408,22 +407,35 @@ window.addEventListener('DOMContentLoaded', async () => {
             if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
         });
     }
+
+    // 【核心修正】toggleCash 開啟警告邏輯
     if (toggleCash) {
-        toggleCash.addEventListener('change', function() {
-            if (!this.checked && cashWarningModal) {
-                cashWarningModal.style.display = 'flex';
+        // 預設關閉
+        toggleCash.checked = false; 
+        
+        toggleCash.addEventListener('click', function(e) {
+            // 如果當前是「關閉」狀態，使用者點擊想要「開啟」
+            if (this.checked) {
+                // 先攔截狀態切換，保持關閉
+                this.checked = false; 
+                e.preventDefault();
+                // 彈出警告視窗
+                if (cashWarningModal) cashWarningModal.style.display = 'flex';
             }
         });
     }
+
     if (warningConfirmBtn) {
         warningConfirmBtn.addEventListener('click', () => {
-            if (toggleCash) toggleCash.checked = false;
+            // 使用者點擊確認，將開關切換為開啟
+            if (toggleCash) toggleCash.checked = true;
             if (cashWarningModal) cashWarningModal.style.display = 'none';
         });
     }
     if (warningCancelBtn) {
         warningCancelBtn.addEventListener('click', () => {
-            if (toggleCash) toggleCash.checked = true;
+            // 使用者點擊取消，保持關閉
+            if (toggleCash) toggleCash.checked = false;
             if (cashWarningModal) cashWarningModal.style.display = 'none';
         });
     }
@@ -460,35 +472,48 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // 【核心修正】shopRegisterForm 提交邏輯與按鈕修復
     const shopRegisterForm = document.getElementById('shopRegisterForm');
     if (shopRegisterForm) {
         shopRegisterForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
             const user = auth.currentUser;
             if (!user) { alert("【PACE 提示】開鋪前請先登入帳號喔！"); return; }
             
-            const isOnlinePayEnabled = toggleOnline ? toggleOnline.checked : false;
-            const isCashPayEnabled = toggleCash ? toggleCash.checked : false;
+            // 抓取收款方式狀態
+            const isOnlinePayEnabled = document.getElementById('toggleOnline')?.checked || false;
+            const isCashPayEnabled = document.getElementById('toggleCash')?.checked || false;
 
             if (!isOnlinePayEnabled && !isCashPayEnabled) {
                 alert("⚠️ 請至少選擇一種收款方式（線上刷卡或現場付現）才能順利開張喔！");
                 return;
             }
 
-            const name = document.getElementById('shopName')?.value.trim() || '';
-            const phone = document.getElementById('shopPhone')?.value.trim() || '';
-            const city = shopCity ? shopCity.value : '';
-            const district = shopDistrict ? shopDistrict.value : '';
-            const detailAddress = document.getElementById('shopAddress')?.value.trim() || '';
+            // 抓取各項欄位
+            const name = document.getElementById('shopName')?.value.trim();
+            const phone = document.getElementById('shopPhone')?.value.trim();
+            const city = document.getElementById('shopCity')?.value;
+            const district = document.getElementById('shopDistrict')?.value;
+            const detailAddress = document.getElementById('shopAddress')?.value.trim();
+            
+            // 驗證必填欄位
+            if (!name || !phone || !city || !district || !detailAddress) {
+                alert("⚠️ 請填寫完整的店舖資訊（店名、電話、地址等）！");
+                return;
+            }
+
             const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
             const status = document.getElementById('shopStatus')?.value || 'online';
             const prepareTime = parseInt(document.getElementById('prepareTimeInput')?.value) || 15;
             const logoEl = document.getElementById('shopLogoPreview');
             const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
+            
             const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
             const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
             const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
             
+            // 抓取菜單
             const menuRows = document.querySelectorAll('.menu-item-row');
             const menuItems = [];
             menuRows.forEach(row => {
@@ -519,10 +544,16 @@ window.addEventListener('DOMContentLoaded', async () => {
             }
 
             try {
+                // 執行寫入
                 await setDoc(doc(db, "stores", user.uid), shopData);
+                
+                // 更新使用者角色為賣家
+                await updateDoc(doc(db, "users", user.uid), { role: "seller" });
+                
                 alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張！");
                 window.location.href = "seller.html";
             } catch (dbError) {
+                console.error("提交失敗：", dbError);
                 alert("寫入失敗：" + dbError.message);
                 if (shopSubmitBtn) {
                     shopSubmitBtn.innerText = "建立店鋪";
@@ -778,7 +809,7 @@ window.deleteStore = async function(storeId) {
     if (confirm("⚠️ 確定要從 Firebase 徹底刪除這個店家嗎？(刪除後無法恢復)")) {
         try {
             await deleteDoc(doc(db, "stores", storeId));
-            alert("🗑️ 店家已成功刪除！");
+            alert("🗑️ 店家預已成功刪除！");
             fetchStoresFromFirebase(); 
         } catch (error) {
             console.error("刪除失敗:", error);
@@ -825,7 +856,6 @@ function loadHeader() {
         })
         .then(htmlData => {
             headerContainer.innerHTML = htmlData;
-            // 【核心修復】Header 載入後，立即執行事件綁定與主題初始化
             bindHeaderEvents();
             initTheme();
         })

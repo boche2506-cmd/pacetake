@@ -877,27 +877,3 @@ window.issuePromoCode = async function() {
         alert("發行失敗，請檢查您的系統權限配置！");
     }
 };
-
-function autoScaleCanvas() {
-    const wrapper = document.querySelector('.phone-wrapper');
-    if (!wrapper) return;
-
-    // 設計稿的基礎寬高
-    const designWidth = 375;
-    const designHeight = 667;
-
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-
-    // 計算縮放比例 (取寬度或高度較小的那個，保證不切邊)
-    const scale = Math.min(windowWidth / designWidth, windowHeight / designHeight);
-
-    // 應用變形 (Transform)
-    wrapper.style.transform = `scale(${scale})`;
-}
-
-// 監聽視窗變化，自動重算
-window.addEventListener('resize', autoScaleCanvas);
-
-// 初始化
-autoScaleCanvas();

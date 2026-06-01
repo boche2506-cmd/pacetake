@@ -14,17 +14,16 @@
 
 /* 總容器：確保佔據 28% 且內部元素不溢出 */
 .sticky-top-group {
-    flex: 0 0 28%; /* 強制固定佔據 28% 空間，不放大不縮小 */
-    border-bottom: 1px solid var(--border-color);
+    flex: 0 0 28%; 
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 垂直置中內部元素 */
-    gap: 4%;                /* 用 % 取代 rem，保證縮放間距一致 */
-    padding: 0 4%;          /* 用 % 取代 px/rem，縮放時留白比例不變 */
+    justify-content: center;
+    gap: 4%;
+    padding: 0 4%;
     background-color: var(--bg-container);
     z-index: 100;
     box-shadow: var(--shadow-sm);
-    overflow: hidden;       /* 鎖死，絕不讓內容撐開 */
+    overflow: hidden; /* 確保內容不溢出 */
 }
 
 /* 定位列：水平排列 */
@@ -95,12 +94,13 @@
 }
 /* 店家列表 */
 .store-list {
-    flex: 57 0 0; /* 永遠佔 57% */
-    overflow-y: auto;
+    flex: 1; /* 改為 1，讓它自動佔滿剩下的空間，與 57% 效果一致但更彈性 */
+    overflow-y: auto; /* 內容過多時顯示捲軸 */
     padding: 0.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-height: 0; /* 【超級關鍵】這行強迫 Flex 容器不要被內容物撐開 */
     -webkit-overflow-scrolling: touch;
 }
 
@@ -184,13 +184,14 @@
 
 /* 底部列 */
 .bottom-bar {
-    flex: 15 0 0; /* 永遠佔 15% */    padding: 0.5rem;
+    flex: 0 0 15%; /* 改為 0 0 15%，確保不參與縮放競爭 */
+    padding: 0.5rem;
     border-top: 1px solid var(--border-color);
     background-color: var(--blur-bg);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-shrink: 0; /* 重要：防止底部被擠壓消失 */
+    flex-shrink: 0; /* 絕對不准壓縮 */
     overflow: hidden;
 }
 

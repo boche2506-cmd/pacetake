@@ -6,6 +6,8 @@ html {
     font-size: 16px !important;
 }
 :root {
+    --zoom-factor: 1;
+    --base-font-size: calc(16px * var(--zoom-factor));
     --bg-global: #F8FAFC;
     --bg-container: #FFFFFF;
     --border-color: #E2E8F0;
@@ -57,8 +59,7 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    background-color: #000000; /* 外圍黑色沙盒 */
-    
+    background-color: var(--bg-global); /* 跟隨主題切換 */    
     /* 鎖死觸控反彈與捲軸 */
 
     /* 👑 強制向下對齊 */

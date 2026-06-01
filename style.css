@@ -37,22 +37,6 @@ html {
     --blur-bg: rgba(17, 17, 17, 0.95);
 }
 
-/* ==========================================================================
-   2. 基礎重設與全域元素 (Reset & Globals)
-   ========================================================================== */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    -webkit-tap-highlight-color: transparent;
-    /* ⭕ 修正：將防選取機制嚴格綁定在全域選擇器 * 內，保證所有瀏覽器行為統一 */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
 body {
     /* 🔴 關鍵修正：放棄 width:100% 這種會被父層干擾的寫法，改用絕對視窗維度 */
     width: 100vw;
@@ -80,29 +64,6 @@ img, .card {
     box-sizing: border-box;
 }
 
-*, *::before, *::after {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
-    -webkit-font-smoothing: antialiased;    /* 讓 Mac/iPhone 上的文字更細緻不毛躁 */
-    -moz-osx-font-smoothing: grayscale;
-    box-sizing: border-box;                 /* 順便鎖死所有盒模型的寬度計算，防止破圖 */
-}
-
-@media (max-width: 480px) {
-
-    /* 1. 給大盒子內壁加上緩衝墊，不准黃框貼頂 */
-    .sticky-top-group {
-        padding-top: 15px !important;
-        box-sizing: border-box !important;
-    }
-
-    /* 2. 點名搜尋框跟縣市條，在真手機上強制往下推開，拉開比例！ */
-    .search-container, 
-    .location-bar {
-        margin-top: 10px !important; /* 蓋掉原本的 0px，讓它在手機上長出距離 */
-    }
-
-}
-
 /* ==========================================================================
    3. 核心佈局架構 (Layout)
    ========================================================================== */
@@ -115,21 +76,12 @@ img, .card {
     width: calc(100vh * 9 / 16); /* 根據 9:16 比例計算寬度 */
     min-height: 0;
     display: flex;
-    flex-direction: column;
     overflow: hidden;       /* 確保內部內容不會撐破畫布 */
     background-color: var(--bg-container);
     border: 1px solid var(--border-color);
     border-radius: 2rem; /* 使用相對單位 */
     box-shadow: var(--shadow-md);
     transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-#buyerView, #adminView {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
 }
 
 /* 管理介面覆蓋層 */
@@ -146,7 +98,7 @@ img, .card {
 #buyerView {
     width: 100%;
     height: 100%;
-    display: flex !important; /* 確保不管 JS 怎麼切換 block，都必須維持 flex 佈局 */
+    display: flex; /* 確保不管 JS 怎麼切換 block，都必須維持 flex 佈局 */
     flex-direction: column;
     justify-content: space-between; /* 鐵律：強迫上中下三層死死卡住各自的位置，絕對不准往上吸 */
     box-sizing: border-box;
@@ -155,27 +107,15 @@ img, .card {
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
 .sticky-top-group {
     display: flex;
-    flex-direction: column;
     height: 28%;
-    box-sizing: border-box; /* 確保 margin/padding 不會把這 30% 的高度撐破 */
+    flex-direction: column;
     border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
     gap: 5px;
     top: 0;
-    padding-top: 10px;
+    padding-top: 10 px;
     margin-bottom: 10px;
-    position: sticky;
-    background-color: var(--bg-container) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    background-color: var(--bg-container);
     z-index: 100; 
-}
-
-*, *::before, *::after {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
-    -webkit-font-smoothing: antialiased;    /* 讓 Mac/iPhone 上的文字更細緻不毛躁 */
-    -moz-osx-font-smoothing: grayscale;
-    box-sizing: border-box;                 /* 順便鎖死所有盒模型的寬度計算，防止破圖 */
 }
 
 /* ==========================================================================
@@ -215,6 +155,7 @@ img, .card {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    align-items: flex-end; 
 }
 
 .theme-toggle {
@@ -303,8 +244,8 @@ img, .card {
     display: flex;
     align-items: center;
     gap: 5px;
-    height: 36px;                   /* 固定住的數值：鎖定第二排選單高度 */
     flex-shrink: 0;
+    padding: 0 10px;
 }
 
 .gps-trigger-btn {
@@ -331,7 +272,6 @@ img, .card {
 
 .nav-select {
     flex: 1;
-    height: 32px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
     background-color: var(--bg-global);
@@ -344,8 +284,7 @@ img, .card {
 }
 
 .search-container {
-    margin-bottom: 0px;
-    height: 48px;                   /* 固定住的數值：鎖定第三排搜尋框容器高度 */
+    margin-bottom: 0 px;
     flex-shrink: 0;
     padding: 0 10px;
 }
@@ -356,8 +295,6 @@ img, .card {
     background-color: var(--bg-global);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 0 5px;
-    height: 36px;
 }
 
 .search-box input {

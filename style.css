@@ -252,6 +252,7 @@ img, .card {
     font-weight: 600;
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
+    flex-direction: row;
 }
 
 .dropdown-menu {

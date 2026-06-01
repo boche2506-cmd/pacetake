@@ -95,12 +95,15 @@
 /* 店家列表 */
 .store-list {
     flex: 1; /* 改為 1，讓它自動佔滿剩下的空間，與 57% 效果一致但更彈性 */
-    overflow-y: auto; /* 內容過多時顯示捲軸 */
+    height: auto;;        /* 強制它填滿父層分配到的高度 */
+    min-height: 0;       /* 允許它縮小 */
+    overflow-y: auto;    /* 這是產生捲軸的核心 */
     padding: 0.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
 }
 
 .store-card {

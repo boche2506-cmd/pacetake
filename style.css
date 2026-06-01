@@ -243,11 +243,11 @@ img, .card {
 .user-avatar-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.5rem;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 5px 10px;
-    border-radius: 9999px;
+    padding: 0.25rem 1.0rem;
+    border-radius: 20px;
     font-size: 13px;
     font-weight: 600;
     color: var(--text-main);

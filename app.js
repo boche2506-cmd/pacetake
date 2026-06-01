@@ -851,7 +851,7 @@ window.deleteStore = async function(storeId) {
 };
 
 window.toggleView = function(view) {
-    const adminEl = document.getElementById('admin-section');
+    const adminEl = document.getElementById('adminView');
     const buyerEl = document.getElementById('buyer-section');
     if (view === 'admin') {
         if (adminEl) adminEl.style.display = 'block';

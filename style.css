@@ -250,7 +250,7 @@ img, .card {
     font-weight: 500;
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
-    justify-content: flex-end;
+    align-items: flex-end; 
 }
 
 .dropdown-menu {

@@ -102,7 +102,7 @@ function renderDynamicMenu(role) {
     if (role === 'admin') {
         menuHTML += `
             <div class="menu-divider"></div>
-            <a href="javascript:void(0)" onclick="window.toggleView('admin')" class="nav-fast" style="color: var(--brand-blue); font-weight: bold;">🔮 派思核心控制台</a>
+            <a href="javascript:void(0)" onclick="window.toggleView('admin')" style="color: var(--brand-blue); font-weight: bold;">🔮 派思核心控制台</a>
             <a href="javascript:void(0)" onclick="window.issuePromoCode()" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
             
         `;

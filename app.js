@@ -199,7 +199,7 @@ function updateUIForUser(user, currentRole) {
 // ==========================================
 
 function bindHeaderEvents() {
-    console.log("[PACE DEBUG] Binding header events.");
+    console.log("[PACE DEBUG] bindHeaderEvents() started.");
     themeToggleBtn = document.getElementById('themeToggleBtn');
     loginBtn = document.getElementById('loginBtn');
     avatarBtn = document.getElementById('avatarBtn');
@@ -234,11 +234,41 @@ function bindHeaderEvents() {
             if (loginLightbox) loginLightbox.style.display = 'flex'; 
         });
     }
+    
+    // 同步當前使用者狀態到 Header
+    if (auth.currentUser) {
+        updateUIForUser(auth.currentUser, 'buyer'); // 角色會由 handleUserSyncAndRoleRouting 修正
+    }
+}
+
+function loadHeader() {
+    console.log("[PACE DEBUG] loadHeader() started.");
+    const headerContainer = document.getElementById('header-container');
+    if (!headerContainer) {
+        console.warn("[PACE DEBUG] #header-container not found.");
+        return;
+    }
+    fetch('header.html')
+        .then(response => {
+            if (!response.ok) throw new Error('找不到 header.html');
+            return response.text();
+        })
+        .then(htmlData => {
+            headerContainer.innerHTML = htmlData;
+            console.log("[PACE DEBUG] Header HTML loaded.");
+            bindHeaderEvents();
+            initTheme();
+        })
+        .catch(error => {
+            console.error('[PACE DEBUG] 載入 Header 失敗：', error);
+        });
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
     console.log("[PACE DEBUG] DOMContentLoaded.");
-    initTheme();
+    
+    // 優先執行 Header 載入
+    loadHeader();
     
     // 非 Header 元件抓取
     userNameDisplay = document.getElementById('userNameDisplay');
@@ -425,7 +455,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 【核心修正】toggleCash 開啟警告邏輯
+    // toggleCash 開啟警告邏輯
     if (toggleCash) {
         toggleCash.checked = false; 
         toggleCash.addEventListener('click', function(e) {
@@ -486,7 +516,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 【核心修正】shopSubmitBtn 監聽與手動提交邏輯
+    // shopSubmitBtn 監聽與手動提交邏輯
     const shopSubmitBtn = document.getElementById('shopSubmitBtn');
     if (shopSubmitBtn) {
         shopSubmitBtn.addEventListener('click', async (e) => {
@@ -565,12 +595,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
-
-    // 確保 Header 載入後綁定事件 (如果 Header 是動態載入的)
-    if (typeof window.loadHeader === 'function') {
-        window.loadHeader();
-    }
-    bindHeaderEvents();
 });
 
 // ==========================================
@@ -826,25 +850,10 @@ window.deleteStore = async function(storeId) {
     }
 };
 
-window.issuePromoCode = async function() {
-    const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
-    if (!code || code.trim() === "") return;
-    try {
-        await setDoc(doc(db, "promoCodes", code.trim()), {
-            code: code.trim(), createdBy: currentUserId, createdAt: new Date().toISOString(),
-            isActive: true, usedBy: null
-        });
-        alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！`);
-    } catch (error) {
-        console.error("邀請碼發行失敗:", error);
-        alert("發行失敗，請檢查您的系統權限配置！");
-    }
-};
-
-window.toggleView = function(viewRole) {
-    const adminEl = document.getElementById('adminView');
-    const buyerEl = document.getElementById('buyerView');
-    if (viewRole === 'admin') {
+window.toggleView = function(view) {
+    const adminEl = document.getElementById('admin-section');
+    const buyerEl = document.getElementById('buyer-section');
+    if (view === 'admin') {
         if (adminEl) adminEl.style.display = 'block';
         if (buyerEl) buyerEl.style.display = 'none';
         window.scrollTo(0, 0);
@@ -853,22 +862,3 @@ window.toggleView = function(viewRole) {
         if (buyerEl) buyerEl.style.display = 'block';
     }
 };
-
-function loadHeader() {
-    const headerContainer = document.getElementById('header-container');
-    if (!headerContainer) return;
-    fetch('header.html')
-        .then(response => {
-            if (!response.ok) throw new Error('找不到 header.html');
-            return response.text();
-        })
-        .then(htmlData => {
-            headerContainer.innerHTML = htmlData;
-            bindHeaderEvents();
-            initTheme();
-        })
-        .catch(error => {
-            console.error('載入 Header 失敗：', error);
-        });
-}
-

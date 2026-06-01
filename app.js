@@ -92,6 +92,7 @@ function renderDynamicMenu(role) {
     
     if (role === 'seller' || role === 'admin') {
         menuHTML += `
+            <div class="menu-divider"></div>
             <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
             <a href="manage.html" class="nav-fast">⚙️ 店舖管理</a>
             <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
@@ -100,6 +101,7 @@ function renderDynamicMenu(role) {
 
     if (role === 'admin') {
         menuHTML += `
+            <div class="menu-divider"></div>
             <a href="javascript:void(0)" onclick="window.toggleView('admin')" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
             <a href="javascript:void(0)" onclick="window.issuePromoCode()" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
             
@@ -107,6 +109,7 @@ function renderDynamicMenu(role) {
     }
 
     menuHTML += `
+        <div class="menu-divider"></div>
         <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 10px; background: none; border: none; cursor: pointer; font-size: 14px;">🚪 登出系統</button>
     `;
 

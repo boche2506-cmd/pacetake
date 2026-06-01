@@ -38,15 +38,11 @@ html {
 }
 
 body {
-    /* 🔴 關鍵修正：放棄 width:100% 這種會被父層干擾的寫法，改用絕對視窗維度 */
     width: 100vw;
     height: 100vh;
     margin: 0;
     padding: 0;
-    background-color: var(--bg-global); /* 跟隨主題切換 */    
-    /* 鎖死觸控反彈與捲軸 */
-
-    /* 👑 強制向下對齊 */
+    background-color: var(--bg-global);
     display: flex;
     flex-direction: column;
     justify-content: center;     /* 改成 center，讓整體垂直也置中 */
@@ -93,10 +89,74 @@ img, .card {
     left: 0;
     width: 100%;
     height: 100%;
-    padding: 1.5rem;
+    padding: 1.2rem 1.5rem;
     overflow-y: auto;
     background-color: var(--bg-container);
     z-index: 999;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 讓表單內容自動適應寬度 */
+#adminView > div, 
+#adminView .form-container,
+#adminView form {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* 所有輸入框統一優化 */
+#adminView input,
+#adminView textarea,
+#adminView select {
+    width: 100% !important;           /* 強制填滿父層寬度 */
+    box-sizing: border-box;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background-color: var(--bg-global);
+    font-size: 15px;
+    color: var(--text-main);
+}
+
+/* 兩個欄位並排的情況（例如 聯絡電話 + 區域） */
+#adminView .row,
+#adminView .flex-row {
+    display: flex;
+    gap: 10px;
+}
+
+#adminView .row input,
+#adminView .flex-row input {
+    flex: 1;
+}
+
+/* 按鈕優化 */
+#adminView button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 12px;
+}
+
+/* 綠色確認按鈕 */
+#adminView button[style*="green"],
+#adminView .success-btn {
+    background-color: var(--brand-green) !important;
+    color: white !important;
+    border: none;
+}
+
+/* 標題與說明文字 */
+#adminView h2, 
+#adminView h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
 }
 
 /* buyerView 內部三層布局 */
@@ -234,78 +294,6 @@ img, .card {
     margin: 0.375rem 0;
 }
 
-.location-bar {
-    height: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    flex-shrink: 0;
-    padding: 0 5px;
-}
-
-.gps-trigger-btn {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--brand-blue);
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    padding: 6px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    white-space: nowrap;
-    box-shadow: var(--shadow-sm);
-}
-
-.location-select-group {
-    display: flex;
-    gap: 4px;
-    flex-grow: 1;
-}
-
-.nav-select {
-    flex: 1;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-global);
-    color: var(--text-main);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 0 4px;
-    outline: none;
-    cursor: pointer;
-}
-
-.search-container {
-    height: 1rem;
-    flex-shrink: 0;
-    padding:5px;    
-}
-
-.search-box {
-    display: flex;
-    align-items: center;
-    background-color: var(--bg-global);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 5px;
-    gap: 3px;
-     /* 🔴 關鍵修正：將 search-box 的寬度改為 100%，讓它完全服從父層分配的空間 */
-}
-
-.search-box input {
-    border: none;
-    background: none;
-    width: 100%;
-    height: 100%;
-    margin-left: 8px;
-    font-size: 14px;
-    color: var(--text-main);
-    outline: none;
-}
-
 /* ==========================================================================
    9. 燈箱模態框與通用組件 (Modals & Utilities)
    ========================================================================== */
@@ -375,19 +363,4 @@ img, .card {
     border-color: #E2E8F0;
 }
 
-.modal-close {
-    font-size: 12px;
-    color: var(--text-muted);
-    cursor: pointer;
-    margin-top: 12px;
-    display: inline-block;
-}
-
-.loading-spinner {
-    text-align: center;
-    padding: 40px;
-    color: var(--text-muted);
-    font-size: 14px;
-    font-weight: 600;
-}
 

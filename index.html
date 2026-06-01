@@ -22,6 +22,78 @@
     background-color: var(--bg-container);
 }
 
+.location-bar {
+    height: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    padding: 0 5px;
+}
+
+.gps-trigger-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--brand-blue);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+}
+
+.location-select-group {
+    display: flex;
+    gap: 4px;
+    flex-grow: 1;
+}
+
+.nav-select {
+    flex: 1;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-global);
+    color: var(--text-main);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 0 4px;
+    outline: none;
+    cursor: pointer;
+}
+
+.search-container {
+    height: 1rem;
+    flex-shrink: 0;
+    padding:5px;    
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-global);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 5px;
+    gap: 3px;
+     /* 🔴 關鍵修正：將 search-box 的寬度改為 100%，讓它完全服從父層分配的空間 */
+}
+
+.search-box input {
+    border: none;
+    background: none;
+    width: 100%;
+    height: 100%;
+    margin-left: 8px;
+    font-size: 14px;
+    color: var(--text-main);
+    outline: none;
+}
+
 /* ==========================================================================
    7. 店家列表 (Store List)
    ========================================================================== */

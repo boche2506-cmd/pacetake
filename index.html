@@ -32,15 +32,12 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    width: 100%;
 }
 
 .gps-trigger-btn {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 12px;
-    font-weight: 700;
     color: var(--brand-blue);
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -49,19 +46,14 @@
     cursor: pointer;
     white-space: nowrap;
     box-shadow: var(--shadow-sm);
-    flex-shrink: 0; /* 防止按鈕被擠壓 */
 }
 
 .location-select-group {
     display: flex;
     gap: 4px;
-    flex-grow: 1;
-    min-width: 0; /* 確保在小螢幕下能正確縮放 */
 }
 
 .nav-select {
-    flex: 1;
-    height: 2.25rem;
     border-radius: 0.5rem;
     border: 1px solid var(--border-color);
     background-color: var(--bg-global);
@@ -69,12 +61,10 @@
     font-size: 0.875rem;
     padding: 0 0.5rem;
     outline: none;
-    min-width: 0; /* 確保 flex 子元素能縮小 */
 }
 
 /* 搜尋框 */
 .search-container {
-    width: 100%;
 }
 
 .search-box {
@@ -84,14 +74,11 @@
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     padding: 0 0.75rem;
-    height: 2.5rem;
 }
 
 .search-box input {
     border: none;
     background: transparent;
-    width: 100%;
-    height: 100%;
     font-size: 1rem;
     color: var(--text-main);
     outline: none;

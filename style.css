@@ -128,7 +128,7 @@ img {
     display: flex;
     justify-content: space-between;
     align-items: flex-end; /* 讓左右兩邊的內容底部對齊 */
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 .brand-left-column {

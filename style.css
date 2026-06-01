@@ -1,3 +1,29 @@
+/* 確保 body 成為一個純淨的舞台 */
+body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #000000; /* 背景黑色是為了讓你的「畫布」更跳脫 */
+    overflow: hidden;         /* 鎖死，不讓任何滾動條出現 */
+    display: flex;
+    justify-content: center;
+    align-items: center;      /* 強制畫布永遠在螢幕正中間 */
+}
+
+/* 這是你的「紙張」本體 */
+.phone-wrapper {
+    width: 375px;             /* 假設設計稿基礎寬度 */
+    height: 667px;            /* 假設設計稿基礎高度 */
+    transform-origin: center center; /* 以中心點縮放，最穩定 */
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bg-container);
+    border: 4px solid #222;
+    border-radius: 20px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5);
+}
+
 .header {
     display: flex;
     justify-content: space-between; /* 讓左邊欄位和右邊控制面板各自靠兩端 */
@@ -48,7 +74,6 @@
     align-items: flex-end;  /* 關鍵：讓兩顆按鈕都向右邊靠齊對齊 */
     gap: 3px;               /* 設定上下兩顆按鈕之間的間距（可依喜好調整） */
     height: 100%;           /* 固定住的數值：使控制台與 header 同高，利於垂直居中 */
-    width: 20%;
     justify-content: center;
 }
 
@@ -88,7 +113,7 @@
     display: none; 
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 6px 10px;
+    padding: 6px 8px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;

@@ -194,11 +194,10 @@ img, .card {
     font-weight: 800;
     letter-spacing: -1px;
     line-height: 1;
-    margin-bottom: 2px;
 }
 
 .brand-logo-img {
-    height: 3rem; /* 響應式圖片高度 */
+    height: 3.25rem; /* 響應式圖片高度 */
 }
 
 .brand-subtitle {
@@ -244,7 +243,6 @@ img, .card {
 
 .user-avatar-btn {
     display: flex;
-    gap: 0.5rem;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 20px;
@@ -252,7 +250,7 @@ img, .card {
     font-weight: 500;
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
-    justify-content: space-between;
+    justify-content: flex-end;
 }
 
 .dropdown-menu {

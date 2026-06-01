@@ -11,178 +11,23 @@
 <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
 <link rel="stylesheet" href="style.css">
 <style>
-/* a==========================================================================
-   1. 全局變數與主題防線 (Cyber Blue)
-   ========================================================================== */
-html {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden !important;
-    touch-action: none;
-    font-size: 16px !important;
-}
-:root {
-    --bg-global: #F8FAFC;
-    --bg-container: #FFFFFF;
-    --border-color: #E2E8F0;
-    --text-main: #0F172A;
-    --text-muted: #64748B;
-    --brand-blue: #0062FF; 
-    --brand-green: #10B981;
-    --brand-red: #EF4444;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
-    --card-bg: #FFFFFF;
-    --blur-bg: rgba(255, 255, 255, 0.95);
-}
 
-[data-theme="dark"] {
-    --bg-global: #0A0A0A;
-    --bg-container: #111111;
-    --border-color: #262626;
-    --text-main: #F5F5F5;
-    --text-muted: #A3A3A3;
-    --brand-blue: #2F80ED; 
-    --brand-green: #34D399;
-    --brand-red: #F87171;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
-    --card-bg: #1C1C1E;
-    --blur-bg: rgba(17, 17, 17, 0.95);
-}
-
-/* ==========================================================================
-   2. 基礎重設與全域元素 (Reset & Globals)
-   ========================================================================== */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    -webkit-tap-highlight-color: transparent;
-    /* ⭕ 修正：將防選取機制嚴格綁定在全域選擇器 * 內，保證所有瀏覽器行為統一 */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-input, textarea {
-    -webkit-user-select: text;
-    user-select: text; /* 解除輸入框鎖定，保證可正常打字與選取 */
-}
-
-img, .card {
-    max-width: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
-    height: auto;
-    box-sizing: border-box;
-}
-
-*, *::before, *::after {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
-    -webkit-font-smoothing: antialiased;    /* 讓 Mac/iPhone 上的文字更細緻不毛躁 */
-    -moz-osx-font-smoothing: grayscale;
-    box-sizing: border-box;                 /* 順便鎖死所有盒模型的寬度計算，防止破圖 */
-}
-
-@media (max-width: 480px) {
-
-    /* 1. 給大盒子內壁加上緩衝墊，不准黃框貼頂 */
-    .sticky-top-group {
-        padding-top: 15px !important;
-        box-sizing: border-box !important;
-    }
-
-    /* 2. 點名搜尋框跟縣市條，在真手機上強制往下推開，拉開比例！ */
-    .search-container, 
-    .location-bar {
-        margin-top: 10px !important; /* 蓋掉原本的 0px，讓它在手機上長出距離 */
-    }
-
-}
-
-#adminView {
-    /* 🔴 關鍵 1：用 absolute，不要用 fixed！
-       這樣它才會乖乖以 `.phone-wrapper` 的身體當作世界邊界 */
-    position: absolute; 
-    
-    /* 🔴 關鍵 2：死死貼住手機殼的四個角落，一吋都不準多 */
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 10px !important;;
-    
-    /* 🔴 關鍵 3：寬高百分之百跟隨手機殼，絕對不會變超大一張 */
-    width: 100%;
-    height: 100%;
-    
-    /* 🔴 關鍵 4：層級直接拉到最高，蓋掉原本的店家卡片和底欄黑條 */
-    z-index: 999; 
-    
-    /* 補上底色，切換過去才不會透視看到後面的店家卡片 */
-    background-color: #ffffff; 
-    
-    /* 如果控制台裡面的內容很多，允許它在自己的規格內獨立滾動 */
-    overflow-x: hidden;
-    overflow-y: auto; 
-    box-sizing: border-box !important;
-}
-
-#adminView input, 
-#adminView select, 
-#adminView button {
-    width: 100% !important;        /* 🔴 核心：強行蓋掉 JS 寫死的固定 px，改成跟著手機殼縮放 */
-    max-width: 100% !important;    /* 絕對不准超過 */
-    box-sizing: border-box !important; /* 防爆公式 */
-}
-
-#buyerView {
-    width: 100%;
-    height: 100%;
-    display: flex !important; /* 確保不管 JS 怎麼切換 block，都必須維持 flex 佈局 */
-    flex-direction: column;
-    justify-content: space-between; /* 鐵律：強迫上中下三層死死卡住各自的位置，絕對不准往上吸 */
-    box-sizing: border-box;
-}
-
-/* 👑 頂部全區常駐吸附天花板 (Sticky) */
+/* 頂部群組 */
 .sticky-top-group {
+    height: 28%;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    height: 28%;
-    box-sizing: border-box; /* 確保 margin/padding 不會把這 30% 的高度撐破 */
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-    gap: 5px;
-    top: 0;
-    padding-top: 10px;
-    margin-bottom: 10px;
-    position: sticky;
-    background-color: var(--bg-container) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    z-index: 100; 
+    gap: 0.75rem;
+    background-color: var(--bg-container);
 }
 
-*, *::before, *::after {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
-    -webkit-font-smoothing: antialiased;    /* 讓 Mac/iPhone 上的文字更細緻不毛躁 */
-    -moz-osx-font-smoothing: grayscale;
-    box-sizing: border-box;                 /* 順便鎖死所有盒模型的寬度計算，防止破圖 */
-}
-
-/* ==========================================================================
-   6. 搜尋與定位列 (Search & Location)
-   ========================================================================== */
-
+/* 定位列 */
 .location-bar {
-    padding: 0px;
     display: flex;
     align-items: center;
-    gap: 5px;
-    height: 36px;                   /* 固定住的數值：鎖定第二排選單高度 */
-    flex-shrink: 0;
+    gap: 0.5rem;
 }
 
 .gps-trigger-btn {
@@ -209,23 +54,19 @@ img, .card {
 
 .nav-select {
     flex: 1;
-    height: 32px;
-    border-radius: 8px;
+    height: 2.25rem;
+    border-radius: 0.5rem;
     border: 1px solid var(--border-color);
     background-color: var(--bg-global);
     color: var(--text-main);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 0 4px;
+    font-size: 0.875rem;
+    padding: 0 0.5rem;
     outline: none;
-    cursor: pointer;
 }
 
+/* 搜尋框 */
 .search-container {
-    margin-bottom: 0px;
-    height: 48px;                   /* 固定住的數值：鎖定第三排搜尋框容器高度 */
-    flex-shrink: 0;
-    padding: 0 10px;
+    width: 100%;
 }
 
 .search-box {
@@ -233,88 +74,79 @@ img, .card {
     align-items: center;
     background-color: var(--bg-global);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 0 5px;
-    height: 36px;
+    border-radius: 0.75rem;
+    padding: 0 0.75rem;
+    height: 2.5rem;
 }
 
 .search-box input {
     border: none;
-    background: none;
+    background: transparent;
     width: 100%;
     height: 100%;
-    margin-left: 8px;
-    font-size: 14px;
+    font-size: 1rem;
     color: var(--text-main);
     outline: none;
 }
-/* ==========================================================================
-   7. 店家列表 (Store List)
-   ========================================================================== */
+
+/* 店家列表 */
 .store-list {
     height: 57%;
-    overflow-y: auto;       
-    -webkit-overflow-scrolling: touch; 
-    box-sizing: border-box; 
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 5px;               /* 修改：由 16px 縮小至 8px，緊湊卡片間距 */
-    padding: 0 10px;
+    gap: 1rem;
+    -webkit-overflow-scrolling: touch;
 }
 
 .store-card {
     display: flex;
     align-items: center;
-    gap: 12px;              /* 修改：由 16px 縮小至 12px，縮短圖片與文字的間距 */
+    gap: 1rem;
+    padding: 1rem;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
-    margin-bottom: 0px;     /* 修改：外距歸零，由 list 的 gap 統一控制間距 */
+    border-radius: 1rem;
     text-decoration: none;
     color: inherit;
     box-shadow: var(--shadow-sm);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    width: 100%; /* 強迫卡片指名服從手機大外框的限制，絕不擠破框架 */
-    box-sizing: border-box; /* 新增：確保寬度計算包含 border 與 padding */
-    padding: 5px;
+    transition: transform 0.2s ease;
 }
-
 
 .store-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
 }
 
 .store-img {
-    width: 54px;
-    height: 54px;
+    width: 3.5rem;
+    height: 3.5rem;
     background-color: var(--bg-global);
-    border-radius: 12px;
+    border-radius: 0.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: 1.5rem;
     flex-shrink: 0;
 }
 
 .store-info {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    flex-grow: 1;
-    gap: 6px;
+    gap: 0.25rem;
 }
 
 .store-name {
-    font-size: 16px;
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--text-main);
 }
 
 .store-meta {
-    font-size: 12px;
+    font-size: 0.875rem;
     color: var(--text-muted);
-    margin-top: 2px;
 }
 
 .store-tags {
@@ -347,19 +179,15 @@ img, .card {
     cursor: not-allowed;    /* 滑鼠移上去時，會顯示禁止符號 */
 }
 
-/* ==========================================================================
-   8. 底部懸浮列 (Bottom Bar)
-   ========================================================================== */
+/* 底部列 */
 .bottom-bar {
-    display: flex;
-    height: 15%;              /* 保持：分配剩餘的 20% 高度 */
-    flex-shrink: 0;           /* 保持：強制固定，絕不被壓縮 */
-    box-sizing: border-box;
+    height: 15%;
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
     background-color: var(--blur-bg);
+    display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid var(--border-color);
-    padding: 10px;
 }
 
 .status-msg {
@@ -406,45 +234,36 @@ footer .status-indicator.active{
     background-color: var(--brand-blue);
     color: white;
     border: none;
-    padding: 10px 16px;
-    border-radius: 20px;
-    font-size: 13px;
+    padding: 0.625rem 1.25rem;
+    border-radius: 1.5rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 4px;
-    text-decoration: none;
-    box-shadow: var(--shadow-sm);
-    height: 36px;             /* 新增：固定購物車按鈕的物理高度，防止變形 */
-    box-sizing: border-box;   /* 新增：確保 padding 不會影響按鈕固定高度 */
+    gap: 0.5rem;
+    cursor: pointer;
 }
 
-/* ==========================================================================
-   9. 燈箱模態框與通用組件 (Modals & Utilities)
-   ========================================================================== */
+/* 模態框 */
 .lightbox-modal {
     display: none;
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 200;
+    z-index: 1000;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 1rem;
 }
 
 .modal-card {
     background-color: var(--bg-container);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
+    border-radius: 1.5rem;
     width: 100%;
-    max-width: 320px;
-    padding: 24px;
+    max-width: 20rem;
+    padding: 2rem;
     box-shadow: var(--shadow-md);
-    text-align: center;
 }
 
 .modal-title {

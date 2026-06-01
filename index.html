@@ -32,12 +32,15 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    width: 100%;
 }
 
 .gps-trigger-btn {
     display: flex;
     align-items: center;
     gap: 4px;
+    font-size: 12px;
+    font-weight: 700;
     color: var(--brand-blue);
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -46,6 +49,7 @@
     cursor: pointer;
     white-space: nowrap;
     box-shadow: var(--shadow-sm);
+    flex-shrink: 0; /* 防止按鈕被擠壓 */
 }
 
 .location-select-group {
@@ -65,6 +69,7 @@
 
 /* 搜尋框 */
 .search-container {
+    width: 100%;
 }
 
 .search-box {
@@ -74,6 +79,7 @@
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     padding: 0 0.75rem;
+    height: 2.5rem;
 }
 
 .search-box input {

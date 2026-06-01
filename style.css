@@ -116,3 +116,11 @@ img {
     padding: 1.5rem;
     overflow-y: auto;
 }
+
+.hidden { display: none !important; }
+
+/* 針對超小螢幕的微調 */
+@media (max-width: 320px) {
+    :root { --zoom-factor: 0.85; }
+    .phone-wrapper { width: 95vw; border-radius: 1rem; }
+}

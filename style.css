@@ -117,9 +117,11 @@ img, .card {
     display: flex;
     flex-direction: column;
     overflow: hidden;       /* 確保內部內容不會撐破畫布 */
-    background-color: white;
-    border-radius: 2rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    background-color: var(--bg-container);
+    border: 1px solid var(--border-color);
+    border-radius: 2rem; /* 使用相對單位 */
+    box-shadow: var(--shadow-md);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 #buyerView, #adminView {

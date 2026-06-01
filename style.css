@@ -85,14 +85,14 @@ img {
     
     /* 響應式尺寸：像紙張一樣等比例縮放 */
     width: 90vw;
-    height: auto;
+    height: 100vh; /* 鎖定在螢幕高度 */
     max-width: calc(90vh * 9 / 16);
     max-height: 90vh;
 
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    
+    padding: 0.5rem;
     background-color: var(--bg-container);
     border: 1px solid var(--border-color);
     border-radius: 2rem; /* 使用相對單位 */

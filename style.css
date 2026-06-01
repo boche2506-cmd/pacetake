@@ -83,21 +83,22 @@ img {
     position: relative;
     aspect-ratio: 9 / 16;
     
-    /* 響應式尺寸：像紙張一樣等比例縮放 */
+    /* 這裡稍微微調：移除 height: 100vh，因為我們已經用了 aspect-ratio */
     width: 90vw;
-    height: 100vh; /* 鎖定在螢幕高度 */
-    max-width: calc(90vh * 9 / 16);
-    max-height: 90vh;
-
+    max-width: 450px; /* 限制電腦版最大寬度 */
+    max-height: 90vh; /* 限制最大高度 */
+    
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden; /* 確保內容不會跑出來 */
     padding: 0.5rem;
     background-color: var(--bg-container);
     border: 1px solid var(--border-color);
-    border-radius: 2rem; /* 使用相對單位 */
+    border-radius: 2rem;
     box-shadow: var(--shadow-md);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    
+    /* 關鍵：防止內容溢出影響父層縮放 */
+    flex-shrink: 0; 
 }
 
 #buyerView, #adminView {

@@ -48,6 +48,7 @@
     align-items: flex-end;  /* 關鍵：讓兩顆按鈕都向右邊靠齊對齊 */
     gap: 3px;               /* 設定上下兩顆按鈕之間的間距（可依喜好調整） */
     height: 100%;           /* 固定住的數值：使控制台與 header 同高，利於垂直居中 */
+    width: 20%;
     justify-content: center;
 }
 
@@ -87,7 +88,7 @@
     display: none; 
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 6px 8px;
+    padding: 6px 10px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;

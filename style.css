@@ -107,73 +107,37 @@ img, .card {
    ========================================================================== */
 /* 手機直屏精品大外框 */
 .phone-wrapper {
-    /* 🔴 第一步：不管螢幕多大，強制鎖死 9:16 比例 */
-    aspect-ratio: 9 / 16;
-
-    /* 🔴 第二步：最核心！用這四行互相牽制。
-       寬螢幕時，高度會卡住，左右自動留黑；
-       長螢幕時，寬度會卡住，上下自動留黑！ */
-    width: 100vw;
-    height: 100vh;
-    max-width: calc(100vh * 9 / 16);  /* 根據高度逆推最大寬度 */
-    max-height: calc(100vw * 16 / 9); /* 根據寬度逆推最大高度 */
-
-    /* 🔴 第三步：這三行神陣，保證不管是上下留黑還是左右留黑，永遠「絕對正中央」 */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    /* 🔴 第四步：死不准滑動（你要求的鐵律） */
-    overflow: auto; 
+    max-width: 90vw;       /* 最大寬度限制（你可以設成 375 或 400） */
+    max-height: 100%; /* 確保不會超出父容器高度 */
+    aspect-ratio: 9 / 16;   /* 【核心】強迫 9:16 比例 */
+    height: 100vh; /* 鎖定為視窗高度的 100% */
+    width: calc(100vh * 9 / 16); /* 根據 9:16 比例計算寬度 */
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    padding: 10px;
-    justify-content: space-between; /* 新增：這行是關鍵！它會嚴格要求上中下三層乖乖各自定位，不管資料有沒有來，絕對不允許任何人往上吸 */
-    /* 確保滑動時有 Apple 原生的絲滑回彈手感（Rubber-banding） */
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-    /* 🔴 第五步：立體手機殼裝飾（邊框與陰影） */
-    background-color: var(--bg-container);
-    border: 4px solid #222; /* 給它一個扎實的手機黑色外框 */
-    border-radius: 20px;    /* 稍微帶點圓角更像手機 */
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5); /* 超立體陰影 */
+    overflow: hidden;       /* 確保內部內容不會撐破畫布 */
+    background-color: white;
+    border-radius: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
-#adminView {
-    /* 🔴 關鍵 1：用 absolute，不要用 fixed！
-       這樣它才會乖乖以 `.phone-wrapper` 的身體當作世界邊界 */
-    position: absolute; 
-    
-    /* 🔴 關鍵 2：死死貼住手機殼的四個角落，一吋都不準多 */
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 10px !important;;
-    
-    /* 🔴 關鍵 3：寬高百分之百跟隨手機殼，絕對不會變超大一張 */
+#buyerView, #adminView {
     width: 100%;
     height: 100%;
-    
-    /* 🔴 關鍵 4：層級直接拉到最高，蓋掉原本的店家卡片和底欄黑條 */
-    z-index: 999; 
-    
-    /* 補上底色，切換過去才不會透視看到後面的店家卡片 */
-    background-color: #ffffff; 
-    
-    /* 如果控制台裡面的內容很多，允許它在自己的規格內獨立滾動 */
-    overflow-x: hidden;
-    overflow-y: auto; 
-    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
-#adminView input, 
-#adminView select, 
-#adminView button {
-    width: 100% !important;        /* 🔴 核心：強行蓋掉 JS 寫死的固定 px，改成跟著手機殼縮放 */
-    max-width: 100% !important;    /* 絕對不准超過 */
-    box-sizing: border-box !important; /* 防爆公式 */
+/* 管理介面覆蓋層 */
+#adminView {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    background-color: var(--bg-container);
+    padding: 1.5rem;
+    overflow-y: auto;
 }
 
 #buyerView {

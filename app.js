@@ -825,3 +825,50 @@ window.deleteStore = async function(storeId) {
         }
     }
 };
+
+window.issuePromoCode = async function() {
+    const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
+    if (!code || code.trim() === "") return;
+    try {
+        await setDoc(doc(db, "promoCodes", code.trim()), {
+            code: code.trim(), createdBy: currentUserId, createdAt: new Date().toISOString(),
+            isActive: true, usedBy: null
+        });
+        alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！`);
+    } catch (error) {
+        console.error("邀請碼發行失敗:", error);
+        alert("發行失敗，請檢查您的系統權限配置！");
+    }
+};
+
+window.toggleView = function(viewRole) {
+    const adminEl = document.getElementById('adminView');
+    const buyerEl = document.getElementById('buyerView');
+    if (viewRole === 'admin') {
+        if (adminEl) adminEl.style.display = 'block';
+        if (buyerEl) buyerEl.style.display = 'none';
+        window.scrollTo(0, 0);
+    } else {
+        if (adminEl) adminEl.style.display = 'none';
+        if (buyerEl) buyerEl.style.display = 'block';
+    }
+};
+
+function loadHeader() {
+    const headerContainer = document.getElementById('header-container');
+    if (!headerContainer) return;
+    fetch('header.html')
+        .then(response => {
+            if (!response.ok) throw new Error('找不到 header.html');
+            return response.text();
+        })
+        .then(htmlData => {
+            headerContainer.innerHTML = htmlData;
+            bindHeaderEvents();
+            initTheme();
+        })
+        .catch(error => {
+            console.error('載入 Header 失敗：', error);
+        });
+}
+

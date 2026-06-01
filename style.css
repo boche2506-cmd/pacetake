@@ -242,17 +242,16 @@ img, .card {
 
 .user-avatar-btn {
     display: flex;
-    align-items: center;
     gap: 0.5rem;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 0.25rem 1.0rem;
     border-radius: 20px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
-    justify-content: flex-end; 
+    align-items: center;
+    justify-content: space-between;
 }
 
 .dropdown-menu {

@@ -228,15 +228,16 @@ img, .card {
 }
 
 .login-btn {
-    height: 2.25rem;
+    height: 2.0rem;
     font-size: 0.75rem;
     background-color: var(--brand-blue);
     color: #FFFFFF;
     border: 1px solid var(--border-color);
-    padding: 0.375rem 1.25rem;
+    padding: 0.25rem 1.0rem;
     border-radius: 1.25rem;
     font-weight: 500;
     box-shadow: var(--shadow-sm);
+    margin-top: 0.25rem;
 }
 
 .user-avatar-btn {

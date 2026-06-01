@@ -12,57 +12,60 @@
 <link rel="stylesheet" href="style.css">
 <style>
 
-/* 頂部群組 - 已調整為自動高度，像紙張一樣隨內容縮放 */
+/* 總容器：確保佔據 28% 且內部元素不溢出 */
 .sticky-top-group {
-    height: 28%; 
-    flex-shrink: 0;
+    flex: 0 0 28%; /* 強制固定佔據 28% 空間，不放大不縮小 */
     border-bottom: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    justify-content: center; /* 垂直置中內部元素 */
+    gap: 4%;                /* 用 % 取代 rem，保證縮放間距一致 */
+    padding: 0 4%;          /* 用 % 取代 px/rem，縮放時留白比例不變 */
     background-color: var(--bg-container);
-    top: 0;
     z-index: 100;
-    box-shadow: var(--shadow-sm); /* 增加一點陰影提升紙張層次感 */
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;       /* 鎖死，絕不讓內容撐開 */
 }
 
-/* 定位列 */
+/* 定位列：水平排列 */
 .location-bar {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 2%; 
     width: 100%;
 }
 
 .gps-trigger-btn {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 12px;
+    justify-content: center;
+    font-size: 0.75rem;     /* 保持字體比例 */
     font-weight: 700;
     color: var(--brand-blue);
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 6px 12px;
+    padding: 0.3rem 0.6rem;
     border-radius: 20px;
     cursor: pointer;
     white-space: nowrap;
-    box-shadow: var(--shadow-sm);
-    flex-shrink: 0; /* 防止按鈕被擠壓 */
+    flex: 0 1 auto;         /* 允許按鈕根據文字內容收縮 */
 }
 
 .location-select-group {
     display: flex;
-    gap: 4px;
+    gap: 2%;
+    flex: 1;                /* 讓選單填滿剩下的空間 */
 }
 
 .nav-select {
+    flex: 1;                /* 讓選單平分寬度 */
+    min-width: 0;           /* 防止選單撐破外框 */
     border-radius: 0.5rem;
     border: 1px solid var(--border-color);
     background-color: var(--bg-global);
     color: var(--text-main);
-    font-size: 0.875rem;
-    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    padding: 0.2rem;
     outline: none;
 }
 
@@ -78,17 +81,18 @@
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     padding: 0 0.75rem;
-    height: 2.5rem;
+    height: 40%;            /* 相對於 sticky-top-group 的 40% 高度 */
+    min-height: 24px;       /* 設定一個最小高度防止縮太小看不見 */
 }
 
 .search-box input {
     border: none;
     background: transparent;
-    font-size: 1rem;
+    font-size: 0.875rem;
     color: var(--text-main);
     outline: none;
+    width: 100%;            /* 確保填滿搜尋框 */
 }
-
 /* 店家列表 */
 .store-list {
     height: 57%;

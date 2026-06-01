@@ -1,30 +1,45 @@
-/* 讓 body 變成一個絕對置中的舞台 */
+/* 確保 body 成為一個純淨的舞台 */
 body {
     width: 100vw;
     height: 100vh;
     margin: 0;
     padding: 0;
-    background-color: #000000;
-    display: flex;
-    justify-content: center; /* 左右置中 */
-    align-items: center;     /* 上下置中 */
-    overflow: hidden;
+    background-color: var(--bg-global);
+    color: var(--text-main);
+/* 加上過場動畫，切換主題時才不會太突兀 */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow: hidden;         /* 徹底鎖死捲軸 */
+    position: relative;       /* 為內部的畫布提供定位參考 */
 }
 
-/* 讓手機外殼變成一個縮放基準 */
+/* 這是你的「紙張」本體 */
 .phone-wrapper {
-    width: 375px;            /* 設定你的設計基準寬度 */
-    height: 667px;           /* 設定你的設計基準高度 */
+    /* 比例鎖定 */
+    aspect-ratio: 9 / 16;
+    width: 100vw;
+    height: 100vh;
+    max-width: calc(100vh * 9 / 16); 
+    max-height: calc(100vw * 16 / 9);
+
+    /* 絕對置中神陣 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 這裡會將畫布拉回正中央 */
+
+    /* 外觀裝飾 */
     background-color: var(--bg-container);
     border: 4px solid #222;
     border-radius: 20px;
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5);
-    position: relative;      /* 關鍵：讓內部元件以這裡為邊界 */
     overflow: hidden;
-    transform-origin: center center; /* 以中心點進行縮放 */
-    flex-shrink: 0;          /* 防止被壓縮 */
+    
+    /* 內部排版 */
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    justify-content: space-between;
 }
-
 .header {
     display: flex;
     justify-content: space-between; /* 讓左邊欄位和右邊控制面板各自靠兩端 */

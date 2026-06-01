@@ -104,19 +104,6 @@ img, .card {
     box-sizing: border-box;
 }
 
-/* 👑 頂部全區常駐吸附天花板 (Sticky) */
-.sticky-top-group {
-    display: flex;
-    height: 28%;
-    flex-direction: column;
-    border-bottom: 1px solid var(--border-color);
-    gap: 5px;
-    top: 0;
-    padding-top: 10 px;
-    margin-bottom: 10px;
-    background-color: var(--bg-container);
-    z-index: 100; 
-}
 
 /* ==========================================================================
    6. 搜尋與定位列 (Search & Location)
@@ -140,8 +127,8 @@ img, .card {
 }
 
 .brand-logo-img {
-    height: 2.5rem; /* 響應式圖片高度 */
-    margin-bottom: 0.25rem;
+    height: 3rem; /* 響應式圖片高度 */
+    margin-bottom: 0rem;
 }
 
 .brand-subtitle {
@@ -171,11 +158,12 @@ img, .card {
 }
 
 .login-btn {
+    height: 2.25rem;
     font-size: 0.75rem;
     background-color: var(--brand-blue);
     color: #FFFFFF;
     border: 1px solid var(--border-color);
-    padding: 0.375rem 0.625rem;
+    padding: 0.375rem 0.75rem;
     border-radius: 1.25rem;
     font-weight: 500;
     box-shadow: var(--shadow-sm);
@@ -240,12 +228,12 @@ img, .card {
 }
 
 .location-bar {
-    padding: 0px;
+    height: 1rem;
     display: flex;
     align-items: center;
     gap: 5px;
     flex-shrink: 0;
-    padding: 0 10px;
+    padding: 0 5px;
 }
 
 .gps-trigger-btn {
@@ -284,9 +272,9 @@ img, .card {
 }
 
 .search-container {
-    margin-bottom: 0 px;
+    height: 1rem;
     flex-shrink: 0;
-    padding: 0 10px;
+    padding:5px;    
 }
 
 .search-box {
@@ -295,6 +283,9 @@ img, .card {
     background-color: var(--bg-global);
     border: 1px solid var(--border-color);
     border-radius: 12px;
+    padding: 5px;
+    gap: 3px;
+     /* 🔴 關鍵修正：將 search-box 的寬度改為 100%，讓它完全服從父層分配的空間 */
 }
 
 .search-box input {
@@ -306,177 +297,6 @@ img, .card {
     font-size: 14px;
     color: var(--text-main);
     outline: none;
-}
-/* ==========================================================================
-   7. 店家列表 (Store List)
-   ========================================================================== */
-.store-list {
-    height: 57%;
-    overflow-y: auto;       
-    -webkit-overflow-scrolling: touch; 
-    box-sizing: border-box; 
-    display: flex;
-    flex-direction: column;
-    gap: 5px;               /* 修改：由 16px 縮小至 8px，緊湊卡片間距 */
-    padding: 0 10px;
-}
-
-.store-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;              /* 修改：由 16px 縮小至 12px，縮短圖片與文字的間距 */
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    margin-bottom: 0px;     /* 修改：外距歸零，由 list 的 gap 統一控制間距 */
-    text-decoration: none;
-    color: inherit;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    width: 100%; /* 強迫卡片指名服從手機大外框的限制，絕不擠破框架 */
-    box-sizing: border-box; /* 新增：確保寬度計算包含 border 與 padding */
-    padding: 5px;
-}
-
-
-.store-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-}
-
-.store-img {
-    width: 54px;
-    height: 54px;
-    background-color: var(--bg-global);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    flex-shrink: 0;
-}
-
-.store-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex-grow: 1;
-    gap: 6px;
-}
-
-.store-name {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-main);
-}
-
-.store-meta {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 2px;
-}
-
-.store-tags {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.store-tags span {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 6px;
-}
-
-.tag-time {
-    background-color: rgba(0, 98, 255, 0.08);
-    color: var(--brand-blue);
-}
-
-.tag-pay {
-    background-color: rgba(16, 185, 129, 0.08);
-    color: var(--brand-green);
-}
-
-.tag-time.inactive,
-.tag-pay.inactive {
-    opacity: 0.25;          /* 變得很透明，看起來像灰色沒亮燈 */
-    filter: grayscale(100%); /* 強制把裡面的顏色跟圖示變純灰色 */
-    cursor: not-allowed;    /* 滑鼠移上去時，會顯示禁止符號 */
-}
-
-/* ==========================================================================
-   8. 底部懸浮列 (Bottom Bar)
-   ========================================================================== */
-.bottom-bar {
-    display: flex;
-    height: 15%;              /* 保持：分配剩餘的 20% 高度 */
-    flex-shrink: 0;           /* 保持：強制固定，絕不被壓縮 */
-    box-sizing: border-box;
-    background-color: var(--blur-bg);
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid var(--border-color);
-    padding: 10px;
-}
-
-.status-msg {
-    font-size: 12px;
-    color: var(--text-muted);
-    max-width: 200px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    text-decoration: none;
-    height: 36px;             /* 新增：固定狀態文字區域的高度 */
-}
-
-footer .status-indicator {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background-color: #ff4d4f;
-    flex-shrink: 0;
-}
-
-footer .status-indicator.active{
-    background-color: #52c41a;
-    box-shadow: 0 0 8px #52c41a;
-}
-
-
-.order-badge-count {
-    background-color: var(--brand-red);
-    color: white;
-    font-size: 10px;
-    font-weight: 800;
-    min-width: 15px;
-    height: 15px;
-    border-radius: 8px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px;
-    border: 1px solid var(--bg-container);
-}
-
-.cart-status-btn {
-    background-color: var(--brand-blue);
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    text-decoration: none;
-    box-shadow: var(--shadow-sm);
-    height: 36px;             /* 新增：固定購物車按鈕的物理高度，防止變形 */
-    box-sizing: border-box;   /* 新增：確保 padding 不會影響按鈕固定高度 */
 }
 
 /* ==========================================================================
@@ -564,11 +384,3 @@ footer .status-indicator.active{
     font-weight: 600;
 }
 
-select {
-    width: 100%;       /* 寬度服從父層分配 */
-    height: 32px;      /* 鐵律：鎖死高度（配合你原來的 nav-select 設定） */
-    padding: 0 8px;    /* 只給左右內距，上下給 0，絕不頂開高度 */
-    font-size: 12px;   /* 配合整體導航欄的小巧比例 */
-    line-height: 32px; /* 讓 line-height 等於 height，文字就會完美垂直置中 */
-    box-sizing: border-box; /* 保險線：確保 border 和 padding 全都算在這 32px 裡面 */
-}

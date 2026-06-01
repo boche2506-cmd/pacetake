@@ -227,12 +227,15 @@ function bindHeaderEvents() {
 
     if (loginBtn) {
         loginBtn.addEventListener('click', () => { 
+            console.log("[PACE DEBUG] Login button clicked, showing login lightbox.");
             if (loginLightbox) loginLightbox.style.display = 'flex'; 
         });
     }
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
+    initTheme();
+    bindHeaderEvents(); // 確保 Header 事件在 DOMContentLoaded 時綁定
     
     // 非 Header 元件抓取
     userNameDisplay = document.getElementById('userNameDisplay');
@@ -256,311 +259,287 @@ window.addEventListener('DOMContentLoaded', async () => {
     // 監聽 Firebase 登入狀態
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            console.log("[PACE DEBUG] User logged in:", user.uid);
             handleUserSyncAndRoleRouting(user);
         } else {
+            console.log("[PACE DEBUG] User logged out.");
             loginBtn = document.getElementById('loginBtn');
             avatarBtn = document.getElementById('avatarBtn');
             dropdownMenu = document.getElementById('dropdownMenu');
             if (loginBtn) loginBtn.style.display = 'block';
             if (avatarBtn) avatarBtn.style.display = 'none';
-            if (dropdownMenu) {
-                dropdownMenu.style.display = 'none';
-                dropdownMenu.innerHTML = '';
-            }
-            const statusDot = document.getElementById('statusDot');
-            const statusText = document.getElementById('statusText');
-            if (statusDot) statusDot.classList.remove('active');
-            if (statusText) statusText.innerText = "您尚未登入，請連結google帳號\n或使用電子郵件登入";
-            fetchStoresFromFirebase();
+            if (dropdownMenu) dropdownMenu.style.display = 'none';
+            if (userNameDisplay) userNameDisplay.innerHTML = `訪客`;
+            if (document.getElementById('statusDot')) document.getElementById('statusDot').classList.remove('active');
+            if (document.getElementById('statusText')) document.getElementById('statusText').innerText = `您好 訪客 ~\n請先登入以享受完整服務！`;
+            renderDynamicMenu('guest');
         }
     });
 
-    // 頁面固定元件事件綁定
-    if (customReturnBtn) customReturnBtn.addEventListener('click', () => { 
-        loginLightbox = document.getElementById('loginLightbox');
-        if (loginLightbox) loginLightbox.style.display = 'none'; 
-    });
-    
-    if (toggleEmailFormBtn) {
-        toggleEmailFormBtn.addEventListener('click', () => {
-            if (emailFormSection) emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
+    // 登入彈窗事件綁定
+    if (googleLoginAction) {
+        googleLoginAction.addEventListener('click', async () => {
+            console.log("[PACE DEBUG] Google login initiated.");
+            try {
+                await signInWithPopup(auth, provider);
+                if (loginLightbox) loginLightbox.style.display = 'none';
+            } catch (error) {
+                console.error("Google login error:", error);
+                alert("Google 登入失敗: " + error.message);
+            }
         });
     }
 
-    const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
-    if (togglePasswordVisibility && loginPasswordInput) {
-        togglePasswordVisibility.addEventListener('click', function() {
-            const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            loginPasswordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🙈';
+    if (toggleEmailFormBtn) {
+        toggleEmailFormBtn.addEventListener('click', () => {
+            console.log("[PACE DEBUG] Toggle email form button clicked.");
+            if (emailFormSection) {
+                emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
+                toggleEmailFormBtn.innerText = emailFormSection.style.display === 'none' ? '使用 Email 登入/註冊' : '返回 Google 登入';
+            }
+        });
+    }
+
+    if (customReturnBtn) {
+        customReturnBtn.addEventListener('click', () => {
+            console.log("[PACE DEBUG] Custom return button clicked.");
+            if (emailFormSection) emailFormSection.style.display = 'none';
+            if (toggleEmailFormBtn) toggleEmailFormBtn.innerText = '使用 Email 登入/註冊';
+        });
+    }
+
+    if (emailLoginAction) {
+        emailLoginAction.addEventListener('click', async () => {
+            console.log("[PACE DEBUG] Email login/register initiated.");
+            const email = loginEmailInput ? loginEmailInput.value : '';
+            const password = loginPasswordInput ? loginPasswordInput.value : '';
+
+            if (!email || !password) {
+                alert("請輸入 Email 和密碼。");
+                return;
+            }
+
+            try {
+                // 嘗試登入
+                await signInWithEmailAndPassword(auth, email, password);
+                console.log("[PACE DEBUG] Email login successful.");
+                if (loginLightbox) loginLightbox.style.display = 'none';
+            } catch (loginError) {
+                if (loginError.code === 'auth/user-not-found' || loginError.code === 'auth/wrong-password') {
+                    // 如果登入失敗，嘗試註冊
+                    try {
+                        await createUserWithEmailAndPassword(auth, email, password);
+                        console.log("[PACE DEBUG] Email registration successful.");
+                        alert("註冊成功！您已自動登入。");
+                        if (loginLightbox) loginLightbox.style.display = 'none';
+                    } catch (registerError) {
+                        console.error("Email registration error:", registerError);
+                        alert("註冊失敗: " + registerError.message);
+                    }
+                } else {
+                    console.error("Email login error:", loginError);
+                    alert("登入失敗: " + loginError.message);
+                }
+            }
+        });
+    }
+
+    if (closeAddressModalBtn) {
+        closeAddressModalBtn.addEventListener('click', () => {
+            console.log("[PACE DEBUG] Close address modal button clicked.");
+            if (addressDetailLightbox) addressDetailLightbox.style.display = 'none';
         });
     }
 
     if (gpsPinBtn) {
         gpsPinBtn.addEventListener('click', () => {
+            console.log("[PACE DEBUG] GPS pin button clicked, attempting to get browser location.");
             getBrowserLocation();
             if (addressDetailLightbox) addressDetailLightbox.style.display = 'flex';
         });
     }
-    if (closeAddressModalBtn) closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
 
+    // 城市選擇器初始化與事件
     if (citySelect) {
+        Object.keys(areaData).forEach(city => {
+            const option = document.createElement('option');
+            option.value = city;
+            option.textContent = city;
+            citySelect.appendChild(option);
+        });
+
         citySelect.addEventListener('change', () => {
+            console.log("[PACE DEBUG] City selected:", citySelect.value);
             const selectedCity = citySelect.value;
             if (districtSelect) {
-                districtSelect.innerHTML = '<option value="">選擇區域</option>';
-                if (areaData[selectedCity]) {
-                    areaData[selectedCity].forEach(dist => {
-                        const opt = document.createElement('option');
-                        opt.value = dist;
-                        opt.innerText = dist;
-                        districtSelect.appendChild(opt);
+                districtSelect.innerHTML = '<option value="">請選擇區域</option>';
+                if (selectedCity && areaData[selectedCity]) {
+                    areaData[selectedCity].forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district;
+                        option.textContent = district;
+                        districtSelect.appendChild(option);
                     });
                 }
             }
             filterAndRenderStores();
         });
     }
-    if (districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
-    if (globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
 
-    if (googleLoginAction) {
-        googleLoginAction.addEventListener('click', async () => {
-            try {
-                const result = await signInWithPopup(auth, provider);
-                await handleUserSyncAndRoleRouting(result.user);
-            } catch (error) {
-                console.error("Google 登入失敗：", error);
-                alert("連線失敗，請檢查網路服務！");
-            }
+    if (districtSelect) {
+        districtSelect.addEventListener('change', () => {
+            console.log("[PACE DEBUG] District selected:", districtSelect.value);
+            filterAndRenderStores();
         });
     }
 
-    if (emailLoginAction) {
-        emailLoginAction.addEventListener('click', async () => {
-            const email = loginEmailInput.value.trim();
-            const password = loginPasswordInput.value;
-            if (!email || !password) {
-                alert("密碼或 Email 欄位不可為空！");
-                return;
-            }
-            try {
-                const result = await signInWithEmailAndPassword(auth, email, password);
-                await handleUserSyncAndRoleRouting(result.user);
-            } catch (loginError) {
-                if (loginError.code === "auth/user-not-found" || loginError.code === "auth/invalid-credential") {
-                    try {
-                        const result = await createUserWithEmailAndPassword(auth, email, password);
-                        await handleUserSyncAndRoleRouting(result.user);
-                    } catch (regError) {
-                        alert("註冊密碼強度不足，或帳號已被佔用！");
+    if (globalSearchInput) {
+        globalSearchInput.addEventListener('input', () => {
+            console.log("[PACE DEBUG] Global search input changed:", globalSearchInput.value);
+            filterAndRenderStores();
+        });
+    }
+
+    // 賣家註冊頁面專屬邏輯
+    const registerPageSpecificElements = document.getElementById('shopRegisterForm'); // 檢查是否存在表單來判斷是否在註冊頁
+    if (registerPageSpecificElements) {
+        console.log("[PACE DEBUG] Initializing register page specific elements.");
+
+        const addMenuItemBtn = document.getElementById('addMenuItemBtn');
+        if (addMenuItemBtn) {
+            addMenuItemBtn.addEventListener('click', () => {
+                console.log("[PACE DEBUG] Add menu item button clicked.");
+                addMenuItem();
+            });
+        }
+
+        const toggleCashPay = document.getElementById('toggleCashPay');
+        if (toggleCashPay) {
+            toggleCashPay.addEventListener('change', (event) => {
+                console.log("[PACE DEBUG] Cash pay toggle changed. New state:", event.target.checked);
+                if (event.target.checked) {
+                    alert("⚠️ 開啟現金支付代表您將接受顧客到店取貨時以現金付款，請確保您有足夠的零錢可供找零！");
+                }
+            });
+        }
+
+        // 修正 shopSubmitBtn 監聽方式
+        const shopSubmitBtn = document.getElementById('shopSubmitBtn');
+        if (shopSubmitBtn) {
+            shopSubmitBtn.addEventListener('click', async (e) => {
+                e.preventDefault(); // 阻止按鈕預設行為，雖然不是表單提交，但習慣性加上
+                console.log("[PACE DEBUG] shopSubmitBtn click event triggered.");
+
+                const user = auth.currentUser;
+                if (!user) {
+                    alert("請先登入才能建立店鋪！");
+                    console.log("[PACE DEBUG] User not logged in, cannot submit shop.");
+                    return;
+                }
+
+                const name = document.getElementById('shopNameInput')?.value.trim() || '';
+                const phone = document.getElementById('shopPhoneInput')?.value.trim() || '';
+                const city = document.getElementById('shopCitySelect')?.value || '';
+                const district = document.getElementById('shopDistrictSelect')?.value || '';
+                const detailAddress = document.getElementById('shopAddressInput')?.value.trim() || '';
+                const isOnlinePayEnabled = document.getElementById('toggleOnlinePay') ? document.getElementById('toggleOnlinePay').checked : false;
+                const isCashPayEnabled = document.getElementById('toggleCashPay') ? document.getElementById('toggleCashPay').checked : false;
+
+                if (!name || !phone || !city || !district || !detailAddress) {
+                    alert("⚠️ 請填寫完整的店舖資訊（店名、電話、地址等）！");
+                    console.log("[PACE DEBUG] Missing shop information.");
+                    return;
+                }
+
+                const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
+                const status = document.getElementById('shopStatus')?.value || 'online';
+                const prepareTime = parseInt(document.getElementById('prepareTimeInput')?.value) || 15;
+                const logoEl = document.getElementById('shopLogoPreview');
+                const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
+                
+                const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
+                const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
+                const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
+                
+                // 抓取菜單
+                const menuRows = document.querySelectorAll('.menu-item-row');
+                const menuItems = [];
+                menuRows.forEach(row => {
+                    const nameField = row.querySelector('.item-name-input');
+                    const priceField = row.querySelector('.price-input');
+                    const nameVal = nameField ? nameField.value.trim() : '';
+                    const priceVal = priceField ? parseInt(priceField.value) || 0 : 0;
+                    const imgEl = row.querySelector('.preview-img');
+                    const imgData = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : "";
+                    if (nameVal) menuItems.push({ name: nameVal, price: priceVal, image: imgData });
+                });
+
+                const shopData = {
+                    sellerUid: user.uid,
+                    shopName: name, shopPhone: phone, city: city, district: district,
+                    shopAddress: `${city}${district}${detailAddress}`,
+                    inviteCode: inviteCode, status: status, shopLogo: shopLogoData,
+                    prepareTime: prepareTime, isOnlinePayEnabled: isOnlinePayEnabled,
+                    isCashPayEnabled: isCashPayEnabled,
+                    newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
+                    menuList: menuItems, createdAt: new Date().toISOString()
+                };
+
+                if (shopSubmitBtn) {
+                    shopSubmitBtn.innerText = "⚡ 正在打通雲端地基中...";
+                    shopSubmitBtn.disabled = true;
+                }
+
+                try {
+                    console.log("[PACE DEBUG] Attempting to write shop data to Firestore.", shopData);
+                    // 執行寫入
+                    await setDoc(doc(db, "stores", user.uid), shopData);
+                    
+                    // 更新使用者角色為賣家
+                    await updateDoc(doc(db, "users", user.uid), { role: "seller" });
+                    
+                    alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張！");
+                    console.log("[PACE DEBUG] Shop created successfully, redirecting to seller.html.");
+                    window.location.href = "seller.html";
+                } catch (dbError) {
+                    console.error("提交失敗：", dbError);
+                    alert("寫入失敗：" + dbError.message);
+                    if (shopSubmitBtn) {
+                        shopSubmitBtn.innerText = "建立店鋪";
+                        shopSubmitBtn.disabled = false;
                     }
-                } else {
-                    alert("登入密碼有誤，請再確認一次！");
                 }
-            }
-        });
-    }
+            });
+        }
 
-    // 賣家註冊專區初始化
-    const shopCity = document.getElementById('shopCity');
-    const shopDistrict = document.getElementById('shopDistrict');
-    if (shopCity) {
-        Object.keys(areaData).forEach(city => {
-            const opt = document.createElement('option');
-            opt.value = city; opt.innerText = city; shopCity.appendChild(opt);
-        });
-        shopCity.addEventListener('change', () => {
-            const selectedCity = shopCity.value;
-            if (shopDistrict) {
-                shopDistrict.innerHTML = '<option value="">選擇區域</option>';
-                if (areaData[selectedCity]) {
-                    areaData[selectedCity].forEach(dist => {
-                        const opt = document.createElement('option');
-                        opt.value = dist; opt.innerText = dist; shopDistrict.appendChild(opt);
-                    });
-                }
-            }
-        });
-    }
+        // 處理店鋪城市和區域選擇
+        const shopCitySelect = document.getElementById('shopCitySelect');
+        const shopDistrictSelect = document.getElementById('shopDistrictSelect');
 
-    const toggleOnline = document.getElementById('toggleOnline');
-    const toggleCash = document.getElementById('toggleCash');
-    const newebpayContainer = document.getElementById('newebpayContainer');
-    const cashWarningModal = document.getElementById('cashWarningModal');
-    const warningConfirmBtn = document.getElementById('warningConfirmBtn');
-    const warningCancelBtn = document.getElementById('warningCancelBtn');
-
-    if (newebpayContainer) {
-        newebpayContainer.innerHTML = `
-            <label style="margin-bottom:12px; display:block; font-size:13px; font-weight:700;">🔒 藍新金流 API 開發參數設定</label>
-            <div style="display:flex; flex-direction:column; gap:8px;">
-                <input type="text" id="merchantIdInput" class="input-style" style="height:38px;" placeholder="請輸入 商店代號 (MerchantID)">
-                <input type="text" id="hashKeyInput" class="input-style" style="height:38px;" placeholder="請輸入 HashKey">
-                <input type="text" id="hashIvInput" class="input-style" style="height:38px;" placeholder="請輸入 HashIV">
-            </div>
-        `;
-    }
-
-    if (toggleOnline) {
-        toggleOnline.addEventListener('change', function() {
-            if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
-        });
-    }
-
-    // 【核心修正】toggleCash 開啟警告邏輯
-    if (toggleCash) {
-        // 預設關閉
-        toggleCash.checked = false; 
-        
-        toggleCash.addEventListener('click', function(e) {
-            // 如果當前是「關閉」狀態，使用者點擊想要「開啟」
-            if (this.checked) {
-                // 先攔截狀態切換，保持關閉
-                this.checked = false; 
-                e.preventDefault();
-                // 彈出警告視窗
-                if (cashWarningModal) cashWarningModal.style.display = 'flex';
-            }
-        });
-    }
-
-    if (warningConfirmBtn) {
-        warningConfirmBtn.addEventListener('click', () => {
-            // 使用者點擊確認，將開關切換為開啟
-            if (toggleCash) toggleCash.checked = true;
-            if (cashWarningModal) cashWarningModal.style.display = 'none';
-        });
-    }
-    if (warningCancelBtn) {
-        warningCancelBtn.addEventListener('click', () => {
-            // 使用者點擊取消，保持關閉
-            if (toggleCash) toggleCash.checked = false;
-            if (cashWarningModal) cashWarningModal.style.display = 'none';
-        });
-    }
-
-    if (menuUploadList) {
-        document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
-    }
-
-    const addItemRowBtn = document.getElementById('addItemRowBtn');
-    if (addItemRowBtn && menuUploadList) {
-        addItemRowBtn.addEventListener('click', () => {
-            const newRow = document.createElement('div');
-            newRow.className = 'menu-item-row';
-            newRow.innerHTML = `
-                <div class="img-upload-box" onclick="triggerUpload(this)">
-                    <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                    <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                    <div class="upload-placeholder">📷<span>上傳照片</span></div>
-                </div>
-                <div class="item-fields">
-                    <input type="text" class="input-style item-name-input" style="height:32px; padding: 0 10px;" placeholder="品項名稱" required>
-                    <div class="price-input-wrapper">
-                        <span class="price-symbol">$</span>
-                        <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
-                    </div>
-                </div>
-                <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 6px; justify-content: center;">
-                    <div class="drag-handle" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: grab;">☰</div>
-                    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
-                </div>
-            `;
-            menuUploadList.appendChild(newRow);
-            makeItemDraggable(newRow); 
-        });
-    }
-
-    // 【核心修正】shopRegisterForm 提交邏輯與按鈕修復
-    const shopRegisterForm = document.getElementById('shopRegisterForm');
-    if (shopRegisterForm) {
-        shopRegisterForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const user = auth.currentUser;
-            if (!user) { alert("【PACE 提示】開鋪前請先登入帳號喔！"); return; }
-            
-            // 抓取收款方式狀態
-            const isOnlinePayEnabled = document.getElementById('toggleOnline')?.checked || false;
-            const isCashPayEnabled = document.getElementById('toggleCash')?.checked || false;
-
-            if (!isOnlinePayEnabled && !isCashPayEnabled) {
-                alert("⚠️ 請至少選擇一種收款方式（線上刷卡或現場付現）才能順利開張喔！");
-                return;
-            }
-
-            // 抓取各項欄位
-            const name = document.getElementById('shopName')?.value.trim();
-            const phone = document.getElementById('shopPhone')?.value.trim();
-            const city = document.getElementById('shopCity')?.value;
-            const district = document.getElementById('shopDistrict')?.value;
-            const detailAddress = document.getElementById('shopAddress')?.value.trim();
-            
-            // 驗證必填欄位
-            if (!name || !phone || !city || !district || !detailAddress) {
-                alert("⚠️ 請填寫完整的店舖資訊（店名、電話、地址等）！");
-                return;
-            }
-
-            const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
-            const status = document.getElementById('shopStatus')?.value || 'online';
-            const prepareTime = parseInt(document.getElementById('prepareTimeInput')?.value) || 15;
-            const logoEl = document.getElementById('shopLogoPreview');
-            const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
-            
-            const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
-            const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
-            const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
-            
-            // 抓取菜單
-            const menuRows = document.querySelectorAll('.menu-item-row');
-            const menuItems = [];
-            menuRows.forEach(row => {
-                const nameField = row.querySelector('.item-name-input');
-                const priceField = row.querySelector('.price-input');
-                const nameVal = nameField ? nameField.value.trim() : '';
-                const priceVal = priceField ? parseInt(priceField.value) || 0 : 0;
-                const imgEl = row.querySelector('.preview-img');
-                const imgData = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : "";
-                if (nameVal) menuItems.push({ name: nameVal, price: priceVal, image: imgData });
+        if (shopCitySelect) {
+            Object.keys(areaData).forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                shopCitySelect.appendChild(option);
             });
 
-            const shopData = {
-                sellerUid: user.uid,
-                shopName: name, shopPhone: phone, city: city, district: district,
-                shopAddress: `${city}${district}${detailAddress}`,
-                inviteCode: inviteCode, status: status, shopLogo: shopLogoData,
-                prepareTime: prepareTime, isOnlinePayEnabled: isOnlinePayEnabled,
-                isCashPayEnabled: isCashPayEnabled,
-                newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
-                menuList: menuItems, createdAt: new Date().toISOString()
-            };
-
-            const shopSubmitBtn = document.getElementById('shopSubmitBtn');
-            if (shopSubmitBtn) {
-                shopSubmitBtn.innerText = "⚡ 正在打通雲端地基中...";
-                shopSubmitBtn.disabled = true;
-            }
-
-            try {
-                // 執行寫入
-                await setDoc(doc(db, "stores", user.uid), shopData);
-                
-                // 更新使用者角色為賣家
-                await updateDoc(doc(db, "users", user.uid), { role: "seller" });
-                
-                alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張！");
-                window.location.href = "seller.html";
-            } catch (dbError) {
-                console.error("提交失敗：", dbError);
-                alert("寫入失敗：" + dbError.message);
-                if (shopSubmitBtn) {
-                    shopSubmitBtn.innerText = "建立店鋪";
-                    shopSubmitBtn.disabled = false;
+            shopCitySelect.addEventListener('change', () => {
+                console.log("[PACE DEBUG] Shop city selected:", shopCitySelect.value);
+                const selectedCity = shopCitySelect.value;
+                if (shopDistrictSelect) {
+                    shopDistrictSelect.innerHTML = '<option value="">請選擇區域</option>';
+                    if (selectedCity && areaData[selectedCity]) {
+                        areaData[selectedCity].forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district;
+                            option.textContent = district;
+                            shopDistrictSelect.appendChild(option);
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     loadHeader();
@@ -572,6 +551,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 async function fetchStoresFromFirebase() {
     try {
+        console.log("[PACE DEBUG] Fetching stores from Firebase.");
         const querySnapshot = await getDocs(collection(db, "stores"));
         allStores = [];
         querySnapshot.forEach((doc) => {
@@ -594,6 +574,8 @@ function filterAndRenderStores() {
     const selectedCity = citySelect ? citySelect.value : '';
     const selectedDist = districtSelect ? districtSelect.value : '';
     const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
+
+    console.log(`[PACE DEBUG] Filtering stores: City=${selectedCity}, District=${selectedDist}, Keyword=${searchKeyword}`);
 
     const filtered = allStores.filter(store => {
         const matchCity = !selectedCity || store.city === selectedCity;
@@ -650,15 +632,18 @@ function getBrowserLocation() {
                 currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
                 if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
                 if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
+                console.log("[PACE DEBUG] GPS location obtained.", { lat: buyerLat, lng: buyerLng });
             },
             (error) => {
                 currentBuyerAddress = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
                 if (gpsPinBtn) gpsPinBtn.innerText = "📍 無法定位";
                 if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
+                console.warn("[PACE DEBUG] GPS location error:", error.message);
             }
         );
     } else {
         currentBuyerAddress = "您的裝置不支援 GPS 定位裝置。";
+        console.warn("[PACE DEBUG] Geolocation not supported by browser.");
     }
 }
 
@@ -711,6 +696,7 @@ function startDrag(e, row) {
         window.addEventListener('mousemove', onDragMove);
         window.addEventListener('mouseup', onDragEnd);
     }
+    console.log("[PACE DEBUG] Drag started for item:", row);
 }
 
 function onDragMove(e) {
@@ -734,6 +720,7 @@ function onDragEnd() {
     window.removeEventListener('mouseup', onDragEnd);
     window.removeEventListener('touchmove', onDragMove);
     window.removeEventListener('touchend', onDragEnd);
+    console.log("[PACE DEBUG] Drag ended.");
 }
 
 // ==========================================
@@ -746,11 +733,13 @@ window.deleteRow = function(btn) {
     const rows = menuUploadList.querySelectorAll('.menu-item-row');
     if (rows.length <= 1) { alert("報告老闆，店裡至少要留一項商品才能開張喔！"); return; }
     btn.closest('.menu-item-row').remove();
+    console.log("[PACE DEBUG] Menu item row deleted.");
 };
 
 window.triggerUpload = function(box) {
     const fileInput = box.querySelector('.image-input');
     if (fileInput) fileInput.click();
+    console.log("[PACE DEBUG] Triggering image upload.");
 };
 
 window.previewImage = function(input) {
@@ -763,6 +752,7 @@ window.previewImage = function(input) {
             img.src = e.target.result;
             img.style.display = 'block';
             if (placeholder) placeholder.style.display = 'none';
+            console.log("[PACE DEBUG] Image preview updated.");
         };
         reader.readAsDataURL(input.files[0]);
     }
@@ -771,6 +761,7 @@ window.previewImage = function(input) {
 const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
 if (adminSubmitStoreBtn) {
     adminSubmitStoreBtn.addEventListener('click', async () => {
+        console.log("[PACE DEBUG] Admin submit store button clicked.");
         const name = document.getElementById('adminNewStoreName')?.value.trim() || '';
         const phone = document.getElementById('adminNewStorePhone')?.value.trim() || '';
         const city = document.getElementById('adminNewStoreCity')?.value || '';
@@ -783,11 +774,13 @@ if (adminSubmitStoreBtn) {
 
         if (!name || !district || !address) {
             alert("⚠️ 店名、區域、詳細地址為必填項目！");
+            console.log("[PACE DEBUG] Admin store submission missing required fields.");
             return;
         }
 
         adminSubmitStoreBtn.innerText = "⏳ 正在同步至雲端...";
         try {
+            console.log("[PACE DEBUG] Admin attempting to add new store to Firestore.");
             await addDoc(collection(db, "stores"), {
                 name: name, shopName: name, phone: phone, city: city, district: district,
                 address: address, shopAddress: address, isCashPayEnabled: isCashPayEnabled,
@@ -795,6 +788,7 @@ if (adminSubmitStoreBtn) {
                 menu: [], createdAt: new Date().toISOString()
             });
             alert("✅ 店家已成功新增至雲端！");
+            console.log("[PACE DEBUG] Admin store added successfully.");
             fetchStoresFromFirebase();
         } catch (error) {
             console.error("新增店家失敗:", error);
@@ -808,58 +802,14 @@ if (adminSubmitStoreBtn) {
 window.deleteStore = async function(storeId) {
     if (confirm("⚠️ 確定要從 Firebase 徹底刪除這個店家嗎？(刪除後無法恢復)")) {
         try {
+            console.log("[PACE DEBUG] Attempting to delete store with ID:", storeId);
             await deleteDoc(doc(db, "stores", storeId));
-            alert("🗑️ 店家預已成功刪除！");
-            fetchStoresFromFirebase(); 
+            alert("🗑️ 店家已從雲端刪除！");
+            console.log("[PACE DEBUG] Store deleted successfully.");
+            fetchStoresFromFirebase();
         } catch (error) {
-            console.error("刪除失敗:", error);
-            alert("刪除失敗，請確認你的 Admin 權限！");
+            console.error("刪除店家失敗:", error);
+            alert("刪除失敗，請檢查網路或資料庫權限！");
         }
     }
 };
-
-window.issuePromoCode = async function() {
-    const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
-    if (!code || code.trim() === "") return;
-    try {
-        await setDoc(doc(db, "promoCodes", code.trim()), {
-            code: code.trim(), createdBy: currentUserId, createdAt: new Date().toISOString(),
-            isActive: true, usedBy: null
-        });
-        alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！`);
-    } catch (error) {
-        console.error("邀請碼發行失敗:", error);
-        alert("發行失敗，請檢查您的系統權限配置！");
-    }
-};
-
-window.toggleView = function(viewRole) {
-    const adminEl = document.getElementById('adminView');
-    const buyerEl = document.getElementById('buyerView');
-    if (viewRole === 'admin') {
-        if (adminEl) adminEl.style.display = 'block';
-        if (buyerEl) buyerEl.style.display = 'none';
-        window.scrollTo(0, 0);
-    } else {
-        if (adminEl) adminEl.style.display = 'none';
-        if (buyerEl) buyerEl.style.display = 'block';
-    }
-};
-
-function loadHeader() {
-    const headerContainer = document.getElementById('header-container');
-    if (!headerContainer) return;
-    fetch('header.html')
-        .then(response => {
-            if (!response.ok) throw new Error('找不到 header.html');
-            return response.text();
-        })
-        .then(htmlData => {
-            headerContainer.innerHTML = htmlData;
-            bindHeaderEvents();
-            initTheme();
-        })
-        .catch(error => {
-            console.error('載入 Header 失敗：', error);
-        });
-}

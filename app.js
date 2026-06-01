@@ -69,32 +69,27 @@ let activeDragItem = null;
 function initTheme() {
     const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
-    themeToggleBtn = document.getElementById('themeToggleBtn');
     if (themeToggleBtn) {
         themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
     }
 }
 
 function renderDynamicMenu(role) {
-    dropdownMenu = document.getElementById('dropdownMenu');
     if (!dropdownMenu) return;
     
     let menuHTML = '';
     
     if (role === 'admin') {
-        menuHTML += `
-            <div class="menu-header" style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">🔮 派思核心控制台</div>
-            <a href="javascript:void(0)" onclick="window.toggleView('admin')" class="nav-fast">⚙️ 管理後台</a>
-            <a href="javascript:void(0)" onclick="window.toggleView('buyer')" class="nav-fast">🧑‍💼 切換買家視角</a>
-            <a href="javascript:void(0)" onclick="window.issuePromoCode()" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
-            <div class="menu-divider"></div>
-        `;
-    }
-
     menuHTML += `
         <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
         <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
     `;
+        menuHTML += `
+            <div class="menu-header" style="padding: 10px; border-bottom: 1px solid var(--border-color); font-weight: bold;">🔮 派思核心控制台</div>
+            <a href="javascript:void(0)" onclick="window.issuePromoCode()" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
+            <div class="menu-divider"></div>
+        `;
+    }
 
     if (role === 'buyer' || role === 'admin') {
         menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
@@ -155,11 +150,6 @@ async function handleUserSyncAndRoleRouting(user) {
 }
 
 function updateUIForUser(user, currentRole) {
-    loginBtn = document.getElementById('loginBtn');
-    avatarBtn = document.getElementById('avatarBtn');
-    loginLightbox = document.getElementById('loginLightbox');
-    userNameDisplay = document.getElementById('userNameDisplay');
-
     if (loginBtn) loginBtn.style.display = 'none';
     if (avatarBtn) avatarBtn.style.display = 'block';
     if (loginLightbox) loginLightbox.style.display = 'none';
@@ -196,15 +186,54 @@ function updateUIForUser(user, currentRole) {
 // ==========================================
 // 4. 初始化與事件綁定
 // ==========================================
-
-// 【核心修復】將事件綁定邏輯封裝，確保在 Header 載入後執行
-function bindHeaderEvents() {
+window.addEventListener('DOMContentLoaded', async () => {
+    
+    // UI 元件抓取
     themeToggleBtn = document.getElementById('themeToggleBtn');
     loginBtn = document.getElementById('loginBtn');
     avatarBtn = document.getElementById('avatarBtn');
     dropdownMenu = document.getElementById('dropdownMenu');
+    userNameDisplay = document.getElementById('userNameDisplay');
+    storeContainer = document.getElementById('store-container');
     loginLightbox = document.getElementById('loginLightbox');
+    googleLoginAction = document.getElementById('googleLoginAction');
+    toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
+    emailFormSection = document.getElementById('emailFormSection');
+    customReturnBtn = document.getElementById('customReturnBtn');
+    loginEmailInput = document.getElementById('loginEmail');
+    loginPasswordInput = document.getElementById('loginPassword');
+    emailLoginAction = document.getElementById('emailLoginAction');
+    citySelect = document.getElementById('citySelect');
+    districtSelect = document.getElementById('districtSelect');
+    gpsPinBtn = document.getElementById('gpsPinBtn');
+    addressDetailLightbox = document.getElementById('addressDetailLightbox');
+    modalAddressText = document.getElementById('modalAddressText');
+    closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
+    globalSearchInput = document.getElementById('globalSearchInput');
+    menuUploadList = document.getElementById('menuUploadList');
 
+    initTheme();
+
+    // 監聽 Firebase 登入狀態
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            handleUserSyncAndRoleRouting(user);
+        } else {
+            if (loginBtn) loginBtn.style.display = 'block';
+            if (avatarBtn) avatarBtn.style.display = 'none';
+            if (dropdownMenu) {
+                dropdownMenu.style.display = 'none';
+                dropdownMenu.innerHTML = '';
+            }
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            if (statusDot) statusDot.classList.remove('active');
+            if (statusText) statusText.innerText = "您尚未登入，請連結google帳號\n或使用電子郵件登入";
+            fetchStoresFromFirebase();
+        }
+    });
+
+    // 通用 UI 事件綁定
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -227,62 +256,8 @@ function bindHeaderEvents() {
         });
     }
 
-    if (loginBtn) {
-        loginBtn.addEventListener('click', () => { 
-            if (loginLightbox) loginLightbox.style.display = 'flex'; 
-        });
-    }
-}
-
-window.addEventListener('DOMContentLoaded', async () => {
-    
-    // 非 Header 元件抓取
-    userNameDisplay = document.getElementById('userNameDisplay');
-    storeContainer = document.getElementById('store-container');
-    googleLoginAction = document.getElementById('googleLoginAction');
-    toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
-    emailFormSection = document.getElementById('emailFormSection');
-    customReturnBtn = document.getElementById('customReturnBtn');
-    loginEmailInput = document.getElementById('loginEmail');
-    loginPasswordInput = document.getElementById('loginPassword');
-    emailLoginAction = document.getElementById('emailLoginAction');
-    citySelect = document.getElementById('citySelect');
-    districtSelect = document.getElementById('districtSelect');
-    gpsPinBtn = document.getElementById('gpsPinBtn');
-    addressDetailLightbox = document.getElementById('addressDetailLightbox');
-    modalAddressText = document.getElementById('modalAddressText');
-    closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
-    globalSearchInput = document.getElementById('globalSearchInput');
-    menuUploadList = document.getElementById('menuUploadList');
-
-    // 監聽 Firebase 登入狀態
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            handleUserSyncAndRoleRouting(user);
-        } else {
-            loginBtn = document.getElementById('loginBtn');
-            avatarBtn = document.getElementById('avatarBtn');
-            dropdownMenu = document.getElementById('dropdownMenu');
-            if (loginBtn) loginBtn.style.display = 'block';
-            if (avatarBtn) avatarBtn.style.display = 'none';
-            if (dropdownMenu) {
-                dropdownMenu.style.display = 'none';
-                dropdownMenu.innerHTML = '';
-            }
-            const statusDot = document.getElementById('statusDot');
-            const statusText = document.getElementById('statusText');
-            if (statusDot) statusDot.classList.remove('active');
-            if (statusText) statusText.innerText = "您尚未登入，請連結google帳號\n或使用電子郵件登入";
-            fetchStoresFromFirebase();
-        }
-    });
-
-    // 頁面固定元件事件綁定
-    if (customReturnBtn) customReturnBtn.addEventListener('click', () => { 
-        loginLightbox = document.getElementById('loginLightbox');
-        if (loginLightbox) loginLightbox.style.display = 'none'; 
-    });
-    
+    if (loginBtn) loginBtn.addEventListener('click', () => { loginLightbox.style.display = 'flex'; });
+    if (customReturnBtn) customReturnBtn.addEventListener('click', () => { loginLightbox.style.display = 'none'; });
     if (toggleEmailFormBtn) {
         toggleEmailFormBtn.addEventListener('click', () => {
             if (emailFormSection) emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
@@ -557,10 +532,6 @@ async function fetchStoresFromFirebase() {
 
 function filterAndRenderStores() {
     if (!storeContainer) return;
-    citySelect = document.getElementById('citySelect');
-    districtSelect = document.getElementById('districtSelect');
-    globalSearchInput = document.getElementById('globalSearchInput');
-    
     const selectedCity = citySelect ? citySelect.value : '';
     const selectedDist = districtSelect ? districtSelect.value : '';
     const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
@@ -609,9 +580,6 @@ function filterAndRenderStores() {
 }
 
 function getBrowserLocation() {
-    gpsPinBtn = document.getElementById('gpsPinBtn');
-    modalAddressText = document.getElementById('modalAddressText');
-    
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -711,7 +679,6 @@ function onDragEnd() {
 // ==========================================
 
 window.deleteRow = function(btn) {
-    menuUploadList = document.getElementById('menuUploadList');
     if (!menuUploadList) return;
     const rows = menuUploadList.querySelectorAll('.menu-item-row');
     if (rows.length <= 1) { alert("報告老闆，店裡至少要留一項商品才能開張喔！"); return; }
@@ -826,9 +793,6 @@ function loadHeader() {
         })
         .then(htmlData => {
             headerContainer.innerHTML = htmlData;
-            // 【核心修復】Header 載入後，立即執行事件綁定與主題初始化
-            bindHeaderEvents();
-            initTheme();
         })
         .catch(error => {
             console.error('載入 Header 失敗：', error);

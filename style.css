@@ -1,190 +1,118 @@
-/* 確保 body 成為一個純淨的舞台 */
-body {
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg-global);
-    color: var(--text-main);
-/* 加上過場動畫，切換主題時才不會太突兀 */
-    transition: background-color 0.3s ease, color 0.3s ease;
-    overflow: hidden;         /* 徹底鎖死捲軸 */
-    position: relative;       /* 為內部的畫布提供定位參考 */
-}
-
-/* 這是你的「紙張」本體 */
-.phone-wrapper {
-    /* 比例鎖定 */
-    aspect-ratio: 9 / 16;
-    width: 100vw;
-    height: 100vh;
-    max-width: calc(100vh * 9 / 16); 
-    max-height: calc(100vw * 16 / 9);
-
-    /* 絕對置中神陣 */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* 這裡會將畫布拉回正中央 */
-
-    /* 外觀裝飾 */
-    background-color: var(--bg-container);
-    border: 4px solid #222;
-    border-radius: 20px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
+:root {
+    /* 核心響應式單位：整個畫面的縮放基準 */
+    --zoom-factor: 1;
+    --base-font-size: calc(16px * var(--zoom-factor));
     
-    /* 內部排版 */
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    justify-content: space-between;
-}
-.header {
-    display: flex;
-    justify-content: space-between; /* 讓左邊欄位和右邊控制面板各自靠兩端 */
-    align-items: center;            /* 關鍵：讓左右兩邊的內容物「垂直居中」對齊 */
-    height: 54px;                   /* 固定住的數值：鎖定第一排商標與控制台高度 */
-    flex-shrink: 0;
-    position: relative;
-}
-
-/* ========================================================
-   2. 左區塊（控制 PACE 與小字的垂直排列）
-   ======================================================== */
-.brand-left-column {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end; /* 關鍵：讓整塊內容（含副標題）往底部貼齊，跟右邊對齊 */
-    height: 100%;              /* 確保高度有撐滿，才能順利置底 */
-    margin-top: 10px;
+    /* 顏色變數 - 淺色模式 (預設) */
+    --bg-global: #F8FAFC;
+    --bg-container: #FFFFFF;
+    --border-color: #E2E8F0;
+    --text-main: #0F172A;
+    --text-muted: #64748B;
+    --brand-blue: #0062FF; 
+    --brand-green: #10B981;
+    --brand-red: #EF4444;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
+    --card-bg: #FFFFFF;
+    --blur-bg: rgba(255, 255, 255, 0.95);
 }
 
-/* 設定 PACE 英文標題 */
-.pace-logo {
-    font-size: 32px;          /* 關鍵：單獨放大 PACE 英文的字體大小 */
-    font-weight: bold;
-    margin-bottom: 0px;        /* 讓英文加粗，看起來更大氣 */
-    transform: translateY(5px);
-}
-.brand-logo-img {
-    height: 46px;              /* 放大派思圖片的高度（原本可能較小，可自行調整數值） */
-    width: auto;
-}  
-/* 設定副標題小字 */
-.brand-subtitle {
-    font-size: 12px;
-    color: var(--text-muted);
-    font-weight: 300;
-    text-align: left;
-    margin-bottom: 0px;
+/* 深色模式響應 [data-theme="dark"] */
+[data-theme="dark"] {
+    --bg-global: #0A0A0A;
+    --bg-container: #111111;
+    --border-color: #262626;
+    --text-main: #F5F5F5;
+    --text-muted: #A3A3A3;
+    --brand-blue: #2F80ED; 
+    --brand-green: #34D399;
+    --brand-red: #F87171;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
+    --card-bg: #1C1C1E;
+    --blur-bg: rgba(17, 17, 17, 0.95);
 }
 
 /* ==========================================================================
-   5. 控制台與按鈕 (Controls & Buttons)
+   2. 基礎重設 (Reset & Globals)
    ========================================================================== */
-/* 右上角一體化控制台 */
-.control-panel {
-    display: flex;
-    flex-direction: column; /* 關鍵：讓按鈕由上往下垂直排列 */
-    align-items: flex-end;  /* 關鍵：讓兩顆按鈕都向右邊靠齊對齊 */
-    gap: 3px;               /* 設定上下兩顆按鈕之間的間距（可依喜好調整） */
-    height: 100%;           /* 固定住的數值：使控制台與 header 同高，利於垂直居中 */
-    justify-content: center;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-
-/* 通用按鈕基礎 */
-.theme-toggle {
-    display: flex;
-    justify-content: center; /* 修改：讓月亮圖示「水平置中」 */
-    align-items: center;     /* 新增：讓月亮圖示「垂直置中」 */
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    font-size: 12px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;          /*  削成圓形            */
-    cursor: pointer;                  /*  滑鼠點上去變形 */
-    color: var(--text-main);
-    padding: 5px 5px;
-}
-
-.login-btn {
-    display: flex;
-    justify-content: flex-end;
-    background-color: var(--brand-blue);
-    color: #FFFFFF;
-    border: none;
-    padding: 6px 8px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 0px;
-}
-
-.user-avatar-btn {
-    display: none; 
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    padding: 6px 8px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-main);
-    cursor: pointer;
-    align-items: center;
-    gap: 3px;
-}
-
-/* 下拉選單面板 */
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 42px;
-    right: 0;
-    width: 200px;
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: var(--shadow-md);
-    
-    /* 🔴 修正：因為上層骨架是 10，裡面的人寫 11 甚至不寫（繼承父層優先權）就能壓死中層了 */
-    z-index: 500; 
-    
-    padding: 3px;
-    
-    /* 🔴 這個防爆限制還是要留著，手機才不會破圖 */
-    max-height: 280px;     
-    overflow-y: auto;      
-    -webkit-overflow-scrolling: touch;
-}
-
-.dropdown-menu a, 
-.dropdown-menu button {
-    display: flex;
-    align-items: center;
+html, body {
     width: 100%;
-    padding: 10px 12px;
-    color: var(--text-main);
-    text-decoration: none;
-    font-size: 13px;
-    border: none;
-    background: none;
-    text-align: left;
-    border-radius: 8px;
-    cursor: pointer;
+    height: 100%;
+    overflow: hidden;
+    touch-action: none;
+    font-size: var(--base-font-size);
 }
 
-.dropdown-menu a:hover, 
-.dropdown-menu button:hover {
-    background-color: var(--bg-global);
+body {
+    background-color: var(--bg-global); /* 跟隨主題切換 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease;
 }
 
-.menu-divider {
-    height: 1px;
-    background-color: var(--border-color);
-    margin: 6px 0;
+input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ==========================================================================
+   3. 核心佈局架構 (Layout)
+   ========================================================================== */
+.phone-wrapper {
+    /* 移除絕對定位，改用 Flex 置中 */
+    position: relative;
+    aspect-ratio: 9 / 16;
+    
+    /* 響應式尺寸：像紙張一樣等比例縮放 */
+    width: 90vw;
+    height: auto;
+    max-width: calc(90vh * 9 / 16);
+    max-height: 90vh;
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    
+    background-color: var(--bg-container);
+    border: 1px solid var(--border-color);
+    border-radius: 2rem; /* 使用相對單位 */
+    box-shadow: var(--shadow-md);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+#buyerView, #adminView {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* 管理介面覆蓋層 */
+#adminView {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    background-color: var(--bg-container);
+    padding: 1.5rem;
+    overflow-y: auto;
 }

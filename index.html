@@ -15,11 +15,15 @@
 <style>
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
 .sticky-top-group {
-    flex-shrink: 0;           /* 防止被壓縮 */
-    height: 28%;
+    flex-shrink: 0;
+    height: 30%;                    /* 稍微增加一點高度，讓空間更舒服 */
     border-bottom: 1px solid var(--border-color);
-    padding: 10px;
+    padding: 12px 10px 8px;
     background-color: var(--bg-container);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
 }
 
 .location-bar {
@@ -35,12 +39,12 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--brand-blue);
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 6px 12px;
+    padding: 7px 10px;
     border-radius: 20px;
     cursor: pointer;
     white-space: nowrap;
@@ -49,19 +53,20 @@
 
 .location-select-group {
     display: flex;
-    gap: 4px;
-    flex-grow: 1;
+    gap: 6px;
+    flex: 1;
 }
 
 .nav-select {
     flex: 1;
-    border-radius: 8px;
+    height: 36px;
+    border-radius: 10px;
     border: 1px solid var(--border-color);
     background-color: var(--bg-global);
     color: var(--text-main);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    padding: 0 4px;
+    padding: 0 10px;
     outline: none;
     cursor: pointer;
 }
@@ -69,7 +74,7 @@
 .search-container {
     height: 1rem;
     flex-shrink: 0;
-    padding:5px;    
+    padding:2px 2px 0;    
 }
 
 .search-box {
@@ -89,9 +94,18 @@
     width: 100%;
     height: 100%;
     margin-left: 8px;
-    font-size: 14px;
+    font-size: 15px;
     color: var(--text-main);
     outline: none;
+}
+
+select {
+    width: 100%;       /* 寬度服從父層分配 */
+    height: 32px;      /* 鐵律：鎖死高度（配合你原來的 nav-select 設定） */
+    padding: 0 8px;    /* 只給左右內距，上下給 0，絕不頂開高度 */
+    font-size: 12px;   /* 配合整體導航欄的小巧比例 */
+    line-height: 32px; /* 讓 line-height 等於 height，文字就會完美垂直置中 */
+    box-sizing: border-box; /* 保險線：確保 border 和 padding 全都算在這 32px 裡面 */
 }
 
 /* ==========================================================================
@@ -267,14 +281,7 @@ footer .status-indicator.active{
     box-sizing: border-box;   /* 新增：確保 padding 不會影響按鈕固定高度 */
 }
 
-select {
-    width: 100%;       /* 寬度服從父層分配 */
-    height: 32px;      /* 鐵律：鎖死高度（配合你原來的 nav-select 設定） */
-    padding: 0 8px;    /* 只給左右內距，上下給 0，絕不頂開高度 */
-    font-size: 12px;   /* 配合整體導航欄的小巧比例 */
-    line-height: 32px; /* 讓 line-height 等於 height，文字就會完美垂直置中 */
-    box-sizing: border-box; /* 保險線：確保 border 和 padding 全都算在這 32px 裡面 */
-}
+
 </style>
 </body>
 <div class="phone-wrapper">

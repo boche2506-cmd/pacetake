@@ -1,11 +1,9 @@
-html {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden !important;
-    touch-action: none;
-    font-size: 16px !important;
-}
 :root {
+    /* 核心響應式單位：整個畫面的縮放基準 */
+    --zoom-factor: 1;
+    --base-font-size: calc(16px * var(--zoom-factor));
+    
+    /* 顏色變數 - 淺色模式 (預設) */
     --bg-global: #F8FAFC;
     --bg-container: #FFFFFF;
     --border-color: #E2E8F0;
@@ -20,6 +18,7 @@ html {
     --blur-bg: rgba(255, 255, 255, 0.95);
 }
 
+/* 深色模式響應 [data-theme="dark"] */
 [data-theme="dark"] {
     --bg-global: #0A0A0A;
     --bg-container: #111111;
@@ -36,89 +35,67 @@ html {
 }
 
 /* ==========================================================================
-   2. 基礎重設與全域元素 (Reset & Globals)
+   2. 基礎重設 (Reset & Globals)
    ========================================================================== */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
     -webkit-tap-highlight-color: transparent;
-    /* ⭕ 修正：將防選取機制嚴格綁定在全域選擇器 * 內，保證所有瀏覽器行為統一 */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: none;
+    font-size: var(--base-font-size);
 }
 
 body {
-    /* 🔴 關鍵修正：放棄 width:100% 這種會被父層干擾的寫法，改用絕對視窗維度 */
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    background-color: #000000; /* 外圍黑色沙盒 */
-    
-    /* 鎖死觸控反彈與捲軸 */
-
-    /* 👑 強制向下對齊 */
+    background-color: var(--bg-global); /* 跟隨主題切換 */
     display: flex;
-    flex-direction: column;    /* 讓排列方向變成垂直軸 */
-    justify-content: flex-end; /* 🔴 核心關鍵：將所有東西徹底推到最底部 */
-    align-items: center;       /* 橫向依然保持完美置中 */
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease;
 }
 
 input, textarea {
     -webkit-user-select: text;
-    user-select: text; /* 解除輸入框鎖定，保證可正常打字與選取 */
+    user-select: text;
 }
 
-img, .card {
-    max-width: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
+img {
+    max-width: 100%;
     height: auto;
-    box-sizing: border-box;
-}
-
-*, *::before, *::after {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
-    -webkit-font-smoothing: antialiased;    /* 讓 Mac/iPhone 上的文字更細緻不毛躁 */
-    -moz-osx-font-smoothing: grayscale;
-    box-sizing: border-box;                 /* 順便鎖死所有盒模型的寬度計算，防止破圖 */
-}
-
-@media (max-width: 480px) {
-
-    /* 1. 給大盒子內壁加上緩衝墊，不准黃框貼頂 */
-    .sticky-top-group {
-        padding-top: 15px !important;
-        box-sizing: border-box !important;
-    }
-
-    /* 2. 點名搜尋框跟縣市條，在真手機上強制往下推開，拉開比例！ */
-    .search-container, 
-    .location-bar {
-        margin-top: 10px !important; /* 蓋掉原本的 0px，讓它在手機上長出距離 */
-    }
-
 }
 
 /* ==========================================================================
    3. 核心佈局架構 (Layout)
    ========================================================================== */
-/* 手機直屏精品大外框 */
 .phone-wrapper {
-    max-width: 90vw;       /* 最大寬度限制（你可以設成 375 或 400） */
-    max-height: 100%; /* 確保不會超出父容器高度 */
-    aspect-ratio: 9 / 16;   /* 【核心】強迫 9:16 比例 */
-    height: 100vh; /* 鎖定為視窗高度的 100% */
-    width: calc(100vh * 9 / 16); /* 根據 9:16 比例計算寬度 */
-    min-height: 0;
+    /* 移除絕對定位，改用 Flex 置中 */
+    position: relative;
+    aspect-ratio: 9 / 16;
+    
+    /* 響應式尺寸：像紙張一樣等比例縮放 */
+    width: 90vw;
+    height: auto;
+    max-width: calc(90vh * 9 / 16);
+    max-height: 90vh;
+
     display: flex;
     flex-direction: column;
-    overflow: hidden;       /* 確保內部內容不會撐破畫布 */
-    background-color: white;
-    border-radius: 2rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+    
+    background-color: var(--bg-container);
+    border: 1px solid var(--border-color);
+    border-radius: 2rem; /* 使用相對單位 */
+    box-shadow: var(--shadow-md);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 #buyerView, #adminView {
@@ -140,32 +117,18 @@ img, .card {
     overflow-y: auto;
 }
 
-#buyerView {
-    width: 100%;
-    height: 100%;
-    display: flex !important; /* 確保不管 JS 怎麼切換 block，都必須維持 flex 佈局 */
-    flex-direction: column;
-    justify-content: space-between; /* 鐵律：強迫上中下三層死死卡住各自的位置，絕對不准往上吸 */
-    box-sizing: border-box;
-}
+/* ==========================================================================
+   4. 元件樣式 (Components)
+   ========================================================================== */
 
-/* 👑 頂部全區常駐吸附天花板 (Sticky) */
+/* 頂部群組 */
 .sticky-top-group {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    height: 28%;
-    box-sizing: border-box; /* 確保 margin/padding 不會把這 30% 的高度撐破 */
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-    gap: 5px;
-    top: 0;
-    padding-top: 10px;
-    margin-bottom: 10px;
-    position: sticky;
-    background-color: var(--bg-container) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    z-index: 100; 
+    gap: 0.75rem;
+    background-color: var(--bg-container);
 }
 
 *, *::before, *::after {

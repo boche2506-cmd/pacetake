@@ -70,8 +70,6 @@ img, .card {
     max-height: 100vh;                    /* 避免超出畫面 */
     aspect-ratio: 9 / 16;
     width: calc(100vh * 9 / 16);        /* 根據高度計算寬度 */
-    height: auto;                        /* 改成 auto，讓 aspect-ratio 主導 */
-    min-height: 0;
     display: flex;
     flex-direction: column;
     background-color: var(--bg-container);
@@ -212,14 +210,13 @@ img, .card {
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    min-width: 70px;
     align-items: flex-end; 
 }
 
 .theme-toggle {
-    width: 2rem;
-    height: 2rem;
-    font-size: 0.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.5rem;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 50%;
@@ -229,14 +226,13 @@ img, .card {
 }
 
 .login-btn {
-    height: 2.0rem;
-    font-size: 0.75rem;
+    font-size: 0.625rem;
     background-color: var(--brand-blue);
     color: #FFFFFF;
     border: 1px solid var(--border-color);
-    padding: 0.25rem 1.0rem;
+    padding: 0.375rem 1.25rem;
     border-radius: 1.25rem;
-    font-weight: 500;
+    font-weight: 400;
     box-shadow: var(--shadow-sm);
     margin-top: 0.25rem;
 }

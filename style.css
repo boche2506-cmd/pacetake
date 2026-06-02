@@ -189,6 +189,7 @@ img, .card {
     justify-content: space-between;
     align-items: flex-end; 
     gap: 0.3rem;
+    position: relative
 }
 
 .brand-left-column {

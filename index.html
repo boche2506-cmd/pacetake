@@ -220,7 +220,7 @@ select {
     background-color: var(--blur-bg);
     justify-content: space-between;
     border-top: 1px solid var(--border-color);
-    padding:1.25rem 1.75rem;
+    padding:1rem;
 }
 
 .status-msg {
@@ -270,8 +270,8 @@ footer .status-indicator.active{
     border: none;
     padding:1rem 1.75rem;
     border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 500;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -281,6 +281,7 @@ footer .status-indicator.active{
     height: 36px;             /* 新增：固定購物車按鈕的物理高度，防止變形 */
     box-sizing: border-box;   /* 新增：確保 padding 不會影響按鈕固定高度 */
     top : 1rem;              /* 新增：確保按鈕距離底部有適當空隙 */
+    text-align: center; 
 }
 
 
@@ -339,7 +340,7 @@ footer .status-indicator.active{
             <span id="statusText">您目前沒有進行中的訂單喔！</span>
         </a>
         <a href="cart.html" class="cart-status-btn nav-fast">
-            <span>🛒 </span>
+            <span>結帳🛒</span>
         </a>
     </footer>
   </div>

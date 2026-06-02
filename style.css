@@ -78,6 +78,7 @@ img, .card {
     box-shadow: var(--shadow-md);
     overflow: hidden;
     position: relative;
+    padding: 0.5rem;
 }
 
 /* adminView 也強制置中 */
@@ -195,7 +196,7 @@ img, .card {
 }
 
 .brand-logo-img {
-    height: 3.25rem; /* 響應式圖片高度 */
+    height: 3rem; /* 響應式圖片高度 */
 }
 
 .brand-subtitle {

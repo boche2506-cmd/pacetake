@@ -1,12 +1,10 @@
 html {
-    width: 100%;
-    height: 100%;
-    /* 移除強制 hidden，改用更彈性的方式 */
-    overflow: hidden;
-    touch-action: manipulation;
-    font-size: 16px;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden !important;
+    touch-action: none;
+    font-size: 16px !important;
 }
-
 :root {
     --zoom-factor: 1;
     --base-font-size: calc(16px * var(--zoom-factor));
@@ -22,13 +20,6 @@ html {
     --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
     --card-bg: #FFFFFF;
     --blur-bg: rgba(255, 255, 255, 0.95);
-    /* 新增：定義層疊順序變數，方便管理 */
-    --z-index-base: 1;
-    --z-index-card: 10;
-    --z-index-header: 100;
-    --z-index-dropdown: 2000; /* 確保選單最高 */
-    --z-index-modal: 3000;
-    --z-index-admin: 1500;
 }
 
 [data-theme="dark"] {
@@ -47,21 +38,21 @@ html {
 }
 
 body {
-    width: 100dvw;
-    height: 100dvh; 
+    width: 100vw;
+    height: 100vh;
     margin: 0;
     padding: 0;
     background-color: var(--bg-global);
     display: flex;
     flex-direction: column;
-    justify-content: center;     
-    align-items: center;         
+    justify-content: center;     /* 改成 center，讓整體垂直也置中 */
+    align-items: center;         /* 水平置中 */
     overflow: hidden;
 }
 
 input, textarea {
     -webkit-user-select: text;
-    user-select: text; 
+    user-select: text; /* 解除輸入框鎖定，保證可正常打字與選取 */
 }
 
 img, .card {
@@ -75,32 +66,22 @@ img, .card {
    ========================================================================== */
 /* 手機外框 - 加強置中穩定性 */
 .phone-wrapper {
-    width: 100%;
-    max-width: 500px; /* PC 端限制寬度 */
-    height: 100dvh;   /* 手機端撐滿動態高度 */
+    max-width: 100vw;
+    max-height: 100vh;                    /* 避免超出畫面 */
+    aspect-ratio: 9 / 16;
+    width: calc(100vh * 9 / 16);        /* 根據高度計算寬度 */
     display: flex;
     flex-direction: column;
     background-color: var(--bg-container);
     border: 1px solid var(--border-color);
-    /* 手機上移除圓角與邊框以撐滿螢幕 */
-    border-radius: 0;
+    border-radius: 2rem;
     box-shadow: var(--shadow-md);
     overflow: hidden;
     position: relative;
-    padding: 0; /* 移除內距讓內容貼邊，內部元件再自訂 padding */
+    padding: 0.5rem;
 }
 
-/* 在較大螢幕（如平板或電腦）才顯示手機外殼感 */
-@media (min-width: 501px) {
-    .phone-wrapper {
-        height: 90vh;
-        aspect-ratio: 9 / 19; /* 更接近現代手機比例 */
-        width: auto;
-        border-radius: 2.5rem;
-        border: 8px solid #333; /* 模擬手機邊框 */
-    }
-}
-
+/* adminView 也強制置中 */
 #adminView {
     position: absolute;
     top: 0;
@@ -110,7 +91,7 @@ img, .card {
     padding: 1.2rem 1.5rem;
     overflow-y: auto;
     background-color: var(--bg-container);
-    z-index: var(--z-index-admin); /* 提升層級 */
+    z-index: 999;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -129,7 +110,7 @@ img, .card {
 #adminView input,
 #adminView textarea,
 #adminView select {
-    width: 100%;           /* 強制填滿父層寬度 */
+    width: 100% !important;           /* 強制填滿父層寬度 */
     box-sizing: border-box;
     padding: 12px 14px;
     margin-bottom: 12px;
@@ -165,26 +146,21 @@ img, .card {
 /* 綠色確認按鈕 */
 #adminView button[style*="green"],
 #adminView .success-btn {
-    background-color: var(--brand-green);
-    color: white;
+    background-color: var(--brand-green) !important;
+    color: white !important;
     border: none;
 }
 
 /* 標題與說明文字 */
 #adminView h2, 
 #adminView h3 {
+    margin: 0 0 16px 0;
     font-size: 18px;
 }
 
+/* buyerView 內部三層布局 */
 #buyerView {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    padding: 1rem; /* 補回 wrapper 移除的 padding */
-    justify-content: flex-start; /* 改回頂部對齊，避免內容跳動 */
-    overflow-y: auto;
+    justify-content: space-between;   /* 上中下平均分配 */
 }
 
 #buyerView, #adminView {
@@ -199,41 +175,44 @@ img, .card {
    6. 搜尋與定位列 (Search & Location)
    ========================================================================== */
 .header {
-    width: 100%;
     display: flex;
     justify-content: space-between;
-    align-items: center; /* 改為 center 對齊較美觀 */
-    gap: 0.3rem;
-    position: relative; /* 作為選單定位參考 */
-    z-index: var(--z-index-header);
-    margin-bottom: 1rem;
+    align-items: flex-end; 
+    gap: 8px;
 }
 
 .brand-left-column {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
+    height: 100%;
 }
 
 .pace-logo {
-    font-size: 2rem;
+    font-size: 2.1rem;
+    font-weight: 800;
+    letter-spacing: -1px;
     line-height: 1;
 }
 
 .brand-logo-img {
-    height: 2.5rem; 
+    top: 0.5rem;
+    height: 3rem; /* 響應式圖片高度 */
 }
 
 .brand-subtitle {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
     margin: 0;
 }
 
 .control-panel {
+    height: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 2px;
+    align-items: flex-end; 
 }
 
 .theme-toggle {
@@ -274,15 +253,16 @@ img, .card {
 .dropdown-menu {
     display: none;
     position: absolute;
-    top: calc(100% + 10px); /* 定位在按鈕下方 */
+    top: 2.5rem; /* 調整為相對單位 */
     right: 0;
-    width: 180px;
+    width: 12.5rem; /* 調整為相對單位 */
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     box-shadow: var(--shadow-md);
     z-index: 500;
     padding: 0.2rem;
+    max-height: 17.5rem; /* 調整為相對單位 */
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -339,7 +319,6 @@ img, .card {
     padding: 24px;
     box-shadow: var(--shadow-md);
     text-align: center;
-    position: relative;
 }
 
 .modal-title {

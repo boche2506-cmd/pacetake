@@ -259,7 +259,7 @@ img, .card {
 }
 
 .dropdown-menu {
-    display: none;
+    display: flex;
     top: 2.5rem; /* 調整為相對單位 */
     right: 0;
     width: 12.5rem; /* 調整為相對單位 */

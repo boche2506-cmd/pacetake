@@ -16,7 +16,7 @@
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
 .sticky-top-group {
     flex-shrink: 0;
-    height: 28%;                    /* 稍微增加一點高度，讓空間更舒服 */
+    height: 26%;                    /* 稍微增加一點高度，讓空間更舒服 */
     border-bottom: 1px solid var(--border-color);
     padding: 12px 5px 8px 10px;
     background-color: var(--bg-container);
@@ -26,7 +26,7 @@
     overflow: hidden;
     overflow-y: auto;       
     -webkit-overflow-scrolling: touch; 
-    justify-content: center; 
+    align-items: center; 
 }
 
 .location-bar {
@@ -114,7 +114,7 @@ select {
    7. 店家列表 (Store List)
    ========================================================================== */
 .store-list {
-    height: 55%;
+    height: 57%;
     overflow-y: auto;       
     -webkit-overflow-scrolling: touch; 
     box-sizing: border-box; 
@@ -336,7 +336,6 @@ footer .status-indicator.active{
     <footer class="bottom-bar">
         <a href="orders.html" class="status-msg" >
             <div class="status-indicator active" id="statusDot"></div>
-            <div class="order-badge-count" id="orderBadgeCount">0</div>
             <span id="statusText">您目前沒有進行中的訂單喔！</span>
         </a>
         <a href="cart.html" class="cart-status-btn nav-fast">

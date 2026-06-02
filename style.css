@@ -47,7 +47,7 @@ html {
 }
 
 body {
-    width: 100%;
+    width: 100dvw;
     /* 使用 dvh (Dynamic Viewport Height) 解決手機網址列遮擋問題 */
     height: 100dvh; 
     margin: 0;
@@ -120,7 +120,7 @@ img, .card {
 #adminView input,
 #adminView textarea,
 #adminView select {
-    width: 100% !important;           /* 強制填滿父層寬度 */
+    width: 100% ;           /* 強制填滿父層寬度 */
     box-sizing: border-box;
     padding: 12px 14px;
     margin-bottom: 12px;
@@ -204,7 +204,7 @@ img, .card {
 }
 
 .brand-logo-img {
-    height: 2.5rem; 
+    height: 3rem; 
 }
 
 .brand-subtitle {
@@ -259,7 +259,6 @@ img, .card {
 
 .dropdown-menu {
     display: none;
-    position: absolute;
     top: 2.5rem; /* 調整為相對單位 */
     right: 0;
     width: 12.5rem; /* 調整為相對單位 */

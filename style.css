@@ -246,7 +246,7 @@ img, .card {
 }
 
 .user-avatar-btn {
-    position: fixed;
+    position: relative;
     display: flex;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);

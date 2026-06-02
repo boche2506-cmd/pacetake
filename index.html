@@ -17,8 +17,9 @@
 .sticky-top-group {
     flex-shrink: 0;
     height: 26%;                    /* 稍微增加一點高度，讓空間更舒服 */
+    width: 100%;
     border-bottom: 1px solid var(--border-color);
-    padding: 0.5rem 0.3rem 0.3rem 0.5rem;
+    padding: 0.5rem;
     background-color: var(--bg-container);
     display: flex;
     flex-direction: column;
@@ -44,7 +45,7 @@
     color: var(--brand-blue);
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 0.25rem 1rem;
+    padding: 0.25rem 0.75rem;
     border-radius: 20px;
     cursor: pointer;
     white-space: nowrap;
@@ -54,6 +55,7 @@
 .location-select-group {
     display: flex;
     gap: 0.3rem;
+    justify-content: flex-end;
 }
 
 .nav-select {
@@ -62,7 +64,6 @@
     background-color: var(--bg-global);
     color: var(--text-main);
     font-size: 0.75rem;
-    font-weight: 500;
     outline: none;
     cursor: pointer;
 }
@@ -73,9 +74,8 @@
     background-color: var(--bg-global);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 0.25rem 1.25rem;
+    padding: 0.25rem 0;
     gap: 3px;
-     /* 🔴 關鍵修正：將 search-box 的寬度改為 100%，讓它完全服從父層分配的空間 */
 }
 
 .search-box input {

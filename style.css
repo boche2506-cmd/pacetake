@@ -205,7 +205,7 @@ img, .card {
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
     flex: 1;
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-end; 
@@ -220,7 +220,6 @@ img, .card {
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     box-shadow: var(--shadow-md);
-    padding: 0.25rem;
     max-height: 17.5rem; /* 調整為相對單位 */
     position: absolute;
     overflow-y: auto;

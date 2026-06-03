@@ -150,7 +150,7 @@ img, .card {
 }
 
 .brand-logo-img {
-    height: 3.25rem; /* 響應式圖片高度 */
+    height: 3rem; /* 響應式圖片高度 */
 
 }
 
@@ -205,13 +205,16 @@ img, .card {
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
     flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .dropdown-menu {
     display: none;
     top: 2.5rem; /* 調整為相對單位 */
     right: 0;
-    width: 12.5rem; /* 調整為相對單位 */
+    width: 10rem; /* 調整為相對單位 */
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
@@ -219,7 +222,6 @@ img, .card {
     padding: 0.2rem;
     max-height: 17.5rem; /* 調整為相對單位 */
     position: absolute;
-    overflow-y: auto;
 }
 
 .dropdown-menu a,

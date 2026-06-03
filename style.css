@@ -213,10 +213,10 @@ img, .card {
 }
 
 .dropdown-menu {
-    display: flex; 
+    display: block; 
     top: 2.5rem; /* 調整為相對單位 */
     right: 0;
-    width: 8rem; /* 調整為相對單位 */
+    width: 12rem; /* 調整為相對單位 */
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
@@ -225,6 +225,9 @@ img, .card {
     position: absolute;
     overflow-y: auto;
     cursor: pointer;
+    flex-direction: column; 
+    justify-content: space-between;
+    align-items: flex-end; 
 }
 
 .dropdown-menu a,

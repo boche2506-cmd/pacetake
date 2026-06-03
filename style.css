@@ -1,6 +1,6 @@
 :root {
     --zoom-factor: 1;
-    --base-font-size: calc(16px * var(--zoom-factor));
+    --base-font-size: calc(1rem * var(--zoom-factor));
     --bg-global: #F8FAFC;
     --bg-container: #FFFFFF;
     --border-color: #E2E8F0;
@@ -9,8 +9,8 @@
     --brand-blue: #0062FF; 
     --brand-green: #10B981;
     --brand-red: #EF4444;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 0.625rem 1.625rem rgba(0, 0, 0, 0.05);
     --card-bg: #FFFFFF;
     --blur-bg: rgba(255, 255, 255, 0.95);
 }
@@ -24,8 +24,8 @@
     --brand-blue: #2F80ED; 
     --brand-green: #34D399;
     --brand-red: #F87171;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 0.625rem 1.625rem rgba(0, 0, 0, 0.4);
     --card-bg: #1C1C1E;
     --blur-bg: rgba(17, 17, 17, 0.95);
 }
@@ -35,7 +35,7 @@ html, body {
     padding: 0;
     width: 100%;       /* 💡 陷阱 1：寬度改用 100%，不要用 100vw */
     height: 100%;      /* 用 100% 讓它順著瀏覽器高度即可 */
-    overflow-x: hidden;/* 防止手機版意外出現左右小偏移動作 */
+    overflow: hidden;/* 防止手機版意外出現左右小偏移動作 */
     background-color: var(--bg-global);   
 }
 
@@ -257,39 +257,39 @@ img, .card {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(0.25rem);
+    -webkit-backdrop-filter: blur(0.25rem);
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 1.25rem;
 }
 
 .modal-card {
     background-color: var(--bg-container);
     border: 1px solid var(--border-color);
-    border-radius: 20px;
+    border-radius: 1.25rem;
     width: 100%;
-    max-width: 320px;
-    padding: 24px;
+    max-width: 20rem;
+    padding: 1.5rem;
     box-shadow: var(--shadow-md);
     text-align: center;
 }
 
 .modal-title {
-    font-size: 18px;
+    font-size: 1.125rem;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
 }
 
 .modal-desc-address {
-    font-size: 13px;
+    font-size: 0.875rem;
     color: var(--text-main);
     line-height: 1.5;
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
     word-break: break-all;
     background-color: var(--bg-global);
-    padding: 12px;
-    border-radius: 8px;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
     border: 1px solid var(--border-color);
     text-align: left;
 }
@@ -298,14 +298,14 @@ img, .card {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 0.5rem;
     width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    font-size: 14px;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    margin-bottom: 10px;
+    margin-bottom: 0.625rem;
     border: 1px solid var(--border-color);
     background: var(--card-bg);
     color: var(--text-main);

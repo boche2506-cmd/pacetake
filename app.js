@@ -890,3 +890,27 @@ window.issuePromoCode = async function() {
         alert("發行失敗，請檢查您的系統權限配置！");
     }
 };
+
+window.addEventListener('DOMContentLoaded', () => {
+    const topGroup = document.querySelector('.sticky-top-group');
+    let startY = 0;
+
+    if (topGroup) {
+        // 監聽手指按下的瞬間
+        topGroup.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].pageY;
+        }, { passive: true });
+
+        // 監聽手指往下滑動的距離
+        topGroup.addEventListener('touchmove', (e) => {
+            const currentY = e.touches[0].pageY;
+            const pullDistance = currentY - startY;
+
+            // 💡 當在頂端列「往下拉」超過 80px 時，直接重新整理網頁！
+            if (pullDistance > 80) {
+                console.log("[PACE] 偵測到上層下拉，觸發重新整理！");
+                location.reload(); 
+            }
+        }, { passive: true });
+    }
+});

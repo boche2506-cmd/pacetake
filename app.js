@@ -254,10 +254,23 @@ function loadHeader() {
             return response.text();
         })
         .then(htmlData => {
-            headerContainer.innerHTML = htmlData;
-            console.log("[PACE DEBUG] Header HTML loaded.");
-            bindHeaderEvents();
-            initTheme();
+                        // 1. 將讀取到的文字轉換成真正的 DOM 節點
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlData, 'text/html');
+            const newHeader = doc.querySelector('header');
+
+            if (newHeader) {
+                // 2. 用 header.html 的 <header> 直接「取代」掉 index.html 的 #header-container
+                headerContainer.replaceWith(newHeader);
+                console.log("[PACE DEBUG] Header HTML loaded and replaced.");
+                
+                // 3. 後續的事件綁定與初始化依然能正常運作
+                bindHeaderEvents();
+                initTheme();
+            } else {
+                console.error('[PACE DEBUG] 在 header.html 中找不到 <header> 標籤');
+            }
+
         })
         .catch(error => {
             console.error('[PACE DEBUG] 載入 Header 失敗：', error);
@@ -852,7 +865,7 @@ window.deleteStore = async function(storeId) {
 
 window.toggleView = function(view) {
     const adminEl = document.getElementById('adminView');
-    const buyerEl = document.getElementById('buyer-section');
+    const buyerEl = document.getElementById('buyerView');
     if (view === 'admin') {
         if (adminEl) adminEl.style.display = 'block';
         if (buyerEl) buyerEl.style.display = 'none';

@@ -1,9 +1,8 @@
 html {
     width: 100vw;
     height: 100vh;
-    overflow: hidden !important;
-    touch-action: none;
-    font-size: 16px !important;
+    overflow: hidden ;
+    font-size: 16px ;
 }
 :root {
     --zoom-factor: 1;
@@ -38,16 +37,13 @@ html {
 }
 
 body {
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg-global);
     display: flex;
     flex-direction: column;
-    justify-content: center;     /* 改成 center，讓整體垂直也置中 */
-    align-items: center;         /* 水平置中 */
-    overflow: hidden;
+    justify-content: center; /* 水平方向置中 */
+    align-items: center;     /* 垂直方向置中 */    
+    height: 100vh;           /* 父層需要有高度，否則垂直置中會無效 */
+    width: 100vw;
+    background-color: var(--bg-global);   
 }
 
 input, textarea {
@@ -67,38 +63,44 @@ img, .card {
 /* 手機外框 - 加強置中穩定性 */
 .phone-wrapper {
     max-width: 100vw;
-    max-height: 100vh;                    /* 避免超出畫面 */
-    aspect-ratio: 9 / 16;
-    width: calc(100vh * 9 / 16);        /* 根據高度計算寬度 */
+    max-height: 100vh;
+    width: 100%;                    /* 先預設 100% */
+    height: auto;
+    margin: auto;                 /* 置中 */
+    width: calc(100vh * 9 / 16);
+    aspect-ratio: 9 / 16;           /* 維持手機比例 */
+    overflow: hidden;
     display: flex;
-    flex-direction: column;
+    justify-content: space-around;
+    align-items: flex-end;
     background-color: var(--bg-container);
     border: 1px solid var(--border-color);
     border-radius: 2rem;
     box-shadow: var(--shadow-md);
-    overflow: hidden;
-    position: relative;
     padding: 0.5rem;
-}
+    box-sizing: border-box;
+    position: relative;
+} 
 
-/* adminView 也強制置中 */
+#buyerView,
 #adminView {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
     position: absolute;
+    box-sizing: border-box;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    padding: 1.2rem 1.5rem;
-    overflow-y: auto;
     background-color: var(--bg-container);
     z-index: 999;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
 }
 
-/* 讓表單內容自動適應寬度 */
-#adminView > div, 
+/* 表單容器相關 */
+#adminView > div,
 #adminView .form-container,
 #adminView form {
     width: 100%;
@@ -106,124 +108,76 @@ img, .card {
     box-sizing: border-box;
 }
 
-/* 所有輸入框統一優化 */
+/* 輸入框統一樣式 */
 #adminView input,
 #adminView textarea,
 #adminView select {
-    width: 100% !important;           /* 強制填滿父層寬度 */
+    width: 100% ;
     box-sizing: border-box;
-    padding: 12px 14px;
-    margin-bottom: 12px;
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: 0.8rem;
     background-color: var(--bg-global);
-    font-size: 15px;
+    font-size: 0.8rem;
     color: var(--text-main);
 }
 
-/* 兩個欄位並排的情況（例如 聯絡電話 + 區域） */
+/* 並排欄位 */
 #adminView .row,
 #adminView .flex-row {
     display: flex;
-    gap: 10px;
+    gap: 0.6rem;
 }
 
-#adminView .row input,
-#adminView .flex-row input {
-    flex: 1;
-}
-
-/* 按鈕優化 */
-#adminView button {
-    width: 100%;
-    padding: 14px;
-    margin-top: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 12px;
-}
-
-/* 綠色確認按鈕 */
-#adminView button[style*="green"],
-#adminView .success-btn {
-    background-color: var(--brand-green) !important;
-    color: white !important;
-    border: none;
-}
-
-/* 標題與說明文字 */
-#adminView h2, 
-#adminView h3 {
-    margin: 0 0 16px 0;
-    font-size: 18px;
-}
-
-/* buyerView 內部三層布局 */
-#buyerView {
-    justify-content: space-between;   /* 上中下平均分配 */
-}
-
-#buyerView, #adminView {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-}
-
-/* ==========================================================================
-   6. 搜尋與定位列 (Search & Location)
-   ========================================================================== */
 .header {
+    width: 100%;
+    overflow: hidden;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end; 
-    gap: 8px;
+    flex-direction: row; 
+    justify-content: space-between; 
+    align-items: flex-start;    
+    position: relative;
+    box-sizing: border-box; 
 }
 
 .brand-left-column {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    align-items: flex-start;
     height: 100%;
 }
 
 .pace-logo {
     font-size: 2.1rem;
-    font-weight: 800;
-    letter-spacing: -1px;
-    line-height: 1;
 }
 
 .brand-logo-img {
-    top: 0.5rem;
     height: 3rem; /* 響應式圖片高度 */
 }
 
 .brand-subtitle {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: var(--text-muted);
-    margin: 0;
 }
 
 .control-panel {
     height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 2px;
+    justify-content: space-between; 
     align-items: flex-end; 
+    gap: 0.1rem;
+    flex-grow: 1;/* 關鍵：代表自動伸展並佔滿所有剩餘的空白空間 */
 }
 
 .theme-toggle {
     width: 1.75rem;
     height: 1.75rem;
-    font-size: 0.5rem;
+    font-size: 0.75rem;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 50%;
     color: var(--text-main);
-    padding: 0.3rem;
     cursor: pointer;
 }
 
@@ -252,7 +206,7 @@ img, .card {
 
 .dropdown-menu {
     display: none;
-    position: absolute;
+    position: relative;
     top: 2.5rem; /* 調整為相對單位 */
     right: 0;
     width: 12.5rem; /* 調整為相對單位 */
@@ -260,11 +214,10 @@ img, .card {
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     box-shadow: var(--shadow-md);
-    z-index: 500;
+    z-index: 1000;
     padding: 0.2rem;
     max-height: 17.5rem; /* 調整為相對單位 */
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .dropdown-menu a,

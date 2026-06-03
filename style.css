@@ -96,7 +96,6 @@ img, .card {
     width: 100%;
     height: 100%;
     background-color: var(--bg-container);
-    z-index: 999;
 }
 
 /* 表單容器相關 */
@@ -214,7 +213,6 @@ img, .card {
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     box-shadow: var(--shadow-md);
-    z-index: 1000;
     padding: 0.2rem;
     max-height: 17.5rem; /* 調整為相對單位 */
     overflow-y: auto;
@@ -257,7 +255,6 @@ img, .card {
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    z-index: 200;
     justify-content: center;
     align-items: center;
     padding: 20px;

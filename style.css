@@ -194,7 +194,6 @@ img, .card {
 
 .dropdown-menu {
     display: none;
-    position: relative;
     top: 2.5rem; /* 調整為相對單位 */
     right: 0;
     width: 12.5rem; /* 調整為相對單位 */
@@ -219,7 +218,7 @@ img, .card {
     background: none;
     text-align: left;
     border-radius: 0.5rem;
-    cursor: pointer;
+    cursor: pointer;        /* 滑鼠移上去要變手指 */
 }
 
 .dropdown-menu a:hover,

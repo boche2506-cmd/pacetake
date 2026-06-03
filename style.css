@@ -196,9 +196,6 @@ img, .card {
 }
 
 .user-avatar-btn {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between; 
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     padding: 0.375rem 1.25rem;

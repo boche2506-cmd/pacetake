@@ -45,8 +45,8 @@ input, textarea {
 }
 
 img, .card {
-    max-width: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
-    height: auto;
+    max-height: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
+    width: auto;
     box-sizing: border-box;
 }
 
@@ -93,7 +93,6 @@ img, .card {
     width: 100%;
     height: 100%;
     background-color: var(--bg-container);
-    overflow: auto;
 }
 
 /* 表單容器相關 */
@@ -141,34 +140,24 @@ img, .card {
     justify-content: flex-end;
     align-items: flex-start;
     height: 100%;
-}
-
-.pace-logo {
-    font-size: 2.1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
+    position: relative;
 }
 
 .brand-logo-img {
-    height: 3rem; /* 響應式圖片高度 */
-
+    display: inline-flex;
+    justify-content: center; 
+    align-items: flex-start; 
+    height: 3.25rem; /* 響應式圖片高度 */
 }
 
 .brand-subtitle {
-    font-size: 0.75rem;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: flex-end; 
+    align-items: flex-start; 
+    font-size: 1rem;
     color: var(--text-muted);
-}
-
-.control-panel {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; 
-    align-items: flex-end; 
-    gap: 0.1rem;
-    flex: 1;
-    position: relative;
+    padding-left: 0.125rem;
 }
 
 .theme-toggle {
@@ -185,6 +174,17 @@ img, .card {
     align-items: center;
 }
 
+.control-panel {
+    height: 100%;
+    display: flex;
+    flex-direction:  row;
+    justify-content: space-between; 
+    align-items: flex-end; 
+    gap: 0.1rem;
+    flex: 1;
+    position: relative;
+}
+
 .login-btn {
     font-size: 0.75rem;
     background-color: var(--brand-blue);
@@ -193,12 +193,12 @@ img, .card {
     border-radius: 1.25rem;
     font-weight: 500;
     box-shadow: var(--shadow-sm);
+    padding: 0.375rem 1.25rem;
 }
 
 .user-avatar-btn {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 0.375rem 1.25rem;
     border-radius: 1.25rem;
     font-size: 0.75rem;
     font-weight: 500;
@@ -222,6 +222,7 @@ img, .card {
     padding: 0.2rem;
     max-height: 17.5rem; /* 調整為相對單位 */
     position: absolute;
+    overflow-y: auto;
 }
 
 .dropdown-menu a,

@@ -190,6 +190,7 @@ img, .card {
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
     align-items: center; 
+    position: relative;
 }
 
 .dropdown-menu {
@@ -203,6 +204,7 @@ img, .card {
     box-shadow: var(--shadow-md);
     padding: 0.2rem;
     max-height: 17.5rem; /* 調整為相對單位 */
+    position: absolute;
 }
 
 .dropdown-menu a,

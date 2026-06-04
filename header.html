@@ -1,22 +1,18 @@
 <header class="header">
-    <div class="brand-left-column"> 
-    <div class="pace-logo-img">       
-        <a href="index.html">
-        <img src="pace3.png" class="pace-logo" alt="派思 官方網站"> 
-        </a></div>
-    <div class="brand-subtitle">
-    <span><button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>店內價外帶自取/點餐系統</span>            
+    <div class="brand-left-column">
+    <div class="pace-logo">
+        <img src="pace3.png" alt="派思 官方網站" class="brand-logo-img">
     </div>
+    <div class="brand-subtitle">店內價外帶自取/點餐系統</div>
     </div> 
         <div class="control-panel">
-        <div id="defaultIcon" class="avatar-icon">
-            <span>👤</span><span id="userNameDisplay">載入中...</span>
-            <img id="userAvatarImg" src="" style="display: none; width: 1.5rem; height: 1.5rem; border-radius: 50%;">            
-        </div>
-        <div class="login-btn" id="loginBtn">
-            <span>登入 / 註冊</span>
-            <button class="user-avatar-btn" id="avatarBtn" style="display: none;"></button>
-        </div>               
+        <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+        <button class="login-btn" id="loginBtn">登入/註冊</button>
+        <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+    <span id="defaultIcon" class="avatar-icon">👤</span>
+    <span class="user-name" id="userNameDisplay">載入中...</span>
+    <img id="userAvatarImg" src="" style="display: none; width: 1.5rem; height: 1.5rem; border-radius: 50%;">   
+    </button>
         <div class="dropdown-menu" id="dropdownMenu"></div>
         </div>
         </header>

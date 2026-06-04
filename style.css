@@ -235,7 +235,7 @@ img, .card {
     overflow-y: auto;
     z-index: 100;
     padding: 0.125rem;
-    position: relative; 
+    position: absolute;
 }
 
 .dropdown-menu a,
@@ -254,7 +254,7 @@ img, .card {
     border-radius: 0.5rem;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
     padding: 0.125rem;
-   position: relative;
+    position: absolute;
  }   
 
 
@@ -290,7 +290,7 @@ img, .card {
     border-radius: 1.25rem;
     width: 100%;
     max-width: 20rem;
-    padding: 1.5rem;
+    padding: 0.5rem;
     box-shadow: var(--shadow-md);
     text-align: center;
 }
@@ -308,7 +308,7 @@ img, .card {
     margin-bottom: 0.5rem;
     word-break: break-all;
     background-color: var(--bg-global);
-    padding: 0.75rem;
+    padding: 0.5rem;
     border-radius: 0.5rem;
     border: 1px solid var(--border-color);
     text-align: left;
@@ -320,7 +320,7 @@ img, .card {
     justify-content: center;
     gap: 0.5rem;
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.5rem;
     border-radius: 0.75rem;
     font-size: 0.75rem;
     font-weight: 600;

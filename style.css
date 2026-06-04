@@ -185,7 +185,6 @@ img, .card {
     flex-direction: column;
     justify-content: flex-end; 
     align-items: flex-end; 
-    gap: 0.1rem;
     position: relative;
 }
 
@@ -218,7 +217,6 @@ img, .card {
     font-weight: 500;
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
-    flex: 1;
 }
 
 .dropdown-menu {
@@ -241,6 +239,7 @@ img, .card {
 
 .dropdown-menu a,
 .dropdown-menu button {
+    z-index: 100;
     display: flex;
     align-items: center;            
     width: 10rem;
@@ -253,7 +252,9 @@ img, .card {
     border-radius: 0.5rem;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
     padding: 0.125rem;
-}
+    position: absolute
+ }   
+
 
 .dropdown-menu a:hover,
 .dropdown-menu button:hover {

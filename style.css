@@ -24,8 +24,8 @@
     --brand-blue: #2F80ED; 
     --brand-green: #34D399;
     --brand-red: #F87171;
-    --shadow-sm: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 0.625rem 1.625rem rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.8);
+    --shadow-md: 0 0.625rem 1.625rem rgba(0, 0, 0, 0.8);
     --card-bg: #1C1C1E;
     --blur-bg: rgba(17, 17, 17, 0.95);
 }
@@ -186,7 +186,6 @@ img, .card {
     justify-content: flex-end; 
     align-items: flex-end; 
     gap: 0.1rem;
-    flex: 1;
     position: relative;
 }
 
@@ -207,6 +206,10 @@ img, .card {
 }
 
 .user-avatar-btn {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     padding: 0.375rem 1.25rem;
@@ -222,26 +225,25 @@ img, .card {
     display: none;
     top: 2.5rem; /* 調整為相對單位 */
     right: 0;
-    width: 12.5rem; /* 調整為相對單位 */
+    width: 10rem; /* 調整為相對單位 */
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     box-shadow: var(--shadow-md);
-    padding: 0.2rem;
-    max-height: 17.5rem; /* 調整為相對單位 */
+    max-height: 15rem; /* 調整為相對單位 */
     position: absolute;
     overflow-y: auto;
+    z-index: 100;
 }
 
 .dropdown-menu a,
 .dropdown-menu button {
     display: flex;
     align-items: center;
-    width: 100%;
-    padding: 0.625rem 0.75rem;
+    width: 10rem;
     color: var(--text-main);
     text-decoration: none;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     border: none;
     background: none;
     text-align: left;

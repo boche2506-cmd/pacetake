@@ -330,16 +330,16 @@ footer .status-indicator.active{
 <!-- ========================================== -->
 <!-- 🔮 派思核心控制台 (Admin 視圖) -->
 <!-- ========================================== -->
-<div id="adminView" style="display: none; padding: 0.5rem; background: #121212; color: #e0e0e0; min-height: 100vh; font-family: sans-serif;">
+<div id="adminView" style="display: none; padding: 0.5rem; background: #121212; color: #e0e0e0; min-height: 100vh; overflow: auto; font-family: sans-serif;">
     
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.125rem solid #333; padding-bottom: 0.5rem;">
         <h1 style="color: #4dadff; margin: 0; font-size: 1.75rem;">🔮 派思最高意志控制台</h1>
-        <button onclick="window.toggleView('buyer')" style="padding: 0.75rem 1.25rem; background: #ff4d4d; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: bold; font-size: 0.875rem; transition: 0.2s;">
+        <button onclick="window.toggleView('buyer')" style="padding: 0.5rem 1rem; background: #ff4d4d; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: bold; font-size: 0.5rem; transition: 0.2s;">
             🧑‍💼 返回一般買家視圖
         </button>
-    </div> <div style="background: #1e1e1e; padding: 0.5rem; border-radius: 0.5rem; margin-bottom: 0.5rem; border: 1px solid #2d2d2d;overflow-y: auto;">
+    </div> <div style="background: #1e1e1e; padding: 0.25rem; border-radius: 0.5rem; margin-bottom: 0.25rem; border: 1px solid #2d2d2d;overflow-y: auto;">
         <h3 style="color: #ffca28; margin-top: 0;">➕ 新增全新店家</h3>
-        <p style="color: #aaa; font-size: 0.8125rem; margin-bottom: 0.9375rem;">請輸入店家資訊，新增後將立即同步至 Firebase 雲端資料庫。</p>   
+        <p style="color: #aaa; font-size: 0.5rem; margin-bottom: 0.25rem;">請輸入店家資訊，新增後將立即同步至 Firebase 雲端資料庫。</p>   
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.5rem;">
             <input type="text" id="adminNewStoreName" placeholder="店家名稱 (*必填)" style="padding: 0.5rem; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 0.375rem;">

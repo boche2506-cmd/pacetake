@@ -9,8 +9,8 @@
     --brand-blue: #0062FF; 
     --brand-green: #10B981;
     --brand-red: #EF4444;
-    --shadow-sm: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 0.625rem 1.625rem rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.09);
+    --shadow-md: 0 0.625rem 1.625rem rgba(0, 0, 0, 0.09);
     --card-bg: #FFFFFF;
     --blur-bg: rgba(255, 255, 255, 0.95);
 }
@@ -24,8 +24,8 @@
     --brand-blue: #2F80ED; 
     --brand-green: #34D399;
     --brand-red: #F87171;
-    --shadow-sm: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.8);
-    --shadow-md: 0 0.625rem 1.625rem rgba(0, 0, 0, 0.8);
+    --shadow-sm: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.9);
+    --shadow-md: 0 0.625rem 1.625rem rgba(0, 0, 0, 0.9);
     --card-bg: #1C1C1E;
     --blur-bg: rgba(17, 17, 17, 0.95);
 }
@@ -222,6 +222,7 @@ img, .card {
 }
 
 .dropdown-menu {
+    font-size: 1rem;
     display: none;
     top: 2.5rem; /* 調整為相對單位 */
     right: 0;
@@ -234,6 +235,8 @@ img, .card {
     position: absolute;
     overflow-y: auto;
     z-index: 100;
+    padding: 0.125rem;
+    cursor: pointer; 
 }
 
 .dropdown-menu a,
@@ -243,12 +246,13 @@ img, .card {
     width: 10rem;
     color: var(--text-main);
     text-decoration: none;
-    font-size: 0.75rem;
+    font-size: 1rem;
     border: none;
     background: none;
     text-align: left;
     border-radius: 0.5rem;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
+    padding: 0.125rem;
 }
 
 .dropdown-menu a:hover,

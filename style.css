@@ -111,9 +111,9 @@ img, .card {
     width: 100% ;
     box-sizing: border-box;
     border: 1px solid var(--border-color);
-    border-radius: 0.8rem;
+    border-radius: 0.75rem;
     background-color: var(--bg-global);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-main);
 }
 
@@ -144,7 +144,7 @@ img, .card {
 }
 
 .pace-logo {
-    font-size: 2.1rem;
+    font-size: 2rem;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -160,7 +160,7 @@ img, .card {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center; 
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
     gap: 0.375rem;
 }
@@ -199,7 +199,7 @@ img, .card {
     background-color: var(--brand-blue);
     color: #FFFFFF;
     border: 1px solid var(--border-color);
-    padding: 0.375rem 1.25rem;
+    padding: 0.25rem 1rem;
     border-radius: 1.25rem;
     font-weight: 500;
     box-shadow: var(--shadow-sm);
@@ -222,11 +222,11 @@ img, .card {
 }
 
 .dropdown-menu {
-    font-size: 1rem;
+    font-size: 0.75rem;
     display: none;
     top: 2.5rem; /* 調整為相對單位 */
     right: 0;
-    width: 10rem; /* 調整為相對單位 */
+    width: 12rem; /* 調整為相對單位 */
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
@@ -242,11 +242,11 @@ img, .card {
 .dropdown-menu a,
 .dropdown-menu button {
     display: flex;
-    align-items: center;
+    align-items: center;            
     width: 10rem;
     color: var(--text-main);
-    text-decoration: none;
-    font-size: 1rem;
+    text-decoration: none;  
+    font-size: 0.75rem;
     border: none;
     background: none;
     text-align: left;
@@ -293,16 +293,16 @@ img, .card {
 }
 
 .modal-title {
-    font-size: 1.125rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .modal-desc-address {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: var(--text-main);
     line-height: 1.5;
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.5rem;
     word-break: break-all;
     background-color: var(--bg-global);
     padding: 0.75rem;
@@ -319,7 +319,7 @@ img, .card {
     width: 100%;
     padding: 0.75rem;
     border-radius: 0.75rem;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 600;
     cursor: pointer;
     margin-bottom: 0.625rem;

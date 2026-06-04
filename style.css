@@ -140,8 +140,8 @@ img, .card {
     justify-content: flex-end;
     align-items: flex-start;
     height: 100%;
-    position: relative;
     gap: 0.25rem;
+    box-sizing: border-box; 
 }
 
 .pace-logo {
@@ -153,7 +153,8 @@ img, .card {
 }
 
 .brand-logo-img {
-    height: 3rem; /* 響應式圖片高度 */    
+    height: 3rem; /* 響應式圖片高度 */
+    box-sizing: border-box;     
 }
 
 .brand-subtitle {
@@ -163,6 +164,7 @@ img, .card {
     align-items: center; 
     font-size: 0.75rem;
     color: var(--text-muted);
+    gap: 0.25rem;
 }
 
 .theme-toggle {
@@ -231,11 +233,12 @@ img, .card {
     border-radius: 0.75rem;
     box-shadow: var(--shadow-md);
     max-height: 15rem; /* 調整為相對單位 */
-    position: absolute;
     overflow-y: auto;
     z-index: 100;
     padding: 0.125rem;
-    position: absolute;
+    position: relative;
+    cursor: pointer;        /* 滑鼠移上去要變手指 */
+
 }
 
 .dropdown-menu a,
@@ -254,7 +257,7 @@ img, .card {
     border-radius: 0.5rem;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
     padding: 0.125rem;
-    position: absolute;
+    position: relative;
  }   
 
 

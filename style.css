@@ -141,6 +141,7 @@ img, .card {
     align-items: flex-start;
     height: 100%;
     position: relative;
+    gap: 0.25rem;
 }
 
 .pace-logo {
@@ -162,7 +163,6 @@ img, .card {
     align-items: center; 
     font-size: 0.75rem;
     color: var(--text-muted);
-    gap: 0.25rem;
 }
 
 .theme-toggle {
@@ -186,6 +186,7 @@ img, .card {
     justify-content: flex-end; 
     align-items: flex-end; 
     position: relative;
+    gap: 0.25rem;
 }
 
 .avatar-icon { 

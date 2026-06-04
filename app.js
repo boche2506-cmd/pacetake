@@ -171,7 +171,7 @@ function updateUIForUser(user, currentRole) {
         } else if (currentRole === "seller") {
             userNameDisplay.innerHTML = `🏪 老闆`;
         } else {
-            userNameDisplay.innerHTML = `<img src="logo.png" alt="買家圖示" style="width: 1.5rem; height: 1.5rem; margin-right: 0.25rem;"> 買家`;
+            userNameDisplay.innerHTML = `<img src="logo.png" alt="買家圖示" style="width: 1.5rem; height: 1.5rem;"> 買家`;
         }
     }
 
@@ -453,11 +453,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     if (newebpayContainer) {
         newebpayContainer.innerHTML = `
-            <label style="margin-bottom:0.75rem; display:block; font-size:0.875rem; font-weight:700;">🔒 藍新金流 API 開發參數設定</label>
-            <div style="display:flex; flex-direction:column; gap:0.5rem;">
-                <input type="text" id="merchantIdInput" class="input-style" style="height:2.375rem;" placeholder="請輸入 商店代號 (MerchantID)">
-                <input type="text" id="hashKeyInput" class="input-style" style="height:2.375rem;" placeholder="請輸入 HashKey">
-                <input type="text" id="hashIvInput" class="input-style" style="height:2.375rem;" placeholder="請輸入 HashIV">
+            <label style="margin-bottom:0.75rem; display:block; font-size:0.75rem; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
+            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                <input type="text" id="merchantIdInput" class="input-style" style="height:1.5rem;" placeholder="請輸入 商店代號 (MerchantID)">
+                <input type="text" id="hashKeyInput" class="input-style" style="height:1.5rem;" placeholder="請輸入 HashKey">
+                <input type="text" id="hashIvInput" class="input-style" style="height:1.5rem;" placeholder="請輸入 HashIV">
             </div>
         `;
     }
@@ -513,15 +513,15 @@ window.addEventListener('DOMContentLoaded', async () => {
                     <div class="upload-placeholder">📷<span>上傳照片</span></div>
                 </div>
                 <div class="item-fields">
-                    <input type="text" class="input-style item-name-input" style="height:2rem; padding: 0 0.625rem;" placeholder="品項名稱" required>
+                    <input type="text" class="input-style item-name-input" style="height:1.5rem; padding: 0 0.5rem;" placeholder="品項名稱" required>
                     <div class="price-input-wrapper">
                         <span class="price-symbol">$</span>
-                        <input type="number" class="input-style price-input" style="height:2rem; padding-left:1.375rem !important;" placeholder="金額" min="0" required>
+                        <input type="number" class="input-style price-input" style="height:1.5rem; padding-left:0.75rem !important;" placeholder="金額" min="0" required>
                     </div>
                 </div>
-                <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 0.375rem; justify-content: center;">
-                    <div class="drag-handle" style="width: 2.25rem; height: 2rem; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; cursor: grab;">☰</div>
-                    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 2.25rem; height: 2rem; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 0.875rem;">❌</button>
+                <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 0.25rem; justify-content: center;">
+                    <div class="drag-handle" style="width: 1.5rem; height: 2rem; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: grab;">☰</div>
+                    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 1.5rem; height: 2rem; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">❌</button>
                 </div>
             `;
             menuUploadList.appendChild(newRow);
@@ -727,7 +727,7 @@ function renderAdminTable() {
             <td style="padding: 0.75rem; border: 1px solid #3a3a3a; color: #bbb;">${phone}</td>
             <td style="padding: 0.75rem; border: 1px solid #3a3a3a; text-align: center; color: ${store.status === 'offline' ? '#ef4444' : '#10b981'}; font-weight: bold;">${statusText}</td>
             <td style="padding: 0.75rem; border: 1px solid #3a3a3a; text-align: center;">
-                <button onclick="window.deleteStore('${store.id}')" style="padding: 0.375rem 0.75rem; background: #ef4444; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: bold;">刪除</button>
+                <button onclick="window.deleteStore('${store.id}')" style="padding: 0.25rem 0.5rem; background: #ef4444; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: bold;">刪除</button>
             </td>
         `;
         tbody.appendChild(tr);

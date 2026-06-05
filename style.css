@@ -34,7 +34,7 @@ html, body {
     margin: 0;
     padding: 0;
     width: auto;       /* 💡 陷阱 1：寬度改用 100%，不要用 100vw */
-    height: 100%;      /* 用 100% 讓它順著瀏覽器高度即可 */
+    height: auto;      /* 用 100% 讓它順著瀏覽器高度即可 */
     overflow: hidden;/* 防止手機版意外出現左右小偏移動作 */
     background-color: var(--bg-global);   
 }
@@ -46,7 +46,7 @@ input, textarea {
 
 img, .card {
     max-width: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
-    height: 100%;
+    height: auto;
     width: auto;
     box-sizing: border-box;
 }
@@ -64,7 +64,7 @@ img, .card {
     min-height: 100dvh; /* 現代手機專用：會自動扣除手機工具列的高度 */
     width: calc(100vh * 9 / 16);
     aspect-ratio: 9 / 16;           /* 維持手機比例 */
-    height: 100%;
+    height: auto;
     width: auto;                    /* 先預設 100% */
     margin: 0 auto;                 /* 置中 */
     overflow: hidden;

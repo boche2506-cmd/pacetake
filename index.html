@@ -17,15 +17,15 @@
 .sticky-top-group {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; 
-    height: 28%;                /* 稍微增加一點高度，讓空間更舒服 */
-    width: 100%;
+    justify-content: flex-end;
+    height: 28%;
+    width: auto;                    /* 先預設 100% */
+    margin: 0 auto;
     border-bottom: 1px solid var(--border-color);
     padding: 0.5rem 0.5rem 0.25rem 0.5rem;
     gap: 0.25rem;
     box-sizing: border-box;
     /* 💡 關鍵三：使用 sticky，讓它在正常狀態下死死釘在最頂端，中層滾動時它不動 */
-    position: sticky;
 }
 
 .location-bar {

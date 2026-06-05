@@ -86,7 +86,7 @@ img, .card {
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-end;
-    position: absolute;
+    position: relative;
     box-sizing: border-box;
     top: 0;
     left: 0;
@@ -102,6 +102,7 @@ img, .card {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    position: relative;
 }
 
 /* 輸入框統一樣式 */
@@ -115,6 +116,7 @@ img, .card {
     background-color: var(--bg-global);
     font-size: 0.75rem;
     color: var(--text-main);
+    position: relative;
 }
 
 /* 並排欄位 */
@@ -122,16 +124,17 @@ img, .card {
 #adminView .flex-row {
     display: flex;
     gap: 0.5rem;
+    position: relative;
 }
 
 .header {
     display: flex;
     flex-direction: row; 
     justify-content: space-between; 
-    align-items: flex-end;    
-    position: relative;
+    align-items: stretch;    
     box-sizing: border-box; 
     padding: 0.25rem 0 0 0;
+    
 }
 
 .brand-left-column {
@@ -244,21 +247,22 @@ img, .card {
 
 .dropdown-menu a,
 .dropdown-menu button {
-    z-index: 100;
-    display: flex;
-    align-items: center;            
-    width: 12rem;
-    max-height: 15rem;
-    color: var(--text-main);
-    text-decoration: none;  
     font-size: 0.75rem;
-    border: none;
-    background: none;
-    text-align: left;
-    border-radius: 0.5rem;
-    cursor: pointer;        /* 滑鼠移上去要變手指 */
+    display: none;
+    top: 2.5rem; /* 調整為相對單位 */
+    right: 0;
+    width: 12rem; /* 調整為相對單位 */
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-md);
+    max-height: 15rem; /* 調整為相對單位 */
+    overflow-y: auto;
+    z-index: 100;
     padding: 0.125rem;
- }   
+    cursor: pointer;        /* 滑鼠移上去要變手指 */
+
+}   
 
 
 .dropdown-menu a:hover,

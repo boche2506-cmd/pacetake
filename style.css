@@ -194,6 +194,7 @@ select {
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
     cursor: pointer;
+    position: absolute;
 }
 
 .dropdown-menu {
@@ -209,7 +210,6 @@ select {
     z-index: 100;
     padding: 0.125rem;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
-    position: relative;
 }
 
 .dropdown-menu a,
@@ -230,7 +230,6 @@ select {
     text-decoration: none;  
     font-size: 0.75rem;
     text-align: left;
-    position: relative;
  }   
 
 

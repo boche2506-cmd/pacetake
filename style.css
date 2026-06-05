@@ -185,7 +185,8 @@ select {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    align-items: flex-end; 
+    align-items: flex-end;
+    position: relative;
 }
 
 .avatar-icon { 
@@ -220,7 +221,6 @@ select {
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
     cursor: pointer;
-    position: relative;
 }
 
 .dropdown-menu {

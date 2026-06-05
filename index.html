@@ -19,13 +19,10 @@
     flex-direction: column;
     justify-content: flex-end;
     height: 28%;
-    width: auto;                    /* 先預設 100% */
-    margin: 0 auto;
-    border-bottom: 1px solid var(--border-color);
+    width: auto;
+    border-bottom: 0.1rem solid var(--border-color);
     padding: 0.5rem 0.5rem 0.25rem 0.5rem;
     gap: 0.25rem;
-    box-sizing: border-box;
-    position: relative;
 }
 
 .location-bar {
@@ -37,14 +34,10 @@
 }
 
 .gps-trigger-btn {
-    display: flex;
-    flex-direction: column;
-    justify-content: center; 
-    align-items: center; 
     font-size: 0.75rem;
     color: var(--brand-blue);
     background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     padding: 0.125rem 0.5rem;
     border-radius: 1.25rem;
     cursor: pointer;     /* 滑鼠變成「手指」圖示 */
@@ -60,7 +53,7 @@
 
 .nav-select {
     border-radius: 0.75rem;
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     background-color: var(--bg-global);
     color: var(--text-main);
     font-size: 0.75rem;
@@ -74,7 +67,7 @@
     justify-content: flex-start; 
     align-items: center;
     background-color: var(--bg-global);
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     border-radius: 0.8rem;
     padding: 0.125rem 0.5rem;
 }
@@ -88,15 +81,6 @@
     flex: 1;  
 }
 
-select {
-    width: auto;
-    height: 1.5rem;
-    padding: 0 0.5rem;    /* 只給左右內距，上下給 0，絕不頂開高度 */
-    font-size: 0.75rem;   /* 配合整體導航欄的小巧比例 */
-    line-height: 2rem; /* 讓 line-height 等於 height，文字就會完美垂直置中 */
-    box-sizing: border-box;
-}
-
 /* ==========================================================================
    7. 店家列表 (Store List)
    ========================================================================== */
@@ -104,7 +88,6 @@ select {
     height: 57%;
     width: auto;
     overflow-y: auto;       
-    box-sizing: border-box; 
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
@@ -116,14 +99,13 @@ select {
     align-items: center;
     gap: 0.25rem;
     background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     border-radius: 1rem;
     text-decoration: none;
     color: inherit;
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     width: auto; /* 強迫卡片指名服從手機大外框的限制，絕不擠破框架 */
-    box-sizing: border-box; /* 新增：確保寬度計算包含 border 與 padding */
     padding: 0.125rem;
 }
 
@@ -200,10 +182,9 @@ select {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    box-sizing: border-box; 
     height: 15%;
     background-color: var(--blur-bg);
-    border-top: 1px solid var(--border-color);
+    border-top: 0.1rem solid var(--border-color);
     padding:1rem;
     flex-shrink: 0;
     width: auto;
@@ -248,7 +229,7 @@ footer .status-indicator.active{
     align-items: center;
     justify-content: center;
     padding: 0 0.25rem;
-    border: 1px solid var(--bg-container);
+    border: 0.1rem solid var(--bg-container);
 }
 
 .cart-status-btn {
@@ -268,7 +249,6 @@ footer .status-indicator.active{
     box-shadow: var(--shadow-sm);
     height: 2.25rem;             /* 新增：固定購物車按鈕的物理高度，防止變形 */
     width: 4.5rem;
-    box-sizing: border-box;   /* 新增：確保 padding 不會影響按鈕固定高度 */
 }
 
 
@@ -340,27 +320,27 @@ footer .status-indicator.active{
         <button onclick="window.toggleView('buyer')" style="padding: 0.5rem 1rem; background: #ff4d4d; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.2s;">
             🧑‍💼 返回一般買家視圖
         </button>
-    </div> <div style="background: #1e1e1e; padding: 0.25rem; border-radius: 0.5rem; margin-bottom: 0.25rem; border: 1px solid #2d2d2d;overflow-y: auto;">
+    </div> <div style="background: #1e1e1e; padding: 0.25rem; border-radius: 0.5rem; margin-bottom: 0.25rem; border: 0.1rem solid #2d2d2d;overflow-y: auto;">
         <h3 style="color: #ffca28; margin-top: 0;">➕ 新增全新店家</h3>
         <p style="color: #aaa; font-size: 0.75rem; margin-bottom: 0.25rem;">請輸入店家資訊，新增後將立即同步至 Firebase 雲端資料庫。</p>   
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem; margin-bottom: 0.25rem;">
-            <input type="text" id="adminNewStoreName" placeholder="店家名稱 (*必填)" style="padding: 0.25rem; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 0.25rem;">
-            <input type="text" id="adminNewStorePhone" placeholder="聯絡電話 (*必填)" style="padding: 0.25rem; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 0.25rem;">
-            <input type="text" id="adminNewStoreCity" placeholder="縣市 (如: 基隆市) (*必填)" style="padding: 0.25rem; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 0.25rem;">
-            <input type="text" id="adminNewStoreDistrict" placeholder="區域 (如: 七堵區) (*必填)" style="padding: 0.25rem; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 0.25rem;">
-            <input type="text" id="adminNewStoreAddress" placeholder="詳細地址 (*必填)" style="padding: 0.25rem; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 0.25rem; grid-column: span 2;">
+            <input type="text" id="adminNewStoreName" placeholder="店家名稱 (*必填)" style="padding: 0.25rem; background: #2a2a2a; border: 0.1rem solid #444; color: white; border-radius: 0.25rem;">
+            <input type="text" id="adminNewStorePhone" placeholder="聯絡電話 (*必填)" style="padding: 0.25rem; background: #2a2a2a; border: 0.1rem solid #444; color: white; border-radius: 0.25rem;">
+            <input type="text" id="adminNewStoreCity" placeholder="縣市 (如: 基隆市) (*必填)" style="padding: 0.25rem; background: #2a2a2a; border: 0.1rem solid #444; color: white; border-radius: 0.25rem;">
+            <input type="text" id="adminNewStoreDistrict" placeholder="區域 (如: 七堵區) (*必填)" style="padding: 0.25rem; background: #2a2a2a; border: 0.1rem solid #444; color: white; border-radius: 0.25rem;">
+            <input type="text" id="adminNewStoreAddress" placeholder="詳細地址 (*必填)" style="padding: 0.25rem; background: #2a2a2a; border: 0.1rem solid #444; color: white; border-radius: 0.25rem; grid-column: span 2;">
 
         </div>
         <button id="adminSubmitStoreBtn" style="width: 100%; padding: 0.25rem; background: #059669; color: white; border: none; border-radius: 0.25rem; font-weight: bold; cursor: pointer; transition: 0.2s;">✅ 確認新增店家至雲端</button>
-    </div> <div style="background: #1e1e1e; padding: 0.25rem; border-radius: 0.5rem; border: 1px solid #2d2d2d; overflow-x: auto;">
+    </div> <div style="background: #1e1e1e; padding: 0.25rem; border-radius: 0.5rem; border: 0.1rem solid #2d2d2d; overflow-x: auto;">
         <h3 style="color: #4da5ff; margin-top: 0;"> 📋 目前雲端店家總覽</h3>
         <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem; text-align: left; font-size: 0.75rem;">
             <tr style="background: #2d2d2d; color: #fff;">
-                <th style="padding: 0.75rem; border: 1px solid #3a3a3a;">店家名稱</th>
-                <th style="padding: 0.75rem; border: 1px solid #3a3a3a;">詳細地址</th>
-                <th style="padding: 0.75rem; border: 1px solid #3a3a3a;">聯絡電話</th>
-                <th style="padding: 0.75rem; border: 1px solid #3a3a3a; text-align: center;">核心操作</th>
+                <th style="padding: 0.75rem; border: 0.1rem solid #3a3a3a;">店家名稱</th>
+                <th style="padding: 0.75rem; border: 0.1rem solid #3a3a3a;">詳細地址</th>
+                <th style="padding: 0.75rem; border: 0.1rem solid #3a3a3a;">聯絡電話</th>
+                <th style="padding: 0.75rem; border: 0.1rem solid #3a3a3a; text-align: center;">核心操作</th>
             </tr>
             <tbody id="adminStoreTableBody">
                 <tr><td colspan="4" style="text-align: center; padding: 0.25rem; color: #888;">正在載入雲端資料...</td></tr>
@@ -370,7 +350,7 @@ footer .status-indicator.active{
     <div class="modal-card">
         <div class="modal-title" style="font-weight: 600; margin-bottom: 0.25rem; color: #1f2937;">加入PACE 派思</div>
         
-        <button class="modal-btn google" id="googleLoginAction" style="box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <button class="modal-btn google" id="googleLoginAction" style="box-shadow: 0 0.1rem 0.125 rgba(0,0,0,0.05);">
             <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:0.5rem;">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -380,7 +360,7 @@ footer .status-indicator.active{
             Google 登入
         </button>
 
-        <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 100%; background-color: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.5rem; font-size: 0.75rem; font-weight: 500; color: #374151; margin-top: 0.5rem; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 10rem; background-color: white; border: 0.1rem solid #e5e7eb; border-radius: 0.5rem; padding: 0.5rem; font-size: 0.75rem; font-weight: 500; color: #374151; margin-top: 0.5rem; cursor: pointer; box-shadow: 0 0.1rem 0.125rem rgba(0,0,0,0.05);">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.5rem;">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                 <polyline points="22,6 12,13 2,6"></polyline>
@@ -390,11 +370,11 @@ footer .status-indicator.active{
         <div id="emailFormSection" style="display: none; margin-top: 0.5em; text-align: left; width: 100%;">
             <div style="margin-bottom: 0.5rem;">
                 <label for="loginEmail" style="display:block; margin: bottom 0.25rem;font-size:0.75rem; color:#6b7280; font-weight:500;">電子郵件</label>
-                <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width:100%; padding:0.25rem 0.75rem; border:1px solid #e5e7eb; border-radius:0.5rem; box-sizing:border-box; font-size:0.75rem; background-color:#f9fafb; color: #111111;">
-            </div> <div style="margin-bottom:0.5rem; position: relative;">
+                <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width:100%; padding:0.25rem 0.75rem; border:0.1rem solid #e5e7eb; border-radius:0.5rem; box-sizing:border-box; font-size:0.75rem; background-color:#f9fafb; color: #111111;">
+            </div> <div style="margin-bottom:0.5rem;">
                 <label for="loginPassword" style="display:block; margin-bottom:0.25rem; font-size:0.75rem; color:#6b7280; font-weight:500;">密碼</label>
-                <div style="position: relative; display: flex; align-items: center;">
-                    <input type="password" id="loginPassword" placeholder="請輸入密碼" autocomplete="current-password" style="width:100%; padding:0.25rem 0.75rem; border:1px solid #e5e7eb; border-radius:0.5rem; box-sizing:border-box; font-size:0.75rem; background-color:#f9fafb; color: #111111;">
+                <div style="display: flex; align-items: center;">
+                    <input type="password" id="loginPassword" placeholder="請輸入密碼" autocomplete="current-password" style="width:100%; padding:0.25rem 0.75rem; border:0.1rem solid #e5e7eb; border-radius:0.5rem; box-sizing:border-box; font-size:0.75rem; background-color:#f9fafb; color: #111111;">
                     <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; font-size: 0.75rem; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
                 </div>
             </div> <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width:100%; padding: 0.25rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 500; cursor: pointer; box-shadow: 0 0.25rem 0.5rem rgba(5, 150, 105, 0.15);">電子郵件登入 / 註冊</button>

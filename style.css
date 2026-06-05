@@ -1,6 +1,5 @@
 :root {
-    --zoom-factor: 1;
-    --base-font-size: calc(1rem * var(--zoom-factor));
+    font-size: clamp(10px, 2.5vw, 20px);
     --bg-global: #F8FAFC;
     --bg-container: #FFFFFF;
     --border-color: #E2E8F0;
@@ -9,7 +8,7 @@
     --brand-blue: #0062FF; 
     --brand-green: #10B981;
     --brand-red: #EF4444;
-    --shadow-sm: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.09);
+    --shadow-sm: 0 0.1rem 0.5rem rgba(0, 0, 0, 0.09);
     --shadow-md: 0 0.625rem 1.625rem rgba(0, 0, 0, 0.09);
     --card-bg: #FFFFFF;
     --blur-bg: rgba(255, 255, 255, 0.95);
@@ -24,31 +23,49 @@
     --brand-blue: #2F80ED; 
     --brand-green: #34D399;
     --brand-red: #F87171;
-    --shadow-sm: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.9);
+    --shadow-sm: 0 0.1rem 0.5rem rgba(0, 0, 0, 0.9);
     --shadow-md: 0 0.625rem 1.625rem rgba(0, 0, 0, 0.9);
     --card-bg: #1C1C1E;
     --blur-bg: rgba(17, 17, 17, 0.95);
 }
 
+* {
+    box-sizing: border-box;
+}
+
 html, body {
     margin: 0;
     padding: 0;
-    width: auto;       /* 💡 陷阱 1：寬度改用 100%，不要用 100vw */
-    height: auto;      /* 用 100% 讓它順著瀏覽器高度即可 */
-    overflow: hidden;/* 防止手機版意外出現左右小偏移動作 */
+    height: 100vh;
+    width: 100vw;
     background-color: var(--bg-global);   
+    display: flex;
+    justify-content: center; /* 水平置中 */
+    align-items: center;
+    overflow: hidden;    /* 隱藏超出視窗的內容，確保整體像紙張一樣 */
 }
 
 input, textarea {
     -webkit-user-select: text;
     user-select: text; /* 解除輸入框鎖定，保證可正常打字與選取 */
+    border: 0.1rem solid var(--border-color);
+    border-radius: 0.75rem;
+    background-color: var(--bg-global);
+    font-size: 0.75rem;
+    color: var(--text-main);
 }
 
 img, .card {
     max-width: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
-    height: auto;
+    display: block;   /* 避免圖片下方產生多餘的空隙 */
+}
+
+select {
     width: auto;
-    box-sizing: border-box;
+    height: 1.5rem;
+    padding: 0 0.5rem;    /* 只給左右內距，上下給 0，絕不頂開高度 */
+    font-size: 0.75rem;   /* 配合整體導航欄的小巧比例 */
+    line-height: 2rem; /* 讓 line-height 等於 height，文字就會完美垂直置中 */
 }
 
 /* ==========================================================================
@@ -56,29 +73,19 @@ img, .card {
    ========================================================================== */
 /* 手機外框 - 加強置中穩定性 */
 .phone-wrapper {
-    max-width: 100vw;
-    max-width: 100dvw;
-    max-height: 100vh;
-    max-height: 100dvh;
-    min-height: 100vh; 
-    min-height: 100dvh; /* 現代手機專用：會自動扣除手機工具列的高度 */
-    width: calc(100vh * 9 / 16);
-    aspect-ratio: 9 / 16;           /* 維持手機比例 */
-    height: auto;
-    width: auto;                    /* 先預設 100% */
-    margin: 0 auto;                 /* 置中 */
     overflow: hidden;
+    height: 100vh;           /* 高度撐滿視窗 */
+    aspect-ratio: 9 / 16;    /* 強制維持 9:16 比例 */
+    max-width: 100vw;        /* 不超過螢幕寬度 */
+    background-color: var(--bg-container);
     display: flex;
-    flex-direction: column;
+    flex-direction: column;  /* 垂直排列 */
     justify-content: space-between;
     align-items: center;
-    background-color: var(--bg-container);
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     border-radius: 2rem;
     box-shadow: var(--shadow-md);
     padding: 0.5rem;
-    box-sizing: border-box;
-    position: relative;
 } 
 
 #buyerView,
@@ -87,45 +94,9 @@ img, .card {
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-end;
-    position: relative;
-    box-sizing: border-box;
     height: 100%;
-    width: auto;
+    width: 100%;
     background-color: var(--bg-container);
-}
-
-/* 表單容器相關 */
-#adminView > div,
-#adminView .form-container,
-#adminView form {
-    height: 100%;
-    width: auto;
-    max-width: 100%;
-    box-sizing: border-box;
-    position: relative;
-}
-
-/* 輸入框統一樣式 */
-#adminView input,
-#adminView textarea,
-#adminView select {
-    height: 100%;
-    width: auto;
-    box-sizing: border-box;
-    border: 1px solid var(--border-color);
-    border-radius: 0.75rem;
-    background-color: var(--bg-global);
-    font-size: 0.75rem;
-    color: var(--text-main);
-    position: relative;
-}
-
-/* 並排欄位 */
-#adminView .row,
-#adminView .flex-row {
-    display: flex;
-    gap: 0.5rem;
-    position: relative;
 }
 
 .header {
@@ -133,9 +104,6 @@ img, .card {
     flex-direction: row; 
     justify-content: space-between; 
     align-items: flex-end;    
-    box-sizing: border-box; 
-    padding: 0.25rem 0 0 0;
-    position: relative;    
 }
 
 .brand-left-column {
@@ -144,8 +112,6 @@ img, .card {
     justify-content: flex-end;
     align-items: flex-start;
     gap: 0.25rem;
-    box-sizing: border-box;
-    position: relative; 
 }
 
 .pace-logo {
@@ -153,12 +119,10 @@ img, .card {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    position: relative;    
 }
 
 .brand-logo-img {
     height: 3rem; /* 響應式圖片高度 */
-    box-sizing: border-box;     
 }
 
 .brand-subtitle {
@@ -176,7 +140,7 @@ img, .card {
     height: 1.5rem;
     font-size: 0.75rem;
     background: var(--card-bg);
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     border-radius: 50%;
     color: var(--text-main);
     cursor: pointer;
@@ -190,7 +154,6 @@ img, .card {
     flex-direction: column;
     justify-content: flex-end; 
     align-items: flex-end; 
-    position: relative;
     gap: 0.25rem;
 }
 
@@ -205,12 +168,11 @@ img, .card {
     font-size: 0.75rem;
     background-color: var(--brand-blue);
     color: #FFFFFF;
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     padding: 0.25rem 0.5rem;
     border-radius: 1.25rem;
     font-weight: 500;
     box-shadow: var(--shadow-sm);
-    position: relative;
 }
 
 .user-avatar-btn {
@@ -219,14 +181,13 @@ img, .card {
     justify-content: space-between;
     align-items: flex-end;
     background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     padding: 0.25rem 0.5rem;
     border-radius: 1.25rem;
     font-size: 0.75rem;
     font-weight: 500;
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
-    position: relative;
 }
 
 .dropdown-menu {
@@ -236,15 +197,14 @@ img, .card {
     right: 0;
     width: 12rem; /* 調整為相對單位 */
     background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     border-radius: 0.75rem;
     box-shadow: var(--shadow-md);
     max-height: 15rem; /* 調整為相對單位 */
     overflow-y: auto;
     z-index: 100;
-    padding: 0.125rem;
+    padding: 0.1rem;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
-    position: relative;
 }
 
 .dropdown-menu a,
@@ -263,7 +223,6 @@ img, .card {
     border-radius: 0.5rem;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
     padding: 0.125rem;
-    position: relative;
  }   
 
 
@@ -273,7 +232,7 @@ img, .card {
 }
 
 .menu-divider {
-    height: 1px;
+    height: 0.1rem;
     background-color: var(--border-color);
     margin: 0.25rem 0;
 }
@@ -295,7 +254,7 @@ img, .card {
 
 .modal-card {
     background-color: var(--bg-container);
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     border-radius: 1.25rem;
     max-width: 20rem;
     padding: 0.5rem;
@@ -304,16 +263,18 @@ img, .card {
 }
 
 .modal-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
+    width: auto;
+    height: 1.5rem;
+    padding: 0 0.5rem;    /* 只給左右內距，上下給 0，絕不頂開高度 */
+    font-size: 0.75rem;   /* 配合整體導航欄的小巧比例 */
+    line-height: 2rem; /* 讓 line-height 等於 height，文字就會完美垂直置中 */
 }
 
 .modal-desc-address {
     font-size: 0.75rem;
     color: var(--text-main);
     background-color: var(--bg-global);
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     line-height: 1.5;
     margin-bottom: 0.5rem;
     word-break: break-all;
@@ -326,7 +287,7 @@ img, .card {
     font-size: 0.75rem;
     color: var(--text-main);
     background: var(--card-bg);
-    border: 1px solid var(--border-color);
+    border: 0.1rem solid var(--border-color);
     margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
@@ -335,6 +296,7 @@ img, .card {
     border-radius: 0.5rem;
     font-weight: 600;
     cursor: pointer;
+    width: 10rem;
 }
 
 .modal-btn.google {

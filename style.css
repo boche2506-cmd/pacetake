@@ -197,7 +197,7 @@ select {
 }
 
 .login-btn {
-    height: 50%;
+    height: 45%;
     width: 100%;
     font-size: 0.75rem;
     background-color: var(--brand-blue);
@@ -211,7 +211,7 @@ select {
 }
 
 .user-avatar-btn {
-    height: 50%;
+    height: 45%;
     width: 100%;
     font-size: 0.75rem;
     background-color: var(--card-bg);
@@ -229,14 +229,13 @@ select {
     display: none;             /* 預設隱藏，點擊時用 JS 切換顯示 */
     position: absolute;
     top: 100%;                 /* 緊貼在頭像/名字按鈕下方 */
-    right: 0;                 /* 居中對齊 */
-    transform: translateX(-50%);
-    
+    right: 0;
+    left: auto;
     background-color: #ffffff; /* 白色背景 */
     min-width: 60%;          /* 給選單一個足夠的寬度 */
     border: 1px solid #e0e0e0; /* 淡淡的灰色外框 */
     border-radius: 0.5rem;        /* 圓角看起來比較現代 */
-    padding: 0.25rem 0;            /* 上下留點空格 */
+    padding: 0.25rem 0.5rem;            /* 上下留點空格 */
     box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.1); /* 漂浮陰影效果 */
     z-index: 100;             /* 確保一定在最上層 */
 }
@@ -259,9 +258,9 @@ select {
 
 /* 3. 分隔線樣式（就是你 JS 裡的 .menu-divider） */
 .dropdown-menu .menu-divider {
-    height: 1px;
+    height: 1rem;
     background-color: #eeeeee;
-    margin: 0.25rem 0;             /* 上下留點距離 */
+    margin: 0.25rem 0.5rem;             /* 上下留點距離 */
 }
 
 /* 4. 特殊調整：JS 裡面最後一行的「登出按鈕」 */

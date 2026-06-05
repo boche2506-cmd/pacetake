@@ -134,7 +134,7 @@ img, .card {
     align-items: flex-end;    
     box-sizing: border-box; 
     padding: 0.25rem 0 0 0;
-    
+    position: relative;    
 }
 
 .brand-left-column {
@@ -144,7 +144,8 @@ img, .card {
     align-items: flex-start;
     height: 100%;
     gap: 0.25rem;
-    box-sizing: border-box; 
+    box-sizing: border-box;
+    position: relative; 
 }
 
 .pace-logo {
@@ -152,7 +153,7 @@ img, .card {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    
+    position: relative;    
 }
 
 .brand-logo-img {
@@ -210,6 +211,7 @@ img, .card {
     border-radius: 1.25rem;
     font-weight: 500;
     box-shadow: var(--shadow-sm);
+    position: relative;
 }
 
 .user-avatar-btn {

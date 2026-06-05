@@ -14,18 +14,25 @@
 <body>
 <style>
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
+
+* {
+    box-sizing: border-box;
+}
+
 .sticky-top-group {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    height: 28%;
-    width: auto;
+    height: 18%;
+    width: 100%;
     border-bottom: 0.1rem solid var(--border-color);
     padding: 0.5rem 0.5rem 0.25rem 0.5rem;
     gap: 0.25rem;
 }
 
 .location-bar {
+    height: 50%;
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center; 
@@ -62,6 +69,8 @@
 }
 
 .search-box {
+    height: 50%;
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: flex-start; 
@@ -85,8 +94,8 @@
    7. 店家列表 (Store List)
    ========================================================================== */
 .store-list {
-    height: 57%;
-    width: auto;
+    height: 55%;
+    width: 100%;
     overflow-y: auto;       
     display: flex;
     flex-direction: column;
@@ -183,11 +192,11 @@
     justify-content: space-between;
     align-items: center;
     height: 15%;
+    width: 100%;
     background-color: var(--blur-bg);
     border-top: 0.1rem solid var(--border-color);
     padding:1rem;
     flex-shrink: 0;
-    width: auto;
 }
 
 .status-msg {
@@ -255,8 +264,8 @@ footer .status-indicator.active{
 </style>
 <div class="phone-wrapper">
 <div id="buyerView" style="display: block;">
-<div class="sticky-top-group">
 <header id="header-container"></header>
+<div class="sticky-top-group">
             <div class="location-bar">
             <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
             <div class="location-select-group">

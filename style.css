@@ -37,6 +37,7 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100vh;
+    width: 100vw;
     background-color: var(--bg-global);   
     display: flex;
     justify-content: center; /* 水平置中 */
@@ -78,6 +79,7 @@ select {
     height: 100vh;           /* 高度撐滿視窗 */
     aspect-ratio: 9 / 16;    /* 強制維持 9:16 比例 */
     max-width: 100vw;        /* 不超過螢幕寬度 */
+    margin: 0 auto;
     background-color: var(--bg-container);
     display: flex;
     flex-direction: column;  /* 垂直排列 */
@@ -87,6 +89,8 @@ select {
     border-radius: 2rem;
     box-shadow: var(--shadow-md);
     padding: 0.5rem;
+    position: relative;
+    font-size: 1rem;
 } 
 
 #buyerView,
@@ -96,8 +100,9 @@ select {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100%;
-    width: 100%;
+    height: 100vh;           /* 高度撐滿視窗 */
+    aspect-ratio: 9 / 16;    /* 強制維持 9:16 比例 */
+    max-width: 100vw;        /* 不超過螢幕寬度 */
     background-color: var(--bg-container);
 }
 
@@ -105,8 +110,9 @@ select {
 #adminView > div,
 #adminView .form-container,
 #adminView form {
-    width: 100%;
-    max-width: 100%;
+    height: 100vh;           /* 高度撐滿視窗 */
+    aspect-ratio: 9 / 16;    /* 強制維持 9:16 比例 */
+    max-width: 100vw;        /* 不超過螢幕寬度 */
     box-sizing: border-box;
 }
 

@@ -131,7 +131,7 @@ img, .card {
     display: flex;
     flex-direction: row; 
     justify-content: space-between; 
-    align-items: stretch;    
+    align-items: flex-end;    
     box-sizing: border-box; 
     padding: 0.25rem 0 0 0;
     

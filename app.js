@@ -712,7 +712,7 @@ function renderAdminTable() {
     if (!tbody) return;
     tbody.innerHTML = '';
     if (allStores.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1rem; color:#aaa;">目前雲端尚無店家資料</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:0.5rem; color:#aaa;">目前雲端尚無店家資料</td></tr>';
         return;
     }
     allStores.forEach(store => {
@@ -722,11 +722,11 @@ function renderAdminTable() {
         const statusText = store.status === 'offline' ? '🔴 下線' : '🟢 上線';
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td style="padding: 0.75rem; border: 1px solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
-            <td style="padding: 0.75rem; border: 1px solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
-            <td style="padding: 0.75rem; border: 1px solid #3a3a3a; color: #bbb;">${phone}</td>
-            <td style="padding: 0.75rem; border: 1px solid #3a3a3a; text-align: center; color: ${store.status === 'offline' ? '#ef4444' : '#10b981'}; font-weight: bold;">${statusText}</td>
-            <td style="padding: 0.75rem; border: 1px solid #3a3a3a; text-align: center;">
+            <td style="padding: 0.5rem; border: 1px solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
+            <td style="padding: 0.5rem; border: 1px solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
+            <td style="padding: 0.5rem; border: 1px solid #3a3a3a; color: #bbb;">${phone}</td>
+            <td style="padding: 0.5rem; border: 1px solid #3a3a3a; text-align: center; color: ${store.status === 'offline' ? '#ef4444' : '#10b981'}; font-weight: bold;">${statusText}</td>
+            <td style="padding: 0.5rem; border: 1px solid #3a3a3a; text-align: center;">
                 <button onclick="window.deleteStore('${store.id}')" style="padding: 0.25rem 0.5rem; background: #ef4444; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: bold;">刪除</button>
             </td>
         `;

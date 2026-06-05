@@ -56,6 +56,8 @@ input, textarea {
     height: 1.5rem;
     line-height: 1.5rem;
     box-sizing: border-box;
+    white-space: nowrap;   /* 1. 強制不換行 */
+    text-overflow: ellipsis; /* 3. 超出的部分顯示為 ... */
 }
 
 img, .card {
@@ -100,9 +102,8 @@ select {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;           /* 高度撐滿視窗 */
-    aspect-ratio: 9 / 16;    /* 強制維持 9:16 比例 */
-    max-width: 100vw;        /* 不超過螢幕寬度 */
+    height: 100%;
+    width: 100%;
     background-color: var(--bg-container);
 }
 
@@ -110,9 +111,8 @@ select {
 #adminView > div,
 #adminView .form-container,
 #adminView form {
-    height: 100vh;           /* 高度撐滿視窗 */
-    aspect-ratio: 9 / 16;    /* 強制維持 9:16 比例 */
-    max-width: 100vw;        /* 不超過螢幕寬度 */
+    height: 100%;
+    width: 100%;
     box-sizing: border-box;
 }
 
@@ -175,6 +175,7 @@ select {
 .theme-toggle {
     height: 1.25rem;
     width: 1.25rem;
+    padding: 0.25rem;
     background: var(--card-bg);
     border: 0.1rem solid var(--border-color);
     border-radius: 50%;
@@ -244,13 +245,15 @@ select {
 
 /* 1. 選單本體的外觀與定位 */
 .dropdown-menu {
+    height: 80%;
+    width: 60%;
     display: none;             /* 預設隱藏，點擊時用 JS 切換顯示 */
     position: absolute;
     top: 100%;                 /* 緊貼在頭像/名字按鈕下方 */
     right: 0;
     left: auto;
     background-color: #ffffff; /* 白色背景 */
-    min-width: 60%;          /* 給選單一個足夠的寬度 */
+    min-width: 70%;          /* 給選單一個足夠的寬度 */
     border: 1px solid #e0e0e0; /* 淡淡的灰色外框 */
     border-radius: 0.5rem;        /* 圓角看起來比較現代 */
     padding: 0.25rem 0.5rem;            /* 上下留點空格 */

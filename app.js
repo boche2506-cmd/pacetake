@@ -672,7 +672,7 @@ function filterAndRenderStores() {
             <div class="store-info">
                 <div>
                     <div class="store-name">${finalName}</div>
-                    <div class="store-meta">📍 ${finalCity}${finalDistrict} ${finalAddress}</div>
+                    <div class="store-meta">📍 ${finalAddress}</div>
                 </div>
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>

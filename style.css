@@ -187,18 +187,19 @@ select {
     justify-content: flex-end;
     align-items: flex-end;
     position: relative;
+    box-sizing: border-box;
 }
 
 .avatar-icon { 
     font-size: 1.5rem;
-    height: 25%;
+    height: 50%;
     width: 100%;
 }
 
 .login-btn {
-    height: 30%;
+    height: 50%;
     width: 100%;
-    font-size: 0.625rem;
+    font-size: 0.75rem;
     background-color: var(--brand-blue);
     color: #FFFFFF;
     border: 0.1rem solid var(--border-color);
@@ -210,9 +211,9 @@ select {
 }
 
 .user-avatar-btn {
-    height: 30%;
+    height: 50%;
     width: 100%;
-    font-size: 1rem;
+    font-size: 0.75rem;
     background-color: var(--card-bg);
     border: 0.1rem solid var(--border-color);
     padding: 0.25rem;
@@ -226,7 +227,6 @@ select {
 .dropdown-menu {
     font-size: 0.75rem;
     display: none;
-    width: 60%; /* 調整為相對單位 */
     background-color: var(--card-bg);
     border: 0.1rem solid var(--border-color);
     border-radius: 0.75rem;
@@ -240,12 +240,12 @@ select {
     box-sizing: border-box;
     height: 15rem;
     width: 10rem;
+    top:20%;
 }
 
 .dropdown-menu a,
 .dropdown-menu button {
     display: none;
-    width: 60%; /* 調整為相對單位 */
     background-color: var(--card-bg);
     border: 0.1rem solid var(--border-color);
     border-radius: 0.75rem;
@@ -263,6 +263,7 @@ select {
     box-sizing: border-box;
     height: 15rem;
     width: 10rem;
+    top:20%;
  }   
 
 

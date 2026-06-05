@@ -228,6 +228,9 @@ footer .status-indicator {
 }
 
 footer .status-indicator.active{
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 50%;
     background-color: #52c41a;
     box-shadow: 0 0 0.5rem #52c41a;
 }
@@ -252,7 +255,7 @@ footer .status-indicator.active{
     background-color: var(--brand-blue);
     color: white;
     border: none;
-    padding:0.5rem 1rem;
+    padding:0.25rem 0.5rem;
     border-radius: 1.25rem;
     font-size: 0.75rem;
     font-weight: 500;
@@ -261,10 +264,10 @@ footer .status-indicator.active{
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    gap: 0.25rem;
     text-decoration: none;
     box-shadow: var(--shadow-sm);
     height: 2.25rem;             /* 新增：固定購物車按鈕的物理高度，防止變形 */
+    width: 4.5rem;
     box-sizing: border-box;   /* 新增：確保 padding 不會影響按鈕固定高度 */
 }
 
@@ -323,7 +326,7 @@ footer .status-indicator.active{
             <span id="statusText">您目前沒有進行中的訂單喔！</span>
         </a>
         <a href="cart.html" class="cart-status-btn nav-fast">
-            <span>🛒  結 帳</span>
+            <span>🛒 結 帳</span>
         </a>
     </footer>
   </div>
@@ -400,7 +403,7 @@ footer .status-indicator.active{
     <div class="modal-card">
         <div class="modal-title" style="color: var(--brand-blue); font-weight: 700;">📍 目前位置</div>
         <div class="modal-desc-address" id="modalAddressText" style="margin-bottom: 0.5rem; margin-top: 0.5rem;">尚未獲取定位，請開啟 GPS。</div>
-        <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; border: none; width: 100%; height: 2rem; border-radius: 0.625rem; font-size: 0.75rem; font-weight: 500; cursor: pointer;">確認</button>
+        <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; border: none; width: 100%; height: 2.25rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 500; cursor: pointer;">確認</button>
     </div> </div> </div> <script type="module" src="app.js"></script>
 </body>
 </html>

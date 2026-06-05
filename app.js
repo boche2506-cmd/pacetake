@@ -321,7 +321,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             const statusDot = document.getElementById('statusDot');
             const statusText = document.getElementById('statusText');
             if (statusDot) statusDot.classList.remove('active');
-            if (statusText) statusText.innerText = "您尚未登入，請連結google帳號\n或使用電子郵件登入";
+            if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
             if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
             renderDynamicMenu('guest');
             fetchStoresFromFirebase();

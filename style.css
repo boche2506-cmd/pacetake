@@ -197,11 +197,13 @@ img, .card {
 }
 
 .login-btn {
+    height: 2.25rem;             /* 新增：固定購物車按鈕的物理高度，防止變形 */
+    width: 6.5rem;
     font-size: 0.75rem;
     background-color: var(--brand-blue);
     color: #FFFFFF;
     border: 1px solid var(--border-color);
-    padding: 0.25rem 1rem;
+    padding: 0.25rem 0.5rem;
     border-radius: 1.25rem;
     font-weight: 500;
     box-shadow: var(--shadow-sm);
@@ -236,7 +238,6 @@ img, .card {
     overflow-y: auto;
     z-index: 100;
     padding: 0.125rem;
-    position: relative;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
 
 }
@@ -257,7 +258,6 @@ img, .card {
     border-radius: 0.5rem;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
     padding: 0.125rem;
-    position: relative;
  }   
 
 

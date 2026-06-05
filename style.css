@@ -225,6 +225,7 @@ img, .card {
     font-weight: 500;
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
+    position: relative;
 }
 
 .dropdown-menu {
@@ -242,7 +243,7 @@ img, .card {
     z-index: 100;
     padding: 0.125rem;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
-    position: fixed;
+    position: relative;
 }
 
 .dropdown-menu a,
@@ -261,7 +262,7 @@ img, .card {
     border-radius: 0.5rem;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
     padding: 0.125rem;
-    position: fixed;
+    position: relative;
  }   
 
 

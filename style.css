@@ -194,8 +194,8 @@ select {
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
     cursor: pointer;
-    position: absolute;
-    display: none;
+    position: relative;
+    display: inline-block;        /* 剛好包裹住按鈕 */
 }
 
 .dropdown-menu {
@@ -211,6 +211,9 @@ select {
     z-index: 100;
     padding: 0.125rem;
     cursor: pointer;        /* 滑鼠移上去要變手指 */
+    position: absolute;
+    top: 100%;
+    right: 0;
 }
 
 .dropdown-menu a,
@@ -231,6 +234,8 @@ select {
     text-decoration: none;  
     font-size: 0.75rem;
     text-align: left;
+    position: absolute;
+    right: 100%;
  }   
 
 

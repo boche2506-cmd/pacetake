@@ -33,7 +33,7 @@
 html, body {
     margin: 0;
     padding: 0;
-    width: 100%;       /* 💡 陷阱 1：寬度改用 100%，不要用 100vw */
+    width: auto;       /* 💡 陷阱 1：寬度改用 100%，不要用 100vw */
     height: 100%;      /* 用 100% 讓它順著瀏覽器高度即可 */
     overflow: hidden;/* 防止手機版意外出現左右小偏移動作 */
     background-color: var(--bg-global);   
@@ -46,7 +46,8 @@ input, textarea {
 
 img, .card {
     max-width: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
-    height: auto;
+    height: 100%;
+    width: auto;
     box-sizing: border-box;
 }
 
@@ -88,10 +89,8 @@ img, .card {
     align-items: flex-end;
     position: relative;
     box-sizing: border-box;
-    top: 0;
-    left: 0;
-    width: 100%;
     height: 100%;
+    width: auto;
     background-color: var(--bg-container);
 }
 
@@ -99,7 +98,8 @@ img, .card {
 #adminView > div,
 #adminView .form-container,
 #adminView form {
-    width: 100%;
+    height: 100%;
+    width: auto;
     max-width: 100%;
     box-sizing: border-box;
     position: relative;
@@ -109,7 +109,8 @@ img, .card {
 #adminView input,
 #adminView textarea,
 #adminView select {
-    width: 100% ;
+    height: 100%;
+    width: auto;
     box-sizing: border-box;
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
@@ -142,7 +143,6 @@ img, .card {
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-start;
-    height: 100%;
     gap: 0.25rem;
     box-sizing: border-box;
     position: relative; 
@@ -186,7 +186,6 @@ img, .card {
 }
 
 .control-panel {
-    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-end; 
@@ -221,7 +220,7 @@ img, .card {
     align-items: flex-end;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    padding: 0.25rem 1rem;
+    padding: 0.25rem 0.5rem;
     border-radius: 1.25rem;
     font-size: 0.75rem;
     font-weight: 500;
@@ -298,7 +297,6 @@ img, .card {
     background-color: var(--bg-container);
     border: 1px solid var(--border-color);
     border-radius: 1.25rem;
-    width: 100%;
     max-width: 20rem;
     padding: 0.5rem;
     box-shadow: var(--shadow-md);
@@ -333,7 +331,6 @@ img, .card {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
     padding: 0.5rem;
     border-radius: 0.5rem;
     font-weight: 600;

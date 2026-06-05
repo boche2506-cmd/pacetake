@@ -238,6 +238,8 @@ select {
     cursor: pointer;        /* 滑鼠移上去要變手指 */
     position: absolute;
     box-sizing: border-box;
+    height: 15rem;
+    width: 10rem;
 }
 
 .dropdown-menu a,
@@ -259,6 +261,8 @@ select {
     text-align: left;
     position: absolute;
     box-sizing: border-box;
+    height: 15rem;
+    width: 10rem;
  }   
 
 

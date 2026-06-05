@@ -208,6 +208,21 @@ select {
     cursor: pointer;
 }
 
+.user-name {
+    height: 30%;
+    width: 100%;
+    font-size: 1rem;
+    background-color: var(--card-bg);
+    border: 0.1rem solid var(--border-color);
+    padding: 0.25rem;
+    border-radius: 1.25rem;
+    font-weight: 500;
+    color: var(--text-main);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    position: relative;
+}
+
 .user-avatar-btn {
     height: 30%;
     width: 100%;

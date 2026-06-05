@@ -190,7 +190,7 @@ img, .card {
     flex-direction: column;
     justify-content: flex-end; 
     align-items: flex-end; 
-    position: absolute;
+    position: relative;
     gap: 0.25rem;
 }
 

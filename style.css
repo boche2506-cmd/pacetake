@@ -229,25 +229,25 @@ select {
     display: none;             /* 預設隱藏，點擊時用 JS 切換顯示 */
     position: absolute;
     top: 100%;                 /* 緊貼在頭像/名字按鈕下方 */
-    left: 50%;                 /* 居中對齊 */
+    right: 0;                 /* 居中對齊 */
     transform: translateX(-50%);
     
     background-color: #ffffff; /* 白色背景 */
-    min-width: 180px;          /* 給選單一個足夠的寬度 */
+    min-width: 60%;          /* 給選單一個足夠的寬度 */
     border: 1px solid #e0e0e0; /* 淡淡的灰色外框 */
-    border-radius: 8px;        /* 圓角看起來比較現代 */
-    padding: 8px 0;            /* 上下留點空格 */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* 漂浮陰影效果 */
-    z-index: 1000;             /* 確保一定在最上層 */
+    border-radius: 0.5rem;        /* 圓角看起來比較現代 */
+    padding: 0.25rem 0;            /* 上下留點空格 */
+    box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.1); /* 漂浮陰影效果 */
+    z-index: 100;             /* 確保一定在最上層 */
 }
 
 /* 2. 控制選單內每一行 <a> 超連結的排版（解決擠扁換行問題） */
 .dropdown-menu .nav-fast {
     display: block;            /* 核心：讓每一個選項各佔獨立的一整行 */
-    padding: 10px 16px;        /* 讓手機或滑鼠比較好點擊的範圍 */
+    padding: 0.25rem 0.5rem;        /* 讓手機或滑鼠比較好點擊的範圍 */
     color: #333333;            /* 文字顏色 */
     text-decoration: none;     /* 移除超連結下底線 */
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     white-space: nowrap;       /* 核心：強制一行字絕對不換行 */
     text-align: left;          /* 文字靠左對齊 */
 }
@@ -261,7 +261,7 @@ select {
 .dropdown-menu .menu-divider {
     height: 1px;
     background-color: #eeeeee;
-    margin: 6px 0;             /* 上下留點距離 */
+    margin: 0.25rem 0;             /* 上下留點距離 */
 }
 
 /* 4. 特殊調整：JS 裡面最後一行的「登出按鈕」 */
@@ -269,8 +269,8 @@ select {
     width: 100%;    /* 覆蓋你寫在行內的 60%，點擊範圍比較大 */
     display: block;
     text-align: left;
-    padding: 10px 16px; /* 跟上面的超連結對齊 */
-    font-size: 0.9rem;  /* 讓字體大小跟其他選項一致 */
+    padding: 0.25rem 0.5rem; /* 跟上面的超連結對齊 */
+    font-size: 0.75rem;  /* 讓字體大小跟其他選項一致 */
 }
 #logoutBtn:hover {
     background-color: #fff0f0; /* 登出按鈕移過去時顯示淡淡的紅色 */

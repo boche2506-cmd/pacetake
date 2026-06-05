@@ -187,6 +187,7 @@ select {
     justify-content: flex-end;
     align-items: flex-end;
     box-sizing: border-box;
+    position: relative;
 }
 
 .avatar-icon { 

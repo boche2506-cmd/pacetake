@@ -59,6 +59,11 @@ input, textarea {
     box-sizing: border-box;
 }
 
+img, .card {
+    max-width: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
+    display: block;   /* 避免圖片下方產生多餘的空隙 */
+}
+
 select {
     height: 1.5rem;
     padding: 0.25rem 0.375rem;    /* 只給左右內距，上下給 0，絕不頂開高度 */
@@ -239,6 +244,11 @@ select {
     justify-content: space-between; 
     align-items: flex-end;
     font-size: 0.75rem;
+    height: 40%;
+    max-width: 100%;
+}
+
+.buyer {    
     height: 40%;
     max-width: 40%;
 }

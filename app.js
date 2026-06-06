@@ -160,8 +160,7 @@ function updateUIForUser(user, currentRole) {
     avatarBtn = document.getElementById('avatarBtn');
     loginLightbox = document.getElementById('loginLightbox');
     userNameDisplay = document.getElementById('userNameDisplay');
-    function updateUIForUser(user, currentRole) {
-    console.log("目前登入的角色是:", currentRole);
+    
     if (loginBtn) loginBtn.style.display = 'none';
     if (avatarBtn) avatarBtn.style.display = 'block';
     if (loginLightbox) loginLightbox.style.display = 'none';
@@ -176,7 +175,7 @@ function updateUIForUser(user, currentRole) {
             font-weight: 600; font-size: 0.75rem;"> 買家`;
         }
     }
-}
+
     const userAvatarImg = document.getElementById('userAvatarImg');
     const defaultIcon = document.getElementById('defaultIcon');
     if (user.photoURL && userAvatarImg && defaultIcon) {
@@ -599,10 +598,24 @@ window.addEventListener('DOMContentLoaded', async () => {
             try {
                 console.log("[PACE DEBUG] Writing shop data:", shopData);
                 await setDoc(doc(db, "stores", user.uid), shopData);
-                await updateDoc(doc(db, "users", user.uid), { role: "seller" });
-                alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張！");
-                window.location.href = "seller.html";
-            } catch (dbError) {
+// --- 新增：權限守門員 ---
+    const userDocRef = doc(db, "users", user.uid);
+    const userDoc = await getDoc(userDocRef); // 先獲取現有資料
+    const currentRole = userDoc.data()?.role;
+
+    // 只有在目前不是 admin 的情況下，才執行變更身份的動作
+    if (currentRole !== "admin") {
+        await updateDoc(userDocRef, { role: "seller" });
+        console.log("[PACE DEBUG] Role updated to seller.");
+    } else {
+        console.log("[PACE DEBUG] Admin override: Role remains admin.");
+    }
+    // -----------------------
+
+    alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張！");
+    window.location.href = "seller.html";
+
+} catch (dbError) {
                 console.error("提交失敗：", dbError);
                 alert("寫入失敗：" + dbError.message);
                 shopSubmitBtn.innerText = "建立店鋪";

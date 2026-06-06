@@ -207,7 +207,7 @@ select {
 }
 
 .login-btn {
-    height: 40%;
+    height: 45%;
     width: 100%;
     font-size: 0.625rem;
     background-color: var(--brand-blue);
@@ -225,7 +225,7 @@ select {
 }
 
 .user-avatar-btn {
-    height: 40%;
+    height: 45%;
     width: 100%;
     font-size: 0.625rem;
     background-color: var(--card-bg);
@@ -241,10 +241,10 @@ select {
 .user-name {    
     display: flex;
     flex-direction: row;
-    justify-content: space-between; 
+    justify-content: center; 
     align-items: center;
     font-size: 0.75rem;
-    height: 40%;
+    height: 45%;
     max-width: 100%;
 }
 
@@ -256,8 +256,8 @@ select {
 
 /* 1. 選單本體的外觀與定位 */
 .dropdown-menu {
-    height: 15rem;
-    width: 5rem;
+    height: 10rem;
+    width: 4rem;
     display: none;             /* 預設隱藏，點擊時用 JS 切換顯示 */
     position: absolute;
     top: 100%;                 /* 緊貼在頭像/名字按鈕下方 */

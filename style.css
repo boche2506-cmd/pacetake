@@ -264,8 +264,8 @@ select {
     position: absolute;
     top: 100%;                 /* 緊貼在頭像/名字按鈕下方 */
     right: 0;
-    height: 10rem;
-    width: 6rem;
+    height: 12rem;
+    width: 8rem;
     left: auto;
     background-color: #ffffff; /* 白色背景 */
     min-width: 80%;          /* 給選單一個足夠的寬度 */

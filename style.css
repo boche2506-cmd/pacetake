@@ -236,10 +236,16 @@ select {
     color: var(--text-main);
     box-shadow: var(--shadow-sm);
     cursor: pointer;
+}
+
+.buyer {    
     display: flex;
-    flex-direction: row; 
-    justify-content: space-between;
+    flex-direction: row;
+    justify-content: space-between; 
     align-items: flex-end;
+    font-size: 0.75rem;
+    width: 100%;
+    height: 40%;
 }
 
 /* 1. 選單本體的外觀與定位 */

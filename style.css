@@ -242,14 +242,14 @@ select {
     display: flex;
     flex-direction: row;
     justify-content: space-between; 
-    align-items: flex-end;
+    align-items: center;
     font-size: 0.75rem;
     height: 40%;
     max-width: 100%;
 }
 
 .buyer {    
-    height: 40%;
+    height: 100%;
     max-width: 40%;
 }
 

@@ -264,7 +264,7 @@ select {
     position: absolute;
     top: 100%;                 /* 緊貼在頭像/名字按鈕下方 */
     right: 0;
-    height: 15rem;
+    height: 18rem;
     width: 10rem;
     left: auto;
     background-color: #ffffff; /* 白色背景 */

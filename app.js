@@ -615,7 +615,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     alert("🎉 恭喜老闆！您的店鋪（" + name + "）已成功開張！");
     window.location.href = "seller.html";
 
-} catch (dbError) {
+            } catch (dbError) {
                 console.error("提交失敗：", dbError);
                 alert("寫入失敗：" + dbError.message);
                 shopSubmitBtn.innerText = "建立店鋪";

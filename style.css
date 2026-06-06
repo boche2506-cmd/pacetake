@@ -340,6 +340,7 @@ select {
 
 .modal-title {
     width: auto;
+    text-align: center; 
     height: 1.5rem;
     padding: 0 0.5rem;    /* 只給左右內距，上下給 0，絕不頂開高度 */
     font-size: 0.75rem;   /* 配合整體導航欄的小巧比例 */

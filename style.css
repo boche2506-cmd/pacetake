@@ -250,7 +250,7 @@ select {
 
 .buyer {    
     height: 100%;
-    max-width: 40%;
+    max-width: 100%;
 }
 
 /* 1. 選單本體的外觀與定位 */

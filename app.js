@@ -160,7 +160,8 @@ function updateUIForUser(user, currentRole) {
     avatarBtn = document.getElementById('avatarBtn');
     loginLightbox = document.getElementById('loginLightbox');
     userNameDisplay = document.getElementById('userNameDisplay');
-
+    function updateUIForUser(user, currentRole) {
+    console.log("目前登入的角色是:", currentRole);
     if (loginBtn) loginBtn.style.display = 'none';
     if (avatarBtn) avatarBtn.style.display = 'block';
     if (loginLightbox) loginLightbox.style.display = 'none';
@@ -175,7 +176,7 @@ function updateUIForUser(user, currentRole) {
             font-weight: 600; font-size: 0.75rem;"> 買家`;
         }
     }
-
+}
     const userAvatarImg = document.getElementById('userAvatarImg');
     const defaultIcon = document.getElementById('defaultIcon');
     if (user.photoURL && userAvatarImg && defaultIcon) {

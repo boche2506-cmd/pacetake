@@ -248,9 +248,10 @@ select {
     max-width: 100%;
 }
 
-.buyer {    
-    height: 100%;
-    max-width: 100%;
+.buyer {
+    font-size: 1.5rem;
+    height:1.5rem;
+    width: 1.5rem;
 }
 
 /* 1. 選單本體的外觀與定位 */

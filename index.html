@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
 <!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
 <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
@@ -22,8 +22,8 @@
 .sticky-top-group {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-end; 
+    align-items: flex-end;
     height: 15%;
     width: 100%;
     border-bottom: 0.1rem solid var(--border-color);
@@ -327,12 +327,10 @@ footer .status-indicator.active{
                     </select>
                  </div>
               </div>
-        <div class="search-container">
             <div class="search-box">
                 <span>🔍</span>
                 <input type="text" id="globalSearchInput" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
-          </div>
-        </div>
+            </div>
       </div>
     <main class="store-list" id="store-container">
         <div class="loading-spinner" id="loading-Spinner">⚡ 正在連線雲端資料庫...</div>

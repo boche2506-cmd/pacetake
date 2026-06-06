@@ -110,7 +110,7 @@ function renderDynamicMenu(role) {
 
     menuHTML += `
         <div class="menu-divider"></div>
-        <button id="logoutBtn" style="color: var(--brand-red); width: 60%; text-align: left; padding: 0.5rem; background: none; border: none; cursor: pointer; font-size: 0.75rem;">🚪 登出系統</button>
+        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 0.5rem; background: none; border: none; cursor: pointer; font-size: 0.75rem;">🚪 登出系統</button>
     `;
 
     dropdownMenu.innerHTML = menuHTML;

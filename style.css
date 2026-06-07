@@ -248,7 +248,7 @@ img, .card {
     width: 30%;
     font-size: 4cqw;
     font-weight: 500;
-    display: inline-flex;
+    display: flex;
     flex-direction: row;
     justify-content: center; 
     align-items: center; 

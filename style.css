@@ -229,24 +229,25 @@ img, .card {
 }
 
 .user-avatar-btn {
-    height: 100%;
-    max-width: 30%;
-    font-size: 4cqw;
-    font-weight: 500;
-    background-color: var(--card-bg);
-    color: var(--text-main);
+    height: 100%;             /* 承襲原本的高度，確保在導覽列中置中對齊 */
+    padding: 2cqw 4cqw;               /* 清除原本的文字內襯，避免頭像變形 */
+    background-color: transparent; /* 移除原本的藍色背景，改為透明 */
     border: 0.1cqw solid var(--border-color);
-    padding: 2cqw 4cqw;
-    border-radius: 10cqw;
+    border-radius: 10cqw;       /* 關鍵：變成完美的圓形 */
     box-shadow: var(--shadow-sm);
     cursor: pointer;
     display: flex;
-    flex-direction: row;;
     justify-content: center;
     align-items: center; 
     box-sizing: border-box;
-    line-height: 1;   /* 讓行距跟著字體一起自動調整 */
-    white-space: nowrap; 
+}
+
+/* 裡面的買家大頭貼圖片 */
+.user-avatar-btn .buyer {
+    max-width: 30%;
+    height: 100%;
+    object-fit: cover;        /* 關鍵：保護圖片比例不變形，並填滿整個圓圈 */
+    display: block;
 }
 
 /* 1. 選單本體的外觀與定位 */

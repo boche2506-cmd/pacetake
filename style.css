@@ -142,7 +142,7 @@ img, .card {
     display: flex;
     flex-direction: row; 
     justify-content: space-between; 
-    align-items: flex-end;  
+    align-items: center;   
     box-sizing: border-box;
 }
 
@@ -180,7 +180,7 @@ img, .card {
 .pace {
     height: 100%;
     max-width: 70%;
-    font-size: 5.25cqw;
+    font-size: 4cqw;
     color: var(--text-muted);
     line-height: 1; /* 讓行距跟著字體一起自動調整 */
     display: flex;
@@ -238,6 +238,7 @@ img, .card {
     box-shadow: var(--shadow-sm);
     cursor: pointer;
     box-sizing: border-box;
+    display: flex;
     flex-direction: row;
     justify-content: center; 
     align-items: center; 
@@ -249,7 +250,7 @@ img, .card {
     font-size: 4cqw;
     font-weight: 500;
     display: flex; 
-    flex-direction: row; 
+    flex-direction: column;
     justify-content: center;
     align-items: center; 
 }

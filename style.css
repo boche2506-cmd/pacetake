@@ -258,6 +258,7 @@ img, .card {
 .user-avatar-btn .buyer {
     max-width: 30%;
     height: 100%;
+    display: inline-flex;
     object-fit: contain;
     flex-direction: row;
 }

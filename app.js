@@ -110,7 +110,7 @@ function renderDynamicMenu(role) {
 
     menuHTML += `
         <div class="menu-divider"></div>
-        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 0.25vw; background: none; border: none; cursor: pointer; font-size: 1vw;">🚪 登出系統</button>
+        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 2cqw;">🚪 登出系統</button>
     `;
 
     dropdownMenu.innerHTML = menuHTML;
@@ -172,7 +172,7 @@ function updateUIForUser(user, currentRole) {
             userNameDisplay.innerHTML = `🏪 老闆`;
         } else {
             userNameDisplay.innerHTML = `<img src="logo.png" class="buyer" alt="買家圖示" style="
-            font-weight: 600; font-size: 3vw;"> 買家`;
+            height: 100%; max-width: 30%; font-weight: 500; padding: 2cqw 4cqw; border-radius: 10cqw; font-size: 4.5cqw;"> 買家`;
         }
     }
 

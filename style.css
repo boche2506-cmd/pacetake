@@ -248,7 +248,7 @@ img, .card {
 .user-name {
     /* height: 100%; */          /* 移除它，讓內容自然靠 flex 置中即可 */
     /* max-width: 30%; */       /* ❌ 刪除這行！就是它把字跟圖片擠扁的 */
-    font-size: 6cqw;
+    font-size: 8cqw;
     font-weight: 500;
     display: flex; 
     flex-direction: row; 
@@ -260,10 +260,11 @@ img, .card {
 
 /* 💡 新增：限制買家圖片的尺寸，不然圖片會原始大小爆開 */
 .user-name .buyer {
-    height: 6cqw;               /* 讓高度跟字體大小（4cqw）差不多高或稍微大一點 */
+    height: 8cqw;               /* 讓高度跟字體大小（4cqw）差不多高或稍微大一點 */
     width: auto;
     object-fit: contain;
     display: inline-block;
+    color: var(--text-main);
 }
 
 /* 1. 選單本體的外觀與定位 */

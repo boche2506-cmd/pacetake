@@ -48,7 +48,7 @@ html, body {
 input, textarea {
     -webkit-user-select: text;
     user-select: text; /* 解除輸入框鎖定，保證可正常打字與選取 */
-    border: 0.2vw solid var(--border-color);
+    border: 0.1vw solid var(--border-color);
     border-radius: 2.5vw;
     background-color: var(--bg-global);
     color: var(--text-main);
@@ -82,7 +82,7 @@ img, .card {
     flex-direction: column;  /* 垂直排列 */
     justify-content: space-between;
     align-items: stretch; 
-    border: 0.2vw solid var(--border-color);
+    border: 0.1vw solid var(--border-color);
     border-radius: 4vw;
     box-shadow: var(--shadow-md);
     padding: 1vw;
@@ -179,13 +179,14 @@ img, .card {
     box-sizing: border-box;
     gap:0.25vw;
     white-space: nowrap;
+    position: relative;
 }
 
 .theme-toggle {
     font-size: 1.25vw;
     padding: 0.25vw;
     background: var(--card-bg);
-    border: 0.2vw solid var(--border-color);
+    border: 0.1vw solid var(--border-color);
     border-radius: 50%;
     color: var(--text-main);
     cursor: pointer;
@@ -203,7 +204,7 @@ img, .card {
     font-weight: 500;
     background-color: var(--brand-blue);
     color: #FFFFFF;
-    border: 0.2vw solid var(--border-color);
+    border: 0.1vw solid var(--border-color);
     padding: 0.5vw 1vw;
     border-radius: 2vw;
     box-shadow: var(--shadow-sm);
@@ -224,8 +225,8 @@ img, .card {
     font-weight: 500;
     background-color: var(--card-bg);
     color: var(--text-main);
-    border: 0.2vw solid var(--border-color);
-    padding: 0.93vw 1.86vw;
+    border: 0.1vw solid var(--border-color);
+    padding: 1vw 2vw;
     border-radius: 1.25rem;
     box-shadow: var(--shadow-sm);
     cursor: pointer;
@@ -244,25 +245,24 @@ img, .card {
     position: absolute;
     top: 100%;                 /* 緊貼在頭像/名字按鈕下方 */
     right: 0;
-    height: 18rem;
-    width: 10rem;
+    height: 70%;
+    max-width: 60%;
     left: auto;
     background-color: #ffffff; /* 白色背景 */
-    min-width: 80%;          /* 給選單一個足夠的寬度 */
-    border: 1px solid #e0e0e0; /* 淡淡的灰色外框 */
-    border-radius: 1.86vw;        /* 圓角看起來比較現代 */
-    padding: 0.93vw 1.86vw;            /* 上下留點空格 */
-    box-shadow: 0 0.93vw 0.75rem rgba(0,0,0,0.1); /* 漂浮陰影效果 */
+    border: 0.1vw solid #e0e0e0; /* 淡淡的灰色外框 */
+    border-radius: 2vw;        /* 圓角看起來比較現代 */
+    padding: 1vw 2vw;            /* 上下留點空格 */
+    box-shadow: 0 1vw 2vw rgba(0,0,0,0.1); /* 漂浮陰影效果 */
     z-index: 100;             /* 確保一定在最上層 */
 }
 
 /* 2. 控制選單內每一行 <a> 超連結的排版（解決擠扁換行問題） */
 .dropdown-menu .nav-fast {
     display: block;            /* 核心：讓每一個選項各佔獨立的一整行 */
-    padding: 0.93vw 1.86vw;        /* 讓手機或滑鼠比較好點擊的範圍 */
+    padding: 1vw 2vw;        /* 讓手機或滑鼠比較好點擊的範圍 */
     color: #333333;            /* 文字顏色 */
     text-decoration: none;     /* 移除超連結下底線 */
-    font-size: 0.75rem;
+    font-size: 3vw;
     white-space: nowrap;       /* 核心：強制一行字絕對不換行 */
     text-align: left;          /* 文字靠左對齊 */
 }
@@ -310,30 +310,30 @@ img, .card {
 .modal-card {
     color: var(--text-main);
     background-color: var(--bg-container);
-    border: 0.1rem solid var(--border-color);
-    border-radius: 1.25rem;
+    border: 0.1vw solid var(--border-color);
+    border-radius: 2vw;
     max-width: 100%;
-    padding: 1.86vw;
+    padding: 2vw;
     box-shadow: var(--shadow-md);
     text-align: center;
 }
 
 .modal-title {
-    font-size: 1rem;
+    font-size: 0.25vw;
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 0.25vw;
 }
 
 .modal-desc-address {
-    font-size: 13px;
+    font-size: 3vw;
     color: var(--text-main);
     line-height: 1;
-    margin-bottom: 1.25rem;
+    margin-bottom: 4vw;
     word-break: break-all;
     background-color: var(--bg-global);
-    padding: 1.86vw;
-    border-radius: 1.86vw;
-    border: 1px solid var(--border-color);
+    padding: 2vw;
+    border-radius: 2vw;
+    border: 0.1vw solid var(--border-color);
     text-align: left;
 }
 
@@ -341,15 +341,15 @@ img, .card {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1.86vw;
+    gap: 2vw;
     width: 100%;
-    padding: 1.86vw;
-    border-radius: 0.75rem;
-    font-size: 0.875rem;
+    padding: 2vw;
+    border-radius: 2vw;
+    font-size: 0.25vw;
     font-weight: 600;
     cursor: pointer;
-    margin-bottom: 1.86vw;
-    border: 1px solid var(--border-color);
+    margin-bottom: 2vw;
+    border: 0.1vw solid var(--border-color);
     background: var(--card-bg);
     color: var(--text-main);
 }

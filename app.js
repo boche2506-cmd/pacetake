@@ -171,7 +171,7 @@ function updateUIForUser(user, currentRole) {
         } else if (currentRole === "seller") {
             userNameDisplay.innerHTML = `🏪 老闆`;
         } else {
-            userNameDisplay.innerHTML = `<img src="logo.png" class="buyer" alt="買家圖示" style="display: flex; flex-direction: row; justify-content: center; align-items: center;"> 買家`;
+            userNameDisplay.innerHTML = `<img src="logo.png" class="buyer" alt="買家圖示"> 買家`;
         }
     }
 

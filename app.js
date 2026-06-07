@@ -110,7 +110,7 @@ function renderDynamicMenu(role) {
 
     menuHTML += `
         <div class="menu-divider"></div>
-        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 0.5rem; background: none; border: none; cursor: pointer; font-size: 0.75rem;">🚪 登出系統</button>
+        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 0.25vw; background: none; border: none; cursor: pointer; font-size: 1vw;">🚪 登出系統</button>
     `;
 
     dropdownMenu.innerHTML = menuHTML;
@@ -172,7 +172,7 @@ function updateUIForUser(user, currentRole) {
             userNameDisplay.innerHTML = `🏪 老闆`;
         } else {
             userNameDisplay.innerHTML = `<img src="logo.png" class="buyer" alt="買家圖示" style="
-            font-weight: 600; font-size: 0.75rem;"> 買家`;
+            font-weight: 600; font-size: 3vw;"> 買家`;
         }
     }
 
@@ -454,11 +454,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     if (newebpayContainer) {
         newebpayContainer.innerHTML = `
-            <label style="margin-bottom:0.75rem; display:block; font-size:0.75rem; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                <input type="text" id="merchantIdInput" class="input-style" style="height:1.5rem;" placeholder="請輸入 商店代號 (MerchantID)">
-                <input type="text" id="hashKeyInput" class="input-style" style="height:1.5rem;" placeholder="請輸入 HashKey">
-                <input type="text" id="hashIvInput" class="input-style" style="height:1.5rem;" placeholder="請輸入 HashIV">
+            <label style="margin-bottom:2.5vw; display:block; font-size:2.5vw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
+            <div style="display:flex; flex-direction:column; gap:1vw;">
+                <input type="text" id="merchantIdInput" class="input-style" style="height:5vw;" placeholder="請輸入 商店代號 (MerchantID)">
+                <input type="text" id="hashKeyInput" class="input-style" style="height:5vw;" placeholder="請輸入 HashKey">
+                <input type="text" id="hashIvInput" class="input-style" style="height:5vw;" placeholder="請輸入 HashIV">
             </div>
         `;
     }
@@ -510,19 +510,19 @@ window.addEventListener('DOMContentLoaded', async () => {
             newRow.innerHTML = `
                 <div class="img-upload-box" onclick="triggerUpload(this)">
                     <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                    <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 0.5rem;">
+                    <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2vw;">
                     <div class="upload-placeholder">📷<span>上傳照片</span></div>
                 </div>
                 <div class="item-fields">
-                    <input type="text" class="input-style item-name-input" style="height:1.5rem; padding: 0 0.5rem;" placeholder="品項名稱" required>
+                    <input type="text" class="input-style item-name-input" style="height:5vw; padding: 0 1vw;" placeholder="品項名稱" required>
                     <div class="price-input-wrapper">
                         <span class="price-symbol">$</span>
-                        <input type="number" class="input-style price-input" style="height:1.5rem; padding-left:0.75rem !important;" placeholder="金額" min="0" required>
+                        <input type="number" class="input-style price-input" style="height:5vw; padding-left:2vw;" placeholder="金額" min="0" required>
                     </div>
                 </div>
-                <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 0.25rem; justify-content: center;">
-                    <div class="drag-handle" style="width: 1.5rem; height: 2rem; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: grab;">☰</div>
-                    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 1.5rem; height: 2rem; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">❌</button>
+                <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 1vw; justify-content: center;">
+                    <div class="drag-handle" style="width: 3vw; height: 6vw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 2vw; cursor: grab;">☰</div>
+                    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 3vw; height: 4vw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 2vw;">❌</button>
                 </div>
             `;
             menuUploadList.appendChild(newRow);
@@ -727,7 +727,7 @@ function renderAdminTable() {
     if (!tbody) return;
     tbody.innerHTML = '';
     if (allStores.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:0.5rem; color:#aaa;">目前雲端尚無店家資料</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1vw; color:#aaa;">目前雲端尚無店家資料</td></tr>';
         return;
     }
     allStores.forEach(store => {
@@ -737,12 +737,12 @@ function renderAdminTable() {
         const statusText = store.status === 'offline' ? '🔴 下線' : '🟢 上線';
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td style="padding: 0.5rem; border: 1px solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
-            <td style="padding: 0.5rem; border: 1px solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
-            <td style="padding: 0.5rem; border: 1px solid #3a3a3a; color: #bbb;">${phone}</td>
-            <td style="padding: 0.5rem; border: 1px solid #3a3a3a; text-align: center; color: ${store.status === 'offline' ? '#ef4444' : '#10b981'}; font-weight: bold;">${statusText}</td>
-            <td style="padding: 0.5rem; border: 1px solid #3a3a3a; text-align: center;">
-                <button onclick="window.deleteStore('${store.id}')" style="padding: 0.25rem 0.5rem; background: #ef4444; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: bold;">刪除</button>
+            <td style="padding: 1vw; border: 1px solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
+            <td style="padding: 1vw; border: 1px solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
+            <td style="padding: 1vw; border: 1px solid #3a3a3a; color: #bbb;">${phone}</td>
+            <td style="padding: 1vw; border: 1px solid #3a3a3a; text-align: center; color: ${store.status === 'offline' ? '#ef4444' : '#10b981'}; font-weight: bold;">${statusText}</td>
+            <td style="padding: 1vw; border: 1px solid #3a3a3a; text-align: center;">
+                <button onclick="window.deleteStore('${store.id}')" style="padding: 1vw 2vw; background: #ef4444; color: white; border: none; border-radius: 1vw; cursor: pointer; font-weight: bold;">刪除</button>
             </td>
         `;
         tbody.appendChild(tr);

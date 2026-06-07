@@ -164,6 +164,7 @@ img, .card {
     justify-content: space-between; 
     align-items: flex-end;  
     box-sizing: border-box;
+    position: relative;
 }
 
 .pace {
@@ -179,7 +180,6 @@ img, .card {
     box-sizing: border-box;
     gap:0.25vw;
     white-space: nowrap;
-    position: relative;
 }
 
 .theme-toggle {

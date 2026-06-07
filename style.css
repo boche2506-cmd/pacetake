@@ -91,7 +91,7 @@ img, .card {
     justify-content: space-between;
     align-items: stretch; 
     border: 0.2cqw solid var(--border-color);
-    border-radius: 5cqw;
+    border-radius: 8%;
     box-shadow: var(--shadow-md);
     padding: 1.5cqw;
     container-type: size; /* 讓這個容器成為所有內部元素的參考點 */
@@ -228,7 +228,7 @@ img, .card {
     white-space: nowrap;
 }
 
-.user-avatar-btn {
+.user-avatar-btn.user-name.buyer {
     height: 100%;
     max-width: 30%;
     font-size: 4cqw;
@@ -246,7 +246,7 @@ img, .card {
     align-items: center; 
     box-sizing: border-box;
     line-height: 1;   /* 讓行距跟著字體一起自動調整 */
-    white-space: nowrap;
+    white-space: nowrap; 
 }
 
 /* 1. 選單本體的外觀與定位 */

@@ -91,7 +91,7 @@ img, .card {
     justify-content: space-between;
     align-items: stretch; 
     border: 0.2cqw solid var(--border-color);
-    border-radius: 8%;
+    border-radius: 7%;
     box-shadow: var(--shadow-md);
     padding: 1.5cqw;
     container-type: size; /* 讓這個容器成為所有內部元素的參考點 */
@@ -157,7 +157,7 @@ img, .card {
 }
 
 .avatar-icon {
-    font-size: 5cqw;
+    font-size: 15cqw;
     height: 100%; 
     max-width: 30%;    
     display: flex;
@@ -228,7 +228,7 @@ img, .card {
     white-space: nowrap;
 }
 
-.user-avatar-btn .user-name .buyer {
+.user-avatar-btn {
     height: 100%;
     max-width: 30%;
     font-size: 4cqw;

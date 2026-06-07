@@ -180,7 +180,7 @@ img, .card {
 .pace {
     height: 100%;
     max-width: 70%;
-    font-size: 4cqw;
+    font-size: 5.25cqw;
     color: var(--text-muted);
     line-height: 1; /* 讓行距跟著字體一起自動調整 */
     display: flex;

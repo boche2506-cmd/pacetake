@@ -247,6 +247,8 @@ img, .card {
 .user-name{
     height: 100%;
     max-width: 30%;
+    display: inline-flex;
+    flex-direction: row;
     align-items: center;
     font-size: 4cqw;
     font-weight: 500;

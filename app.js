@@ -172,7 +172,7 @@ function updateUIForUser(user, currentRole) {
             userNameDisplay.innerHTML = `🏪 老闆`;
         } else {
             userNameDisplay.innerHTML = `<img src="logo.png" class="buyer" alt="買家圖示" style="
-            height: 100%; max-width: 30%; font-weight: 500; padding: 2cqw 4cqw; border-radius: 10cqw; font-size: 4.5cqw;"> 買家`;
+            height: 100%; max-width: 30%; font-weight: 500; padding: 2cqw 4cqw; border-radius: 10cqw; font-size: 4cqw; cursor: pointer; display: flex; flex-direction: row; justify-content: center; align-items: center; "> 買家`;
         }
     }
 

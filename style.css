@@ -186,7 +186,7 @@ img, .card {
     display: flex;
     flex-direction: row; 
     justify-content: flex-start; 
-    align-items: flex-end;
+    align-items: center;
     box-sizing: border-box;
     gap:0.5cqw;
     white-space: nowrap;
@@ -210,7 +210,7 @@ img, .card {
 .login-btn {
     height: 100%;
     max-width: 30%;
-    font-size: 4.5cqw;
+    font-size: 4cqw;
     font-weight: 500;
     background-color: var(--brand-blue);
     color: #FFFFFF;
@@ -230,14 +230,14 @@ img, .card {
 
 .user-avatar-btn {
     height: 100%;
-    max-width: 35%;
-    font-size: 0.625rem;
+    max-width: 30%;
+    font-size: 4cqw;
     font-weight: 500;
     background-color: var(--card-bg);
     color: var(--text-main);
-    border: 0.1vw solid var(--border-color);
-    padding: 1vw 2vw;
-    border-radius: 1.25rem;
+    border: 0.1cqw solid var(--border-color);
+    padding: 2cqw 4cqw;
+    border-radius: 10cqw;
     box-shadow: var(--shadow-sm);
     cursor: pointer;
     display: flex;
@@ -259,20 +259,20 @@ img, .card {
     max-width: 60%;
     left: auto;
     background-color: #ffffff; /* 白色背景 */
-    border: 0.1vw solid #e0e0e0; /* 淡淡的灰色外框 */
-    border-radius: 2vw;        /* 圓角看起來比較現代 */
-    padding: 1vw 2vw;            /* 上下留點空格 */
-    box-shadow: 0 1vw 2vw rgba(0,0,0,0.1); /* 漂浮陰影效果 */
+    border: 0.1cqw solid #e0e0e0; /* 淡淡的灰色外框 */
+    border-radius: 10cqw;        /* 圓角看起來比較現代 */
+    padding: 2cqw 4cqw;            /* 上下留點空格 */
+    box-shadow: 0 1cqw 4cqw rgba(0,0,0,0.9); /* 漂浮陰影效果 */
     z-index: 100;             /* 確保一定在最上層 */
 }
 
 /* 2. 控制選單內每一行 <a> 超連結的排版（解決擠扁換行問題） */
 .dropdown-menu .nav-fast {
     display: block;            /* 核心：讓每一個選項各佔獨立的一整行 */
-    padding: 1vw 2vw;        /* 讓手機或滑鼠比較好點擊的範圍 */
+    padding: 2cqw 4cqw;        /* 讓手機或滑鼠比較好點擊的範圍 */
     color: #333333;            /* 文字顏色 */
     text-decoration: none;     /* 移除超連結下底線 */
-    font-size: 3vw;
+    font-size: 3cqw;
     white-space: nowrap;       /* 核心：強制一行字絕對不換行 */
     text-align: left;          /* 文字靠左對齊 */
 }
@@ -284,9 +284,9 @@ img, .card {
 
 /* 3. 分隔線樣式（就是你 JS 裡的 .menu-divider） */
 .dropdown-menu .menu-divider {
-    height: 0.1rem;
+    height: 0.1cqw;
     background-color: #eeeeee;
-    margin: 0.93vw 1.86vw;             /* 上下留點距離 */
+    margin: 0.5cqw 1cqw;             /* 上下留點距離 */
 }
 
 /* 4. 特殊調整：JS 裡面最後一行的「登出按鈕」 */
@@ -294,8 +294,8 @@ img, .card {
     width: 100%;    /* 覆蓋你寫在行內的 60%，點擊範圍比較大 */
     display: block;
     text-align: left;
-    padding: 0.93vw 1.86vw; /* 跟上面的超連結對齊 */
-    font-size: 0.75rem;  /* 讓字體大小跟其他選項一致 */
+    padding: 0.5cqw 1cqw;  /* 跟上面的超連結對齊 */
+    font-size: 3cqw;  /* 讓字體大小跟其他選項一致 */
 }
 #logoutBtn:hover {
     background-color: #fff0f0; /* 登出按鈕移過去時顯示淡淡的紅色 */
@@ -309,41 +309,41 @@ img, .card {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(0.93vw);
-    -webkit-backdrop-filter: blur(0.93vw);
+    backdrop-filter: blur(1cqw);
+    -webkit-backdrop-filter: blur(1cqw);
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 1.86vw;
+    padding: 1cqw;
 }
 
 .modal-card {
     color: var(--text-main);
     background-color: var(--bg-container);
-    border: 0.1vw solid var(--border-color);
+    border: 0.1cqw solid var(--border-color);
     border-radius: 2vw;
     max-width: 100%;
-    padding: 2vw;
+    padding: 1cqw;
     box-shadow: var(--shadow-md);
     text-align: center;
 }
 
 .modal-title {
-    font-size: 0.25vw;
+    font-size: 3cqw;;
     font-weight: 700;
-    margin-bottom: 0.25vw;
+    margin-bottom: 1cqw;
 }
 
 .modal-desc-address {
-    font-size: 3vw;
+    font-size: 3cqw;
     color: var(--text-main);
     line-height: 1;
-    margin-bottom: 4vw;
+    margin-bottom: 10cqw;
     word-break: break-all;
     background-color: var(--bg-global);
-    padding: 2vw;
-    border-radius: 2vw;
-    border: 0.1vw solid var(--border-color);
+    padding: 1cqw;
+    border-radius: 5cqw;
+    border: 0.1cqw solid var(--border-color);
     text-align: left;
 }
 
@@ -351,15 +351,15 @@ img, .card {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2vw;
+    gap: 1cqw;
     width: 100%;
-    padding: 2vw;
-    border-radius: 2vw;
-    font-size: 0.25vw;
+    padding: 1cqw;
+    border-radius: 5cqw;
+    font-size: 3cqw;
     font-weight: 600;
     cursor: pointer;
-    margin-bottom: 2vw;
-    border: 0.1vw solid var(--border-color);
+    margin-bottom: 10cqw;
+    border: 0.1cqw solid var(--border-color);
     background: var(--card-bg);
     color: var(--text-main);
 }

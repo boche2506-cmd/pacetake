@@ -387,56 +387,85 @@
         }
 
         // 🎨 2. 動態渲染點餐明細與計算總額
-        function renderCart() {
-            const container = document.getElementById('cartItemsContainer');
-            if (!container) return;
+       function renderCart() {
+    const container = document.getElementById('cartItemsContainer');
+    if (!container) return;
 
-            if (cartData.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車是空的，快去首頁選購吧！</div>`;
-                finalTotalAmount = 0;
-                return;
-            }
+    // 💡 新增：用來累加購物車裡所有商品的總數量
+    let totalQty = 0;
 
-            let html = '';
-            let total = 0;
+    if (cartData.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車是空的，快去首頁選購吧！</div>`;
+        finalTotalAmount = 0;
+
+        // 💡 關鍵：購物車空了，呼叫更新按鈕計數為 (0)
+        updateBottomCartBadge(0);
+        return;
+    }
+
+    let html = '';
+    let total = 0;
             
-            cartData.forEach(item => {
-                const itemPrice = parseInt(item.price) || 0;
-                const itemQty = parseInt(item.qty) || 1;
-                const subtotal = itemPrice * itemQty;
-                total += subtotal;
+    cartData.forEach(item => {
+        const itemPrice = parseInt(item.price) || 0;
+        const itemQty = parseInt(item.qty) || 1;
+        const subtotal = itemPrice * itemQty;
+        total += subtotal;
 
-                html += `
-                    <div class="bill-item">
-                        <div>
-                            <span class="item-name">${item.name}</span>
-                            <span class="item-qty">x${itemQty}</span>
-                        </div>
-                        <span class="item-price">$${subtotal}</span>
-                    </div>
-                `;
-            });
+        // 💡 關鍵：把每一項商品的數量累加起來
+        totalQty += itemQty;
 
-            finalTotalAmount = total;
-
-            html += `
-                <div class="bill-total-row">
-                    <span class="total-label">總計金額</span>
-                    <span class="total-amount" id="totalAmountText">$${finalTotalAmount}</span>
+        html += `
+            <div class="bill-item">
+                <div>
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-qty">x${itemQty}</span>
                 </div>
-            `;
-            container.innerHTML = html;
+                <span class="item-price">$${subtotal}</span>
+            </div>
+        `;
+    });
 
-            // 👑 當有了真實的店家 ID 後，立刻發動雙軌支付開關檢查機制
-            if (targetStoreId) {
-                checkStorePaymentConfig(targetStoreId);
-            } else {
-                // 如果是本機隨機產生的模擬資料，預設開啟信用卡
-                selectPayment("CREDIT");
-                initPaymentSelection(true, true);
-            }
-        }
+    finalTotalAmount = total;
 
+    html += `
+        <div class="bill-total-row">
+            <span class="total-label">總計金額</span>
+            <span class="total-amount" id="totalAmountText">$${finalTotalAmount}</span>
+        </div>
+    `;
+    container.innerHTML = html;
+
+    // 💡 關鍵：渲染完明細後，把最後算出來的總數量丟進去更新底部按鈕！
+    updateBottomCartBadge(totalQty); 
+
+    // 👑 修正點：雙軌支付開關檢查機制，應該放在 renderCart 結束之前！
+    if (targetStoreId) {
+        checkStorePaymentConfig(targetStoreId);
+    } else {
+        // 如果是本機隨機產生的模擬資料，預設開啟信用卡
+        selectPayment("CREDIT");
+        initPaymentSelection(true, true);
+    }
+} // 👈 這裡才是 renderCart 真正的結尾！
+
+// 💡 負責更新按鈕文字的函式（獨立在外面，完全正確）
+function updateBottomCartBadge(count) {
+    const badge = document.querySelector('.order-badge-count');
+    if (!badge) return;
+
+    // 超過 99 顯示 99+
+    const displayCount = count > 99 ? '99+' : count;
+    badge.innerText = `(${displayCount})`;
+    
+    // 如果購物車內有東西，可以讓括號數字變色提醒
+    if (count > 0) {
+        badge.style.color = 'var(--brand-green, #52c41a)'; 
+    } else {
+        badge.style.color = 'inherit'; 
+    }
+}
+     
         // 🏪 3. 核心智慧連動防線：去 Firebase 撈店家設定，決定誰長灰、誰當預設值
         async function checkStorePaymentConfig(storeId) {
             const payOptCredit = document.getElementById('payOptCredit');

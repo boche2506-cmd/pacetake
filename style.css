@@ -260,6 +260,7 @@ img, .card {
     object-fit: cover;        /* 關鍵：保護圖片比例不變形，並填滿整個圓圈 */
     display: inline-block;
     object-fit: contain;
+    flex-direction: row;
 }
 
 /* 1. 選單本體的外觀與定位 */

@@ -231,7 +231,7 @@ img, .card {
 .user-avatar-btn {
     height: 100%;             /* 承襲原本的高度，確保在導覽列中置中對齊 */
     max-width: 30%;
-    font-size: 4cqw;
+    font-size: 10cqw;
     font-weight: 500;
     padding: 2cqw 4cqw;               /* 清除原本的文字內襯，避免頭像變形 */
     background-color: var(--card-bg); /* 移除原本的藍色背景，改為透明 */

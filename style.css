@@ -157,7 +157,7 @@ img, .card {
 }
 
 .avatar-icon {
-    font-size: 15cqw;
+    font-size: 5cqw;
     height: 100%; 
     max-width: 30%;    
     display: flex;
@@ -255,8 +255,8 @@ img, .card {
     position: absolute;
     top: 100%;                 /* 緊貼在頭像/名字按鈕下方 */
     right: 0;
-    height: 20cqw;
-    max-width: 10cqw;
+    height: 100cqw;
+    width: 60cqw;
     left: auto;
     background-color: #ffffff; /* 白色背景 */
     border: 0.1cqw solid #e0e0e0; /* 淡淡的灰色外框 */
@@ -326,7 +326,7 @@ img, .card {
     padding: 3cqw;
     box-shadow: var(--shadow-md);
     text-align: center;
-    width: 70%;
+    width: 80cqw;
     gap:3cqw;
 }
 

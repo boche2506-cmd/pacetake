@@ -251,8 +251,8 @@ img, .card {
 }
 
 /* 裡面的買家大頭貼圖片 */
-.user-avatar-btn .buyer {
-    display: inline-flex;
+.buyer {
+    box-sizing: border-box;
     flex-direction: row;
     justify-content: center; 
     align-items: center; 

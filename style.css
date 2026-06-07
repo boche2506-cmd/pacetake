@@ -91,7 +91,7 @@ img, .card {
     justify-content: space-between;
     align-items: stretch; 
     border: 0.2cqw solid var(--border-color);
-    border-radius: 5cqw;
+    border-radius: 4cqw;
     box-shadow: var(--shadow-md);
     padding: 1.5cqw;
     container-type: size; /* 讓這個容器成為所有內部元素的參考點 */
@@ -230,9 +230,9 @@ img, .card {
 
 .user-avatar-btn {
     height: 100%;             
-    /* max-width: 30%; */       /* 💡 建議先註解掉，或確保它夠寬，膠囊按鈕放了圖文需要寬度 */
+    max-width: 30%;             /* 💡 建議先註解掉，或確保它夠寬，膠囊按鈕放了圖文需要寬度 */
     min-width: fit-content;     /* 💡 新增：確保按鈕至少能完整塞下內文 */
-    padding: 0 4cqw;            /* 調整內襯，讓膠囊兩側有舒服的留白 */
+    padding: 0 2cqw;            /* 調整內襯，讓膠囊兩側有舒服的留白 */
     background-color: var(--card-bg); 
     border: 0.1cqw solid var(--border-color);
     border-radius: 10cqw;       
@@ -248,7 +248,7 @@ img, .card {
 .user-name {
     /* height: 100%; */          /* 移除它，讓內容自然靠 flex 置中即可 */
     /* max-width: 30%; */       /* ❌ 刪除這行！就是它把字跟圖片擠扁的 */
-    font-size: 4cqw;
+    font-size: 6cqw;
     font-weight: 500;
     display: flex; 
     flex-direction: row; 
@@ -260,7 +260,7 @@ img, .card {
 
 /* 💡 新增：限制買家圖片的尺寸，不然圖片會原始大小爆開 */
 .user-name .buyer {
-    height: 5cqw;               /* 讓高度跟字體大小（4cqw）差不多高或稍微大一點 */
+    height: 6cqw;               /* 讓高度跟字體大小（4cqw）差不多高或稍微大一點 */
     width: auto;
     object-fit: contain;
     display: inline-block;

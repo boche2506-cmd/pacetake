@@ -237,19 +237,12 @@ img, .card {
     border-radius: 10cqw;       /* 關鍵：變成完美的圓形 */
     box-shadow: var(--shadow-sm);
     cursor: pointer;
-    align-items: center; 
     box-sizing: border-box;
-    display: inline-flex;
-    flex-direction: row;
-    justify-content: center;
 }
 
 .user-name{
     height: 100%;
     max-width: 30%;
-    display: inline-flex;
-    flex-direction: row;
-    align-items: center;
     font-size: 4cqw;
     font-weight: 500;
 }
@@ -258,9 +251,6 @@ img, .card {
 .user-avatar-btn .buyer {
     max-width: 30%;
     height: 100%;
-    display: inline-flex;
-    object-fit: contain;
-    flex-direction: row;
 }
 
 /* 1. 選單本體的外觀與定位 */

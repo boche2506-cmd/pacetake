@@ -249,6 +249,48 @@ img, .card {
     white-space: nowrap; 
 }
 
+.user-name {
+    height: 100%;
+    max-width: 30%;
+    font-size: 4cqw;
+    font-weight: 500;
+    background-color: var(--card-bg);
+    color: var(--text-main);
+    border: 0.1cqw solid var(--border-color);
+    padding: 2cqw 4cqw;
+    border-radius: 10cqw;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;;
+    justify-content: center;
+    align-items: center; 
+    box-sizing: border-box;
+    line-height: 1;   /* 讓行距跟著字體一起自動調整 */
+    white-space: nowrap; 
+}
+
+.buyer {
+    height: 100%;
+    max-width: 30%;
+    font-size: 4cqw;
+    font-weight: 500;
+    background-color: var(--card-bg);
+    color: var(--text-main);
+    border: 0.1cqw solid var(--border-color);
+    padding: 2cqw 4cqw;
+    border-radius: 10cqw;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;;
+    justify-content: center;
+    align-items: center; 
+    box-sizing: border-box;
+    line-height: 1;   /* 讓行距跟著字體一起自動調整 */
+    white-space: nowrap; 
+}
+
 /* 1. 選單本體的外觀與定位 */
 .dropdown-menu {
     display: none;             /* 預設隱藏，點擊時用 JS 切換顯示 */

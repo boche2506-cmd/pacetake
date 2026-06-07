@@ -162,7 +162,7 @@ function updateUIForUser(user, currentRole) {
     userNameDisplay = document.getElementById('userNameDisplay');
     
     if (loginBtn) loginBtn.style.display = 'none';
-    if (avatarBtn) avatarBtn.style.display = 'block';
+    if (avatarBtn) avatarBtn.style.display = 'flex';
     if (loginLightbox) loginLightbox.style.display = 'none';
 
     if (userNameDisplay) {

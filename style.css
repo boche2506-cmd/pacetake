@@ -247,7 +247,6 @@ img, .card {
 .user-name{
     height: 100%;
     max-width: 30%;
-    display: inline-flex;
     align-items: center;
     font-size: 4cqw;
     font-weight: 500;
@@ -257,8 +256,6 @@ img, .card {
 .user-avatar-btn .buyer {
     max-width: 30%;
     height: 100%;
-    object-fit: cover;        /* 關鍵：保護圖片比例不變形，並填滿整個圓圈 */
-    display: inline-block;
     object-fit: contain;
     flex-direction: row;
 }

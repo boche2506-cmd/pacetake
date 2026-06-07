@@ -69,7 +69,6 @@ input, textarea {
 img, .card {
     height: auto;
     max-width: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
-    display: block;   /* 避免圖片下方產生多餘的空隙 */
     object-fit: contain;
 }
 

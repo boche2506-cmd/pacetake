@@ -239,6 +239,27 @@ img, .card {
     cursor: pointer;
     align-items: center; 
     box-sizing: border-box;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.user-name{
+    height: 100%;
+    max-width: 30%;
+    display: inline-flex;
+    align-items: center;
+    font-size: 4cqw;
+    font-weight: 500;
+}
+
+/* 裡面的買家大頭貼圖片 */
+.user-avatar-btn .buyer {
+    max-width: 30%;
+    height: 100%;
+    object-fit: cover;        /* 關鍵：保護圖片比例不變形，並填滿整個圓圈 */
+    display: inline-block;
+    object-fit: contain;
 }
 
 /* 1. 選單本體的外觀與定位 */

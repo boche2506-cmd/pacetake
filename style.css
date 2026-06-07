@@ -254,8 +254,9 @@ img, .card {
     flex-direction: row; 
     justify-content: center;
     align-items: center; 
-    gap: 1.5cqw;                /* 💡 新增：圖片/皇冠和文字之間的小間距 */
+    gap: 1cqw;                /* 💡 新增：圖片/皇冠和文字之間的小間距 */
     white-space: nowrap;        /* 💡 關鍵：死都不准換行，強迫橫排 */
+    color: var(--text-main);
 }
 
 /* 💡 新增：限制買家圖片的尺寸，不然圖片會原始大小爆開 */
@@ -264,7 +265,6 @@ img, .card {
     width: auto;
     object-fit: contain;
     display: inline-block;
-    color: var(--text-main);
 }
 
 /* 1. 選單本體的外觀與定位 */

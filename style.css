@@ -237,9 +237,6 @@ img, .card {
     border-radius: 10cqw;       /* 關鍵：變成完美的圓形 */
     box-shadow: var(--shadow-sm);
     cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
     align-items: center; 
     box-sizing: border-box;
 }
@@ -247,10 +244,6 @@ img, .card {
 .user-name{
     height: 100%;
     max-width: 30%;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center; 
 }
 
 /* 裡面的買家大頭貼圖片 */

@@ -228,7 +228,7 @@ img, .card {
     white-space: nowrap;
 }
 
-.user-avatar-btn.user-name.buyer {
+.user-avatar-btn .user-name .buyer {
     height: 100%;
     max-width: 30%;
     font-size: 4cqw;
@@ -255,8 +255,8 @@ img, .card {
     position: absolute;
     top: 100%;                 /* 緊貼在頭像/名字按鈕下方 */
     right: 0;
-    height: 70%;
-    max-width: 60%;
+    height: 20cqw;
+    max-width: 10cqw;
     left: auto;
     background-color: #ffffff; /* 白色背景 */
     border: 0.1cqw solid #e0e0e0; /* 淡淡的灰色外框 */
@@ -321,28 +321,29 @@ img, .card {
     color: var(--text-main);
     background-color: var(--bg-container);
     border: 0.1cqw solid var(--border-color);
-    border-radius: 2vw;
+    border-radius: 2cqw;
     max-width: 100%;
-    padding: 1cqw;
+    padding: 3cqw;
     box-shadow: var(--shadow-md);
     text-align: center;
+    width: 70%;
+    gap:3cqw;
 }
 
 .modal-title {
-    font-size: 3cqw;;
+    font-size: 5cqw;;
     font-weight: 700;
-    margin-bottom: 1cqw;
+    margin-bottom: 2cqw;
 }
 
 .modal-desc-address {
-    font-size: 3cqw;
+    font-size: 5cqw;
     color: var(--text-main);
     line-height: 1;
-    margin-bottom: 10cqw;
     word-break: break-all;
     background-color: var(--bg-global);
     padding: 1cqw;
-    border-radius: 5cqw;
+    border-radius: 2cqw;
     border: 0.1cqw solid var(--border-color);
     text-align: left;
 }
@@ -354,11 +355,11 @@ img, .card {
     gap: 1cqw;
     width: 100%;
     padding: 1cqw;
-    border-radius: 5cqw;
-    font-size: 3cqw;
+    border-radius: 3cqw;
+    font-size: 5cqw;
     font-weight: 600;
+    margin-bottom: 2cqw;
     cursor: pointer;
-    margin-bottom: 10cqw;
     border: 0.1cqw solid var(--border-color);
     background: var(--card-bg);
     color: var(--text-main);

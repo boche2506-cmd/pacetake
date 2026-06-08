@@ -268,163 +268,219 @@
     </style>
 </head>
 <body>
-
     <div class="phone-wrapper">
-        <!-- 頂部高級感大字留白區 -->
-        <header class="header">
-            <div class="top-nav">
-                <a href="index.html" class="back-btn nav-fast">⬅️ 返回首頁</a>
-                <button class="theme-toggle" id="themeToggleBtn">🌓</button>
+    <!-- 頂部高級感大字留白區 -->
+    <header class="header">
+        <div class="top-nav">
+            <a href="index.html" class="back-btn nav-fast">⬅️ 返回首頁</a>
+            <button class="theme-toggle" id="themeToggleBtn">🌓</button>
+        </div>
+        <!-- 💡 這裡加上 id 方便用 JS 動態寫入 -->
+        <div class="store-header-info" id="storeHeaderInfo">
+            <h1 id="storeNameText">正在載入雲端店家...</h1>
+            <div class="store-meta">
+                <span id="storeAddressText">📍 讀取地址中...</span>
+                <span>•</span>
+                <span>⚡ 0.05 km</span>
             </div>
-            <div class="store-header-info">
-                <h1>池上木盒便當 - 信義店</h1>
-                <div class="store-meta">
-                    <span>📍 台北市信義區松山路 123 號</span>
-                    <span>•</span>
-                    <span>⚡ 0.05 km</span>
-                </div>
-            </div>
-        </header>
+        </div>
+    </header>
 
-        <!-- 中間精品菜單 -->
-        <main class="menu-container">
-            <!-- 品項 1 -->
-            <div class="food-card" data-price="120" data-id="item_1">
-                <div class="food-img">🍱</div>
-                <div class="food-info">
-                    <div class="food-name">招牌招牌木盒便當</div>
-                    <div class="food-price">$120</div>
-                </div>
-                <div class="action-container">
-                    <button class="add-cart-btn btn-trigger">➕ 加到購物車</button>
-                </div>
-            </div>
+    <!-- 中間精品菜單（原本寫死的卡片全部清空，改由 JS 動態生成） -->
+    <main class="menu-container" id="menuContainer">
+        <!-- 菜單品項會動態渲染在這裡 -->
+    </main>
 
-            <!-- 品項 2 -->
-            <div class="food-card" data-price="135" data-id="item_2">
-                <div class="food-img">🍗</div>
-                <div class="food-info">
-                    <div class="food-name">酥炸大雞腿便當</div>
-                    <div class="food-price">$135</div>
-                </div>
-                <div class="action-container">
-                    <button class="add-cart-btn btn-trigger">➕ 加到購物車</button>
-                </div>
-            </div>
+    <!-- 底部懸浮欄 -->
+    <footer class="bottom-bar">
+        <div class="cart-summary" id="cartSummaryText">
+            🛒 購物車已加入 0 項商品 · 總計 $0
+        </div>
+        <a href="cart.html" class="checkout-btn nav-fast" id="checkoutBtn">去結帳 &gt;&gt;</a>
+    </footer>
+</div>
 
-            <!-- 品項 3 -->
-            <div class="food-card" data-price="110" data-id="item_3">
-                <div class="food-img">🥩</div>
-                <div class="food-info">
-                    <div class="food-name">厚切大排骨便當</div>
-                    <div class="food-price">$110</div>
-                </div>
-                <div class="action-container">
-                    <button class="add-cart-btn btn-trigger">➕ 加到購物車</button>
-                </div>
-            </div>
+<!-- 💡 請確保您的網頁頂部或此處已引入 Firebase SDK -->
+<script>
+    // ==========================================
+    // 0. 從網址解析 storeId 並從 Firebase 撈資料
+    // ==========================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentStoreId = urlParams.get('storeId');
 
-            <!-- 品項 4 (連動下架防線展示) -->
-            <div class="food-card sold-out" data-price="95" data-id="item_4">
-                <div class="food-img">🐟</div>
-                <div class="food-info">
-                    <div class="food-name">薄鹽鯖魚便當 (售罄)</div>
-                    <div class="food-price">$95</div>
-                </div>
-                <div class="action-container">
-                    <button class="add-cart-btn sold-out-btn" disabled>🔴 已售罄</button>
-                </div>
-            </div>
-        </main>
+    if (!currentStoreId) {
+        alert("❌ 找不到店家資訊，將返回首頁！");
+        window.location.href = "index.html";
+    } else {
+        // 當網頁載入完成後，撈取 Firebase 資料
+        document.addEventListener("DOMContentLoaded", fetchStoreAndMenu);
+    }
 
-        <!-- 底部懸浮欄 -->
-        <footer class="bottom-bar">
-            <div class="cart-summary" id="cartSummaryText">
-                🛒 購物車已加入 0 項商品 · 總計 $0
-            </div>
-            <a href="cart.html" class="checkout-btn nav-fast" id="checkoutBtn">去結帳 &gt;&gt;</a>
-        </footer>
-    </div>
+    function fetchStoreAndMenu() {
+    const db = firebase.firestore();
+    
+    // 1. 直接讀取該店家的 Document 資料
+    db.collection("stores").doc(currentStoreId).get().then((doc) => {
+        if (doc.exists) {
+            const storeData = doc.data();
+            
+            // 2. 渲染店名與地址（精準對接您的資料庫欄位）
+            const finalName = storeData.shopName || '未命名店家';
+            const finalAddress = storeData.shopAddress || '';
+            const emoji = storeData.shopLogo || '🏪'; // 您的欄位叫 shopLogo
 
-    <script>
-        // 🚀 0秒無縫閃轉外掛核心架獲
-        function bindFastClick(element, callback) {
-            if (!element) return;
-            let triggered = false;
-            function trigger(e) {
-                if (!triggered) {
-                    triggered = true;
-                    setTimeout(() => { triggered = false; }, 300);
-                    callback(e);
-                }
-                e.preventDefault();
+            document.getElementById('storeNameText').innerText = `${finalName}`;
+            document.getElementById('storeAddressText').innerText = `📍 ${finalAddress}`;
+            
+            // 3. 核心改變：直接從 storeData 裡面拿出 menuList 陣列
+            const menuList = storeData.menuList || [];
+            const menuContainer = document.getElementById('menuContainer');
+            menuContainer.innerHTML = ""; // 清空原本載入中的提示
+
+            if (menuList.length === 0) {
+                menuContainer.innerHTML = `<div style="text-align:center; padding:10cqw; color:var(--text-main);">📭 本店家目前尚未上架任何餐點。</div>`;
+                return;
             }
-            element.addEventListener('touchstart', trigger, { passive: false });
-            element.addEventListener('mousedown', trigger);
-        }
 
-        // 🌓 系統全局膚色同步防線
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        function initTheme() {
-            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        }
-        bindFastClick(themeToggleBtn, () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('pacetake-theme', newTheme);
-        });
-        initTheme();
-
-        // 🛒 購物車動態計數與金額加算核心
-        let cartCount = 0;
-        let cartTotal = 0;
-        const cartSummaryText = document.getElementById('cartSummaryText');
-
-        function updateCartUI() {
-            cartSummaryText.innerText = `🛒 購物車已加入 ${cartCount} 項商品 · 總計 $${cartTotal}`;
-        }
-
-        // 綁定所有加到購物車按鈕
-        const addBtns = document.querySelectorAll('.btn-trigger');
-        addBtns.forEach(btn => {
-            bindFastClick(btn, (e) => {
-                const card = btn.closest('.food-card');
-                if(card.classList.contains('sold-out')) return; // 安全防線
+            // 4. 用 forEach 迴圈把陣列裡的每一個 map（餐點）倒出來渲染
+            menuList.forEach((item, index) => {
+                const itemId = `item_${index}`; // 陣列沒有獨立 ID，我們用索引值當作代號
+                const itemName = item.name || '未命名商品';
+                const itemPrice = parseInt(item.price, 10) || 0;
+                const itemImg = item.image || ''; // 您的欄位叫 image (內含 Base64 圖片編碼)
                 
-                const price = parseInt(card.getAttribute('data-price'), 10);
-                
-                cartCount += 1;
-                cartTotal += price;
+                // 檢查店家狀態或個別餐點是否有售罄狀態 (可視您未來需求調整)
+                const isSoldOut = storeData.status === "offline"; 
 
-                // 0.2秒極簡精品流暢點擊回饋動畫
-                btn.innerText = "✓ 已加入";
-                btn.style.backgroundColor = "rgba(0, 102, 255, 0.1)";
-                btn.style.color = "var(--brand-blue)";
-                btn.style.borderColor = "var(--brand-blue)";
+                // 建立餐點 HTML 卡片結構
+                const foodCard = document.createElement('div');
+                foodCard.className = `food-card ${isSoldOut ? 'sold-out' : ''}`;
+                foodCard.setAttribute('data-price', itemPrice);
+                foodCard.setAttribute('data-id', itemId);
+                foodCard.setAttribute('data-name', itemName); // 順便把名字存進 HTML 節點，方便等一下進購物車
 
-                setTimeout(() => {
-                    btn.innerText = "➕ 加到購物車";
-                    btn.style.backgroundColor = "var(--bg-global)";
-                    btn.style.color = "var(--text-main)";
-                    btn.style.borderColor = "var(--border-color)";
-                }, 400);
+                // 處理 Base64 圖片或預設大頭貼
+                let imgElement = `🍱`;
+                if (itemImg && itemImg.startsWith('data:image')) {
+                    imgElement = `<img src="${itemImg}" style="width:100%; height:100%; object-fit:cover; border-radius:2cqw;">`;
+                }
 
-                updateCartUI();
-            });
-        });
+                foodCard.innerHTML = `
+                    <div class="food-img">${imgElement}</div>
+                    <div class="food-info">
+                        <div class="food-name">${itemName} ${isSoldOut ? '(暫停供應)' : ''}</div>
+                        <div class="food-price">$${itemPrice}</div>
+                    </div>
+                    <div class="action-container">
+                        ${isSoldOut 
+                            ? `<button class="add-cart-btn sold-out-btn" disabled>🔴 暫停供應</button>`
+                            : `<button class="add-cart-btn btn-trigger">➕ 加到購物車</button>`
+                        }
+                    </div>
+                `;
 
-        // 全局相對路徑跳轉無縫對接
-        const navElements = document.querySelectorAll('.nav-fast');
-        navElements.forEach(elem => {
-            bindFastClick(elem, () => {
-                const dest = elem.getAttribute('href');
-                if (dest && dest !== '#') {
-                    window.location.href = dest;
+                menuContainer.appendChild(foodCard);
+
+                // 動態綁定新生成的「加到購物車」按鈕點擊事件
+                if (!isSoldOut) {
+                    const btn = foodCard.querySelector('.btn-trigger');
+                    bindCartEvent(btn);
                 }
             });
+
+        } else {
+            document.getElementById('storeNameText').innerText = "❌ 店家不存在";
+            document.getElementById('menuContainer').innerHTML = "";
+            console.error("找不到該店家的 Document ID");
+        }
+    })
+    .catch((error) => {
+        console.error("讀取雲端店家資料失敗:", error);
+    });
+}
+
+
+    // ==========================================
+    // 1. 🚀 您原本的 0秒無縫閃轉外掛核心架構
+    // ==========================================
+    function bindFastClick(element, callback) {
+        if (!element) return;
+        let triggered = false;
+        function trigger(e) {
+            if (!triggered) {
+                triggered = true;
+                setTimeout(() => { triggered = false; }, 300);
+                callback(e);
+            }
+            e.preventDefault();
+        }
+        element.addEventListener('touchstart', trigger, { passive: false });
+        element.addEventListener('mousedown', trigger);
+    }
+
+    // 🌓 系統全局膚色同步防線
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    function initTheme() {
+        const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+    bindFastClick(themeToggleBtn, () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('pacetake-theme', newTheme);
+    });
+    initTheme();
+
+    // ==========================================
+    // 2. 🛒 購物車動態計數與金額加算核心
+    // ==========================================
+    let cartCount = 0;
+    let cartTotal = 0;
+    const cartSummaryText = document.getElementById('cartSummaryText');
+
+    function updateCartUI() {
+        cartSummaryText.innerText = `🛒 購物車已加入 ${cartCount} 項商品 · 總計 $${cartTotal}`;
+    }
+
+    // 將原本整批綁定的邏輯，改為「單一按鈕獨立綁定」的函式，以便動態生成的卡片呼叫
+    function bindCartEvent(btn) {
+        bindFastClick(btn, (e) => {
+            const card = btn.closest('.food-card');
+            if(card.classList.contains('sold-out')) return; // 安全防線
+            
+            const price = parseInt(card.getAttribute('data-price'), 10);
+            
+            cartCount += 1;
+            cartTotal += price;
+
+            // 精品流暢點擊回饋動畫
+            btn.innerText = "✓ 已加入";
+            btn.style.backgroundColor = "rgba(0, 102, 255, 0.1)";
+            btn.style.color = "var(--brand-blue)";
+            btn.style.borderColor = "var(--brand-blue)";
+
+            setTimeout(() => {
+                btn.innerText = "➕ 加到購物車";
+                btn.style.backgroundColor = "var(--bg-global)";
+                btn.style.color = "var(--text-main)";
+                btn.style.borderColor = "var(--border-color)";
+            }, 400);
+
+            updateCartUI();
         });
-    </script>
+    }
+
+    // 全局相對路徑跳轉無縫對接
+    const navElements = document.querySelectorAll('.nav-fast');
+    navElements.forEach(elem => {
+        bindFastClick(elem, () => {
+            const dest = elem.getAttribute('href');
+            if (dest && dest !== '#') {
+                window.location.href = dest;
+            }
+        });
+    });
+</script>
 </body>
 </html>

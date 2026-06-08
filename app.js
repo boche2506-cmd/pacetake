@@ -678,7 +678,7 @@ function filterAndRenderStores() {
         const paySupported = store.isOnlinePayEnabled !== false;
 
         const card = document.createElement('a');
-        card.href = `menu.html?storeId=${store.id}`;
+        card.href = `store.html?storeId=${store.id}`;
         card.className = 'store-card';
         card.innerHTML = `
             <div class="store-img">${store.emoji || '🏪'}</div>

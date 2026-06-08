@@ -200,225 +200,179 @@
 </div>
 <script type="module" src="app.js">
     // ==========================================
-    // 🧯 1. FIREBASE 初始化防線（請填入您專案的真實金鑰）
-    // ==========================================
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY_HERE",
-        authDomain: "YOUR_PROJECT_://firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID_HERE",
-        storageBucket: "YOUR_PROJECT_://appspot.com",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
+// 🚀 PACE 專屬：store.html 點餐與購物車獨立控制腳本
+// ==========================================
 
-    // 確保不重複初始化，安全防線
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+// 1. 先抓到網址後面的店家 ID
+const urlParams = new URLSearchParams(window.location.search);
+const currentStoreId = urlParams.get('storeId');
 
-    // ==========================================
-    // 🚀 2. 解析網址並「強制推進」撈取雲端資料
-    // ==========================================
-    const urlParams = new URLSearchParams(window.location.search);
-    const currentStoreId = urlParams.get('storeId');
-
-    console.log("[PACE DEBUG] 網址抓到的店家 ID 為:", currentStoreId);
-
+// 2. 當網頁完全開好之後，立刻發動
+window.addEventListener('DOMContentLoaded', () => {
     if (!currentStoreId) {
         alert("❌ 找不到店家資訊，將返回首頁！");
         window.location.href = "index.html";
-    } else {
-        // 拋棄所有監聽器，直接執行！
-        fetchStoreAndMenu();
+        return;
     }
+    
+    // 呼叫下方抓資料的函式
+    loadStoreAndMenu();
+});
 
-    function fetchStoreAndMenu() {
-        console.log("[PACE DEBUG] 開始連線 Firestore 讀取店家...");
-        const db = firebase.firestore();
-        
-        db.collection("stores").doc(currentStoreId).get().then((doc) => {
-            console.log("[PACE DEBUG] Firebase 連線成功！該店家存在狀態:", doc.exists);
+// ==========================================
+// 專門去雲端抓這家店資料與菜單的函式 (大括號完美修復版)
+// ==========================================
+async function loadStoreAndMenu() {
+    try {
+        // 💡 直接沿用您專案最習慣的連線大腦！
+        const docRef = firebase.firestore().collection("stores").doc(currentStoreId);
+        const docSnap = await docRef.get();
+
+        if (docSnap.exists) {
+            const storeData = docSnap.data();
             
-            if (doc.exists) {
-                const storeData = doc.data();
-                
-                // 讀取您的真實資料庫欄位
-                const finalName = storeData.shopName || '未命名店家';
-                const finalAddress = storeData.shopAddress || '';
-                const emoji = storeData.shopLogo || '🏪';
+                        // --- 區塊 B：畫出中間的菜單品項與備註欄 ---
+            const menuList = storeData.menuList || [];
+            const menuContainer = document.getElementById('menuContainer');
+            menuContainer.innerHTML = ""; // 清空載入中提示
 
-                // 渲染頂部店家資訊
-                document.getElementById('storeNameText').innerText = `${finalName}`;
-                document.getElementById('storeAddressText').innerText = `📍 ${finalAddress}`;
-                
-                // 讀取您的 menuList 陣列
-                const menuList = storeData.menuList || [];
-                const menuContainer = document.getElementById('menuContainer');
-                menuContainer.innerHTML = ""; // 清空載入中提示
+            if (menuList.length === 0) {
+                menuContainer.innerHTML = `<div style="text-align:center; padding:10cqw; color:var(--text-main);">📭 本店家目前尚未上架任何餐點。</div>`;
+                return;
+            }
 
-                if (menuList.length === 0) {
-                    menuContainer.innerHTML = `<div style="text-align:center; padding:10cqw; color:var(--text-main);">📭 本店家目前尚未上架任何餐點。</div>`;
-                    return;
+            let localCartData = []; // 用來裝這頁選好商品的籃子
+            const cartSummaryText = document.getElementById('cartSummaryText');
+
+            // 迴圈把菜一道一道畫出來
+            menuList.forEach((item, index) => {
+                const itemId = `item_${index}`;
+                const itemName = item.name || '未命名商品';
+                const itemPrice = parseInt(item.price, 10) || 0;
+                const itemImg = item.image || '';
+                const isSoldOut = storeData.status === "offline";
+
+                const foodCard = document.createElement('div');
+                foodCard.className = `food-card ${isSoldOut ? 'sold-out' : ''}`;
+                
+                // 處理餐點本身的相片 (Base64)
+                let imgElement = `🍱`;
+                if (itemImg && itemImg.startsWith('data:image')) {
+                    imgElement = `<img src="${itemImg}" style="width:100%; height:100%; object-fit:cover; border-radius:2cqw;">`;
                 }
 
-                // 迴圈渲染菜單陣列
-                menuList.forEach((item, index) => {
-                    const itemId = `item_${index}`; 
-                    const itemName = item.name || '未命名商品';
-                    const itemPrice = parseInt(item.price, 10) || 0;
-                    const itemImg = item.image || ''; 
-                    
-                    // 根據您資料庫的 status 判斷是否下線
-                    const isSoldOut = storeData.status === "offline"; 
-
-                    const foodCard = document.createElement('div');
-                    foodCard.className = `food-card ${isSoldOut ? 'sold-out' : ''}`;
-                    foodCard.setAttribute('data-price', itemPrice);
-                    foodCard.setAttribute('data-id', itemId);
-                    foodCard.setAttribute('data-name', itemName);
-
-                    // 處理您資料庫中的 Base64 圖片編碼
-                    let imgElement = `🍱`;
-                    if (itemImg && itemImg.startsWith('data:image')) {
-                        imgElement = `<img src="${itemImg}" style="width:100%; height:100%; object-fit:cover; border-radius:2cqw;">`;
-                    }
-
-                    foodCard.innerHTML = `
+                // 注入一整道菜的卡片 HTML (含數量加減與備註輸入框)
+                foodCard.innerHTML = `
+                    <div class="food-main-row" style="display: flex; width: 100%; align-items: center;">
                         <div class="food-img">${imgElement}</div>
-                        <div class="food-info">
-                            <div class="food-name">${itemName} ${isSoldOut ? '(暫停供應)' : ''}</div>
+                        <div class="food-info" style="flex: 1; margin-left: 3cqw;">
+                            <div class="food-name">${itemName}</div>
                             <div class="food-price">$${itemPrice}</div>
                         </div>
                         <div class="action-container">
                             ${isSoldOut 
                                 ? `<button class="add-cart-btn sold-out-btn" disabled>🔴 暫停供應</button>`
-                                : `<button class="add-cart-btn btn-trigger">➕ 加到購物車</button>`
+                                : `
+                                  <div class="quantity-control-panel" style="display: flex; align-items: center; gap: 2cqw; background: var(--bg-secondary); border-radius: 50px; padding: 1cqw 2cqw; border: 1px solid var(--border-color);">
+                                      <button class="minus-btn" style="border: none; background: transparent; font-size: 4cqw; padding: 1cqw 3cqw; cursor: pointer; color: var(--text-main); font-weight: bold;">-</button>
+                                      <span class="qty-number" style="font-size: 3.5cqw; font-weight: bold; min-width: 4cqw; text-align: center;">0</span>
+                                      <button class="plus-btn" style="border: none; background: transparent; font-size: 4cqw; padding: 1cqw 3cqw; cursor: pointer; color: var(--brand-blue); font-weight: bold;">+</button>
+                                  </div>
+                                `
                             }
                         </div>
-                    `;
+                    </div>
+                    <div class="note-wrapper" style="width: 100%; margin-top: 2.5cqw; border-top: 1px dashed var(--border-color); padding-top: 2cqw;">
+                        <input type="text" class="item-note-input" placeholder="✍️ 填寫去冰、微辣、不加蔥等客製化備註..." style="width: 100%; background: var(--bg-global); border: 1px solid var(--border-color); border-radius: 1.5cqw; padding: 1.5cqw 2.5cqw; font-size: 3cqw; color: var(--text-main); outline: none;">
+                    </div>
+                `;
 
-                    menuContainer.appendChild(foodCard);
+                menuContainer.appendChild(foodCard);
 
-                    // 動態對接購物車點擊事件
-                    if (!isSoldOut) {
-                        const btn = foodCard.querySelector('.btn-trigger');
-                        bindCartEvent(btn);
+                // --- 區塊 C：控制「加鍵」、「減鍵」與「打字備註」的同步計算 ---
+                if (!isSoldOut) {
+                    const plusBtn = foodCard.querySelector('.plus-btn');
+                    const minusBtn = foodCard.querySelector('.minus-btn');
+                    const qtyDisplay = foodCard.querySelector('.qty-number');
+                    const noteInput = foodCard.querySelector('.item-note-input');
+
+                    // 重新加總下方黑條金額與總數量的功能
+                    function refreshTotalCartUI() {
+                        let totalQty = 0;
+                        let totalPrice = 0;
+                        localCartData.forEach(cartItem => {
+                            totalQty += cartItem.qty;
+                            totalPrice += (cartItem.price * cartItem.qty);
+                        });
+                        if (cartSummaryText) {
+                            cartSummaryText.innerText = `🛒 購物車已加入 ${totalQty} 項商品 · 總計 $${totalPrice}`;
+                        }
                     }
-                });
 
-            } else {
-                document.getElementById('storeNameText').innerText = "❌ 店家不存在";
-                document.getElementById('menuContainer').innerHTML = "雲端無此店家檔案。";
-            }
-        })
-        .catch((error) => {
-            console.error("[PACE ERROR] 讀取失敗，原因為:", error);
-            document.getElementById('storeNameText').innerText = "❌ 雲端連線失敗";
-        });
-    }
+                    // 把當前這道菜的最新「數量」與「備註文字」打包存進瀏覽器的功能
+                    function saveToBrowserStorage() {
+                        const currentQty = parseInt(qtyDisplay.innerText, 10);
+                        const currentNote = noteInput ? noteInput.value.trim() : "";
 
-    // ==========================================
-    // 🏎️ 3. 0秒無縫閃轉外掛核心架構
-    // ==========================================
-    function bindFastClick(element, callback) {
-        if (!element) return;
-        let triggered = false;
-        function trigger(e) {
-            if (!triggered) {
-                triggered = true;
-                setTimeout(() => { triggered = false; }, 300);
-                callback(e);
+                        // 先清除舊紀錄，防重複
+                        localCartData = localCartData.filter(i => i.id !== itemId);
+
+                        // 如果數量大於 0，才寫進籃子裡
+                        if (currentQty > 0) {
+                            localCartData.push({
+                                id: itemId,
+                                name: itemName,
+                                price: itemPrice,
+                                qty: currentQty,
+                                note: currentNote, // 備註裝進這裡
+                                storeId: currentStoreId
+                            });
+                        }
+                        // 100% 對接您 cart.html 的關鍵金鑰 'pacetake_cart'
+                        localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
+                        refreshTotalCartUI();
+                    }
+
+                    // 點擊「+」
+                    plusBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        let count = parseInt(qtyDisplay.innerText, 10);
+                        count += 1;
+                        qtyDisplay.innerText = count;
+                        saveToBrowserStorage();
+                    });
+
+                    // 點擊「-」
+                    minusBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        let count = parseInt(qtyDisplay.innerText, 10);
+                        if (count > 0) {
+                            count -= 1;
+                            qtyDisplay.innerText = count;
+                            saveToBrowserStorage();
+                        }
+                    });
+
+                    // 在備註欄每打一個字
+                    if (noteInput) {
+                        noteInput.addEventListener('input', () => {
+                            saveToBrowserStorage();
+                        });
+                    }
+                }
+            });
+
+        } else {
+            console.error("雲端無此店家檔案。");
+            if (document.getElementById('storeNameText')) {
+                document.getElementById('storeNameText').innerText = "❌ 店家暫停營業中";
             }
-            e.preventDefault();
         }
-        element.addEventListener('touchstart', trigger, { passive: false });
-        element.addEventListener('mousedown', trigger);
+    } catch (error) {
+        console.error("載入點餐頁失敗：", error);
     }
+}
 
-    // 🌓 系統全局膚色同步防線
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
-    function initTheme() {
-        const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    }
-    bindFastClick(themeToggleBtn, () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('pacetake-theme', newTheme);
-    });
-    initTheme();
-
-    // ==========================================
-    // 🛒 4. 購物車暫存與動態計數核心
-    // ==========================================
-    let cartCount = 0;
-    let cartTotal = 0;
-    let localCartData = []; // 用來暫存準備傳給 cart.html 的資料
-    const cartSummaryText = document.getElementById('cartSummaryText');
-
-    function updateCartUI() {
-        cartSummaryText.innerText = `🛒 購物車已加入 ${cartCount} 項商品 · 總計 $${cartTotal}`;
-    }
-
-    function bindCartEvent(btn) {
-        bindFastClick(btn, (e) => {
-            const card = btn.closest('.food-card');
-            if(card.classList.contains('sold-out')) return; 
-            
-            const price = parseInt(card.getAttribute('data-price'), 10);
-            const id = card.getAttribute('data-id');
-            const name = card.getAttribute('data-name');
-            
-            // 累加數值
-            cartCount += 1;
-            cartTotal += price;
-
-            // 存入暫存陣列，以便等等傳給 cart.html（對接剛才的 localStorage 結構）
-            const existingItem = localCartData.find(i => i.id === id);
-            if (existingItem) {
-                existingItem.qty += 1;
-            } else {
-                localCartData.push({
-                    id: id,
-                    name: name,
-                    price: price,
-                    qty: 1,
-                    storeId: currentStoreId // 傳送當前店家 ID，供金流判斷
-                });
-            }
-            // 寫入 localStorage 供下一頁讀取
-            localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
-
-            // 精品流暢點擊回饋動畫
-            btn.innerText = "✓ 已加入";
-            btn.style.backgroundColor = "rgba(0, 102, 255, 0.1)";
-            btn.style.color = "var(--brand-blue)";
-            btn.style.borderColor = "var(--brand-blue)";
-
-            setTimeout(() => {
-                btn.innerText = "➕ 加到購物車";
-                btn.style.backgroundColor = "var(--bg-global)";
-                btn.style.color = "var(--text-main)";
-                btn.style.borderColor = "var(--border-color)";
-            }, 400);
-
-            updateCartUI();
-        });
-    }
-
-    // 全局相對路徑跳轉無縫對接
-const navElements = document.querySelectorAll('.nav-fast');
-navElements.forEach(elem => {
-    bindFastClick(elem, () => {
-        const dest = elem.getAttribute('href');
-        
-        // 檢查如果網址存在，且不是「#」空網址，就執行跳轉
-        if (dest && dest !== '#') {
-            window.location.href = dest;
-        }
-    });
-});
 </script>
 </body>
 </html>

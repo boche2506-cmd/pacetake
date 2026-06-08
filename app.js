@@ -668,7 +668,7 @@ function filterAndRenderStores() {
     }
 
     storeContainer.innerHTML = "";
-    filtered.forEach(store => {
+        filtered.forEach(store => {
         if (store.status === "offline") return;
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
@@ -677,11 +677,21 @@ function filterAndRenderStores() {
         const takeoutSupported = store.isCashPayEnabled !== false;
         const paySupported = store.isOnlinePayEnabled !== false;
 
+        // 💡【首頁照片大復活核心邏輯】
+        // 優先讀取 shopLogo 欄位，如果沒有才用舊的 emoji
+        const logoData = store.shopLogo || store.emoji || '🏪';
+        let finalLogoHtml = logoData; // 預設當作 Emoji 處理
+
+        // 檢查是不是一長串上傳的 Base64 照片文字，或者是網路圖片網址
+        if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
+            finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
+        }
+
         const card = document.createElement('a');
         card.href = `store.html?storeId=${store.id}`;
         card.className = 'store-card';
         card.innerHTML = `
-            <div class="store-img">${store.emoji || '🏪'}</div>
+            <div class="store-img">${finalLogoHtml}</div> <!-- 💡 這裡換成處理後的照片 HTML -->
             <div class="store-info">
                 <div class="store">
                     <div class="store-name">${finalName}</div>

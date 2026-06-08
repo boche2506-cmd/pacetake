@@ -961,13 +961,13 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 🎯 PACE 專屬：store.html 雲端菜單動態渲染模組 (純 v9+ 模組化終極防線)
+// 🎯 PACE 專屬：store.html 終極完美動態渲染模組 (含首頁卡片替換、加減鍵、備註欄)
 // ==========================================
 async function initStorePage() {
     const menuContainer = document.getElementById('menuContainer');
     if (!menuContainer) return; // 確保身處 store.html 才發動
 
-    console.log("[PACE DEBUG] 偵測到身處 store.html，啟動點餐頁面渲染程序...");
+    console.log("[PACE DEBUG] 啟動點餐頁面終極渲染程序...");
 
     const urlParams = new URLSearchParams(window.location.search);
     const currentStoreId = urlParams.get('storeId');
@@ -979,28 +979,19 @@ async function initStorePage() {
     }
 
     try {
-        // 1. 🔥【直接對齊您的首頁大腦】🔥
-        // 不再呼叫任何舊版 .collection() 或 .doc()，直接使用您專案頂部已經引入的模組化變數
-        // 如果您的頂部有引入 getDoc 和 doc，這邊就能完美通關
-        const firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
-        
         let storeData = null;
+        const firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
 
+        // --- 1. 雲端資料庫讀取防線 ---
         if (typeof db !== 'undefined') {
-            // 優先嘗試純 v9 模組化底層路徑
             try {
-                // 如果 app.js 頂部有全局導入的 doc 函式
                 if (typeof doc === 'function' && typeof getDoc === 'function') {
                     const docRef = doc(db, "stores", currentStoreId);
                     const docSnap = await getDoc(docRef);
                     if (docSnap.exists()) storeData = docSnap.data();
                 }
-            } catch (innerErr) {
-                console.log("[PACE DEBUG] 模組化語法微調，切換為實例路徑...");
-            }
+            } catch (innerErr) { }
         }
-
-        // 2. 備用安全防線：如果上述方法失敗，直接用底層最原始的實例去拔資料
         if (!storeData) {
             const fallbackDb = typeof db !== 'undefined' ? db : firebaseFirestore;
             if (fallbackDb && typeof fallbackDb.collection === 'function') {
@@ -1012,15 +1003,33 @@ async function initStorePage() {
             }
         }
 
-        // 3. 開始渲染畫面
+        // --- 2. 開始渲染畫面 ---
         if (storeData) {
-            console.log("[PACE DEBUG] 成功獲取店家資料:", storeData.shopName);
+            // 💡【核心改動一】：完美複製首頁卡片 HTML 結構，直接替代點餐頁頂部的 store-header-info 區域
+            const storeHeaderInfo = document.getElementById('storeHeaderInfo');
+            if (storeHeaderInfo) {
+                const finalName = storeData.shopName || '未命名店家';
+                const finalAddress = storeData.shopAddress || '';
+                const takeoutSupported = storeData.isCashPayEnabled !== false;
+                const paySupported = storeData.isOnlinePayEnabled !== false;
 
-            const storeNameText = document.getElementById('storeNameText');
-            const storeAddressText = document.getElementById('storeAddressText');
-            
-            if (storeNameText) storeNameText.innerText = `${storeData.shopLogo || '🏪'} ${storeData.shopName || '未命名店家'}`;
-            if (storeAddressText) storeAddressText.innerText = `📍 ${storeData.shopAddress || ''}`;
+                // 這裡的 HTML 結構與 Class 名稱，與您首頁傳給我的卡片一模一樣，100% 移植外觀！
+                storeHeaderInfo.innerHTML = `
+                    <div class="store-card" style="box-shadow: none; padding: 0; background: transparent; margin: 0; width: 100%;">
+                        <div class="store-img">${storeData.shopLogo || '🏪'}</div>
+                        <div class="store-info">
+                            <div class="store">
+                                <div class="store-name" style="font-size: 5cqw; font-weight: bold; color: var(--text-main);">${finalName}</div>
+                                <div class="store-meta" style="font-size: 3cqw; margin-top: 1cqw;">📍 ${finalAddress}</div>
+                            </div>
+                            <div class="store-tags" style="margin-top: 2cqw;">
+                                <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
+                                <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
 
             const menuList = storeData.menuList || [];
             menuContainer.innerHTML = ""; 
@@ -1030,8 +1039,13 @@ async function initStorePage() {
                 return;
             }
 
+            // 初始化購物車暫存陣列（先清空本機前一次的殘留舊紀錄，確保乾淨）
             let localCartData = []; 
+            localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
 
+            const cartSummaryText = document.getElementById('cartSummaryText');
+
+            // --- 3. 迴圈渲染餐點卡片 (含加減按鈕與備註欄) ---
             menuList.forEach((item, index) => {
                 const itemId = `item_${index}`;
                 const itemName = item.name || '未命名商品';
@@ -1050,60 +1064,115 @@ async function initStorePage() {
                     imgElement = `<img src="${itemImg}" style="width:100%; height:100%; object-fit:cover; border-radius:2cqw;">`;
                 }
 
+                // 💡【核心改動二】：重構餐點卡片 HTML，增加「➖ 數字 ➕」控制面板，並在最下方附帶獨立備註欄
                 foodCard.innerHTML = `
-                    <div class="food-img">${imgElement}</div>
-                    <div class="food-info">
-                        <div class="food-name">${itemName} ${isSoldOut ? '(暫停供應)' : ''}</div>
-                        <div class="food-price">$${itemPrice}</div>
+                    <div class="food-main-row" style="display: flex; width: 100%; align-items: center;">
+                        <div class="food-img">${imgElement}</div>
+                        <div class="food-info" style="flex: 1; margin-left: 3cqw;">
+                            <div class="food-name">${itemName} ${isSoldOut ? '(暫停供應)' : ''}</div>
+                            <div class="food-price">$${itemPrice}</div>
+                        </div>
+                        <div class="action-container">
+                            ${isSoldOut 
+                                ? `<button class="add-cart-btn sold-out-btn" disabled>🔴 暫停供應</button>`
+                                : `
+                                  <div class="quantity-control-panel" style="display: flex; align-items: center; gap: 2cqw; background: var(--bg-secondary); border-radius: 50px; padding: 1cqw 2cqw; border: 1px solid var(--border-color);">
+                                      <button class="minus-btn" style="border: none; background: transparent; font-size: 4cqw; padding: 1cqw 3cqw; cursor: pointer; color: var(--text-main); font-weight: bold;">-</button>
+                                      <span class="qty-number" style="font-size: 3.5cqw; font-weight: bold; min-width: 4cqw; text-align: center;">0</span>
+                                      <button class="plus-btn" style="border: none; background: transparent; font-size: 4cqw; padding: 1cqw 3cqw; cursor: pointer; color: var(--brand-blue); font-weight: bold;">+</button>
+                                  </div>
+                                `
+                            }
+                        </div>
                     </div>
-                    <div class="action-container">
-                        ${isSoldOut 
-                            ? `<button class="add-cart-btn sold-out-btn" disabled>🔴 暫停供應</button>`
-                            : `<button class="add-cart-btn btn-trigger">➕ 加到購物車</button>`
-                        }
+                    <!-- 💡【核心改動三】：每道菜下方專屬的精緻備註欄 -->
+                    ${isSoldOut ? '' : `
+                    <div class="note-wrapper" style="width: 100%; margin-top: 2.5cqw; border-top: 1px dashed var(--border-color); padding-top: 2cqw;">
+                        <input type="text" class="item-note-input" placeholder="✍️ 填寫去冰、微辣、不加蔥等客製化備註..." style="width: 100%; background: var(--bg-global); border: 1px solid var(--border-color); border-radius: 1.5cqw; padding: 1.5cqw 2.5cqw; font-size: 3cqw; color: var(--text-main); outline: none;">
                     </div>
+                    `}
                 `;
 
                 menuContainer.appendChild(foodCard);
 
+                // --- 4. 數值與購物車核心聯動邏輯 ---
                 if (!isSoldOut) {
-                    const btn = foodCard.querySelector('.btn-trigger');
-                    const cartSummaryText = document.getElementById('cartSummaryText');
+                    const plusBtn = foodCard.querySelector('.plus-btn');
+                    const minusBtn = foodCard.querySelector('.minus-btn');
+                    const qtyDisplay = foodCard.querySelector('.qty-number');
+                    const noteInput = foodCard.querySelector('.item-note-input');
 
-                    btn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const currentSummary = cartSummaryText ? cartSummaryText.innerText : "0";
-                        let curCount = parseInt(currentSummary.match(/\d+/) ? currentSummary.match(/\d+/) : 0, 10);
-                        
-                        let curTotal = 0;
-                        if (currentSummary.includes('$')) {
-                            curTotal = parseInt(currentSummary.split('$')[1], 10) || 0;
-                        }
-                        
-                        curCount += 1;
-                        curTotal += itemPrice;
-                        
+                    // 更新本專案局部總合計 UI
+                    function refreshTotalCartUI() {
+                        let totalQty = 0;
+                        let totalPrice = 0;
+                        localCartData.forEach(cartItem => {
+                            totalQty += cartItem.qty;
+                            totalPrice += (cartItem.price * cartItem.qty);
+                        });
                         if (cartSummaryText) {
-                            cartSummaryText.innerText = `🛒 購物車已加入 ${curCount} 項商品 · 總計 $${curTotal}`;
+                            cartSummaryText.innerText = `🛒 購物車已加入 ${totalQty} 項商品 · 總計 $${totalPrice}`;
                         }
+                    }
 
-                        const existingItem = localCartData.find(i => i.id === itemId);
-                        if (existingItem) {
-                            existingItem.qty += 1;
-                        } else {
+                    // 儲存或更新當前項目的數據到記憶體與 localStorage
+                    function updateLocalStorageData() {
+                        const currentQty = parseInt(qtyDisplay.innerText, 10);
+                        const currentNote = noteInput ? noteInput.value.trim() : "";
+
+                        // 先從現有購物車移除舊紀錄
+                        localCartData = localCartData.filter(i => i.id !== itemId);
+
+                        // 如果數量大於 0，重新推入最新狀態 (攜帶備註欄名 note)
+                        if (currentQty > 0) {
                             localCartData.push({
-                                id: itemId, name: itemName, price: itemPrice, qty: 1, storeId: currentStoreId
+                                id: itemId,
+                                name: itemName,
+                                price: itemPrice,
+                                qty: currentQty,
+                                note: currentNote, // 👈 完美包裝備註，100% 傳給 cart.html
+                                storeId: currentStoreId
                             });
                         }
                         localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
+                        refreshTotalCartUI();
+                    }
 
-                        btn.innerText = "✓ 已加入";
-                        btn.style.backgroundColor = "rgba(0, 102, 255, 0.1)";
-                        setTimeout(() => {
-                            btn.innerText = "➕ 加到購物車";
-                            btn.style.backgroundColor = "";
-                        }, 400);
+                                        // ➕ 點擊加號：增加數量
+                    plusBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        let count = parseInt(qtyDisplay.innerText, 10);
+                        count += 1;
+                        qtyDisplay.innerText = count;
+                        
+                        // 微調動畫反饋
+                        plusBtn.style.transform = "scale(1.2)";
+                        setTimeout(() => plusBtn.style.transform = "none", 150);
+
+                        updateLocalStorageData();
                     });
+
+                    // ➖ 點擊減號：減少數量 (最低至 0)
+                    minusBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        let count = parseInt(qtyDisplay.innerText, 10);
+                        if (count > 0) {
+                            count -= 1;
+                            qtyDisplay.innerText = count;
+                            
+                            minusBtn.style.transform = "scale(1.2)";
+                            setTimeout(() => minusBtn.style.transform = "none", 150);
+
+                            updateLocalStorageData();
+                        }
+                    });
+
+                    // ✍️ 當使用者在備註欄打字時，即時同步更新到購物車快取中
+                    if (noteInput) {
+                        noteInput.addEventListener('input', () => {
+                            updateLocalStorageData();
+                        });
+                    }
                 }
             });
 
@@ -1123,7 +1192,3 @@ if (document.readyState === 'loading') {
 } else {
     initStorePage();
 }
-
-
-
-            

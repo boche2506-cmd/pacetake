@@ -10,6 +10,8 @@
 <!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
 <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
 <link rel="stylesheet" href="style.css">
+</head>
+<body>
     <style>
         /* 全局變數與主題防線 */
         :root {
@@ -269,17 +271,13 @@
             box-shadow: var(--shadow-sm);
         }
     </style>
-</head>
-<body>
-    <div class="phone-wrapper">
+<div class="phone-wrapper">
     <!-- 頂部高級感大字留白區 -->
-    <header id="header-container"></header>
-    <store class="header">
+    <div class="header">
         <div class="top-nav">
             <a href="index.html" class="back-btn nav-fast">⬅️ 返回首頁</a>
             <button class="theme-toggle" id="themeToggleBtn">🌓</button>
         </div>
-        <!-- 💡 這裡加上 id 方便用 JS 動態寫入 -->
         <div class="store-header-info" id="storeHeaderInfo">
             <h1 id="storeNameText">正在載入雲端店家...</h1>
             <div class="store-meta">
@@ -288,9 +286,9 @@
                 <span>⚡ 0.05 km</span>
             </div>
         </div>
-    </store>
+    </div>
 
-    <!-- 中間精品菜單（原本寫死的卡片全部清空，改由 JS 動態生成） -->
+    <!-- 中間精品菜單 -->
     <main class="menu-container" id="menuContainer">
         <!-- 菜單品項會動態渲染在這裡 -->
     </main>
@@ -304,108 +302,127 @@
     </footer>
 </div>
 
-<!-- 💡 請確保您的網頁頂部或此處已引入 Firebase SDK -->
 <script type="module" src="app.js">
     // ==========================================
-    // 0. 從網址解析 storeId 並從 Firebase 撈資料
+    // 🧯 1. FIREBASE 初始化防線（請填入您專案的真實金鑰）
+    // ==========================================
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY_HERE",
+        authDomain: "YOUR_PROJECT_://firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID_HERE",
+        storageBucket: "YOUR_PROJECT_://appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    // 確保不重複初始化，安全防線
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    // ==========================================
+    // 🚀 2. 解析網址並「強制推進」撈取雲端資料
     // ==========================================
     const urlParams = new URLSearchParams(window.location.search);
     const currentStoreId = urlParams.get('storeId');
+
+    console.log("[PACE DEBUG] 網址抓到的店家 ID 為:", currentStoreId);
 
     if (!currentStoreId) {
         alert("❌ 找不到店家資訊，將返回首頁！");
         window.location.href = "index.html";
     } else {
-        // 當網頁載入完成後，撈取 Firebase 資料
-        document.addEventListener("DOMContentLoaded", fetchStoreAndMenu);
+        // 拋棄所有監聽器，直接執行！
+        fetchStoreAndMenu();
     }
 
     function fetchStoreAndMenu() {
-    const db = firebase.firestore();
-    
-    // 1. 直接讀取該店家的 Document 資料
-    db.collection("stores").doc(currentStoreId).get().then((doc) => {
-        if (doc.exists) {
-            const storeData = doc.data();
+        console.log("[PACE DEBUG] 開始連線 Firestore 讀取店家...");
+        const db = firebase.firestore();
+        
+        db.collection("stores").doc(currentStoreId).get().then((doc) => {
+            console.log("[PACE DEBUG] Firebase 連線成功！該店家存在狀態:", doc.exists);
             
-            // 2. 渲染店名與地址（精準對接您的資料庫欄位）
-            const finalName = storeData.shopName || '未命名店家';
-            const finalAddress = storeData.shopAddress || '';
-            const emoji = storeData.shopLogo || '🏪'; // 您的欄位叫 shopLogo
-
-            document.getElementById('storeNameText').innerText = `${finalName}`;
-            document.getElementById('storeAddressText').innerText = `📍 ${finalAddress}`;
-            
-            // 3. 核心改變：直接從 storeData 裡面拿出 menuList 陣列
-            const menuList = storeData.menuList || [];
-            const menuContainer = document.getElementById('menuContainer');
-            menuContainer.innerHTML = ""; // 清空原本載入中的提示
-
-            if (menuList.length === 0) {
-                menuContainer.innerHTML = `<div style="text-align:center; padding:10cqw; color:var(--text-main);">📭 本店家目前尚未上架任何餐點。</div>`;
-                return;
-            }
-
-            // 4. 用 forEach 迴圈把陣列裡的每一個 map（餐點）倒出來渲染
-            menuList.forEach((item, index) => {
-                const itemId = `item_${index}`; // 陣列沒有獨立 ID，我們用索引值當作代號
-                const itemName = item.name || '未命名商品';
-                const itemPrice = parseInt(item.price, 10) || 0;
-                const itemImg = item.image || ''; // 您的欄位叫 image (內含 Base64 圖片編碼)
+            if (doc.exists) {
+                const storeData = doc.data();
                 
-                // 檢查店家狀態或個別餐點是否有售罄狀態 (可視您未來需求調整)
-                const isSoldOut = storeData.status === "offline"; 
+                // 讀取您的真實資料庫欄位
+                const finalName = storeData.shopName || '未命名店家';
+                const finalAddress = storeData.shopAddress || '';
+                const emoji = storeData.shopLogo || '🏪';
 
-                // 建立餐點 HTML 卡片結構
-                const foodCard = document.createElement('div');
-                foodCard.className = `food-card ${isSoldOut ? 'sold-out' : ''}`;
-                foodCard.setAttribute('data-price', itemPrice);
-                foodCard.setAttribute('data-id', itemId);
-                foodCard.setAttribute('data-name', itemName); // 順便把名字存進 HTML 節點，方便等一下進購物車
+                // 渲染頂部店家資訊
+                document.getElementById('storeNameText').innerText = `${finalName}`;
+                document.getElementById('storeAddressText').innerText = `📍 ${finalAddress}`;
+                
+                // 讀取您的 menuList 陣列
+                const menuList = storeData.menuList || [];
+                const menuContainer = document.getElementById('menuContainer');
+                menuContainer.innerHTML = ""; // 清空載入中提示
 
-                // 處理 Base64 圖片或預設大頭貼
-                let imgElement = `🍱`;
-                if (itemImg && itemImg.startsWith('data:image')) {
-                    imgElement = `<img src="${itemImg}" style="width:100%; height:100%; object-fit:cover; border-radius:2cqw;">`;
+                if (menuList.length === 0) {
+                    menuContainer.innerHTML = `<div style="text-align:center; padding:10cqw; color:var(--text-main);">📭 本店家目前尚未上架任何餐點。</div>`;
+                    return;
                 }
 
-                foodCard.innerHTML = `
-                    <div class="food-img">${imgElement}</div>
-                    <div class="food-info">
-                        <div class="food-name">${itemName} ${isSoldOut ? '(暫停供應)' : ''}</div>
-                        <div class="food-price">$${itemPrice}</div>
-                    </div>
-                    <div class="action-container">
-                        ${isSoldOut 
-                            ? `<button class="add-cart-btn sold-out-btn" disabled>🔴 暫停供應</button>`
-                            : `<button class="add-cart-btn btn-trigger">➕ 加到購物車</button>`
-                        }
-                    </div>
-                `;
+                // 迴圈渲染菜單陣列
+                menuList.forEach((item, index) => {
+                    const itemId = `item_${index}`; 
+                    const itemName = item.name || '未命名商品';
+                    const itemPrice = parseInt(item.price, 10) || 0;
+                    const itemImg = item.image || ''; 
+                    
+                    // 根據您資料庫的 status 判斷是否下線
+                    const isSoldOut = storeData.status === "offline"; 
 
-                menuContainer.appendChild(foodCard);
+                    const foodCard = document.createElement('div');
+                    foodCard.className = `food-card ${isSoldOut ? 'sold-out' : ''}`;
+                    foodCard.setAttribute('data-price', itemPrice);
+                    foodCard.setAttribute('data-id', itemId);
+                    foodCard.setAttribute('data-name', itemName);
 
-                // 動態綁定新生成的「加到購物車」按鈕點擊事件
-                if (!isSoldOut) {
-                    const btn = foodCard.querySelector('.btn-trigger');
-                    bindCartEvent(btn);
-                }
-            });
+                    // 處理您資料庫中的 Base64 圖片編碼
+                    let imgElement = `🍱`;
+                    if (itemImg && itemImg.startsWith('data:image')) {
+                        imgElement = `<img src="${itemImg}" style="width:100%; height:100%; object-fit:cover; border-radius:2cqw;">`;
+                    }
 
-        } else {
-            document.getElementById('storeNameText').innerText = "❌ 店家不存在";
-            document.getElementById('menuContainer').innerHTML = "";
-            console.error("找不到該店家的 Document ID");
-        }
-    })
-    .catch((error) => {
-        console.error("讀取雲端店家資料失敗:", error);
-    });
-}
+                    foodCard.innerHTML = `
+                        <div class="food-img">${imgElement}</div>
+                        <div class="food-info">
+                            <div class="food-name">${itemName} ${isSoldOut ? '(暫停供應)' : ''}</div>
+                            <div class="food-price">$${itemPrice}</div>
+                        </div>
+                        <div class="action-container">
+                            ${isSoldOut 
+                                ? `<button class="add-cart-btn sold-out-btn" disabled>🔴 暫停供應</button>`
+                                : `<button class="add-cart-btn btn-trigger">➕ 加到購物車</button>`
+                            }
+                        </div>
+                    `;
 
+                    menuContainer.appendChild(foodCard);
+
+                    // 動態對接購物車點擊事件
+                    if (!isSoldOut) {
+                        const btn = foodCard.querySelector('.btn-trigger');
+                        bindCartEvent(btn);
+                    }
+                });
+
+            } else {
+                document.getElementById('storeNameText').innerText = "❌ 店家不存在";
+                document.getElementById('menuContainer').innerHTML = "雲端無此店家檔案。";
+            }
+        })
+        .catch((error) => {
+            console.error("[PACE ERROR] 讀取失敗，原因為:", error);
+            document.getElementById('storeNameText').innerText = "❌ 雲端連線失敗";
+        });
+    }
 
     // ==========================================
-    // 1. 🚀 您原本的 0秒無縫閃轉外掛核心架構
+    // 🏎️ 3. 0秒無縫閃轉外掛核心架構
     // ==========================================
     function bindFastClick(element, callback) {
         if (!element) return;
@@ -437,26 +454,45 @@
     initTheme();
 
     // ==========================================
-    // 2. 🛒 購物車動態計數與金額加算核心
+    // 🛒 4. 購物車暫存與動態計數核心
     // ==========================================
     let cartCount = 0;
     let cartTotal = 0;
+    let localCartData = []; // 用來暫存準備傳給 cart.html 的資料
     const cartSummaryText = document.getElementById('cartSummaryText');
 
     function updateCartUI() {
         cartSummaryText.innerText = `🛒 購物車已加入 ${cartCount} 項商品 · 總計 $${cartTotal}`;
     }
 
-    // 將原本整批綁定的邏輯，改為「單一按鈕獨立綁定」的函式，以便動態生成的卡片呼叫
     function bindCartEvent(btn) {
         bindFastClick(btn, (e) => {
             const card = btn.closest('.food-card');
-            if(card.classList.contains('sold-out')) return; // 安全防線
+            if(card.classList.contains('sold-out')) return; 
             
             const price = parseInt(card.getAttribute('data-price'), 10);
+            const id = card.getAttribute('data-id');
+            const name = card.getAttribute('data-name');
             
+            // 累加數值
             cartCount += 1;
             cartTotal += price;
+
+            // 存入暫存陣列，以便等等傳給 cart.html（對接剛才的 localStorage 結構）
+            const existingItem = localCartData.find(i => i.id === id);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                localCartData.push({
+                    id: id,
+                    name: name,
+                    price: price,
+                    qty: 1,
+                    storeId: currentStoreId // 傳送當前店家 ID，供金流判斷
+                });
+            }
+            // 寫入 localStorage 供下一頁讀取
+            localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
 
             // 精品流暢點擊回饋動畫
             btn.innerText = "✓ 已加入";
@@ -476,15 +512,17 @@
     }
 
     // 全局相對路徑跳轉無縫對接
-    const navElements = document.querySelectorAll('.nav-fast');
-    navElements.forEach(elem => {
-        bindFastClick(elem, () => {
-            const dest = elem.getAttribute('href');
-            if (dest && dest !== '#') {
-                window.location.href = dest;
-            }
-        });
+const navElements = document.querySelectorAll('.nav-fast');
+navElements.forEach(elem => {
+    bindFastClick(elem, () => {
+        const dest = elem.getAttribute('href');
+        
+        // 檢查如果網址存在，且不是「#」空網址，就執行跳轉
+        if (dest && dest !== '#') {
+            window.location.href = dest;
+        }
     });
+});
 </script>
 </body>
 </html>

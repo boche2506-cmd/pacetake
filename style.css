@@ -337,12 +337,12 @@ img, .card {
     color: var(--text-main);
     background-color: var(--bg-container);
     border: 0.1cqw solid var(--border-color);
-    border-radius: 2cqw;
+    border-radius: 5cqw;
     max-width: 100%;
     padding: 3cqw;
     box-shadow: var(--shadow-md);
     text-align: center;
-    height: 50cqw;
+    height: 60cqw;
     width: 80cqw;
 }
 
@@ -370,7 +370,7 @@ img, .card {
     justify-content: center;
     gap: 1cqw;
     width: 100%;
-    padding: 1cqw;
+    padding: 3cqw 0;
     border-radius: 3cqw;
     font-size: 5cqw;
     font-weight: 600;

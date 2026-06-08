@@ -21,7 +21,7 @@
 
 .sticky-top-group {
     /* 這裡的高度與寬度原本是 15% 和 100%，我們用 cqw 重新定義它們的比例 */
-    height: 10%;
+    height: 12%;
     max-width: 100%;               
     display: flex;
     flex-direction: column; 
@@ -128,7 +128,7 @@
     width: 100%;                 /* 撐滿剩下的空間 */
     border: none;       
     background: none;   
-    font-size: 3.5cqw;           /* 字體改用 cqw */
+    font-size: 5cqw;           /* 字體改用 cqw */
     color: var(--text-main);
     outline: none;
     text-align: left;
@@ -140,7 +140,7 @@
    ========================================================================== */
 /* 店家列表大容器（佔畫面高55%） */
 .store-list {
-    height: 57%;
+    height: 55%;
     max-width: 100%;               
     overflow-y: auto;       
     display: flex;
@@ -452,30 +452,30 @@ footer .status-indicator.active {
             Google 登入
         </button>
 
-        <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 5cqw; background-color: white; border: 0.1cqw solid #e5e7eb; border-radius: 3cqw; padding: 1cqw; font-size: 5cqw; font-weight: 600; color: #374151; cursor: pointer; box-shadow: 0 0.5cqw 2cqw rgba(0,0,0,0.05);">
+        <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 5cqw; background-color: white; border: 0.1cqw solid #e5e7eb; border-radius: 2cqw; padding: 3cqw 0; font-size: 4cqw; font-weight: 600; color: #374151; cursor: pointer; box-shadow: 0 0.5cqw 2cqw rgba(0,0,0,0.05);">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.5cqw;">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                 <polyline points="22,6 12,13 2,6"></polyline>
             </svg>
             使用電子郵件登入
         </button>
-        <div id="emailFormSection" style="display: none; text-align: left; width: 10cqw;">
+        <div id="emailFormSection" style="display: none; margin-top: 5cqw; text-align: left; height: 100%; box-sizing: border-box; background-color: var(--bg-container); border: 0.1cqw solid var(--border-color); ">
             <div style="margin-bottom: 1cqw;">
-                <label for="loginEmail" style="display:block; margin: bottom 0.25cqw;font-size:0.75cqw; color:#6b7280; font-weight:500;">電子郵件</label>
-                <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width: 10cqw; padding:0.25cqw 0.75cqw; border:0.1cqw solid #e5e7eb; border-radius:0.5cqw; box-sizing:border-box; font-size:0.75cqw; background-color:#f9fafb; color: #111111;">
-            </div> <div style="margin-bottom:1cqw;">
-                <label for="loginPassword" style="display:block; margin-bottom:0.25cqw; font-size:0.75cqw; color:#6b7280; font-weight:500;">密碼</label>
+                <label for="loginEmail" style="display:block; margin: bottom 5cqw; font-size:5cqw; color:#6b7280; font-weight:700;">電子郵件</label>
+                <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width: 100%; box-sizing: border-box; padding: 2cqw; border:0.2cqw solid #e5e7eb; border-radius:2cqw; box-sizing:border-box; font-size:5cqw; background-color:#f9fafb; color: #111111;">
+            </div> <div style="margin-bottom:10cqw;">
+                <label for="loginPassword" style="display:block; margin-bottom:0.25cqw; font-size:5cqw; color:#6b7280; font-weight:500;">密碼</label>
                 <div style="position: relative; display: flex; align-items: center;">
-                    <input type="password" id="loginPassword" placeholder="請輸入密碼" autocomplete="current-password" style="width: 10cqw; padding:0.25cqw 0.75cqw; border:0.1cqw solid #e5e7eb; border-radius:0.5cqw; box-sizing:border-box; font-size:0.75cqw; background-color:#f9fafb; color: #111111;">
-                    <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 0.75cqw; background: none; border: none; cursor: pointer; font-size: 0.75cqw; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
+                    <input type="password" id="loginPassword" placeholder="請輸入密碼" autocomplete="current-password" style="width: 100%; padding:0.25cqw 0.75cqw; border:0.1cqw solid #e5e7eb; border-radius:2cqw; box-sizing:border-box; font-size:5cqw; background-color:#f9fafb; color: #111111;">
+                    <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 5cqw; background: none; border: none; cursor: pointer; font-size: 5cqw; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
                 </div>
-            </div> <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width: 10cqw; padding: 0.25cqw; border-radius: 0.5cqw; font-size: 0.75cqw; font-weight: 500; cursor: pointer; box-shadow: 0 0.25cqw 0.5cqw rgba(255, 255, 255, 0.15);">電子郵件登入 / 註冊</button>
+            </div> <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width: 100%; padding: 0.25cqw; border-radius: 0.5cqw; font-size: 5cqw; font-weight: 700; cursor: pointer; box-shadow: 0 0.25cqw 0.5cqw rgba(255, 255, 255, 0.15);">電子郵件登入 / 註冊</button>
         </div><span class="modal-close" id="customReturnBtn" style="margin-top: 0.5cqw; text-decoration: underline; cursor: pointer; display: block; text-align: center;">暫時返回</span>
     </div> </div> <div class="lightbox-modal" id="addressDetailLightbox" style="display: none;">
     <div class="modal-card">
         <div class="modal-title" style="color: var(--brand-blue); font-weight: 700;">📍 目前位置</div>
         <div class="modal-desc-address" id="modalAddressText" style="margin-bottom: 0.5cqw; margin-top: 0.5cqw;">尚未獲取定位，請開啟 GPS。</div>
-        <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; border: none; width: 10cqw; height: 2.25cqw; border-radius: 0.5cqw; font-size: 0.75cqw; font-weight: 500; cursor: pointer;">確認</button>
+        <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; border: none; width: 100%; height: 80%; border-radius: 0.5cqw; font-size: 5cqw; font-weight: 700; cursor: pointer;">確認</button>
     </div></div></div><script type="module" src="app.js"></script>
 </body>
 </html>

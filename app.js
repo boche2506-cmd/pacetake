@@ -963,7 +963,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 // 🎯 PACE 專屬：store.html 雲端菜單動態渲染模組 (Firebase v9+ Modular)
 // ==========================================
-import { doc, getDoc } from "https://gstatic.com/firebasejs/9.23.0/firebase-app.js"
+import { doc, getDoc } from "https://gstatic.com/firebasejs/9.23.0/firestore.js"
 
 async function initStorePage() {
     // 1. 檢查目前畫面上是否有 menuContainer，有才代表使用者人在 store.html

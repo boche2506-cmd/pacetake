@@ -249,7 +249,7 @@ img, .card {
 .user-name {
     /* height: 100%; */          /* 移除它，讓內容自然靠 flex 置中即可 */
     /* max-width: 30%; */       /* ❌ 刪除這行！就是它把字跟圖片擠扁的 */
-    font-size: 4cqw;
+    font-size: 6cqw;
     font-weight: 600;
     display: flex; 
     flex-direction: row; 

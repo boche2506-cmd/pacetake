@@ -75,7 +75,7 @@
         }
 
         /* 頂部導航與大字留白 */
-        .header {
+        .store {
             padding: 20px 20px 16px 20px;
             border-bottom: 1px solid var(--border-color);
         }
@@ -273,7 +273,8 @@
 <body>
     <div class="phone-wrapper">
     <!-- 頂部高級感大字留白區 -->
-    <header class="header">
+    <header id="header-container"></header>
+    <store class="header">
         <div class="top-nav">
             <a href="index.html" class="back-btn nav-fast">⬅️ 返回首頁</a>
             <button class="theme-toggle" id="themeToggleBtn">🌓</button>
@@ -287,7 +288,7 @@
                 <span>⚡ 0.05 km</span>
             </div>
         </div>
-    </header>
+    </store>
 
     <!-- 中間精品菜單（原本寫死的卡片全部清空，改由 JS 動態生成） -->
     <main class="menu-container" id="menuContainer">

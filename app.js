@@ -1015,8 +1015,28 @@ async function initStorePage() {
 
         // --- 2. 開始渲染畫面 ---
         if (storeData) {
-            const menuList = storeData.menuList || [];
-            menuContainer.innerHTML = ""; 
+            
+            // 👇 新增：把上方店名、照片、地址補上去！
+            const storeNameText = document.getElementById('storeNameText');
+            const storeAddressText = document.getElementById('storeAddressText');
+            const finalName = storeData.shopName || storeData.name || '未命名店家';
+            const finalAddress = storeData.shopAddress || storeData.address || '';
+            const logoData = storeData.shopLogo || storeData.emoji || '🏪';
+            let finalLogoHtml = logoData;
+            
+            if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
+                finalLogoHtml = `<img src="${logoData}" style="width:14cqw; height:14cqw; object-fit:cover; margin-right:3cqw; display:inline-block; vertical-align:middle; border-radius: 2cqw;">`;
+            } else {
+                finalLogoHtml = `<span style="font-size:8cqw; margin-right:3cqw; vertical-align:middle;">${logoData}</span>`;
+            }
+
+            if (storeNameText) storeNameText.innerHTML = `${finalLogoHtml} <span style="vertical-align:middle;">${finalName}</span>`;
+            if (storeAddressText) storeAddressText.innerText = `📍 ${finalAddress}`;
+            // 👆 新增結束
+
+            // 💡 關鍵修復：同時支援 menuList 與 menu，避免管理員建立的店家菜單變空白
+            const menuList = storeData.menuList || storeData.menu || [];
+            menuContainer.innerHTML = "";
 
             if (menuList.length === 0) {
                 menuContainer.innerHTML = `<div style="text-align:center; padding:10cqw; color:var(--text-main);">📭 本店家目前尚未上架任何餐點。</div>`;

@@ -91,9 +91,9 @@ img, .card {
     justify-content: space-between;
     align-items: stretch; 
     border: 0.2cqw solid var(--border-color);
-    border-radius: 6cqw;
+    border-radius: 5%;
     box-shadow: var(--shadow-md);
-    padding: 3cqw;
+    padding: 2cqw;
     container-type: size; /* 讓這個容器成為所有內部元素的參考點 */
     container-name: phone;
 } 

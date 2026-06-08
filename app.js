@@ -683,7 +683,7 @@ function filterAndRenderStores() {
         card.innerHTML = `
             <div class="store-img">${store.emoji || '🏪'}</div>
             <div class="store-info">
-                <div>
+                <div class="store">
                     <div class="store-name">${finalName}</div>
                     <div class="store-meta">📍 ${finalAddress}</div>
                 </div>

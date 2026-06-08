@@ -29,13 +29,13 @@
     align-items: center;            /* 置中對齊 */
     box-sizing: border-box;
     border-bottom: 0.1cqw solid var(--border-color);
-    padding: 2cqw 3cqw;          /* 使用 cqw 控制外襯 padding */
+    padding: 0 3cqw;          /* 使用 cqw 控制外襯 padding */
 }
 
 /* 上層：位置列 */
 .location-bar {
-    height: 12cqw;               /* 設定剛好的高度比例 */
-    width: 100cqw; 
+    height: 50%;
+    max-width: 100%; 
     display: flex;
     flex-direction: row; 
     justify-content: space-between; 
@@ -95,8 +95,8 @@
 
 /* 下層：搜尋列外殼 */
 .search {
-    height: 12cqw;               /* 與上面的 location-bar 同高，達成 50% / 50% 感覺 */
-    width: 100cqw; 
+    height: 50%;
+    max-width: 100%; 
     display: flex;
     flex-direction: row; 
     justify-content: center; 
@@ -168,7 +168,7 @@
     color: inherit;
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    padding: 2cqw;             /* 卡片內部內襯改用 cqw */
+    padding: 1cqw;             /* 卡片內部內襯改用 cqw */
     box-sizing: border-box;
 }
 
@@ -195,9 +195,20 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 2cqw;
+    align-items: flex-start;
     flex-grow: 1;                /* 💡 關鍵：讓文字區塊拿走剩下的所有寬度，點點點才會精準生效 */
     overflow: hidden;            /* 💡 關鍵：防止內部文字把外殼撐開 */
+    gap: 2cqw;
+}
+
+.store {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-grow: 1;                /* 💡 關鍵：讓文字區塊拿走剩下的所有寬度，點點點才會精準生效 */
+    overflow: hidden;            /* 💡 關鍵：防止內部文字把外殼撐開 */
+    gap: 2cqw;
 }
 
 /* 店家名稱 */
@@ -212,7 +223,7 @@
 
 /* 📍 店家地址/距離（你要的太長顯示...設定在這裡） */
 .store-meta {
-    font-size: 4cqw;             /* 字體改用 cqw */
+    font-size: 3cqw;             /* 字體改用 cqw */
     color: var(--text-muted);
     white-space: nowrap;   
     overflow: hidden;            /* 💡 關鍵：隱藏超出寬度的字 */
@@ -263,7 +274,7 @@
     justify-content: space-between;
     align-items: center;
     height: 15%;                  /* 保留你原本佔外殼的 15% 高度比例 */
-    width: 100cqw;
+    max-width: 100%;
     background-color: var(--blur-bg);
     border-top: 0.3cqw solid var(--border-color); /* 邊框 cqw */
     padding: 2cqw 4cqw;           /* 左右微調內襯，讓留白更好看 */
@@ -281,7 +292,7 @@
     align-items: center;
     gap: 2cqw;                    /* 發光圓點與文字的間距 */
     text-decoration: none;
-    line-height: 1.4;             /* 💡 新增：給予舒適的行高，讓兩行字並存時不擁擠 */
+    line-height: 1;             /* 💡 新增：給予舒適的行高，讓兩行字並存時不擁擠 */
 }
 
 /* 🔴 預設未啟用狀態的狀態點 */

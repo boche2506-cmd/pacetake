@@ -38,6 +38,8 @@
 
 * {
     box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
 }
 
 html, body {
@@ -50,7 +52,6 @@ html, body {
     justify-content: center; /* 水平置中 */
     overflow: hidden;    /* 隱藏超出視窗的內容，確保整體像紙張一樣 */
     line-height: 1; /* 讓行距跟著字體一起自動調整 */
-    font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
 }
 
 input, textarea {

@@ -46,17 +46,16 @@
 
 /* 📍 目前位置按鈕 */
 .gps-trigger-btn {
-    font-size: 3.2cqw;           /* 字體改用 cqw */
+    font-size: 4cqw;           /* 字體改用 cqw */
     color: var(--brand-blue);
     background-color: var(--card-bg);
     border: 0.3cqw solid var(--border-color); /* 邊框粗細 cqw */
-    padding: 1.5cqw 2.5cqw;      /* 內襯上下左右 cqw */
     border-radius: 5cqw;         /* 圓角改用 cqw */
     cursor: pointer;    
     white-space: nowrap; 
     box-shadow: var(--shadow-sm);
-    height: 90%;                 /* 讓它在 location-bar 裡自然撐高 */
-    width: 32cqw;                /* 給予固定的 cqw 寬度 */
+    height: 60%;                 /* 讓它在 location-bar 裡自然撐高 */
+    width: 34%;                /* 給予固定的 cqw 寬度 */
     display: flex;
     flex-direction: row;
     justify-content: center; 
@@ -67,9 +66,9 @@
 
 /* 下拉選單群組 (縣市 + 區域) */
 .location-select-group {
-    height: 90%;
-    width: 64cqw;                /* 與 GPS 按鈕加起來剛好分配總寬度 */
-    gap: 1.5cqw;                 /* 縣市和區域中間的間距 */
+    height: 65%;
+    width: 66%;                /* 與 GPS 按鈕加起來剛好分配總寬度 */
+    gap: 2cqw;                 /* 縣市和區域中間的間距 */
     display: flex;
     flex-direction: row; 
     justify-content: space-between; 
@@ -79,16 +78,16 @@
 
 /* 縣市、區域下拉選單本體 */
 .nav-select {
-    border-radius: 2.5cqw;       /* 圓角改用 cqw */
+    border-radius: 5cqw;       /* 圓角改用 cqw */
     border: 0.3cqw solid var(--border-color);
     background-color: var(--bg-global);
     color: var(--text-main);
-    font-size: 3.2cqw;           /* 字體與按鈕對齊 */
+    font-size: 4cqw;           /* 字體與按鈕對齊 */
     outline: none;            
     cursor: pointer;          
     height: 100%;
-    width: 48%;                  /* 兩個選單各佔將近一半 */
-    padding: 0 1cqw;             /* 讓裡面的文字不會太貼邊框 */
+    width: 50%;
+    padding: 0 2cqw;             /* 讓裡面的文字不會太貼邊框 */
     box-sizing: border-box;
     line-height: 1;
 }
@@ -96,23 +95,22 @@
 /* 下層：搜尋列外殼 */
 .search {
     height: 50%;
-    max-width: 100%; 
+    width: 100%; 
     display: flex;
     flex-direction: row; 
     justify-content: center; 
     align-items: center; 
     box-sizing: border-box;
     line-height: 1;
-    margin-top: 1cqw;            /* 微調上下列的微小間距 */
 }
 
 /* 搜尋框大盒子 */
 .search-box {
-    height: 100%;                /* 撐滿 search 外殼 */
-    width: 100cqw;               /* 橫向撐滿 */
+    height: 70%;
+    width: 95%; 
     background-color: var(--bg-global);
     border: 0.3cqw solid var(--border-color);
-    border-radius: 2.5cqw;       /* 圓角改用 cqw */
+    border-radius: 5cqw;       /* 圓角改用 cqw */
     display: flex;
     align-items: center;
     padding: 0 3cqw;             /* 左右內襯 */
@@ -277,7 +275,7 @@
     max-width: 100%;
     background-color: var(--blur-bg);
     border-top: 0.3cqw solid var(--border-color); /* 邊框 cqw */
-    padding: 2cqw 4cqw;           /* 左右微調內襯，讓留白更好看 */
+    padding: 1cqw 2cqw;           /* 左右微調內襯，讓留白更好看 */
     box-sizing: border-box;
     flex-shrink: 0;
 }
@@ -285,7 +283,7 @@
 /* 左側：訂單狀態訊息區塊 */
 .status-msg {
     height: 60%;
-    max-width: 60%;
+    max-width: 65%;
     font-size: 4.5cqw;              /* 字體改用 cqw */
     color: var(--text-muted);
     display: flex;
@@ -331,7 +329,7 @@ footer .status-indicator.active {
     text-decoration: none;
     box-shadow: var(--shadow-sm);
     height: 50%;
-    max-width: 40%;
+    max-width: 35%;
     padding: 0 2cqw;
     box-sizing: border-box;
     white-space: nowrap;          /* 確保結帳文字絕對不折行 */

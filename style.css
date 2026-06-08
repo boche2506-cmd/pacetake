@@ -48,11 +48,9 @@ html, body {
     background-color: var(--bg-global);   
     display: flex;
     justify-content: center; /* 水平置中 */
-    align-items: center;
     overflow: hidden;    /* 隱藏超出視窗的內容，確保整體像紙張一樣 */
     line-height: 1; /* 讓行距跟著字體一起自動調整 */
     font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
-    margin: 0 auto;
 }
 
 input, textarea {
@@ -90,13 +88,13 @@ img, .card {
     display: flex;
     flex-direction: column;  /* 垂直排列 */
     justify-content: space-between;
-    align-items: stretch; 
     border: 0.2cqw solid var(--border-color);
     border-radius: 5%;
     box-shadow: var(--shadow-md);
     padding: 2cqw;
     container-type: size; /* 讓這個容器成為所有內部元素的參考點 */
     container-name: phone;
+    margin: 0 auto;
 } 
 
 #buyerView,
@@ -104,8 +102,6 @@ img, .card {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;  /* 垂直排列 */
-    justify-content: space-between;
-    align-items: stretch; 
     height: 100%;
     width: 100%;
     background-color: var(--bg-container);
@@ -284,7 +280,7 @@ img, .card {
     padding: 2cqw 4cqw;            /* 上下留點空格 */
     box-shadow: 0 1cqw 4cqw rgba(0,0,0,0.9); /* 漂浮陰影效果 */
     z-index: 100;             /* 確保一定在最上層 */
-    gap: 1cqw;
+    gap: 2cqw;
 }
 
 /* 2. 控制選單內每一行 <a> 超連結的排版（解決擠扁換行問題） */

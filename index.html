@@ -21,20 +21,20 @@
 
 .sticky-top-group {
     /* 這裡的高度與寬度原本是 15% 和 100%，我們用 cqw 重新定義它們的比例 */
-    height: 15%;
+    height: 10%;
     max-width: 100%;               
     display: flex;
     flex-direction: column; 
-    justify-content: space-between; /* 改用 space-between 讓上下兩列自動均分上下空間 */
-    align-items: center;            /* 置中對齊 */
+    justify-content: flex-start;   /* 改用 space-between 讓上下兩列自動均分上下空間 */
+    align-items: stretch;
     box-sizing: border-box;
     border-bottom: 0.1cqw solid var(--border-color);
-    padding: 0 2cqw;          /* 使用 cqw 控制外襯 padding */
+    padding: 0 2cqw 2cqw;          /* 使用 cqw 控制外襯 padding */
 }
 
 /* 上層：位置列 */
 .location-bar {
-    height: 50%;
+    height: 55%;
     max-width: 100%; 
     display: flex;
     flex-direction: row; 
@@ -54,7 +54,7 @@
     cursor: pointer;    
     white-space: nowrap; 
     box-shadow: var(--shadow-sm);
-    height: 60%;                 /* 讓它在 location-bar 裡自然撐高 */
+    height: 80%;                 /* 讓它在 location-bar 裡自然撐高 */
     width: 34%;                /* 給予固定的 cqw 寬度 */
     display: flex;
     flex-direction: row;
@@ -66,7 +66,7 @@
 
 /* 下拉選單群組 (縣市 + 區域) */
 .location-select-group {
-    height: 65%;
+    height: 80%;
     width: 66%;                /* 與 GPS 按鈕加起來剛好分配總寬度 */
     gap: 2cqw;                 /* 縣市和區域中間的間距 */
     display: flex;
@@ -94,7 +94,7 @@
 
 /* 下層：搜尋列外殼 */
 .search {
-    height: 50%;
+    height: 45%;
     width: 100%; 
     display: flex;
     flex-direction: row; 
@@ -106,7 +106,7 @@
 
 /* 搜尋框大盒子 */
 .search-box {
-    height: 70%;
+    height: 100%;
     width: 95%; 
     background-color: var(--bg-global);
     border: 0.3cqw solid var(--border-color);
@@ -140,7 +140,7 @@
    ========================================================================== */
 /* 店家列表大容器（佔畫面高55%） */
 .store-list {
-    height: 55%;
+    height: 57%;
     max-width: 100%;               
     overflow-y: auto;       
     display: flex;
@@ -452,14 +452,14 @@ footer .status-indicator.active {
             Google 登入
         </button>
 
-        <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 2cqw; background-color: white; border: 0.1cqw solid #e5e7eb; border-radius: 3cqw; padding: 1cqw; font-size: 5cqw; font-weight: 600; color: #374151; cursor: pointer; box-shadow: 0 0.5cqw 2cqw rgba(0,0,0,0.05);">
+        <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 5cqw; background-color: white; border: 0.1cqw solid #e5e7eb; border-radius: 3cqw; padding: 1cqw; font-size: 5cqw; font-weight: 600; color: #374151; cursor: pointer; box-shadow: 0 0.5cqw 2cqw rgba(0,0,0,0.05);">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.5cqw;">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                 <polyline points="22,6 12,13 2,6"></polyline>
             </svg>
             使用電子郵件登入
         </button>
-        <div id="emailFormSection" style="display: none; margin-top: 1cqw; text-align: left; width: 10cqw;">
+        <div id="emailFormSection" style="display: none; text-align: left; width: 10cqw;">
             <div style="margin-bottom: 1cqw;">
                 <label for="loginEmail" style="display:block; margin: bottom 0.25cqw;font-size:0.75cqw; color:#6b7280; font-weight:500;">電子郵件</label>
                 <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width: 10cqw; padding:0.25cqw 0.75cqw; border:0.1cqw solid #e5e7eb; border-radius:0.5cqw; box-sizing:border-box; font-size:0.75cqw; background-color:#f9fafb; color: #111111;">

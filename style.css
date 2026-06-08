@@ -124,7 +124,7 @@ img, .card {
 }
 
 .header {
-    height: 15%;
+    height: 18%;
     max-width: 100%;
     display: flex;
     flex-direction: column; 
@@ -342,15 +342,14 @@ img, .card {
     padding: 3cqw;
     box-shadow: var(--shadow-md);
     text-align: center;
-    height: 50%;
-    width: 80%;
-    gap:5cqw;
+    height: 50cqw;
+    width: 80cqw;
 }
 
 .modal-title {
     font-size: 5cqw;;
     font-weight: 700;
-    margin-bottom: 2cqw;
+    margin-bottom: 5cqw;
 }
 
 .modal-desc-address {
@@ -375,7 +374,7 @@ img, .card {
     border-radius: 3cqw;
     font-size: 5cqw;
     font-weight: 600;
-    margin-bottom: 2cqw;
+    margin-bottom: 5cqw;
     cursor: pointer;
     border: 0.1cqw solid var(--border-color);
     background: var(--card-bg);

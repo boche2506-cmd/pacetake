@@ -961,15 +961,12 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 🎯 PACE 專屬：store.html 雲端菜單動態渲染模組 (相容您原本的環境)
+// 🎯 PACE 專屬：store.html 雲端菜單動態渲染模組 (自動適應變數版)
 // ==========================================
 async function initStorePage() {
     // 1. 檢查目前畫面上是否有 menuContainer，有才代表使用者人在 store.html
     const menuContainer = document.getElementById('menuContainer');
-    if (!menuContainer) {
-        console.log("[PACE DEBUG] 身處首頁，安全退出點餐頁模組。");
-        return; //  如果是 index.html，直接退出，絕對不干擾原本的首頁功能！
-    }
+    if (!menuContainer) return; // 如果人在首頁，直接退出，絕對不干擾原本的首頁功能！
 
     console.log("[PACE DEBUG] 偵測到身處 store.html，啟動點餐頁面渲染程序...");
 
@@ -984,23 +981,43 @@ async function initStorePage() {
     }
 
     try {
-        // 3. 改用與您首頁一模一樣的相容語法去抓單一店家資料
-        // 💡 註：此處直接沿用您原本在 app.js 頂部就宣告好的 db 與 firebase 大腦
-        const docRef = firebase.firestore().collection("stores").doc(currentStoreId);
-        const docSnap = await docRef.get();
+        // 3. 🔥【大升級：自動變數適應防線】🔥
+        // 檢查您的 app.js 頂部是用 db 還是 window.db 還是原生 firebase 變數
+        let firestoreInstance;
+        if (typeof db !== 'undefined') {
+            firestoreInstance = db;
+        } else if (typeof window.db !== 'undefined') {
+            firestoreInstance = window.db;
+        } else if (typeof firebase !== 'undefined') {
+            firestoreInstance = firebase.firestore();
+        } else {
+            console.error("[PACE ERROR] 找不到任何有效的 Firestore 資料庫變數(db)！請確認 app.js 頂部初始化名稱。");
+            return;
+        }
 
-        if (docSnap.exists) {
+        // 4. 使用對齊後的變數，安全牽線抓取單一店家資料
+        let docSnap;
+        if (typeof firestoreInstance.collection === 'function') {
+            // 舊版/相容版語法 (Compat/v8 style)
+            docSnap = await firestoreInstance.collection("stores").doc(currentStoreId).get();
+        } else {
+            // 如果您的專案是純 v9 模組化，則需搭配 app.js 頂部 import
+            console.warn("[PACE WARNING] 偵測到純模組化環境，嘗試使用相容橋樑讀取...");
+            docSnap = await firestoreInstance.doc("stores/" + currentStoreId).get();
+        }
+
+        if (docSnap && (docSnap.exists || (typeof docSnap.data === 'function' && docSnap.data()))) {
             const storeData = docSnap.data();
             console.log("[PACE DEBUG] 成功自雲端獲取店家資料:", storeData.shopName);
 
-            // 4. 渲染頂部店名與地址
+            // 5. 渲染頂部店名與地址
             const storeNameText = document.getElementById('storeNameText');
             const storeAddressText = document.getElementById('storeAddressText');
             
             if (storeNameText) storeNameText.innerText = `${storeData.shopLogo || '🏪'} ${storeData.shopName || '未命名店家'}`;
             if (storeAddressText) storeAddressText.innerText = `📍 ${storeData.shopAddress || ''}`;
 
-            // 5. 提取您儲存在 stores 裡面的 menuList 菜單陣列
+            // 6. 提取您儲存在 stores 裡面的 menuList 菜單陣列
             const menuList = storeData.menuList || [];
             menuContainer.innerHTML = ""; // 清空 HTML 原本寫死的「正在載入...」
 
@@ -1011,7 +1028,7 @@ async function initStorePage() {
 
             let localCartData = []; // 準備用來裝購物車的陣列
 
-            // 6. 迴圈渲染菜單卡片
+            // 7. 迴圈渲染菜單卡片
             menuList.forEach((item, index) => {
                 const itemId = `item_${index}`;
                 const itemName = item.name || '未命名商品';
@@ -1046,7 +1063,7 @@ async function initStorePage() {
 
                 menuContainer.appendChild(foodCard);
 
-                // 7. 綁定「加到購物車」點擊與合計事件
+                // 8. 綁定「加到購物車」點擊與合計事件
                 if (!isSoldOut) {
                     const btn = foodCard.querySelector('.btn-trigger');
                     const cartSummaryText = document.getElementById('cartSummaryText');
@@ -1056,9 +1073,8 @@ async function initStorePage() {
                         
                         // 從介面文字解析目前數量與金額並累加
                         const currentSummary = cartSummaryText ? cartSummaryText.innerText : "0";
-                        let curCount = parseInt(currentSummary.match(/\d+/) ? currentSummary.match(/\d+/)[0] : 0, 10);
+                        let curCount = parseInt(currentSummary.match(/\d+/) ? currentSummary.match(/\d+/) : 0, 10);
                         
-                        // 提取金額部分
                         let curTotal = 0;
                         if (currentSummary.includes('$')) {
                             curTotal = parseInt(currentSummary.split('$')[1], 10) || 0;
@@ -1107,7 +1123,10 @@ async function initStorePage() {
     }
 }
 
-// 確保網頁一讀取就啟動偵測程序
-initStorePage();
+// 9. 延遲 300 毫秒執行，防範與 app.js 最前方的初始化發生「時間差搶跑」錯誤
+setTimeout(() => {
+    initStorePage();
+}, 300);
+
 
             

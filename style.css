@@ -272,7 +272,7 @@ img, .card {
     top: 100%;                 /* 緊貼在頭像/名字按鈕下方 */
     right: 0;
     height: 90cqw;
-    width: 70cqw;
+    width: 60cqw;
     left: auto;
     background-color: #ffffff; /* 白色背景 */
     border: 0.1cqw solid #e0e0e0; /* 淡淡的灰色外框 */
@@ -280,7 +280,6 @@ img, .card {
     padding: 2cqw 4cqw;            /* 上下留點空格 */
     box-shadow: 0 1cqw 4cqw rgba(0,0,0,0.9); /* 漂浮陰影效果 */
     z-index: 100;             /* 確保一定在最上層 */
-    gap: 3cqw;
 }
 
 /* 2. 控制選單內每一行 <a> 超連結的排版（解決擠扁換行問題） */
@@ -292,6 +291,7 @@ img, .card {
     font-size: 5cqw;
     white-space: nowrap;       /* 核心：強制一行字絕對不換行 */
     text-align: left;          /* 文字靠左對齊 */
+    gap: 3cqw;
 }
 
 /* 當滑鼠移過去選項時，產生灰色高亮反白效果 */

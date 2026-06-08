@@ -960,4 +960,149 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// ==========================================
+// 🎯 PACE 專屬：store.html 雲端菜單動態渲染模組 (Firebase v9+ Modular)
+// ==========================================
+import { doc, getDoc } from "https://gstatic.com";
+
+async function initStorePage() {
+    // 1. 檢查目前畫面上是否有 menuContainer，有才代表使用者人在 store.html
+    const menuContainer = document.getElementById('menuContainer');
+    if (!menuContainer) return; // 如果人在首頁，直接退出，絕不干擾原本的 app.js
+
+    console.log("[PACE DEBUG] 偵測到身處 store.html，啟動點餐頁面渲染程序...");
+
+    // 2. 從網址解析出當前的 storeId
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentStoreId = urlParams.get('storeId');
+
+    if (!currentStoreId) {
+        alert("❌ 找不到店家資訊，將返回首頁！");
+        window.location.href = "index.html";
+        return;
+    }
+
+    try {
+        // 3. 使用 v9 Modular 語法讀取單一店家資料 (db 為您全局定義的 Firestore 實例)
+        const docRef = doc(db, "stores", currentStoreId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const storeData = docSnap.data();
+            console.log("[PACE DEBUG] 成功自雲端獲取店家資料:", storeData.shopName);
+
+            // 4. 渲染頂部店名與地址
+            const storeNameText = document.getElementById('storeNameText');
+            const storeAddressText = document.getElementById('storeAddressText');
+            
+            if (storeNameText) storeNameText.innerText = `${storeData.shopLogo || '🏪'} ${storeData.shopName || '未命名店家'}`;
+            if (storeAddressText) storeAddressText.innerText = `📍 ${storeData.shopAddress || ''}`;
+
+            // 5. 提取您儲存在 stores 裡面的 menuList 菜單陣列
+            const menuList = storeData.menuList || [];
+            menuContainer.innerHTML = ""; // 清空 HTML 原本寫死的「正在載入...」
+
+            if (menuList.length === 0) {
+                menuContainer.innerHTML = `<div style="text-align:center; padding:10cqw; color:var(--text-main);">📭 本店家目前尚未上架任何餐點。</div>`;
+                return;
+            }
+
+            let localCartData = []; // 準備用來裝購物車的陣列
+
+            // 6. 迴圈渲染菜單卡片
+            menuList.forEach((item, index) => {
+                const itemId = `item_${index}`;
+                const itemName = item.name || '未命名商品';
+                const itemPrice = parseInt(item.price, 10) || 0;
+                const itemImg = item.image || '';
+                const isSoldOut = storeData.status === "offline";
+
+                const foodCard = document.createElement('div');
+                foodCard.className = `food-card ${isSoldOut ? 'sold-out' : ''}`;
+                foodCard.setAttribute('data-price', itemPrice);
+                foodCard.setAttribute('data-id', itemId);
+                foodCard.setAttribute('data-name', itemName);
+
+                let imgElement = `🍱`;
+                if (itemImg && itemImg.startsWith('data:image')) {
+                    imgElement = `<img src="${itemImg}" style="width:100%; height:100%; object-fit:cover; border-radius:2cqw;">`;
+                }
+
+                foodCard.innerHTML = `
+                    <div class="food-img">${imgElement}</div>
+                    <div class="food-info">
+                        <div class="food-name">${itemName} ${isSoldOut ? '(暫停供應)' : ''}</div>
+                        <div class="food-price">$${itemPrice}</div>
+                    </div>
+                    <div class="action-container">
+                        ${isSoldOut 
+                            ? `<button class="add-cart-btn sold-out-btn" disabled>🔴 暫停供應</button>`
+                            : `<button class="add-cart-btn btn-trigger">➕ 加到購物車</button>`
+                        }
+                    </div>
+                `;
+
+                menuContainer.appendChild(foodCard);
+
+                // 7. 綁定「加到購物車」點擊與合計事件
+                if (!isSoldOut) {
+                    const btn = foodCard.querySelector('.btn-trigger');
+                    let cartCount = 0;
+                    let cartTotal = 0;
+                    const cartSummaryText = document.getElementById('cartSummaryText');
+
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        
+                        // 累加合計金額與數量
+                        const currentSummary = cartSummaryText.innerText;
+                        // 從介面文字解析目前數量與金額
+                        let curCount = parseInt(currentSummary.match(/\d+/) ? currentSummary.match(/\d+/)[0] : 0, 10);
+                        let curTotal = parseInt(currentSummary. Bir || currentSummary.split('$')[1] || 0, 10);
+                        
+                        curCount += 1;
+                        curTotal += itemPrice;
+                        
+                        if (cartSummaryText) {
+                            cartSummaryText.innerText = `🛒 購物車已加入 ${curCount} 項商品 · 總計 $${curTotal}`;
+                        }
+
+                        // 打包寫入 localStorage，100% 對接您的 cart.html 規格
+                        const existingItem = localCartData.find(i => i.id === itemId);
+                        if (existingItem) {
+                            existingItem.qty += 1;
+                        } else {
+                            localCartData.push({
+                                id: itemId,
+                                name: itemName,
+                                price: itemPrice,
+                                qty: 1,
+                                storeId: currentStoreId
+                            });
+                        }
+                        localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
+
+                        // 按鈕精品級動畫回饋
+                        btn.innerText = "✓ 已加入";
+                        btn.style.backgroundColor = "rgba(0, 102, 255, 0.1)";
+                        setTimeout(() => {
+                            btn.innerText = "➕ 加到購物車";
+                            btn.style.backgroundColor = "";
+                        }, 400);
+                    });
+                }
+            });
+
+        } else {
+            console.error("[PACE ERROR] 雲端找不到該 storeId 對應的店家");
+            const storeNameText = document.getElementById('storeNameText');
+            if (storeNameText) storeNameText.innerText = "❌ 店家暫停營業中";
+        }
+    } catch (error) {
+        console.error("[PACE ERROR] 讀取點餐頁面失敗：", error);
+    }
+}
+
+// 確保網頁一讀取就啟動偵測程序
+initStorePage();
             

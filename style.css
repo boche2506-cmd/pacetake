@@ -52,6 +52,7 @@ html, body {
     overflow: hidden;    /* 隱藏超出視窗的內容，確保整體像紙張一樣 */
     line-height: 1; /* 讓行距跟著字體一起自動調整 */
     font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+    margin: 0 auto;
 }
 
 input, textarea {
@@ -283,6 +284,7 @@ img, .card {
     padding: 2cqw 4cqw;            /* 上下留點空格 */
     box-shadow: 0 1cqw 4cqw rgba(0,0,0,0.9); /* 漂浮陰影效果 */
     z-index: 100;             /* 確保一定在最上層 */
+    gap: 1cqw;
 }
 
 /* 2. 控制選單內每一行 <a> 超連結的排版（解決擠扁換行問題） */

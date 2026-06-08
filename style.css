@@ -233,7 +233,7 @@ img, .card {
     height: 100%;             
     max-width: 30%;             /* 💡 建議先註解掉，或確保它夠寬，膠囊按鈕放了圖文需要寬度 */
     min-width: fit-content;     /* 💡 新增：確保按鈕至少能完整塞下內文 */
-    padding: 0 1cqw;            /* 調整內襯，讓膠囊兩側有舒服的留白 */
+    padding: 0 1.5cqw;            /* 調整內襯，讓膠囊兩側有舒服的留白 */
     background-color: var(--card-bg); 
     border: 0.1cqw solid var(--border-color);
     border-radius: 10cqw;       

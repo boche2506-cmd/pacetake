@@ -89,7 +89,7 @@ img, .card {
     flex-direction: column;  /* 垂直排列 */
     justify-content: space-between;
     border: 0.2cqw solid var(--border-color);
-    border-radius: 5cqw;
+    border-radius: 3cqw;
     box-shadow: var(--shadow-md);
     padding: 2cqw;
     container-type: size; /* 讓這個容器成為所有內部元素的參考點 */

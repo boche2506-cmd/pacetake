@@ -812,18 +812,49 @@ window.triggerUpload = function(box) {
     if (fileInput) fileInput.click();
 };
 
+//「避免使用者上傳太大張的照片導致網頁卡頓或伺服器負擔」
 window.previewImage = function(input) {
     const box = input.parentElement;
     const img = box.querySelector('.preview-img');
     const placeholder = box.querySelector('.upload-placeholder');
+    
     if (input.files && input.files[0]) {
+        const file = input.files[0];
         const reader = new FileReader();
+
         reader.onload = function(e) {
-            img.src = e.target.result;
-            img.style.display = 'block';
-            if (placeholder) placeholder.style.display = 'none';
+            const tempImg = new Image();
+            tempImg.src = e.target.result;
+            
+            tempImg.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800; // 限制最大寬度為 800px，你可以自行調整
+                const scaleSize = MAX_WIDTH / tempImg.width;
+                
+                // 如果圖片大於設定寬度，才進行縮小
+                if (tempImg.width > MAX_WIDTH) {
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = tempImg.height * scaleSize;
+                } else {
+                    canvas.width = tempImg.width;
+                    canvas.height = tempImg.height;
+                }
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+
+                // 將圖片轉為 base64，品質設為 0.7 (70%)
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                
+                // 更新預覽區
+                img.src = compressedDataUrl;
+                img.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
+                
+                console.log("[PACE] 圖片壓縮完成，新尺寸:", canvas.width, "x", canvas.height);
+            };
         };
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(file);
     }
 };
 
@@ -928,3 +959,5 @@ window.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     }
 });
+
+            

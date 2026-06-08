@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 商家開店</title>
 <!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
 <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
@@ -11,49 +11,59 @@
 <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
 <link rel="stylesheet" href="style.css">
     <style>
+        .register-body {
+        overflow: hidden; /* 鎖定 body */
+    }
+
+        .register-wrapper {
+        height: 100vh;
+        overflow-y: auto; /* 讓內部內容滾動 */
+        width: 100vw;
+    }
 
          /* 填表區域 */
         .form-container {
-            padding: 20px;
+            padding: 2cqw;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 1cqw;
         }
 
         .form-section {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 1cqw;
+            overflow-y: auto;
         }
 
         .section-title {
-            font-size: 14px;
+            font-size: 4cqw;
             font-weight: 700;
             color: var(--text-muted);
-            letter-spacing: 0.5px;
+            letter-spacing: 1cqw;
             text-transform: uppercase;
         }
 
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 1cqw;
         }
 
         .input-group label {
-            font-size: 13px;
+            font-size: 4cqw;
             font-weight: 700;
             color: var(--text-main);
         }
 
         .input-style {
             width: 100%;
-            height: 44px;
+            height: 7cqw;
             background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0 14px;
-            font-size: 14px;
+            border: 0.1cqw solid var(--border-color);
+            border-radius: 2cqw;
+            padding: 0 2cqw;
+            font-size: 4cqw;
             color: var(--text-main);
             outline: none;
             transition: background-color 0.15s ease, border-color 0.15s ease;
@@ -62,21 +72,21 @@
         /* 👑 招牌圖片與店鋪名稱並排排版 */
         .shop-name-block {
             display: flex;
-            gap: 12px;
+            gap: 1cqw;
             align-items: center;
             width: 100%;
         }
 
         .shop-logo-box {
-            width: 64px;
-            height: 64px;
-            border-radius: 14px;
-            border: 2px dashed var(--border-color);
+            width: 17cqw;
+            height: 17cqw;
+            border-radius: 2cqw;
+            border: 0.1cqw dashed var(--border-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 4cqw;
             background-color: var(--bg-global);
             cursor: pointer;
             color: var(--text-muted);
@@ -85,15 +95,15 @@
             flex-shrink: 0;
         }
         .shop-logo-box span {
-            font-size: 9px;
-            margin-top: 2px;
+            font-size: 4cqw;
+            margin-top: 1cqw;
             font-weight: 700;
         }
 
         /* 縣市區域並排選單 */
         .select-row {
             display: flex;
-            gap: 8px;
+            gap: 1cqw;
         }
         .select-row select {
             flex: 1;
@@ -105,25 +115,25 @@
             justify-content: space-between;
             align-items: center;
             background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 14px;
+            border: 0.1cqw solid var(--border-color);
+            border-radius: 2cqw;
+            padding: 2cqw;
             box-shadow: var(--shadow-sm);
         }
 
         .switch-info {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 1cqw;
         }
 
         .switch-title {
-            font-size: 14px;
+            font-size: 4cqw;
             font-weight: 700;
         }
 
         .switch-desc {
-            font-size: 11px;
+            font-size: 3cqw;
             color: var(--text-muted);
         }
 
@@ -131,8 +141,8 @@
         .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 46px;
-            height: 24px;
+            width: 11cqw;
+            height: 6cqw;
         }
 
         .toggle-switch input {
@@ -147,16 +157,16 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: #CBD5E1;
             transition: .2s;
-            border-radius: 24px;
+            border-radius: 6cqw;
         }
 
         .slider::before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
+            height: 4cqw;
+            width: 4cqw;
+            left: 1cqw;
+            bottom: 1cqw;
             background-color: white;
             transition: .2s;
             border-radius: 50%;
@@ -167,7 +177,7 @@
         }
 
         input:checked + .slider::before {
-            transform: translateX(22px);
+            transform: translateX(5cqw);
         }
 
         /* 藍新金流隱藏區塊 */
@@ -180,17 +190,17 @@
         .menu-upload-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 1cqw;
         }
 
         /* 👑 菜單排版大魔改：單列橫向佈局 */
         .menu-item-row {
             display: flex;
             background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 12px;
-            gap: 10px;
+            border: 0.1cqw solid var(--border-color);
+            border-radius: 2cqw;
+            padding: 2cqw;
+            gap: 1cqw;
             align-items: center;
             box-shadow: var(--shadow-sm);
             position: relative;
@@ -199,15 +209,15 @@
         }
 
         .img-upload-box {
-            width: 64px;
-            height: 64px;
-            border-radius: 12px;
-            border: 2px dashed var(--border-color);
+            width: 17cqw;
+            height: 17cqw;
+            border-radius: 2cqw;
+            border: 0.1cqw dashed var(--border-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 4cqw;
             background-color: var(--bg-global);
             cursor: pointer;
             color: var(--text-muted);
@@ -226,14 +236,14 @@
         }
 
         .img-upload-box span {
-            font-size: 9px;
-            margin-top: 2px;
+            font-size: 3cqw;
+            margin-top: 0.1cqw;
         }
 
         .item-fields {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 1cqw;
             flex-grow: 1;
             min-width: 0; /* 防止輸入框爆開 */
         }
@@ -246,44 +256,44 @@
 
         .price-symbol {
             position: absolute;
-            left: 12px;
-            font-size: 14px;
+            left: 2cqw;
+            font-size: 3cqw;
             font-weight: 700;
             color: var(--text-muted);
         }
 
         .price-input {
-            padding-left: 26px !important;
+            padding-left: 5cqw;
         }
 
         /* 👑 刪除與排序移到右側控制區 */
         .item-right-ctrls {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 1cqw;
             flex-shrink: 0;
         }
 
         .del-row-btn {
             background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
+            border: 0.1cqw solid var(--border-color);
             color: var(--brand-red);
-            font-size: 12px;
+            font-size: 3cqw;
             font-weight: 700;
-            padding: 6px 8px;
-            border-radius: 8px;
+            padding: 1.5cqw 2cqw;
+            border-radius: 2cqw;
             cursor: pointer;
             white-space: nowrap;
         }
 
         .drag-handle {
-            font-size: 12px;
+            font-size: 3cqw;
             font-weight: 700;
             color: var(--text-muted);
             background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            padding: 6px 8px;
-            border-radius: 8px;
+            border: 0.1cqw solid var(--border-color);
+            padding: 1.5cqw 2cqw;
+            border-radius: 2cqw;
             cursor: grab;
             white-space: nowrap;
         }
@@ -293,17 +303,17 @@
 
         .add-row-btn {
             background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
+            border: 0.1cqw solid var(--border-color);
             color: var(--brand-blue);
-            height: 44px;
-            border-radius: 12px;
-            font-size: 14px;
+            height: 10cqw;
+            border-radius: 2cqw;
+            font-size: 3cqw;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 1cqw;
             transition: background-color 0.2s;
         }
 
@@ -313,13 +323,12 @@
 
         /* 底部註冊大鈕 */
         .footer-action {
-            position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 16px 20px 24px 20px;
+            padding: 2cqw;
             background-color: var(--bg-container);
-            border-top: 1px solid var(--border-color);
+            border-top: 0.1cqw solid var(--border-color);
         }
 
         .submit-btn {
@@ -327,12 +336,12 @@
             color: white;
             border: none;
             width: 100%;
-            height: 52px;
-            border-radius: 26px;
-            font-size: 16px;
+            height: 12cqw;
+            border-radius: 5cqw;
+            font-size: 4cqw;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(0, 102, 255, 0.3);
+            box-shadow: 0 1cqw 4cqw rgba(0, 102, 255, 0.3);
         }
 
         .submit-btn:disabled {
@@ -347,53 +356,53 @@
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(1cqw);
+            -webkit-backdrop-filter: blur(1cqw);
             z-index: 200;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 5cqw;
         }
 
         .modal-card {
             background-color: var(--bg-container);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
+            border-radius: 5cqw;
             width: 100%;
-            max-width: 320px;
-            padding: 24px;
+            max-width: 100cqw;
+            padding: 5cqw;
             box-shadow: var(--shadow-md);
             text-align: center;
         }
 
         .modal-title {
-            font-size: 16px;
+            font-size: 4cqw;
             font-weight: 800;
             color: var(--brand-red);
-            margin-bottom: 12px;
+            margin-bottom: 3cqw;
         }
 
         .modal-desc {
-            font-size: 13px;
+            font-size: 3cqw;
             color: var(--text-main);
-            line-height: 1.6;
-            margin-bottom: 20px;
+            line-height: 1;
+            margin-bottom: 3cqw;
             text-align: left;
         }
 
         .modal-action-btns {
             display: flex;
-            gap: 10px;
+            gap: 1cqw;
         }
 
         .modal-action-btns button {
             flex: 1;
-            height: 40px;
-            border-radius: 10px;
-            font-size: 13px;
+            height: 10cqw;
+            border-radius: 2cqw;
+            font-size: 3cqw;
             font-weight: 700;
             cursor: pointer;
-            border: 1px solid var(--border-color);
+            border: 0.1cqw solid var(--border-color);
             background: var(--card-bg);
             color: var(--text-main);
         }
@@ -417,31 +426,29 @@
                     <label>店鋪聯絡電話</label>
                     <input type="tel" id="shopPhone" class="input-style" placeholder="請輸入店鋪或老闆的手機號碼" required pattern="[0-9]{9,10}">
                 </div>
-                
                 <div class="input-group">
-                    <label>店鋪招牌與名稱</label>
-                    <div class="shop-name-block">
-                        <div class="shop-logo-box" onclick="triggerUpload(this)">
-                            <input type="file" id="shopLogoInput" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                            <img class="preview-img" id="shopLogoPreview" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
-                            <div class="upload-placeholder">📸<span>上傳招牌</span></div>
-                        </div>
-                        <input type="text" id="shopName" class="input-style" placeholder="請輸入您的店鋪招牌名稱" required style="flex-grow:1;">
-                    </div>
-                </div>
-                
-                <div class="input-group">
-                    <label>店鋪所在區域</label>
-                    <div class="select-row">
-                        <select id="shopCity" class="input-style" required>
-                            <option value="">選擇縣市</option>
-                        </select>
-                        <select id="shopDistrict" class="input-style" required>
-                            <option value="">選擇區域</option>
-                        </select>
-                    </div>
-                </div>
+    <label>店鋪招牌與名稱</label>
+    <div class="shop-name-block">
+        <div class="shop-logo-box" onclick="triggerUpload(this)">
+            <input type="file" id="shopLogoInput" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+            <img class="preview-img" id="shopLogoPreview" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+            <div class="upload-placeholder">📸<span>上傳招牌</span></div>
+        </div>
 
+        <div style="display: flex; flex-direction: column; justify-content: space-between; gap: 1cqw; flex-grow: 1;">
+            <input type="text" id="shopName" class="input-style" placeholder="請輸入您的店鋪招牌名稱" required>
+            
+            <div class="select-row" style="display: flex; gap: 1cqw;">
+                <select id="shopCity" class="input-style" required style="flex: 1;">
+                    <option value="">選擇縣市</option>
+                </select>
+                <select id="shopDistrict" class="input-style" required style="flex: 1;">
+                    <option value="">選擇區域</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
                 <div class="input-group">
                     <label>詳細地址 <span style="color:var(--brand-blue); font-size:11px;">(AI自動轉換經緯度)</span></label>
                     <input type="text" id="shopAddress" class="input-style" placeholder="請輸入巷弄門牌，不需重複寫縣市" required>
@@ -484,7 +491,7 @@
                         <span class="slider"></span>
                     </label>
                 </div>
-            </div>
+            
 
             <div class="form-section">
                 <div class="section-title">菜單商品上架</div>
@@ -503,7 +510,7 @@
                                 <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
                             </div>
                         </div>
-                        <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 6px; justify-content: center;">
+                        <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 1cqw; justify-content: center;">
                             <div class="drag-handle" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: grab;">☰</div>
                             <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
                         </div>
@@ -513,7 +520,7 @@
                 <button type="button" class="add-row-btn" id="addItemRowBtn">＋ 新增下一個品項</button>
             </div>
         </form>
-
+    </div>
         <footer class="footer-action">
             <button class="submit-btn" id="shopSubmitBtn" form="shopRegisterForm" type="submit">建立店鋪</button>
         </footer>

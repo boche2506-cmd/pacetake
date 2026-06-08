@@ -275,7 +275,7 @@ img, .card {
     top: 100%;                 /* 緊貼在頭像/名字按鈕下方 */
     right: 0;
     height: 100cqw;
-    width: 60cqw;
+    width: 80cqw;
     left: auto;
     background-color: #ffffff; /* 白色背景 */
     border: 0.1cqw solid #e0e0e0; /* 淡淡的灰色外框 */
@@ -291,7 +291,7 @@ img, .card {
     padding: 1cqw 2cqw;        /* 讓手機或滑鼠比較好點擊的範圍 */
     color: #333333;            /* 文字顏色 */
     text-decoration: none;     /* 移除超連結下底線 */
-    font-size: 6cqw;
+    font-size: 5cqw;
     white-space: nowrap;       /* 核心：強制一行字絕對不換行 */
     text-align: left;          /* 文字靠左對齊 */
 }
@@ -314,7 +314,7 @@ img, .card {
     display: block;
     text-align: left;
     padding: 0.5cqw 1cqw;  /* 跟上面的超連結對齊 */
-    font-size: 3cqw;  /* 讓字體大小跟其他選項一致 */
+    font-size: 5cqw;  /* 讓字體大小跟其他選項一致 */
 }
 #logoutBtn:hover {
     background-color: #fff0f0; /* 登出按鈕移過去時顯示淡淡的紅色 */

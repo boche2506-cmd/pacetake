@@ -21,8 +21,8 @@
 
 .sticky-top-group {
     /* 這裡的高度與寬度原本是 15% 和 100%，我們用 cqw 重新定義它們的比例 */
-    height: 30cqw;               /* 依據你的設計，大約落在此視覺高度 */
-    width: 100cqw;               
+    height: 15%;
+    max-width: 100%;               
     display: flex;
     flex-direction: column; 
     justify-content: space-between; /* 改用 space-between 讓上下兩列自動均分上下空間 */
@@ -143,11 +143,11 @@
 /* 店家列表大容器（佔畫面高55%） */
 .store-list {
     height: 55%;                 /* 保留你指定的總高 55% */
-    width: 100cqw;               
+    max-width: 100%;               
     overflow-y: auto;       
     display: flex;
     flex-direction: column;
-    gap: 2cqw;                   /* 卡片與卡片之間的間距改用 cqw */
+    gap: 1cqw;                   /* 卡片與卡片之間的間距改用 cqw */
     padding: 2cqw 3cqw 2cqw 4cqw; /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
     box-sizing: border-box;
 }
@@ -168,7 +168,7 @@
     color: inherit;
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    padding: 2.5cqw;             /* 卡片內部內襯改用 cqw */
+    padding: 2cqw;             /* 卡片內部內襯改用 cqw */
     box-sizing: border-box;
 }
 
@@ -195,14 +195,14 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 1cqw;
+    gap: 2cqw;
     flex-grow: 1;                /* 💡 關鍵：讓文字區塊拿走剩下的所有寬度，點點點才會精準生效 */
     overflow: hidden;            /* 💡 關鍵：防止內部文字把外殼撐開 */
 }
 
 /* 店家名稱 */
 .store-name {
-    font-size: 4.5cqw;           /* 字體改用 cqw */
+    font-size: 6cqw;           /* 字體改用 cqw */
     font-weight: 600;
     color: var(--text-main);
     white-space: nowrap;   
@@ -212,7 +212,7 @@
 
 /* 📍 店家地址/距離（你要的太長顯示...設定在這裡） */
 .store-meta {
-    font-size: 3cqw;             /* 字體改用 cqw */
+    font-size: 4cqw;             /* 字體改用 cqw */
     color: var(--text-muted);
     white-space: nowrap;   
     overflow: hidden;            /* 💡 關鍵：隱藏超出寬度的字 */

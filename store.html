@@ -231,7 +231,38 @@ async function loadStoreAndMenu() {
         if (docSnap.exists) {
             const storeData = docSnap.data();
             
-                        // --- 區塊 B：畫出中間的菜單品項與備註欄 ---
+            // ==========================================
+            //  【精準接回：store.html 專屬的相片招牌大復活防線】
+            // ==========================================
+            const storeNameText = document.getElementById('storeNameText');
+            const storeAddressText = document.getElementById('storeAddressText');
+            
+            if (storeData) {
+                const finalName = storeData.shopName || '未命名店家';
+                const finalAddress = storeData.shopAddress || '';
+                
+                // 自動判定您的 shopLogo 到底是 Base64 相片還是單個 Emoji
+                const logoData = storeData.shopLogo || storeData.emoji || '🏪';
+                let finalLogoHtml = logoData;
+                
+                if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
+                    //  關鍵：如果是一長串照片，強制用 <img> 包裹並套用圓形大頭貼排版
+                    finalLogoHtml = `<img src="${logoData}" style="width:14cqw; height:14cqw; object-fit:cover; border-radius:50%; margin-right:3cqw; display:inline-block; vertical-align:middle;">`;
+                } else {
+                    finalLogoHtml = `<span style="font-size:8cqw; margin-right:3cqw; vertical-align:middle;">${logoData}</span>`;
+                }
+
+                // 塞入網頁對應的欄位，絕不覆蓋到外殼樣式
+                if (storeNameText) {
+                    storeNameText.innerHTML = `${finalLogoHtml} <span style="vertical-align:middle;">${finalName}</span>`;
+                }
+                if (storeAddressText) {
+                    storeAddressText.innerText = `📍 ${finalAddress}`;
+                }
+            }
+            // ==========================================
+
+            // --- 區塊 B：畫出中間的菜單品項與備註欄 (下方原本的代碼完全不用動) ---
             const menuList = storeData.menuList || [];
             const menuContainer = document.getElementById('menuContainer');
             menuContainer.innerHTML = ""; // 清空載入中提示

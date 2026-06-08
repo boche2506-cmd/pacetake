@@ -1015,32 +1015,6 @@ async function initStorePage() {
 
         // --- 2. 開始渲染畫面 ---
         if (storeData) {
-            // 💡【核心改動一】：完美複製首頁卡片 HTML 結構，直接替代點餐頁頂部的 store-header-info 區域
-            const storeHeaderInfo = document.getElementById('storeHeaderInfo');
-            if (storeHeaderInfo) {
-                const finalName = storeData.shopName || '未命名店家';
-                const finalAddress = storeData.shopAddress || '';
-                const takeoutSupported = storeData.isCashPayEnabled !== false;
-                const paySupported = storeData.isOnlinePayEnabled !== false;
-
-                // 這裡的 HTML 結構與 Class 名稱，與您首頁傳給我的卡片一模一樣，100% 移植外觀！
-                storeHeaderInfo.innerHTML = `
-                    <div class="store-card" style="box-shadow: none; padding: 0; background: transparent; margin: 0; width: 100%;">
-                        <div class="store-img">${storeData.shopLogo || '🏪'}</div>
-                        <div class="store-info">
-                            <div class="store">
-                                <div class="store-name" style="font-size: 5cqw; font-weight: bold; color: var(--text-main);">${finalName}</div>
-                                <div class="store-meta" style="font-size: 3cqw; margin-top: 1cqw;">📍 ${finalAddress}</div>
-                            </div>
-                            <div class="store-tags" style="margin-top: 2cqw;">
-                                <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
-                                <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-
             const menuList = storeData.menuList || [];
             menuContainer.innerHTML = ""; 
 

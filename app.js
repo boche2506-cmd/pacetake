@@ -961,14 +961,15 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 🎯 PACE 專屬：store.html 雲端菜單動態渲染模組 (Firebase v9+ Modular)
+// 🎯 PACE 專屬：store.html 雲端菜單動態渲染模組 (相容您原本的環境)
 // ==========================================
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"
-
 async function initStorePage() {
     // 1. 檢查目前畫面上是否有 menuContainer，有才代表使用者人在 store.html
     const menuContainer = document.getElementById('menuContainer');
-    if (!menuContainer) return; // 如果人在首頁，直接退出，絕不干擾原本的 app.js
+    if (!menuContainer) {
+        console.log("[PACE DEBUG] 身處首頁，安全退出點餐頁模組。");
+        return; //  如果是 index.html，直接退出，絕對不干擾原本的首頁功能！
+    }
 
     console.log("[PACE DEBUG] 偵測到身處 store.html，啟動點餐頁面渲染程序...");
 
@@ -983,11 +984,12 @@ async function initStorePage() {
     }
 
     try {
-        // 3. 使用 v9 Modular 語法讀取單一店家資料 (db 為您全局定義的 Firestore 實例)
-        const docRef = doc(db, "stores", currentStoreId);
-        const docSnap = await getDoc(docRef);
+        // 3. 改用與您首頁一模一樣的相容語法去抓單一店家資料
+        // 💡 註：此處直接沿用您原本在 app.js 頂部就宣告好的 db 與 firebase 大腦
+        const docRef = firebase.firestore().collection("stores").doc(currentStoreId);
+        const docSnap = await docRef.get();
 
-        if (docSnap.exists()) {
+        if (docSnap.exists) {
             const storeData = docSnap.data();
             console.log("[PACE DEBUG] 成功自雲端獲取店家資料:", storeData.shopName);
 
@@ -1047,18 +1049,20 @@ async function initStorePage() {
                 // 7. 綁定「加到購物車」點擊與合計事件
                 if (!isSoldOut) {
                     const btn = foodCard.querySelector('.btn-trigger');
-                    let cartCount = 0;
-                    let cartTotal = 0;
                     const cartSummaryText = document.getElementById('cartSummaryText');
 
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
                         
-                        // 累加合計金額與數量
-                        const currentSummary = cartSummaryText.innerText;
-                        // 從介面文字解析目前數量與金額
+                        // 從介面文字解析目前數量與金額並累加
+                        const currentSummary = cartSummaryText ? cartSummaryText.innerText : "0";
                         let curCount = parseInt(currentSummary.match(/\d+/) ? currentSummary.match(/\d+/)[0] : 0, 10);
-                        let curTotal = parseInt(currentSummary. Bir || currentSummary.split('$')[1] || 0, 10);
+                        
+                        // 提取金額部分
+                        let curTotal = 0;
+                        if (currentSummary.includes('$')) {
+                            curTotal = parseInt(currentSummary.split('$')[1], 10) || 0;
+                        }
                         
                         curCount += 1;
                         curTotal += itemPrice;
@@ -1105,4 +1109,5 @@ async function initStorePage() {
 
 // 確保網頁一讀取就啟動偵測程序
 initStorePage();
+
             

@@ -194,7 +194,7 @@ img, .card {
     font-size: 4cqw;
     padding: 1cqw;
     background: var(--card-bg);
-    border: 0.1cqw solid var(--border-color);
+    border: 0.2cqw solid var(--border-color);
     border-radius: 50%;
     color: var(--text-main);
     cursor: pointer;
@@ -212,7 +212,7 @@ img, .card {
     font-weight: 500;
     background-color: var(--brand-blue);
     color: #FFFFFF;
-    border: 0.1cqw solid var(--border-color);
+    border: 0.2cqw solid var(--border-color);
     padding: 2cqw 4cqw;
     border-radius: 10cqw;
     box-shadow: var(--shadow-sm);
@@ -232,7 +232,7 @@ img, .card {
     min-width: fit-content;     /* 💡 新增：確保按鈕至少能完整塞下內文 */
     padding: 0 1.5cqw;            /* 調整內襯，讓膠囊兩側有舒服的留白 */
     background-color: var(--card-bg); 
-    border: 0.1cqw solid var(--border-color);
+    border: 0.2cqw solid var(--border-color);
     border-radius: 10cqw;       
     box-shadow: var(--shadow-sm);
     cursor: pointer;
@@ -275,7 +275,7 @@ img, .card {
     width: 70cqw;
     left: auto;
     background-color: #ffffff; /* 白色背景 */
-    border: 0.1cqw solid #e0e0e0; /* 淡淡的灰色外框 */
+    border: 0.2cqw solid #e0e0e0; /* 淡淡的灰色外框 */
     border-radius: 10cqw;        /* 圓角看起來比較現代 */
     padding: 2cqw 4cqw;            /* 上下留點空格 */
     box-shadow: 0 1cqw 4cqw rgba(0,0,0,0.9); /* 漂浮陰影效果 */
@@ -300,7 +300,7 @@ img, .card {
 
 /* 3. 分隔線樣式（就是你 JS 裡的 .menu-divider） */
 .dropdown-menu .menu-divider {
-    height: 0.1cqw;
+    height: 0.2cqw;
     background-color: #eeeeee;
     margin: 0.5cqw 1cqw;             /* 上下留點距離 */
 }
@@ -336,7 +336,7 @@ img, .card {
 .modal-card {
     color: var(--text-main);
     background-color: var(--bg-container);
-    border: 0.1cqw solid var(--border-color);
+    border: 0.2cqw solid var(--border-color);
     border-radius: 5cqw;
     max-width: 100%;
     padding: 3cqw;
@@ -360,7 +360,7 @@ img, .card {
     background-color: var(--bg-global);
     padding: 1cqw;
     border-radius: 2cqw;
-    border: 0.1cqw solid var(--border-color);
+    border: 0.2cqw solid var(--border-color);
     text-align: left;
 }
 
@@ -376,7 +376,7 @@ img, .card {
     font-weight: 600;
     margin-bottom: 5cqw;
     cursor: pointer;
-    border: 0.1cqw solid var(--border-color);
+    border: 0.2cqw solid var(--border-color);
     background: var(--card-bg);
     color: var(--text-main);
 }

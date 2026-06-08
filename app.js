@@ -513,15 +513,15 @@ window.addEventListener('DOMContentLoaded', async () => {
                     <div class="upload-placeholder">📷<span>上傳照片</span></div>
                 </div>
                 <div class="item-fields">
-                    <input type="text" class="input-style item-name-input" style="height:5cqw; padding: 0 1cqw;" placeholder="品項名稱" required>
+                    <input type="text" class="input-style item-name-input" style="height:7cqw; padding: 0 2cqw;" placeholder="品項名稱" required>
                     <div class="price-input-wrapper">
                         <span class="price-symbol">$</span>
-                        <input type="number" class="input-style price-input" style="height:5cqw; padding-left:2cqw;" placeholder="金額" min="0" required>
+                        <input type="number" class="input-style price-input" style="height:7cqw; padding-left:5cqw;" placeholder="金額" min="0" required>
                     </div>
                 </div>
                 <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 1cqw; justify-content: center;">
-                    <div class="drag-handle" style="width: 3cqw; height: 6cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 2cqw; cursor: grab;">☰</div>
-                    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 3cqw height: 4cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 2cqw;">❌</button>
+                    <div class="drag-handle" style="width: 9cqw; height: 8cqw; padding: 1.5cqw 2cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">☰</div>
+                    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 9cqw height: 8cqw; padding: 1.5cqw 2cqw;; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
                 </div>
             `;
             menuUploadList.appendChild(newRow);
@@ -736,11 +736,11 @@ function renderAdminTable() {
         const statusText = store.status === 'offline' ? '🔴 下線' : '🟢 上線';
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td style="padding: 1cqw; border: 0.1cqw solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
-            <td style="padding: 1cqw; border: 0.1cqw solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
-            <td style="padding: 1cqw; border: 0.1cqw solid #3a3a3a; color: #bbb;">${phone}</td>
-            <td style="padding: 1cqw; border: 0.1cqw solid #3a3a3a; text-align: center; color: ${store.status === 'offline' ? '#ef4444' : '#10b981'}; font-weight: bold;">${statusText}</td>
-            <td style="padding: 1cqw; border: 0.1cqw solid #3a3a3a; text-align: center;">
+            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
+            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
+            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #bbb;">${phone}</td>
+            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; text-align: center; color: ${store.status === 'offline' ? '#ef4444' : '#10b981'}; font-weight: bold;">${statusText}</td>
+            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; text-align: center;">
                 <button onclick="window.deleteStore('${store.id}')" style="padding: 1cqw 2cqw; background: #ef4444; color: white; border: none; border-radius: 1cqw; cursor: pointer; font-weight: bold;">刪除</button>
             </td>
         `;
@@ -787,7 +787,7 @@ function onDragMove(e) {
 function onDragEnd() {
     if (!activeDragItem) return;
     activeDragItem.style.opacity = '1';
-    activeDragItem.style.border = '0.1cqw solid var(--border-color)';
+    activeDragItem.style.border = '0.2cqw solid var(--border-color)';
     activeDragItem = null;
     window.removeEventListener('mousemove', onDragMove);
     window.removeEventListener('mouseup', onDragEnd);

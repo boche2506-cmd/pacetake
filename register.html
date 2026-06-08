@@ -11,15 +11,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
 <link rel="stylesheet" href="style.css">
     <style>
-        .register-body {
-        overflow: hidden; /* 鎖定 body */
-    }
-
-        .register-wrapper {
-        height: 100vh;
-        overflow-y: auto; /* 讓內部內容滾動 */
-        width: 100vw;
-    }
 
          /* 填表區域 */
         .form-container {
@@ -29,11 +20,14 @@
             gap: 1cqw;
         }
 
+        .section {
+            overflow-y: auto;
+        }
+
         .form-section {
             display: flex;
             flex-direction: column;
             gap: 1cqw;
-            overflow-y: auto;
         }
 
         .section-title {
@@ -60,7 +54,7 @@
             width: 100%;
             height: 7cqw;
             background-color: var(--bg-global);
-            border: 0.1cqw solid var(--border-color);
+            border: 0.2cqw solid var(--border-color);
             border-radius: 2cqw;
             padding: 0 2cqw;
             font-size: 4cqw;
@@ -81,7 +75,7 @@
             width: 17cqw;
             height: 17cqw;
             border-radius: 2cqw;
-            border: 0.1cqw dashed var(--border-color);
+            border: 0.2cqw dashed var(--border-color);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -115,7 +109,7 @@
             justify-content: space-between;
             align-items: center;
             background-color: var(--card-bg);
-            border: 0.1cqw solid var(--border-color);
+            border: 0.2cqw solid var(--border-color);
             border-radius: 2cqw;
             padding: 2cqw;
             box-shadow: var(--shadow-sm);
@@ -197,7 +191,7 @@
         .menu-item-row {
             display: flex;
             background-color: var(--card-bg);
-            border: 0.1cqw solid var(--border-color);
+            border: 0.2cqw solid var(--border-color);
             border-radius: 2cqw;
             padding: 2cqw;
             gap: 1cqw;
@@ -212,7 +206,7 @@
             width: 17cqw;
             height: 17cqw;
             border-radius: 2cqw;
-            border: 0.1cqw dashed var(--border-color);
+            border: 0.2cqw dashed var(--border-color);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -237,7 +231,7 @@
 
         .img-upload-box span {
             font-size: 3cqw;
-            margin-top: 0.1cqw;
+            margin-top: 0.2cqw;
         }
 
         .item-fields {
@@ -276,7 +270,7 @@
 
         .del-row-btn {
             background-color: var(--bg-global);
-            border: 0.1cqw solid var(--border-color);
+            border: 0.2cqw solid var(--border-color);
             color: var(--brand-red);
             font-size: 3cqw;
             font-weight: 700;
@@ -291,7 +285,7 @@
             font-weight: 700;
             color: var(--text-muted);
             background-color: var(--bg-global);
-            border: 0.1cqw solid var(--border-color);
+            border: 0.2cqw solid var(--border-color);
             padding: 1.5cqw 2cqw;
             border-radius: 2cqw;
             cursor: grab;
@@ -303,7 +297,7 @@
 
         .add-row-btn {
             background-color: var(--bg-global);
-            border: 0.1cqw solid var(--border-color);
+            border: 0.2cqw solid var(--border-color);
             color: var(--brand-blue);
             height: 10cqw;
             border-radius: 2cqw;
@@ -328,7 +322,7 @@
             right: 0;
             padding: 2cqw;
             background-color: var(--bg-container);
-            border-top: 0.1cqw solid var(--border-color);
+            border-top: 0.2cqw solid var(--border-color);
         }
 
         .submit-btn {
@@ -366,7 +360,7 @@
 
         .modal-card {
             background-color: var(--bg-container);
-            border: 1px solid var(--border-color);
+            border: 0.2cqw solid var(--border-color);
             border-radius: 5cqw;
             width: 100%;
             max-width: 100cqw;
@@ -402,7 +396,7 @@
             font-size: 3cqw;
             font-weight: 700;
             cursor: pointer;
-            border: 0.1cqw solid var(--border-color);
+            border: 0.2cqw solid var(--border-color);
             background: var(--card-bg);
             color: var(--text-main);
         }
@@ -414,7 +408,7 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
+            from { opacity: 0; transform: translateY(1cqw); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -431,7 +425,7 @@
     <div class="shop-name-block">
         <div class="shop-logo-box" onclick="triggerUpload(this)">
             <input type="file" id="shopLogoInput" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-            <img class="preview-img" id="shopLogoPreview" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+            <img class="preview-img" id="shopLogoPreview" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
             <div class="upload-placeholder">📸<span>上傳招牌</span></div>
         </div>
 
@@ -450,7 +444,7 @@
     </div>
 </div>
                 <div class="input-group">
-                    <label>詳細地址 <span style="color:var(--brand-blue); font-size:11px;">(AI自動轉換經緯度)</span></label>
+                    <label>詳細地址 <span style="color:var(--brand-blue); font-size:3cqw;">(AI自動轉換經緯度)</span></label>
                     <input type="text" id="shopAddress" class="input-style" placeholder="請輸入巷弄門牌，不需重複寫縣市" required>
                 </div>
 
@@ -464,7 +458,8 @@
                 <div class="input-group">
                     <label>平均餐點準備時間 (分鐘)</label>
                     <input type="number" id="prepareTimeInput" class="input-style" value="15" min="1" required>
-                </div>           
+                </div>
+              <div class="section">            
             <div class="form-section">
                 <div class="section-title">金流防棄單安全防禦線</div>
                 
@@ -478,9 +473,7 @@
                         <span class="slider"></span>
                     </label>
                 </div>
-
                 <div class="input-group newebpay-box" id="newebpayContainer" style="display: none;"></div>
-
                 <div class="switch-row">
                     <div class="switch-info">
                         <div class="switch-title">現場付現</div>
@@ -490,32 +483,29 @@
                         <input type="checkbox" id="toggleCash">
                         <span class="slider"></span>
                     </label>
-                </div>
-            
-
+                </div> 
+              </div>            
             <div class="form-section">
                 <div class="section-title">菜單商品上架</div>
-                <div class="menu-upload-list" id="menuUploadList">
-                    
+                <div class="menu-upload-list" id="menuUploadList">                   
                     <div class="menu-item-row">
                         <div class="img-upload-box" onclick="triggerUpload(this)">
                             <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                            <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                            <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
                             <div class="upload-placeholder">📷<span>上傳照片</span></div>
                         </div>
                         <div class="item-fields">
-                            <input type="text" class="input-style item-name-input" style="height:32px; padding: 0 10px;" placeholder="品項名稱 (如：肉絲炒飯)" required>
+                            <input type="text" class="input-style item-name-input" style="height:7cqw; padding: 0 2cqw;" placeholder="品項名稱 (如：肉絲炒飯)" required>
                             <div class="price-input-wrapper">
                                 <span class="price-symbol">$</span>
-                                <input type="number" class="input-style price-input" style="height:32px; padding-left:22px !important;" placeholder="金額" min="0" required>
+                                <input type="number" class="input-style price-input" style="height:7cqw; padding-left:5cqw;" placeholder="金額" min="0" required>
                             </div>
                         </div>
                         <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 1cqw; justify-content: center;">
-                            <div class="drag-handle" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: grab;">☰</div>
-                            <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 36px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 14px;">❌</button>
+                            <div class="drag-handle" style="width: 9cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">☰</div>
+                            <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 9cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
                         </div>
                     </div>
-
                 </div>
                 <button type="button" class="add-row-btn" id="addItemRowBtn">＋ 新增下一個品項</button>
             </div>

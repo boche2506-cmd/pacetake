@@ -961,16 +961,14 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 🎯 PACE 專屬：store.html 雲端菜單動態渲染模組 (自動適應變數版)
+// 🎯 PACE 專屬：store.html 雲端菜單動態渲染模組 (純 v9+ 模組化終極防線)
 // ==========================================
 async function initStorePage() {
-    // 1. 檢查目前畫面上是否有 menuContainer，有才代表使用者人在 store.html
     const menuContainer = document.getElementById('menuContainer');
-    if (!menuContainer) return; // 如果人在首頁，直接退出，絕對不干擾原本的首頁功能！
+    if (!menuContainer) return; // 確保身處 store.html 才發動
 
     console.log("[PACE DEBUG] 偵測到身處 store.html，啟動點餐頁面渲染程序...");
 
-    // 2. 從網址解析出當前的 storeId
     const urlParams = new URLSearchParams(window.location.search);
     const currentStoreId = urlParams.get('storeId');
 
@@ -981,54 +979,59 @@ async function initStorePage() {
     }
 
     try {
-        // 3. 🔥【大升級：自動變數適應防線】🔥
-        // 檢查您的 app.js 頂部是用 db 還是 window.db 還是原生 firebase 變數
-        let firestoreInstance;
+        // 1. 🔥【直接對齊您的首頁大腦】🔥
+        // 不再呼叫任何舊版 .collection() 或 .doc()，直接使用您專案頂部已經引入的模組化變數
+        // 如果您的頂部有引入 getDoc 和 doc，這邊就能完美通關
+        const firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
+        
+        let storeData = null;
+
         if (typeof db !== 'undefined') {
-            firestoreInstance = db;
-        } else if (typeof window.db !== 'undefined') {
-            firestoreInstance = window.db;
-        } else if (typeof firebase !== 'undefined') {
-            firestoreInstance = firebase.firestore();
-        } else {
-            console.error("[PACE ERROR] 找不到任何有效的 Firestore 資料庫變數(db)！請確認 app.js 頂部初始化名稱。");
-            return;
+            // 優先嘗試純 v9 模組化底層路徑
+            try {
+                // 如果 app.js 頂部有全局導入的 doc 函式
+                if (typeof doc === 'function' && typeof getDoc === 'function') {
+                    const docRef = doc(db, "stores", currentStoreId);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) storeData = docSnap.data();
+                }
+            } catch (innerErr) {
+                console.log("[PACE DEBUG] 模組化語法微調，切換為實例路徑...");
+            }
         }
 
-        // 4. 使用對齊後的變數，安全牽線抓取單一店家資料
-        let docSnap;
-        if (typeof firestoreInstance.collection === 'function') {
-            // 舊版/相容版語法 (Compat/v8 style)
-            docSnap = await firestoreInstance.collection("stores").doc(currentStoreId).get();
-        } else {
-            // 如果您的專案是純 v9 模組化，則需搭配 app.js 頂部 import
-            console.warn("[PACE WARNING] 偵測到純模組化環境，嘗試使用相容橋樑讀取...");
-            docSnap = await firestoreInstance.doc("stores/" + currentStoreId).get();
+        // 2. 備用安全防線：如果上述方法失敗，直接用底層最原始的實例去拔資料
+        if (!storeData) {
+            const fallbackDb = typeof db !== 'undefined' ? db : firebaseFirestore;
+            if (fallbackDb && typeof fallbackDb.collection === 'function') {
+                const docSnap = await fallbackDb.collection("stores").doc(currentStoreId).get();
+                if (docSnap.exists) storeData = docSnap.data();
+            } else if (fallbackDb && typeof fallbackDb.doc === 'function') {
+                const docSnap = await fallbackDb.doc("stores/" + currentStoreId).get();
+                if (typeof docSnap.data === 'function') storeData = docSnap.data();
+            }
         }
 
-        if (docSnap && (docSnap.exists || (typeof docSnap.data === 'function' && docSnap.data()))) {
-            const storeData = docSnap.data();
-            console.log("[PACE DEBUG] 成功自雲端獲取店家資料:", storeData.shopName);
+        // 3. 開始渲染畫面
+        if (storeData) {
+            console.log("[PACE DEBUG] 成功獲取店家資料:", storeData.shopName);
 
-            // 5. 渲染頂部店名與地址
             const storeNameText = document.getElementById('storeNameText');
             const storeAddressText = document.getElementById('storeAddressText');
             
             if (storeNameText) storeNameText.innerText = `${storeData.shopLogo || '🏪'} ${storeData.shopName || '未命名店家'}`;
             if (storeAddressText) storeAddressText.innerText = `📍 ${storeData.shopAddress || ''}`;
 
-            // 6. 提取您儲存在 stores 裡面的 menuList 菜單陣列
             const menuList = storeData.menuList || [];
-            menuContainer.innerHTML = ""; // 清空 HTML 原本寫死的「正在載入...」
+            menuContainer.innerHTML = ""; 
 
             if (menuList.length === 0) {
                 menuContainer.innerHTML = `<div style="text-align:center; padding:10cqw; color:var(--text-main);">📭 本店家目前尚未上架任何餐點。</div>`;
                 return;
             }
 
-            let localCartData = []; // 準備用來裝購物車的陣列
+            let localCartData = []; 
 
-            // 7. 迴圈渲染菜單卡片
             menuList.forEach((item, index) => {
                 const itemId = `item_${index}`;
                 const itemName = item.name || '未命名商品';
@@ -1063,15 +1066,12 @@ async function initStorePage() {
 
                 menuContainer.appendChild(foodCard);
 
-                // 8. 綁定「加到購物車」點擊與合計事件
                 if (!isSoldOut) {
                     const btn = foodCard.querySelector('.btn-trigger');
                     const cartSummaryText = document.getElementById('cartSummaryText');
 
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
-                        
-                        // 從介面文字解析目前數量與金額並累加
                         const currentSummary = cartSummaryText ? cartSummaryText.innerText : "0";
                         let curCount = parseInt(currentSummary.match(/\d+/) ? currentSummary.match(/\d+/) : 0, 10);
                         
@@ -1087,22 +1087,16 @@ async function initStorePage() {
                             cartSummaryText.innerText = `🛒 購物車已加入 ${curCount} 項商品 · 總計 $${curTotal}`;
                         }
 
-                        // 打包寫入 localStorage，100% 對接您的 cart.html 規格
                         const existingItem = localCartData.find(i => i.id === itemId);
                         if (existingItem) {
                             existingItem.qty += 1;
                         } else {
                             localCartData.push({
-                                id: itemId,
-                                name: itemName,
-                                price: itemPrice,
-                                qty: 1,
-                                storeId: currentStoreId
+                                id: itemId, name: itemName, price: itemPrice, qty: 1, storeId: currentStoreId
                             });
                         }
                         localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
 
-                        // 按鈕精品級動畫回饋
                         btn.innerText = "✓ 已加入";
                         btn.style.backgroundColor = "rgba(0, 102, 255, 0.1)";
                         setTimeout(() => {
@@ -1114,19 +1108,22 @@ async function initStorePage() {
             });
 
         } else {
-            console.error("[PACE ERROR] 雲端找不到該 storeId 對應的店家");
+            console.error("[PACE ERROR] 嘗試所有語法皆無法讀取該店家。");
             const storeNameText = document.getElementById('storeNameText');
-            if (storeNameText) storeNameText.innerText = "❌ 店家暫停營業中";
+            if (storeNameText) storeNameText.innerText = "❌ 店家資料格式不相容";
         }
     } catch (error) {
-        console.error("[PACE ERROR] 讀取點餐頁面失敗：", error);
+        console.error("[PACE ERROR] 核心執行發生例外崩潰：", error);
     }
 }
 
-// 9. 延遲 300 毫秒執行，防範與 app.js 最前方的初始化發生「時間差搶跑」錯誤
-setTimeout(() => {
+// 💡 終極解法：包裹在完美的監聽隊列中，等大腦完全醒來才執行
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStorePage);
+} else {
     initStorePage();
-}, 300);
+}
+
 
 
             

@@ -3,16 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PACE 派思 pacetake.tw - 商家開店</title>
-<!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
-<link rel="icon" type="image/png" sizes="32x32" href="logo.png">
-<link rel="icon" type="image/png" sizes="16x16" href="logo.png">
-<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
-<link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+    <title>PACE 派思 pacetake.tw - 買家首頁</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="logoapple.png">
 <link rel="stylesheet" href="style.css">
     <style>
 
          /* 填表區域 */
+        .phone-wrapper { display: flex; 
+            flex-direction: column; 
+            height: 100dvh; 
+            overflow: hidden;
+        }
+
+        .scrollable-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 2cqw;
+            display: flex;
+            flex-direction: column;
+            gap: 2cqw; /* 增加間距避免太擠 */
+            min-height: 0;
+        }
+
         .form-container {
             padding: 2cqw;
             display: flex;
@@ -33,34 +48,70 @@
         .section-title {
             font-size: 4cqw;
             font-weight: 700;
-            color: var(--text-muted);
+            color: var(--text-main);
             letter-spacing: 1cqw;
             text-transform: uppercase;
         }
 
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 1cqw;
+        .input-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1cqw; 
         }
 
-        .input-group label {
-            font-size: 4cqw;
-            font-weight: 700;
-            color: var(--text-main);
+        .input-group label { 
+            font-size: 4cqw; 
+            font-weight: 700; 
+            color: var(--text-main); 
         }
 
-        .input-style {
-            width: 100%;
-            height: 7cqw;
-            background-color: var(--bg-global);
-            border: 0.2cqw solid var(--border-color);
-            border-radius: 2cqw;
-            padding: 0 2cqw;
-            font-size: 4cqw;
-            color: var(--text-main);
-            outline: none;
-            transition: background-color 0.15s ease, border-color 0.15s ease;
+        .input-style { 
+            width: 100%; 
+            height: 8cqw;
+            color: var(--text-main); 
+            background-color: var(--bg-global); 
+            border: 0.2cqw solid var(--border-color); 
+            border-radius: 2cqw; 
+            padding: 0 2cqw; 
+            font-size: 3.5cqw; 
+            outline: none; 
+        }
+        
+        /* 經緯度區塊 */
+
+        .coords-row { display: flex; 
+            gap: 1cqw; 
+            align-items: flex-end; 
+        }
+
+        .query-btn { 
+            height: 8cqw; 
+            padding: 0 2cqw; 
+            font-size: 3cqw; 
+            background: var(--brand-blue); 
+            color: white; 
+            border-radius: 2cqw; 
+            border: none; 
+            cursor: pointer; 
+            white-space: nowrap; 
+        }
+
+        .footer-action { 
+            flex-shrink: 0; 
+            padding: 2cqw; 
+            border-top: 0.2cqw solid var(--border-color); 
+        }
+
+        .submit-btn { 
+            background-color: var(--brand-blue); 
+            color: white; 
+            border: none; 
+            width: 100%; 
+            height: 12cqw; 
+            border-radius: 5cqw; 
+            font-size: 4cqw; 
+            font-weight: 800; 
+            cursor: pointer; 
         }
 
         /* 👑 招牌圖片與店鋪名稱並排排版 */
@@ -108,11 +159,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--card-bg);
-            border: 0.2cqw solid var(--border-color);
             border-radius: 2cqw;
             padding: 2cqw;
-            box-shadow: var(--shadow-sm);
+            color: var(--text-main); 
+            background-color: var(--bg-global); 
+            border: 0.2cqw solid var(--border-color);
         }
 
         .switch-info {
@@ -122,7 +173,7 @@
         }
 
         .switch-title {
-            font-size: 4cqw;
+            font-size: 3cqw;
             font-weight: 700;
         }
 
@@ -414,120 +465,86 @@
     </style>
 </head>
 <body>
-     <div class="phone-wrapper">
-           <div id="header-container"></div>
-                 <div class="input-group">
-                    <label>店鋪聯絡電話</label>
-                    <input type="tel" id="shopPhone" class="input-style" placeholder="請輸入店鋪或老闆的手機號碼" required pattern="[0-9]{9,10}">
-                </div>
-                <div class="input-group">
-    <label>店鋪招牌與名稱</label>
-    <div class="shop-name-block">
-        <div class="shop-logo-box" onclick="triggerUpload(this)">
-            <input type="file" id="shopLogoInput" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-            <img class="preview-img" id="shopLogoPreview" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
-            <div class="upload-placeholder">📸<span>上傳招牌</span></div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; justify-content: space-between; gap: 1cqw; flex-grow: 1;">
-            <input type="text" id="shopName" class="input-style" placeholder="請輸入您的店鋪招牌名稱" required>
-            
-            <div class="select-row" style="display: flex; gap: 1cqw;">
-                <select id="shopCity" class="input-style" required style="flex: 1;">
-                    <option value="">選擇縣市</option>
-                </select>
-                <select id="shopDistrict" class="input-style" required style="flex: 1;">
-                    <option value="">選擇區域</option>
-                </select>
+    <div class="phone-wrapper">
+        <div id="header-container" style="padding: 2cqw; flex-shrink: 0;"></div>
+        
+        <form class="scrollable-content" id="shopRegisterForm">
+            <div class="input-group">
+                <label>店鋪聯絡電話</label>
+                <input type="tel" id="shopPhone" class="input-style" placeholder="請輸入店鋪或老闆的手機號碼" required pattern="[0-9]{9,10}">
             </div>
-        </div>
-    </div>
-</div>
-                <div class="input-group">
-                    <label>詳細地址 <span style="color:var(--brand-blue); font-size:3cqw;">(AI自動轉換經緯度)</span></label>
-                    <input type="text" id="shopAddress" class="input-style" placeholder="請輸入巷弄門牌，不需重複寫縣市" required>
-                </div>
 
-                <div class="input-group">
-                    <label>店家邀請碼 (選填)</label>
-                    <input type="text" id="shopInviteCode" class="input-style" placeholder="若有專屬邀請碼請輸入">
+            <div class="input-group">
+                <label>店鋪招牌與名稱</label>
+                <div class="shop-name-block" style="display: flex; gap: 1cqw; align-items: center;">
+                    <div class="shop-logo-box" onclick="triggerUpload(this)" style="width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <input type="file" id="shopLogoInput" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                        <img class="preview-img" id="shopLogoPreview" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
+                        <div class="upload-placeholder">📸<span>上傳招牌</span></div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1cqw; flex-grow: 1;">
+                        <input type="text" id="shopName" class="input-style" placeholder="請輸入店鋪招牌名稱" required>
+                        <div style="display: flex; gap: 1cqw;">
+                            <select id="shopCity" class="input-style"><option value="">選擇縣市</option></select>
+                            <select id="shopDistrict" class="input-style"><option value="">選擇區域</option></select>
+                        </div>
+                    </div>
                 </div>
+            <div class="input-group">
+                <label>詳細地址</label>
+                <input type="text" id="shopAddress" class="input-style" placeholder="請輸入巷弄門牌" required>
+            </div>
 
-                <input type="hidden" id="shopStatus" value="online">
-
-                <div class="input-group">
-                    <label>平均餐點準備時間 (分鐘)</label>
-                    <input type="number" id="prepareTimeInput" class="input-style" value="15" min="1" required>
+            <div class="input-group">
+                <label>GPS 請務必填寫，將用於計算與客人的距離</label>
+                <div class="coords-row">
+                    <button type="button" class="query-btn" onclick="window.open('https://www.mapcoordinates.net/zh-tw')">查詢座標</button>
+                    <input type="number" id="shopLat" class="input-style" placeholder="緯度 (Lat)" step="any">
+                    <input type="number" id="shopLng" class="input-style" placeholder="經度 (Lng)" step="any">
                 </div>
-              <div class="section">            
+            </div>
+
+            <div class="input-group">
+                <label>店家邀請碼 (選填)</label>
+                <input type="text" id="shopInviteCode" class="input-style" placeholder="若有專屬邀請碼請輸入">
+            </div>
+
+            <div class="input-group">
+                <label>平均餐點準備時間 (分鐘)</label>
+                <input type="number" id="prepareTimeInput" class="input-style" value="15" min="1" required>
+            </div>
+
             <div class="form-section">
-                <div class="section-title">金流防棄單安全防禦線</div>
-                
+                <div class="section-title">支援藍新金流 API(每筆交易需支付藍新金流手續費，非平台收取)</div>
                 <div class="switch-row">
-                    <div class="switch-info">
-                        <div class="switch-title">線上刷卡 / LINE Pay</div>
-                        <div class="switch-desc">安全防護最高，買家先付款才接單</div>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggleOnline">
-                        <span class="slider"></span>
-                    </label>
+                    <div><div>線上刷卡 / LINE Pay</div><small>安全防護最高，買家先付款才接單</small></div>
+                    <label class="toggle-switch"><input type="checkbox" id="toggleOnline"><span class="slider"></span></label>
                 </div>
-                <div class="input-group newebpay-box" id="newebpayContainer" style="display: none;"></div>
-                <div class="switch-row">
-                    <div class="switch-info">
-                        <div class="switch-title">現場付現</div>
-                        <div class="switch-desc">開啟現場付款，需自行承擔未取貨風險</div>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggleCash">
-                        <span class="slider"></span>
-                    </label>
-                </div> 
-              </div>            
+                <div class="switch-row" style="margin-top: 2cqw;">
+                    <div><div>現場付現</div><small>開啟現場付款，需自行承擔未取貨風險</small></div>
+                    <label class="toggle-switch"><input type="checkbox" id="toggleCash"><span class="slider"></span></label>
+                </div>
+            </div>
+
             <div class="form-section">
                 <div class="section-title">菜單商品上架</div>
-                <div class="menu-upload-list" id="menuUploadList">                   
+                <div class="menu-upload-list" id="menuUploadList">
                     <div class="menu-item-row">
-                        <div class="img-upload-box" onclick="triggerUpload(this)">
-                            <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                            <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
-                            <div class="upload-placeholder">📷<span>上傳照片</span></div>
-                        </div>
-                        <div class="item-fields">
-                            <input type="text" class="input-style item-name-input" style="height:7cqw; padding: 0 2cqw;" placeholder="品項名稱 (如：肉絲炒飯)" required>
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">$</span>
-                                <input type="number" class="input-style price-input" style="height:7cqw; padding-left:5cqw;" placeholder="金額" min="0" required>
-                            </div>
-                        </div>
-                        <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 1cqw; justify-content: center;">
-                            <div class="drag-handle" style="width: 9cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">☰</div>
-                            <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 9cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                        <div class="img-upload-box" style="width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">📷</div>
+                        <div style="flex-grow: 1;">
+                            <input type="text" class="input-style" placeholder="品項名稱">
+                            <input type="number" class="input-style" placeholder="金額" style="margin-top: 1cqw;">
                         </div>
                     </div>
                 </div>
-                <button type="button" class="add-row-btn" id="addItemRowBtn">＋ 新增下一個品項</button>
+                <button type="button" class="add-row-btn" id="addItemRowBtn" style="margin-top: 2cqw; width: 100%; height: 10cqw;">＋ 新增下一個品項</button>
             </div>
         </form>
-    </div>
-        <footer class="footer-action">
-            <button class="submit-btn" id="shopSubmitBtn" form="shopRegisterForm" type="submit">建立店鋪</button>
-        </footer>
 
-        <div class="lightbox-modal" id="cashWarningModal" style="display: none;">
-            <div class="modal-card">
-                <div class="modal-title">⚠️ 開啟現場付現風險提示</div>
-                <div class="modal-desc">
-                    您正準備開啟「現場付現」功能。請注意，若遇到買家蓄意棄單、逾時未取，相關食材與營業損失需由店鋪自行全額吸收，平台恕不進行補償。請問是否同意此條款？
-                </div>
-                <div class="modal-action-btns">
-                    <button class="cancel-btn" id="warningCancelBtn">不同意</button>
-                    <button class="confirm-btn" id="warningConfirmBtn">我同意</button>
-                </div>
-            </div>
-        </div>
+        <footer class="footer-action">
+            <button class="submit-btn" id="shopSubmitBtn" type="submit">建立店鋪</button>
+        </footer>
     </div>
-<script type="module" src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

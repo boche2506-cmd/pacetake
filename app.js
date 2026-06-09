@@ -195,6 +195,20 @@ function updateUIForUser(user, currentRole) {
 }
 
 // ==========================================
+// 📍 計算兩點經緯度距離 (回傳公里數)
+// ==========================================
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // 地球半徑(公里)
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; 
+}
+
+// ==========================================
 // 4. 初始化與事件綁定
 // ==========================================
 
@@ -646,14 +660,17 @@ async function fetchStoresFromFirebase() {
 
 function filterAndRenderStores() {
     if (!storeContainer) return;
-    citySelect = document.getElementById('citySelect');
-    districtSelect = document.getElementById('districtSelect');
-    globalSearchInput = document.getElementById('globalSearchInput');
+    
+    // 1. 抓取篩選條件
+    const citySelect = document.getElementById('citySelect');
+    const districtSelect = document.getElementById('districtSelect');
+    const globalSearchInput = document.getElementById('globalSearchInput');
     
     const selectedCity = citySelect ? citySelect.value : '';
     const selectedDist = districtSelect ? districtSelect.value : '';
     const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
 
+    // 2. 進行篩選
     const filtered = allStores.filter(store => {
         const matchCity = !selectedCity || store.city === selectedCity;
         const matchDist = !selectedDist || store.district === selectedDist;
@@ -662,40 +679,49 @@ function filterAndRenderStores() {
         return matchCity && matchDist && matchKeyword;
     });
 
+    // 3. 如果找不到店家，顯示提示並結束
     if (filtered.length === 0) {
         storeContainer.innerHTML = '<div class="loading-Spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
         return;
     }
 
+    // 4. 清空畫面並開始渲染卡片
     storeContainer.innerHTML = "";
-        filtered.forEach(store => {
+    
+    filtered.forEach(store => {
         if (store.status === "offline") return;
+        
+        // 基本資料準備
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
-        const finalCity = store.city || '';
-        const finalDistrict = store.district || '';
         const takeoutSupported = store.isCashPayEnabled !== false;
         const paySupported = store.isOnlinePayEnabled !== false;
 
-        // 💡【首頁照片大復活核心邏輯】
-        // 優先讀取 shopLogo 欄位，如果沒有才用舊的 emoji
+        // 照片處理 (優先顯示 shopLogo)
         const logoData = store.shopLogo || store.emoji || '🏪';
-        let finalLogoHtml = logoData; // 預設當作 Emoji 處理
-
-        // 檢查是不是一長串上傳的 Base64 照片文字，或者是網路圖片網址
+        let finalLogoHtml = logoData;
         if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
             finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         }
 
+        // 距離計算處理
+        let distanceHtml = "<span>⚡ 距離未知</span>";
+        // 確保 buyerLat/Lng 已定義且店家有座標
+        if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
+            const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
+            distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
+        }
+
+        // 生成卡片
         const card = document.createElement('a');
         card.href = `store.html?storeId=${store.id}`;
         card.className = 'store-card';
         card.innerHTML = `
-            <div class="store-img">${finalLogoHtml}</div> <!-- 💡 這裡換成處理後的照片 HTML -->
+            <div class="store-img">${finalLogoHtml}</div>
             <div class="store-info">
                 <div class="store">
                     <div class="store-name">${finalName}</div>
-                    <div class="store-meta">📍 ${finalAddress}</div>
+                    <div class="store-meta">📍 ${finalAddress} • ${distanceHtml}</div>
                 </div>
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
@@ -719,6 +745,8 @@ function getBrowserLocation() {
                 currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
                 if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
                 if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
+                // 💡【新增這行】定位成功後，立刻重新渲染首頁卡片來顯示距離！
+                filterAndRenderStores();
             },
             (error) => {
                 currentBuyerAddress = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";

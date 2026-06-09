@@ -79,7 +79,7 @@ img, .card {
    ========================================================================== */
 /* 手機外框 - 加強置中穩定性 */
 .phone-wrapper {
-    overflow: hidden;
+    -webkit-overflow-scrolling: touch; /* 【加在這裡】讓滑動變順暢 */
     height: 100vh;           /* 高度撐滿視窗 */
     height: 100dvh;
     aspect-ratio: 9 / 16;    /* 強制維持 9:16 比例 */

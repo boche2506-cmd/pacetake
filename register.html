@@ -510,11 +510,11 @@
             </div>
 
             <div class="input-group">
-                <label>GPS 請務必填寫，將用於計算與客人的距離</label>
+                <label>如未自動轉換座標請手動查詢輸入</label>
                 <div class="coords-row">
-                    <button type="button" class="query-btn" onclick="window.open('https://www.mapcoordinates.net/zh-tw')">查詢座標</button>
-                    <input type="number" id="shopLat" class="input-style" placeholder="經度 (Longitude)" step="any">
-                    <input type="number" id="shopLng" class="input-style" placeholder="緯度 (Latitude)" step="any">
+                    <button type="button" class="query-btn" onclick="window.open('https://www.google.com.tw/maps')">查詢座標</button>
+                    <input type="number" id="shopLat" class="input-style" placeholder="緯度 (Lat, e.g. 25.03)" step="any" min="-90" max="90">
+                    <input type="number" id="shopLng" class="input-style" placeholder="經度 (Lng, e.g. 121.56)" step="any" min="-180" max="180">
                 </div>
             </div>
 

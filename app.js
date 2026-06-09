@@ -467,11 +467,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     if (newebpayContainer) {
         newebpayContainer.innerHTML = `
-            <label style="margin-bottom:2.5cqw; display:block; font-size:2.5cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
+            <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
             <div style="display:flex; flex-direction:column; gap:0.5cqw;">
-                <input type="text" id="merchantIdInput" class="input-style" style="height:5cqw;" placeholder="請輸入 商店代號 (MerchantID)">
-                <input type="text" id="hashKeyInput" class="input-style" style="height:5cqw;" placeholder="請輸入 HashKey">
-                <input type="text" id="hashIvInput" class="input-style" style="height:5cqw;" placeholder="請輸入 HashIV">
+                <input type="text" id="merchantIdInput" class="input-style" style="height:8cqw;" placeholder="請輸入 商店代號 (MerchantID)">
+                <input type="text" id="hashKeyInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashKey">
+                <input type="text" id="hashIvInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashIV">
             </div>
         `;
     }
@@ -521,21 +521,28 @@ window.addEventListener('DOMContentLoaded', async () => {
             const newRow = document.createElement('div');
             newRow.className = 'menu-item-row';
             newRow.innerHTML = `
-                <div class="img-upload-box" onclick="triggerUpload(this)">
-                    <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                    <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
-                    <div class="upload-placeholder">📷<span>上傳照片</span></div>
-                </div>
-                <div class="item-fields">
-                    <input type="text" class="input-style item-name-input" style="height:7cqw; padding: 0 2cqw;" placeholder="品項名稱" required>
-                    <div class="price-input-wrapper">
-                        <span class="price-symbol">$</span>
-                        <input type="number" class="input-style price-input" style="height:7cqw; padding-left:5cqw;" placeholder="金額" min="0" required>
+               <div class="menu-item-row">
+                    <div class="menu-item">
+                        <div class="img-upload-box" onclick="triggerUpload(this)">
+                            <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                            <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
+                            <div class="upload-placeholder" style="font-size: 8cqw; width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">📷<span>上傳照片</span></div>
+                        </div>
+                        <div class="item-fields" style="width: 100%; gap: 0.5cqw;">
+                            <input type="text" class="input-style item-name-input" style="height:8cqw; width: 100%; padding: 0 2cqw;" placeholder="品項名稱" required>
+                            <div class="price-input-wrapper">
+                                <span class="price-symbol">$</span>
+                                <input type="number" class="input-style price-input" style="height:8cqw; width: 100%;padding-left:5cqw;" placeholder="金額" min="0" required>
+                            </div>
+                        </div>
+                        <div class="item-right-ctrls" style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
+                            <div class="drag-handle" style="width: 8cqw; height: 17cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">☰</div>
+                        </div>
                     </div>
-                </div>
-                <div class="item-right-ctrls" style="display: flex; flex-direction: column; gap: 1cqw; justify-content: center;">
-                    <div class="drag-handle" style="width: 9cqw; height: 8cqw; padding: 1.5cqw 2cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">☰</div>
-                    <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 9cqw height: 8cqw; padding: 1.5cqw 2cqw;; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                    <div class="remark"style="width: 100%;">
+                        <input type="text" class="input-style" style="height: 8cqw; width: 100%"; placeholder="備註">
+                        <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                    </div>
                 </div>
             `;
             menuUploadList.appendChild(newRow);
@@ -566,6 +573,8 @@ window.addEventListener('DOMContentLoaded', async () => {
             const city = document.getElementById('shopCity')?.value;
             const district = document.getElementById('shopDistrict')?.value;
             const detailAddress = document.getElementById('shopAddress')?.value.trim();
+            const lat = document.getElementById('shopLat')?.value.trim() || '';
+            const lng = document.getElementById('shopLng')?.value.trim() || '';
             
             if (!name || !phone || !city || !district || !detailAddress) {
                 alert("⚠️ 請填寫完整的店舖資訊（店名、電話、地址等）！");
@@ -587,17 +596,21 @@ window.addEventListener('DOMContentLoaded', async () => {
             menuRows.forEach(row => {
                 const nameField = row.querySelector('.item-name-input');
                 const priceField = row.querySelector('.price-input');
+                const noteField = row.querySelector('.item-note-input'); // 注意：請確保你的備註欄 HTML 有 class="item-note-input"
                 const nameVal = nameField ? nameField.value.trim() : '';
                 const priceVal = priceField ? parseInt(priceField.value) || 0 : 0;
+                const noteVal = noteField ? noteField.value.trim() : '';
                 const imgEl = row.querySelector('.preview-img');
                 const imgData = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : "";
-                if (nameVal) menuItems.push({ name: nameVal, price: priceVal, image: imgData });
+                if (nameVal) menuItems.push({ name: nameVal, price: priceVal, note: noteVal, image: imgData });
             });
 
             const shopData = {
                 sellerUid: user.uid,
                 shopName: name, shopPhone: phone, city: city, district: district,
                 shopAddress: `${city}${district}${detailAddress}`,
+                shopLat: lat,
+                shopLng: lng,
                 inviteCode: inviteCode, status: status, shopLogo: shopLogoData,
                 prepareTime: prepareTime, isOnlinePayEnabled: isOnlinePayEnabled,
                 isCashPayEnabled: isCashPayEnabled,

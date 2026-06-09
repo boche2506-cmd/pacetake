@@ -92,7 +92,7 @@ img, .card {
     border: 0.2cqw solid var(--border-color);
     border-radius: 3cqw;
     box-shadow: var(--shadow-md);
-    padding: 2cqw;
+    padding: 1cqw;
     container-type: size; /* 讓這個容器成為所有內部元素的參考點 */
     container-name: phone;
     margin: 0 auto;

@@ -577,17 +577,25 @@ document.getElementById('shopAddress')?.addEventListener('blur', async () => {
         });
     }
 
-    // ... 在 shopSubmitBtn.addEventListener('click'...) 的開頭部分 ...
+   // 確保只有在 register.html 才執行這段檢查
+if (window.location.pathname.includes('register.html')) {
+    
+    // 你的原本的檢查邏輯
+    const shopSubmitBtn = document.getElementById('shopSubmitBtn');
+    if (shopSubmitBtn) {
+        shopSubmitBtn.addEventListener('click', (e) => {
+            const lat = document.getElementById('shopLat')?.value.trim();
+            const lng = document.getElementById('shopLng')?.value.trim();
 
-const lat = document.getElementById('shopLat')?.value.trim();
-const lng = document.getElementById('shopLng')?.value.trim();
-
-// 檢查：如果座標為空，則拒絕提交
-if (!lat || !lng) {
-    alert("⚠️ 請先確認店鋪經緯度！若無法自動取得，請點擊「查詢座標」按鈕手動輸入，確保定位正確喔！");
-    // 讓輸入框閃爍或聚焦提示使用者
-    document.getElementById('shopLat').focus();
-    return; // 中斷後續的所有寫入動作
+            if (!lat || !lng) {
+                e.preventDefault(); // 阻止送出
+                alert("⚠️ 請先確認店鋪經緯度！若無法自動取得，請點擊「查詢座標」按鈕手動輸入，確保定位正確喔！");
+                document.getElementById('shopLat')?.focus();
+                return;
+            }
+            // ... 後續的送出邏輯
+        });
+    }
 }
 
 // ... 下方原本的資料組合與儲存邏輯 ...

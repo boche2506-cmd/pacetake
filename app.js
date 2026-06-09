@@ -459,32 +459,30 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 監聽詳細地址輸入框，當離開欄位時自動查詢
-document.getElementById('shopAddress')?.addEventListener('blur', async () => {
-    const city = document.getElementById('shopCity')?.value;
-    const district = document.getElementById('shopDistrict')?.value;
-    const detail = document.getElementById('shopAddress')?.value.trim();
+document.getElementById('shopAddress')?.addEventListener('blur', () => {
+    const city = document.getElementById('shopCity').value;
+    const district = document.getElementById('shopDistrict').value;
+    const detail = document.getElementById('shopAddress').value.trim();
     
-    if (city && district && detail) {
-        const fullAddress = `${city}${district}${detail}`;
-        console.log("[PACE] 自動查詢地址：", fullAddress);
-        
-        try {
-            // 使用 Nominatim 免費查詢
-            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`);
-            const data = await response.json();
-            
-            if (data && data.length > 0) {
-                // 自動填入輸入框
-                document.getElementById('shopLat').value = data[0].lat;
-                document.getElementById('shopLng').value = data[0].lon;
-                console.log("[PACE] 自動填入座標成功！");
-            } else {
-                console.warn("[PACE] 自動查詢不到座標，請店主手動確認。");
-            }
-        } catch (error) {
-            console.error("API 查詢錯誤", error);
+    if (!city || !district || !detail) return;
+
+    const fullAddress = `${city}${district}${detail}`;
+    console.log("[PACE] 使用 Google API 查詢：", fullAddress);
+
+    // 初始化 Google Geocoder
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({ 'address': fullAddress }, (results, status) => {
+        if (status === 'OK') {
+            const location = results[0].geometry.location;
+            // 填入經緯度欄位
+            document.getElementById('shopLat').value = location.lat();
+            document.getElementById('shopLng').value = location.lng();
+            console.log("[PACE] Google 定位成功！");
+        } else {
+            console.warn("[PACE] Google 定位失敗，狀態：" + status);
         }
-    }
+    });
 });
 
     const toggleOnline = document.getElementById('toggleOnline');

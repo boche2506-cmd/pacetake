@@ -458,6 +458,35 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // 監聽詳細地址輸入框，當離開欄位時自動查詢
+document.getElementById('shopAddress')?.addEventListener('blur', async () => {
+    const city = document.getElementById('shopCity')?.value;
+    const district = document.getElementById('shopDistrict')?.value;
+    const detail = document.getElementById('shopAddress')?.value.trim();
+    
+    if (city && district && detail) {
+        const fullAddress = `${city}${district}${detail}`;
+        console.log("[PACE] 自動查詢地址：", fullAddress);
+        
+        try {
+            // 使用 Nominatim 免費查詢
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`);
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                // 自動填入輸入框
+                document.getElementById('shopLat').value = data[0].lat;
+                document.getElementById('shopLng').value = data[0].lon;
+                console.log("[PACE] 自動填入座標成功！");
+            } else {
+                console.warn("[PACE] 自動查詢不到座標，請店主手動確認。");
+            }
+        } catch (error) {
+            console.error("API 查詢錯誤", error);
+        }
+    }
+});
+
     const toggleOnline = document.getElementById('toggleOnline');
     const toggleCash = document.getElementById('toggleCash');
     const newebpayContainer = document.getElementById('newebpayContainer');
@@ -521,7 +550,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             const newRow = document.createElement('div');
             newRow.className = 'menu-item-row';
             newRow.innerHTML = `
-               <div class="menu-item-row">
                     <div class="menu-item">
                         <div class="img-upload-box" onclick="triggerUpload(this)">
                             <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
@@ -543,12 +571,26 @@ window.addEventListener('DOMContentLoaded', async () => {
                         <input type="text" class="input-style" style="height: 8cqw; width: 100%"; placeholder="備註">
                         <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
                     </div>
-                </div>
             `;
             menuUploadList.appendChild(newRow);
             makeItemDraggable(newRow); 
         });
     }
+
+    // ... 在 shopSubmitBtn.addEventListener('click'...) 的開頭部分 ...
+
+const lat = document.getElementById('shopLat')?.value.trim();
+const lng = document.getElementById('shopLng')?.value.trim();
+
+// 檢查：如果座標為空，則拒絕提交
+if (!lat || !lng) {
+    alert("⚠️ 請先確認店鋪經緯度！若無法自動取得，請點擊「查詢座標」按鈕手動輸入，確保定位正確喔！");
+    // 讓輸入框閃爍或聚焦提示使用者
+    document.getElementById('shopLat').focus();
+    return; // 中斷後續的所有寫入動作
+}
+
+// ... 下方原本的資料組合與儲存邏輯 ...
 
     // shopSubmitBtn 監聽與手動提交邏輯
     const shopSubmitBtn = document.getElementById('shopSubmitBtn');
@@ -1121,7 +1163,7 @@ async function initStorePage() {
                             ${isSoldOut 
                                 ? `<button class="add-cart-btn sold-out-btn" disabled>🔴 暫停供應</button>`
                                 : `
-                                  <div class="quantity-control-panel" style="display: flex; align-items: center; gap: 2cqw; background: var(--bg-secondary); border-radius: 50px; padding: 1cqw 2cqw; border: 1px solid var(--border-color);">
+                                  <div class="quantity-control-panel" style="display: flex; align-items: center; gap: 2cqw; background: var(--bg-secondary); border-radius: 50%; padding: 1cqw 2cqw; border: 0.2cqw solid var(--border-color);">
                                       <button class="minus-btn" style="border: none; background: transparent; font-size: 4cqw; padding: 1cqw 3cqw; cursor: pointer; color: var(--text-main); font-weight: bold;">-</button>
                                       <span class="qty-number" style="font-size: 3.5cqw; font-weight: bold; min-width: 4cqw; text-align: center;">0</span>
                                       <button class="plus-btn" style="border: none; background: transparent; font-size: 4cqw; padding: 1cqw 3cqw; cursor: pointer; color: var(--brand-blue); font-weight: bold;">+</button>
@@ -1132,8 +1174,8 @@ async function initStorePage() {
                     </div>
                     <!-- 💡【核心改動三】：每道菜下方專屬的精緻備註欄 -->
                     ${isSoldOut ? '' : `
-                    <div class="note-wrapper" style="width: 100%; margin-top: 2.5cqw; border-top: 1px dashed var(--border-color); padding-top: 2cqw;">
-                        <input type="text" class="item-note-input" placeholder="✍️ 填寫去冰、微辣、不加蔥等客製化備註..." style="width: 100%; background: var(--bg-global); border: 1px solid var(--border-color); border-radius: 1.5cqw; padding: 1.5cqw 2.5cqw; font-size: 3cqw; color: var(--text-main); outline: none;">
+                    <div class="note-wrapper" style="width: 100%; margin-top: 2.5cqw; border-top: 0.2cqw dashed var(--border-color); padding-top: 2cqw;">
+                        <input type="text" class="item-note-input" placeholder="✍️ 填寫去冰、微辣、不加蔥等客製化備註..." style="width: 100%; background: var(--bg-global); border: 0.2cqw solid var(--border-color); border-radius: 1.5cqw; padding: 1.5cqw 2.5cqw; font-size: 3cqw; color: var(--text-main); outline: none;">
                     </div>
                     `}
                 `;

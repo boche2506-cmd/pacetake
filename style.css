@@ -55,8 +55,6 @@ html, body {
 }
 
 input, textarea {
-    -webkit-user-select: text;
-    user-select: text; /* 解除輸入框鎖定，保證可正常打字與選取 */
     border: 1cqw solid var(--border-color);
     border-radius: 10cqw;
     background-color: var(--bg-global);

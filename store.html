@@ -1,33 +1,52 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PACE 派思 pacetake.tw - 買家首頁</title>
-
+    <title>PACE 派思 pacetake.tw 首頁</title>
     <!-- Favicon & Apple Touch Icon -->
     <link rel="icon" type="image/png" href="png/logoapple.png" sizes="180x180">
     <link rel="apple-touch-icon" href="png/logoapple.png">
     <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
-
     <link rel="stylesheet" href="style.css">
-<style>
+    <style>
         /* 頂部導航與大字留白 */
         .store {
-            padding: 20px 20px 16px 20px;
-            border-bottom: 1px solid var(--border-color);
+            height: 17%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            border-bottom: 0.2cqw solid var(--border-color);
+        }
+
+        .store-header-info {
+            height: 80%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
         }
 
         .store-header-info h1 {
-            font-size: 26px;
+            font-size: 6cqw;
             font-weight: 800;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.5cqw;
             color: var(--text-main);
         }
 
         .store-meta {
-            font-size: 13px;
+            height: 20%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 0px;
             color: var(--text-muted);
             margin-top: 6px;
             font-weight: 500;
@@ -37,23 +56,38 @@
 
         /* 中間精品菜單區 */
         .menu-container {
-            padding: 20px;
+            height: 55%;
+            max-width: 100%;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 1cqw;
+            /* 卡片與卡片之間的間距改用 cqw */
+            padding: 2cqw 3cqw 2cqw 4cqw;
+            /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
+            box-sizing: border-box;
         }
 
         .food-card {
+            min-height: 24cqw;
+            /* 💡 新增：設定最小高度，確保卡片視覺比例穩固 */
+            width: 100%;
+            /* 撐滿 store-list 的寬度（扣除 padding） */
             display: flex;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 12px;
-            gap: 12px;
             align-items: center;
+            gap: 3cqw;
+            /* 圖片與文字區塊的間距 */
+            background-color: var(--card-bg);
+            border: 0.3cqw solid var(--border-color);
+            border-radius: 4cqw;
+            /* 圓角改用 cqw */
+            text-decoration: none;
+            color: inherit;
             box-shadow: var(--shadow-sm);
-            position: relative;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            padding: 1cqw;
+            /* 卡片內部內襯改用 cqw */
+            box-sizing: border-box;
         }
 
         .food-img {
@@ -136,6 +170,12 @@
 
         /* 底部懸浮欄 */
         .bottom-bar {
+            height: 10%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
             bottom: 0;
             left: 0;
             right: 0;
@@ -182,19 +222,17 @@
             <div class="store">
                 <div class="store-header-info" id="storeHeaderInfo">
                     <h1 id="storeNameText">正在載入雲端店家...</h1>
-                    <div class="store-meta">
-                        <span id="storeAddressText">📍 讀取地址中...</span>
-                        <span>•</span>
-                        <span>⚡ 0.05 km</span>
-                    </div>
+                </div>
+                <div class="store-meta">
+                    <span id="storeAddressText">📍 讀取地址中...</span>
+                    <span>•</span>
+                    <span>⚡ 0.05 km</span>
                 </div>
             </div>
-
             <!-- 中間精品菜單 -->
             <main class="menu-container" id="menuContainer">
                 <!-- 菜單品項會動態渲染在這裡 -->
             </main>
-
             <!-- 底部懸浮欄 -->
             <footer class="bottom-bar">
                 <div class="cart-summary" id="cartSummaryText">

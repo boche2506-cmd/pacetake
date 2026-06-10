@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
     <!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
-<link rel="icon" type="image/png" href="logoapple.png">
-<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
-<link rel="apple-touch-icon" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="152x152" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="180x180" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="167x167" href="logoapple.png">
-<link rel="stylesheet" href="style.css">
-<style>
+    <link rel="icon" type="image/png" href="png/logoapple.png">
+    <!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
+    <link rel="apple-touch-icon" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="png/logoapple.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
         /* 全局變數與主題防線 */
         :root {
             --bg-global: #F8FAFC;
@@ -306,22 +307,45 @@
             height: 22px;
         }
 
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
 
         .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--brand-green); /* 預設開關未啟動代表營業中（綠燈） */
-            transition: .2s; border-radius: 22px;
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--brand-green);
+            /* 預設開關未啟動代表營業中（綠燈） */
+            transition: .2s;
+            border-radius: 22px;
         }
 
         .slider::before {
-            position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
-            background-color: white; transition: .2s; border-radius: 50%;
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .2s;
+            border-radius: 50%;
         }
 
         /* 當開關被勾選時，代表啟用「售罄防線」（變紅燈） */
-        input:checked + .slider { background-color: var(--brand-red); }
-        input:checked + .slider::before { transform: translateX(22px); }
+        input:checked+.slider {
+            background-color: var(--brand-red);
+        }
+
+        input:checked+.slider::before {
+            transform: translateX(22px);
+        }
 
         .delete-btn {
             background: none;
@@ -335,7 +359,9 @@
             gap: 2px;
         }
 
-        .delete-btn:hover { color: var(--brand-red); }
+        .delete-btn:hover {
+            color: var(--brand-red);
+        }
 
         /* 新增品項大按鈕 */
         .add-item-btn {
@@ -390,26 +416,34 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div class="phone-wrapper">
         <!-- 頂部導覽列 -->
-         <div id="buyerView" style="display: block;">
-        <header id="header-container"></header>
+        <div id="buyerView" style="display: block;">
+            <header id="header-container"></header>
             <div class="nav-left-group">
                 <a href="seller.html" class="back-btn nav-fast">🧑‍🍳 接單後台</a>
                 <a href="index.html" class="back-btn nav-fast">🏠 首頁</a>
             </div>
-            
+
             <div class="control-panel">
                 <button class="theme-toggle" id="themeToggleBtn">🌓</button>
                 <button class="avatar-btn" id="avatarMenuBtn">🧑‍💼 帳號</button>
-                
+
                 <!-- 用戶下拉選單 (內建當前頁面高亮) -->
                 <div class="dropdown-menu" id="userDropdown">
                     <a href="index.html" class="nav-fast">🛒 我的訂單</a>
@@ -419,116 +453,98 @@
                     <a href="manage.html" class="nav-fast current-page">⚙️ 後台管理</a>
                 </div>
             </div>
-        </header>
+            </header>
 
-        <main class="main-content">
-            <!-- 帳務記帳本 -->
-            <section>
-                <div class="section-title">今日帳務記帳本</div>
-                <div class="ledger-card">
-                    <div class="ledger-row-main">
-                        <div class="ledger-stat">
-                            <h3>今日總接單量</h3>
-                            <div>42 單</div>
-                        </div>
-                        <div class="ledger-stat" style="text-align: right;">
-                            <h3>今日總營業額</h3>
-                            <div class="revenue-num">$5,340</div>
-                        </div>
-                    </div>
-                    <div class="ledger-divider"></div>
-                    <div class="ledger-row-sub">
-                        <span>💵 現場付現實收：$1,240</span>
-                        <span>💳 藍線上支付：$4,100</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 菜單與售罄管理 -->
-           <div class="section-title">菜單商品上架</div>
-            <div class="menu-upload-list" id="menuUploadList">
-                <div class="menu-item-row">
-                    <div class="menu-item">
-                        <div class="img-upload-box" onclick="triggerUpload(this)">
-                            <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                            <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
-                            <div class="upload-placeholder" style="font-size: 8cqw; width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">📷<span>上傳照片</span></div>
-                        </div>
-                        <div class="item-fields" style="width: 100%; gap: 0.5cqw;">
-                            <input type="text" class="input-style item-name-input" style="height:8cqw; width: 100%; padding: 0 2cqw;" placeholder="品項名稱" required>
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">$</span>
-                                <input type="number" class="input-style price-input" style="height:8cqw; width: 100%;padding-left:5cqw;" placeholder="金額" min="0" required>
+            <main class="main-content">
+                <!-- 帳務記帳本 -->
+                <section>
+                    <div class="section-title">今日帳務記帳本</div>
+                    <div class="ledger-card">
+                        <div class="ledger-row-main">
+                            <div class="ledger-stat">
+                                <h3>今日總接單量</h3>
+                                <div>42 單</div>
+                            </div>
+                            <div class="ledger-stat" style="text-align: right;">
+                                <h3>今日總營業額</h3>
+                                <div class="revenue-num">$5,340</div>
                             </div>
                         </div>
-                        <div class="item-right-ctrls" style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
-                            <div class="drag-handle" style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">☰</div>
-                            <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                        <div class="ledger-divider"></div>
+                        <div class="ledger-row-sub">
+                            <span>💵 現場付現實收：$1,240</span>
+                            <span>💳 藍線上支付：$4,100</span>
                         </div>
                     </div>
-                    <div class="remark"style="width: 100%; gap: 0.5cqw">
-                        <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 95%;"; placeholder="備註">
+                </section>
+
+                <!-- 菜單與售罄管理 -->
+                <div class="section-title">菜單商品上架</div>
+                <div class="menu-upload-list" id="menuUploadList">
+                    <div class="menu-item-row">
+                        <div class="menu-item">
+                            <div class="img-upload-box" onclick="triggerUpload(this)">
+                                <input type="file" class="image-input" accept="image/*" style="display: none;"
+                                    onchange="previewImage(this)">
+                                <img class="preview-img" src=""
+                                    style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
+                                <div class="upload-placeholder"
+                                    style="font-size: 8cqw; width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    📷<span>上傳照片</span></div>
+                            </div>
+                            <div class="item-fields" style="width: 100%; gap: 0.5cqw;">
+                                <input type="text" class="input-style item-name-input"
+                                    style="height:8cqw; width: 100%; padding: 0 2cqw;" placeholder="品項名稱" required>
+                                <div class="price-input-wrapper">
+                                    <span class="price-symbol">$</span>
+                                    <input type="number" class="input-style price-input"
+                                        style="height:8cqw; width: 100%;padding-left:5cqw;" placeholder="金額" min="0"
+                                        required>
+                                </div>
+                            </div>
+                            <div class="item-right-ctrls"
+                                style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
+                                <div class="drag-handle"
+                                    style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
+                                    ☰</div>
+                                <button type="button" class="del-row-btn" onclick="deleteRow(this)"
+                                    style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                            </div>
+                        </div>
+                        <div class="remark" style="width: 100%; gap: 0.5cqw">
+                            <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 95%;"
+                                ; placeholder="備註">
                             <label class="toggle-switch">
                                 <input type="checkbox" class="soldout-toggle">
                                 <span class="slider"></span>
                             </label>
-                        
+
+                        </div>
                     </div>
                 </div>
-            </div>
-                <button type="button" class="add-row-btn" id="addItemRowBtn" style="width: 100%; height: 10cqw;">＋ 新增下一個品項</button>
-                        <div class="manage-actions">
-                            
-                            <button class="delete-btn">🗑️ 刪除</button>
-                        </div>
-                    
-            <!-- 地推專用 QR Code 貼紙區 (效能解放優化) -->
-            <section>
-                <div class="section-title">地推專用數位門牌貼紙</div>
-                <div class="qrcode-sticker-card">
-                    <div style="font-size:13px; font-weight:700;">您的專屬永久自取網址：</div>
-                    <div class="qrcode-url-display">https://pacetake.tw</div>
-                    <button class="download-sticker-btn" id="generateDownloadBtn">💾 生成並下載高解析度貼紙</button>
-                </div>
-            </section>
-        </main>
-    </div>
-    </div>
-    <script src="js/cart-manager.js"></script>
-    <script type="module" src="app.js"></script>
-    <script>
-            // 🗑️ 刪除與動態售罄開關事件委派綁定
-        const menuManagementList = document.getElementById('menuManagementList');
-        
-        menuManagementList.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-btn')) {
-                const card = e.target.closest('.manage-food-card');
-                if (card) card.remove();
-            }
-        });
-
-        // ➕ 動態新增品項卡片
-        const addItemCardBtn = document.getElementById('addItemCardBtn');
-        bindFastClick(addItemCardBtn, () => {
-            const newCard = document.createElement('div');
-            newCard.className = 'manage-food-card';
-            newCard.innerHTML = `
-                <div class="food-img">🍳</div>
-                <div class="food-info-fields">
-                    <input type="text" placeholder="新項目名稱" style="width:100%; height:26px; border:1px solid var(--border-color); background:var(--bg-global); color:var(--text-main); border-radius:6px; padding:0 6px; font-size:12px;">
-                    <input type="number" placeholder="金額" style="width:70px; height:26px; border:1px solid var(--border-color); background:var(--bg-global); color:var(--text-main); border-radius:6px; padding:0 6px; font-size:12px; margin-top:2px;">
-                </div>
+                <button type="button" class="add-row-btn" id="addItemRowBtn" style="width: 100%; height: 10cqw;">＋
+                    新增下一個品項</button>
                 <div class="manage-actions">
-                    <label class="toggle-switch">
-                        <input type="checkbox" class="soldout-toggle">
-                        <span class="slider"></span>
-                    </label>
+
                     <button class="delete-btn">🗑️ 刪除</button>
                 </div>
-            `;
-            menuManagementList.appendChild(newCard);
-        });
 
+                <!-- 地推專用 QR Code 貼紙區 (效能解放優化) -->
+                <section>
+                    <div class="section-title">地推專用數位門牌貼紙</div>
+                    <div class="qrcode-sticker-card">
+                        <div style="font-size:13px; font-weight:700;">您的專屬永久自取網址：</div>
+                        <div class="qrcode-url-display">https://pacetake.tw</div>
+                        <button class="download-sticker-btn" id="generateDownloadBtn">💾 生成並下載高解析度貼紙</button>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script type="module" src="js/app.js"></script>
+    <script src="js/cart-manager.js"></script>
+    <script>
+       
         // 💾 QR Code 效能解放優化：即時高速原生 API 生成並下載 SVG
         const generateDownloadBtn = document.getElementById('generateDownloadBtn');
         bindFastClick(generateDownloadBtn, () => {
@@ -552,11 +568,11 @@
                     <text x="200" y="460" font-family="sans-serif" font-size="13" font-weight="600" fill="#0066FF" text-anchor="middle">店內價 0 平台抽成</text>
                 </svg>
             `;
-            
+
             // 轉換為 Blob URL 並觸發高解析度原生物件下載
             const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
             const blobUrl = URL.createObjectURL(blob);
-            
+
             const downloadLink = document.createElement('a');
             downloadLink.href = blobUrl;
             downloadLink.download = 'pacetake-store-sticker.svg';
@@ -565,6 +581,7 @@
             document.body.removeChild(downloadLink);
             URL.revokeObjectURL(blobUrl);
         });
-</script>
+    </script>
 </body>
+
 </html>

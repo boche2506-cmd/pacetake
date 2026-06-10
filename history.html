@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
     <!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
-<link rel="icon" type="image/png" href="logoapple.png">
-<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
-<link rel="apple-touch-icon" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="152x152" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="180x180" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="167x167" href="logoapple.png">
-<link rel="stylesheet" href="style.css">
-<style>
+    <link rel="icon" type="image/png" href="png/logoapple.png">
+    <!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
+    <link rel="apple-touch-icon" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="png/logoapple.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
         /* 全局變數與主題防線 */
         :root {
             --bg-global: #F8FAFC;
@@ -183,51 +184,52 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="phone-wrapper">
         <div id="buyerView" style="display: block;">
-        <header id="header-container"></header>
+            <header id="header-container"></header>
             <a href="index.html" class="back-btn nav-fast">⬅️ 返回首頁</a>
             <h1 style="font-size: 18px; font-weight: 800;">歷史訂單紀錄</h1>
             <button class="theme-toggle" id="themeToggleBtn">🌓</button>
-        </header>
+            </header>
 
-        <main class="history-list">
-            <!-- 紀錄 1 -->
-            <div class="history-card">
-                <div class="card-top">
-                    <span class="store-title">池上木盒便當 - 信義店</span>
-                    <span class="order-date">2026/05/22</span>
+            <main class="history-list">
+                <!-- 紀錄 1 -->
+                <div class="history-card">
+                    <div class="card-top">
+                        <span class="store-title">池上木盒便當 - 信義店</span>
+                        <span class="order-date">2026/05/22</span>
+                    </div>
+                    <div class="card-mid">
+                        招牌木盒便當 x2、酥炸大雞腿便當 x1
+                    </div>
+                    <div class="card-bottom">
+                        <span class="total-amount">實付金額：$375</span>
+                        <a href="store.html" class="reorder-btn nav-fast">🔁 再點一次</a>
+                    </div>
                 </div>
-                <div class="card-mid">
-                    招牌木盒便當 x2、酥炸大雞腿便當 x1
-                </div>
-                <div class="card-bottom">
-                    <span class="total-amount">實付金額：$375</span>
-                    <a href="store.html" class="reorder-btn nav-fast">🔁 再點一次</a>
-                </div>
-            </div>
 
-            <!-- 紀錄 2 -->
-            <div class="history-card">
-                <div class="card-top">
-                    <span class="store-title">大苑子茶飲 - 數位站</span>
-                    <span class="order-date">2026/05/18</span>
+                <!-- 紀錄 2 -->
+                <div class="history-card">
+                    <div class="card-top">
+                        <span class="store-title">大苑子茶飲 - 數位站</span>
+                        <span class="order-date">2026/05/18</span>
+                    </div>
+                    <div class="card-mid">
+                        高山青茶(去冰微糖) x2、翡翠檸檬 x1
+                    </div>
+                    <div class="card-bottom">
+                        <span class="total-amount">實付金額：$165</span>
+                        <a href="store.html" class="reorder-btn nav-fast">🔁 再點一次</a>
+                    </div>
                 </div>
-                <div class="card-mid">
-                    高山青茶(去冰微糖) x2、翡翠檸檬 x1
-                </div>
-                <div class="card-bottom">
-                    <span class="total-amount">實付金額：$165</span>
-                    <a href="store.html" class="reorder-btn nav-fast">🔁 再點一次</a>
-                </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
-    </div>
+    <script type="module" src="js/app.js"></script>
     <script src="js/cart-manager.js"></script>
-    <script type="module" src="app.js"></script>
     <script>
         function bindFastClick(element, callback) {
             if (!element) return;
@@ -266,4 +268,5 @@
         });
     </script>
 </body>
+
 </html>

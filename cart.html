@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
     <!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
-<link rel="icon" type="image/png" href="logoapple.png">
-<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
-<link rel="apple-touch-icon" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="152x152" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="180x180" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="167x167" href="logoapple.png">
-<link rel="stylesheet" href="style.css">
-<style>
+    <link rel="icon" type="image/png" href="png/logoapple.png">
+    <!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
+    <link rel="apple-touch-icon" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="png/logoapple.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
         /* 全局變數與主題防線 */
         :root {
             --bg-global: #F8FAFC;
@@ -40,7 +41,8 @@
 
         * {
             box-sizing: border-box;
-            margin: 0; padding: 0;
+            margin: 0;
+            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
@@ -99,10 +101,13 @@
             background: none;
             border: 1px solid var(--border-color);
             font-size: 16px;
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: var(--text-main);
             background-color: var(--card-bg);
         }
@@ -196,6 +201,7 @@
             outline: none;
             transition: all 0.15s ease;
         }
+
         .input-style:focus {
             border-color: var(--brand-blue);
         }
@@ -220,14 +226,17 @@
         }
 
         .pay-check-dot {
-            width: 16px; height: 16px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             transition: all 0.15s ease;
         }
 
         .footer-action {
             position: absolute;
-            bottom: 0; left: 0; right: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
             padding: 16px 20px 24px 20px;
             background-color: var(--bg-container);
             border-top: 1px solid var(--border-color);
@@ -254,7 +263,7 @@
         .submit-order-btn:active {
             transform: scale(0.98);
         }
-        
+
         .submit-order-btn:disabled {
             background-color: var(--border-color) !important;
             color: var(--text-muted) !important;
@@ -263,76 +272,89 @@
         }
     </style>
 </head>
+
 <body>
     <div class="phone-wrapper">
         <div id="buyerView" style="display: block;">
-        <header id="header-container"></header>
+            <header id="header-container"></header>
             <a href="index.html" class="back-btn">⬅️ 返回首頁</a>
             <h1>確認結帳</h1>
             <button class="theme-toggle" id="themeToggleBtn">🌓</button>
-        <main class="content">
-            <div>
-                <div class="section-title">📋 取貨聯絡資訊 (老闆接單安全防線)</div>
-                <div class="bill-card" style="display: flex; flex-direction: column; gap: 12px;">
-                    <div>
-                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">取貨人真實姓名</label>
-                        <input type="text" id="buyerNameInput" class="input-style" placeholder="請輸入方便老闆稱呼的姓名" required>
-                    </div>
-                    <div>
-                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">手機號碼 (聯絡自取用)</label>
-                        <input type="tel" id="buyerPhoneInput" class="input-style" placeholder="例如：0912345678" required>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <div class="section-title">🛍️ 點餐明細</div>
-                <div class="bill-card" id="cartItemsContainer">
-                    <div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車空空的喔...</div>
-                </div>
-            </div>
-
-            <div class="time-defense-box">
-                <span>⏳</span>
-                <span id="defenseTimeText">本單預計 15 分鐘後可至店內現場自取。</span>
-            </div>
-
-            <div class="pay-defense-group">
-                <div class="section-title">💳 支付方式</div>
-                
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <div class="pay-option" data-paytype="CREDIT" id="payOptCredit" style="transition: all 0.2s ease;">
-                        <div class="pay-info">
-                            <span>💳</span>
-                            <span id="creditText">線上信用卡刷卡 (安全加密)</span>
+            <main class="content">
+                <div>
+                    <div class="section-title">📋 取貨聯絡資訊 (老闆接單安全防線)</div>
+                    <div class="bill-card" style="display: flex; flex-direction: column; gap: 12px;">
+                        <div>
+                            <label
+                                style="font-size: 12px; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">取貨人真實姓名</label>
+                            <input type="text" id="buyerNameInput" class="input-style" placeholder="請輸入方便老闆稱呼的姓名"
+                                required>
                         </div>
-                        <div class="pay-check-dot" id="creditCheckDot" style="width: 16px; height: 16px; border-radius: 50%; background-color: transparent; border: 2px solid var(--border-color);"></div>
-                    </div>
-                    <div id="creditNoticeText" style="font-size: 12px; font-weight: 600; color: #EF4444; padding-left: 6px; display: none; margin-top: -4px; margin-bottom: 4px;">
-                        ⚠️ 本店家不支援線上刷卡，請使用現金結帳。
-                    </div>
-
-                    <div class="pay-option" data-paytype="CASH" id="payOptCash" style="transition: all 0.2s ease;">
-                        <div class="pay-info">
-                            <span>💵</span>
-                            <span id="cashText">現場現金付款 (到店取貨付現)</span>
+                        <div>
+                            <label
+                                style="font-size: 12px; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">手機號碼
+                                (聯絡自取用)</label>
+                            <input type="tel" id="buyerPhoneInput" class="input-style" placeholder="例如：0912345678"
+                                required>
                         </div>
-                        <div class="pay-check-dot" id="cashCheckDot" style="width: 16px; height: 16px; border-radius: 50%; background-color: transparent; border: 2px solid var(--border-color);"></div>
-                    </div>
-                    <div id="cashNoticeText" style="font-size: 12px; font-weight: 600; color: #EF4444; padding-left: 6px; display: none; margin-top: -4px;">
-                        ⚠️ 本店家尚未開啟現場付現功能，請使用信用卡安全結帳。
                     </div>
                 </div>
-            </div>
-        </main>
 
-        <footer class="footer-action">
-            <button class="submit-order-btn" id="submitOrderBtn">
-                <span>🚀 安全前往藍新金流結帳</span>
-            </button>
-        </footer>
+                <div>
+                    <div class="section-title">🛍️ 點餐明細</div>
+                    <div class="bill-card" id="cartItemsContainer">
+                        <div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車空空的喔...</div>
+                    </div>
+                </div>
+
+                <div class="time-defense-box">
+                    <span>⏳</span>
+                    <span id="defenseTimeText">本單預計 15 分鐘後可至店內現場自取。</span>
+                </div>
+
+                <div class="pay-defense-group">
+                    <div class="section-title">💳 支付方式</div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="pay-option" data-paytype="CREDIT" id="payOptCredit"
+                            style="transition: all 0.2s ease;">
+                            <div class="pay-info">
+                                <span>💳</span>
+                                <span id="creditText">線上信用卡刷卡 (安全加密)</span>
+                            </div>
+                            <div class="pay-check-dot" id="creditCheckDot"
+                                style="width: 16px; height: 16px; border-radius: 50%; background-color: transparent; border: 2px solid var(--border-color);">
+                            </div>
+                        </div>
+                        <div id="creditNoticeText"
+                            style="font-size: 12px; font-weight: 600; color: #EF4444; padding-left: 6px; display: none; margin-top: -4px; margin-bottom: 4px;">
+                            ⚠️ 本店家不支援線上刷卡，請使用現金結帳。
+                        </div>
+
+                        <div class="pay-option" data-paytype="CASH" id="payOptCash" style="transition: all 0.2s ease;">
+                            <div class="pay-info">
+                                <span>💵</span>
+                                <span id="cashText">現場現金付款 (到店取貨付現)</span>
+                            </div>
+                            <div class="pay-check-dot" id="cashCheckDot"
+                                style="width: 16px; height: 16px; border-radius: 50%; background-color: transparent; border: 2px solid var(--border-color);">
+                            </div>
+                        </div>
+                        <div id="cashNoticeText"
+                            style="font-size: 12px; font-weight: 600; color: #EF4444; padding-left: 6px; display: none; margin-top: -4px;">
+                            ⚠️ 本店家尚未開啟現場付現功能，請使用信用卡安全結帳。
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="footer-action">
+                <button class="submit-order-btn" id="submitOrderBtn">
+                    <span>🚀 安全前往藍新金流結帳</span>
+                </button>
+            </footer>
+        </div>
     </div>
-</div>
     <form id="newebpayForm" method="post" action="https://ccore.newebpay.com/MPG/mpg_gateway" style="display:none;">
         <input type="text" name="MerchantID" id="formMerchantID">
         <input type="text" name="TradeInfo" id="formTradeInfo">
@@ -341,8 +363,8 @@
     </form>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script type="module" src="js/app.js"></script>
     <script src="js/cart-manager.js"></script>
-    <script type="module" src="app.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
@@ -372,49 +394,49 @@
 
         let finalTotalAmount = 0;
         let cartData = [];
-        let currentPayType = ""; 
-        let targetStoreId = ""; 
+        let currentPayType = "";
+        let targetStoreId = "";
 
         // 🛒 1. 從 localStorage 載入買家在 index.html 選購的真實購物車資料
         function loadCartFromStorage() {
             cartData = getCartData();
-                    // 順便提取這部購物車是屬於哪一個店家的，用來去雲端看店家的金流開關
-                    if(cartData.length > 0 && cartData[0].storeId) {
-                        targetStoreId = cartData[0].storeId;
-                    }
-    renderCart();
-}
+            // 順便提取這部購物車是屬於哪一個店家的，用來去雲端看店家的金流開關
+            if (cartData.length > 0 && cartData[0].storeId) {
+                targetStoreId = cartData[0].storeId;
+            }
+            renderCart();
+        }
 
         // 🎨 2. 動態渲染點餐明細與計算總額
-       function renderCart() {
-    const container = document.getElementById('cartItemsContainer');
-    if (!container) return;
+        function renderCart() {
+            const container = document.getElementById('cartItemsContainer');
+            if (!container) return;
 
-    // 💡 新增：用來累加購物車裡所有商品的總數量
-    let totalQty = 0;
+            // 💡 新增：用來累加購物車裡所有商品的總數量
+            let totalQty = 0;
 
-    if (cartData.length === 0) {
-        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車是空的，快去首頁選購吧！</div>`;
-        finalTotalAmount = 0;
+            if (cartData.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車是空的，快去首頁選購吧！</div>`;
+                finalTotalAmount = 0;
 
-        // 💡 關鍵：購物車空了，呼叫更新按鈕計數為 (0)
-        updateBottomCartBadge(totalQty);
-        return;
-    }
+                // 💡 關鍵：購物車空了，呼叫更新按鈕計數為 (0)
+                updateBottomCartBadge(totalQty);
+                return;
+            }
 
-    let html = '';
-    let total = 0;
-            
-    cartData.forEach(item => {
-        const itemPrice = parseInt(item.price) || 0;
-        const itemQty = parseInt(item.qty) || 1;
-        const subtotal = itemPrice * itemQty;
-        total += subtotal;
+            let html = '';
+            let total = 0;
 
-        // 💡 關鍵：把每一項商品的數量累加起來
-        totalQty += itemQty;
+            cartData.forEach(item => {
+                const itemPrice = parseInt(item.price) || 0;
+                const itemQty = parseInt(item.qty) || 1;
+                const subtotal = itemPrice * itemQty;
+                total += subtotal;
 
-        html += `
+                // 💡 關鍵：把每一項商品的數量累加起來
+                totalQty += itemQty;
+
+                html += `
             <div class="bill-item">
                 <div>
                     <span class="item-name">${item.name}</span>
@@ -423,31 +445,31 @@
                 <span class="item-price">$${subtotal}</span>
             </div>
         `;
-    });
+            });
 
-    finalTotalAmount = total;
+            finalTotalAmount = total;
 
-    html += `
+            html += `
         <div class="bill-total-row">
             <span class="total-label">總計金額</span>
             <span class="total-amount" id="totalAmountText">$${finalTotalAmount}</span>
         </div>
     `;
-    container.innerHTML = html;
+            container.innerHTML = html;
 
-    // 💡 關鍵：渲染完明細後，把最後算出來的總數量丟進去更新底部按鈕！
-    updateBottomCartBadge(totalQty); 
+            // 💡 關鍵：渲染完明細後，把最後算出來的總數量丟進去更新底部按鈕！
+            updateBottomCartBadge(totalQty);
 
-    // 👑 修正點：雙軌支付開關檢查機制，應該放在 renderCart 結束之前！
-    if (targetStoreId) {
-        checkStorePaymentConfig(targetStoreId);
-    } else {
-        // 如果是本機隨機產生的模擬資料，預設開啟信用卡
-        selectPayment("CREDIT");
-        initPaymentSelection(true, true);
-    }
-} // 👈 這裡才是 renderCart 真正的結尾！
-    
+            // 👑 修正點：雙軌支付開關檢查機制，應該放在 renderCart 結束之前！
+            if (targetStoreId) {
+                checkStorePaymentConfig(targetStoreId);
+            } else {
+                // 如果是本機隨機產生的模擬資料，預設開啟信用卡
+                selectPayment("CREDIT");
+                initPaymentSelection(true, true);
+            }
+        } // 👈 這裡才是 renderCart 真正的結尾！
+
         // 🏪 3. 核心智慧連動防線：去 Firebase 撈店家設定，決定誰長灰、誰當預設值
         async function checkStorePaymentConfig(storeId) {
             const payOptCredit = document.getElementById('payOptCredit');
@@ -457,10 +479,10 @@
             const payOptCash = document.getElementById('payOptCash');
             const cashText = document.getElementById('cashText');
             const cashNoticeText = document.getElementById('cashNoticeText');
-            
+
             try {
                 const storeDoc = await getDoc(doc(db, "stores", storeId));
-                
+
                 let isCreditAllowed = true;  // 預設給開，相容舊商家資料
                 let isCashAllowed = false;   // 現金自取通常要有勾才算數
 
@@ -562,7 +584,7 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 console.log("買家驗證已登入:", user.uid);
-                
+
                 if (user.displayName && !document.getElementById('buyerNameInput').value) {
                     document.getElementById('buyerNameInput').value = user.displayName;
                 }
@@ -595,7 +617,7 @@
 
         // 🌓 6. 換膚控制
         const themeToggleBtn = document.getElementById('themeToggleBtn');
-        if(themeToggleBtn) {
+        if (themeToggleBtn) {
             themeToggleBtn.addEventListener('click', () => {
                 const currentTheme = document.documentElement.getAttribute('data-theme');
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -624,7 +646,7 @@
 
         // 🚀 8. 按下巨大結帳按鈕：雙層防線全面阻截與對流分支
         const submitOrderBtn = document.getElementById('submitOrderBtn');
-        if(submitOrderBtn) {
+        if (submitOrderBtn) {
             submitOrderBtn.addEventListener('click', async () => {
                 const buyerName = document.getElementById('buyerNameInput').value.trim();
                 const buyerPhone = document.getElementById('buyerPhoneInput').value.trim();
@@ -645,10 +667,10 @@
                 const user = auth.currentUser;
                 if (!user) {
                     alert("🔒【PACE 安全提示】偵測到您尚未登入會員！\n系統已為您封存購物車與剛填寫的手機姓名。\n完成登入，回來即可直接結帳。");
-                    
+
                     localStorage.setItem('temp_buyer_name', buyerName);
                     localStorage.setItem('temp_buyer_phone', buyerPhone);
-                    
+
                     window.location.href = "index.html"; // 強制打回首頁觸發極簡登入
                     return;
                 }
@@ -658,7 +680,7 @@
                 const orderMerchantOrderNo = "PACE_" + timeStamp;
 
                 // --- 🛡️ 雙軌分流核心判斷 ---
-                
+
                 if (currentPayType === "CASH") {
                     // 💵 A 分支：走現場付現流程 (直接存雲端、不扣藍新)
                     try {
@@ -708,8 +730,8 @@
                     `Version=${NEWEBPAY_CONFIG.Version}`,
                     `MerchantOrderNo=${orderMerchantOrderNo}`,
                     `Amt=${finalTotalAmount}`,
-                    `ItemDesc=快拿自取:${itemNames.substring(0, 20)}`, 
-                    `Email=${user.email || 'buyer@pacetake.tw'}`, 
+                    `ItemDesc=快拿自取:${itemNames.substring(0, 20)}`,
+                    `Email=${user.email || 'buyer@pacetake.tw'}`,
                     `LoginType=0`,
                     `CREDIT=1`
                 ].join('&');
@@ -760,4 +782,5 @@
         loadCartFromStorage();
     </script>
 </body>
+
 </html>

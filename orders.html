@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
     <!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
-<link rel="icon" type="image/png" href="logoapple.png">
-<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
-<link rel="apple-touch-icon" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="152x152" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="180x180" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="167x167" href="logoapple.png">
-<link rel="stylesheet" href="style.css">
-<style>
+    <link rel="icon" type="image/png" href="png/logoapple.png">
+    <!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
+    <link rel="apple-touch-icon" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="png/logoapple.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
         /* 全局變數與主題防線 */
         :root {
             --bg-global: #F8FAFC;
@@ -239,67 +240,69 @@
             text-decoration: none;
             box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
         }
-</style>
+    </style>
 </head>
+
 <body>
     <div class="phone-wrapper">
         <div id="buyerView" style="display: block;">
-<header id="header-container"></header>
+            <header id="header-container"></header>
             <a href="index.html" class="back-btn nav-fast">🏠 回首頁</a>
             <h1 style="font-size: 18px; font-weight: 800;">點單預約狀態</h1>
             <button class="theme-toggle" id="themeToggleBtn">🌓</button>
-        </header>
+            </header>
 
-        <main class="content">
-            <!-- 狀態進度 -->
-            <div class="status-card">
-                <div class="status-title">⏱️ 餐點製作中...</div>
-                <div class="status-desc">店家已接單，預估 12:30 準時出餐 (剩餘 15 分鐘)</div>
-            </div>
-
-            <!-- 巨型自取號碼牌 -->
-            <div class="number-plate">
-                <div class="number-label">自取核對代碼</div>
-                <div class="number-code">#023</div>
-            </div>
-
-            <!-- 明細與備註展示 -->
-            <div class="detail-card">
-                <div style="font-size: 13px; font-weight: 700; color:var(--text-muted);">明細核對</div>
-                
-                <div class="detail-row">
-                    <span class="detail-name">招牌木盒便當 <span class="detail-qty">x2</span></span>
-                    <span class="detail-price">$240</span>
+            <main class="content">
+                <!-- 狀態進度 -->
+                <div class="status-card">
+                    <div class="status-title">⏱️ 餐點製作中...</div>
+                    <div class="status-desc">店家已接單，預估 12:30 準時出餐 (剩餘 15 分鐘)</div>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-name">酥炸大雞腿便當 <span class="detail-qty">x1</span></span>
-                    <span class="detail-price">$135</span>
-                </div>
-                
-                <div class="divider"></div>
 
-                <!-- 🎯 買家自由備註欄展示防線 -->
-                <div>
-                    <div class="note-title">您的訂單備註：</div>
-                    <div class="note-box">
-                        飯多、大辣、雞腿跟便當分開裝。飲料請幫我做去冰微糖，謝謝老闆！
+                <!-- 巨型自取號碼牌 -->
+                <div class="number-plate">
+                    <div class="number-label">自取核對代碼</div>
+                    <div class="number-code">#023</div>
+                </div>
+
+                <!-- 明細與備註展示 -->
+                <div class="detail-card">
+                    <div style="font-size: 13px; font-weight: 700; color:var(--text-muted);">明細核對</div>
+
+                    <div class="detail-row">
+                        <span class="detail-name">招牌木盒便當 <span class="detail-qty">x2</span></span>
+                        <span class="detail-price">$240</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-name">酥炸大雞腿便當 <span class="detail-qty">x1</span></span>
+                        <span class="detail-price">$135</span>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- 🎯 買家自由備註欄展示防線 -->
+                    <div>
+                        <div class="note-title">您的訂單備註：</div>
+                        <div class="note-box">
+                            飯多、大辣、雞腿跟便當分開裝。飲料請幫我做去冰微糖，謝謝老闆！
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="detail-row" style="padding-top:4px;">
+                        <span style="font-weight: 800; font-size: 15px;">實付金額 (線上已付)</span>
+                        <span style="font-size: 20px; font-weight: 900; color: var(--brand-blue);">$375</span>
                     </div>
                 </div>
 
-                <div class="divider"></div>
-                
-                <div class="detail-row" style="padding-top:4px;">
-                    <span style="font-weight: 800; font-size: 15px;">實付金額 (線上已付)</span>
-                    <span style="font-size: 20px; font-weight: 900; color: var(--brand-blue);">$375</span>
-                </div>
-            </div>
-
-            <!-- GPS 導航自取大鈕 -->
-            <a href="https://google.com" class="nav-btn">📍 導航前往：池上木盒便當 - 信義店</a>
-        </main>
+                <!-- GPS 導航自取大鈕 -->
+                <a href="https://google.com" class="nav-btn">📍 導航前往：池上木盒便當 - 信義店</a>
+            </main>
+        </div>
     </div>
-    </div>
+    <script type="module" src="js/app.js"></script>
     <script src="js/cart-manager.js"></script>
-    <script type="module" src="app.js"></script>
 </body>
+
 </html>

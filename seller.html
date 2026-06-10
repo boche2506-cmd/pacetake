@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
     <!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
-<link rel="icon" type="image/png" href="logoapple.png">
-<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
-<link rel="apple-touch-icon" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="152x152" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="180x180" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="167x167" href="logoapple.png">
-<link rel="stylesheet" href="style.css">
-<style>
+    <link rel="icon" type="image/png" href="png/logoapple.png">
+    <!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
+    <link rel="apple-touch-icon" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="png/logoapple.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
         /* 全局變數與主題防線 (全面對齊系統規範) */
         :root {
             --bg-global: #F8FAFC;
@@ -105,7 +106,7 @@
             cursor: pointer;
             transition: all 0.1s ease;
         }
-        
+
         .status-toggle-btn.close-shop {
             background-color: rgba(239, 68, 68, 0.1);
             border-color: var(--brand-red);
@@ -225,11 +226,29 @@
         }
 
         /* 狀態色彩防線 (在明暗模式下皆保持高亮易讀) */
-        .badge-red { background-color: var(--brand-red); color: white; }
-        .badge-green { background-color: var(--brand-green); color: #FFFFFF; }
-        [data-theme="light"] .badge-green { color: #111111; }
-        .badge-amber { background-color: var(--brand-amber); color: white; }
-        .badge-purple { background-color: var(--brand-purple); color: white; }
+        .badge-red {
+            background-color: var(--brand-red);
+            color: white;
+        }
+
+        .badge-green {
+            background-color: var(--brand-green);
+            color: #FFFFFF;
+        }
+
+        [data-theme="light"] .badge-green {
+            color: #111111;
+        }
+
+        .badge-amber {
+            background-color: var(--brand-amber);
+            color: white;
+        }
+
+        .badge-purple {
+            background-color: var(--brand-purple);
+            color: white;
+        }
 
         .time-countdown {
             font-size: 10px;
@@ -265,7 +284,8 @@
         }
 
         .kitchen-food-name {
-            font-size: 42px; /* 字體放大 3 倍 */
+            font-size: 42px;
+            /* 字體放大 3 倍 */
             font-weight: 900;
             color: var(--text-main);
             letter-spacing: -1px;
@@ -303,85 +323,95 @@
         }
 
         @keyframes slideInEffect {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="phone-wrapper">
         <!-- 頂部一體化導覽列 -->
-         <div id="buyerView" style="display: block;">
-        <header class="header">
-            <!-- 最左側：巨型盲操營業開關 -->
-            <button class="status-toggle-btn" id="shopStatusToggle">🟢 營業中</button>
-            
-            <!-- 右側快速跳轉群組與日夜同步鈕 -->
-            <div class="nav-right-group">
-                <button class="theme-toggle" id="themeToggleBtn">🌓</button>
-                <a href="index.html" class="nav-btn nav-fast">🏠 首頁</a>
-                <a href="manage.html" class="nav-btn nav-fast">⚙️ 管理</a>
+        <div id="buyerView" style="display: block;">
+            <header class="header">
+                <!-- 最左側：巨型盲操營業開關 -->
+                <button class="status-toggle-btn" id="shopStatusToggle">🟢 營業中</button>
+
+                <!-- 右側快速跳轉群組與日夜同步鈕 -->
+                <div class="nav-right-group">
+                    <button class="theme-toggle" id="themeToggleBtn">🌓</button>
+                    <a href="index.html" class="nav-btn nav-fast">🏠 首頁</a>
+                    <a href="manage.html" class="nav-btn nav-fast">⚙️ 管理</a>
+                </div>
+            </header>
+
+            <!-- 橫向滑動列：訂單編號常亮 -->
+            <div class="order-tabs-scroll" id="orderTabsContainer">
+                <div class="order-tab active" id="tab_023">#023</div>
+                <div class="order-tab" id="tab_022">#022</div>
+                <div class="order-tab" id="tab_021">#021</div>
             </div>
-        </header>
 
-        <!-- 橫向滑動列：訂單編號常亮 -->
-        <div class="order-tabs-scroll" id="orderTabsContainer">
-            <div class="order-tab active" id="tab_023">#023</div>
-            <div class="order-tab" id="tab_022">#022</div>
-            <div class="order-tab" id="tab_021">#021</div>
-        </div>
+            <!-- 核心工作區區塊 -->
+            <div class="workspace-layout">
 
-        <!-- 核心工作區區塊 -->
-        <div class="workspace-layout">
-            
-            <!-- 左側連動亮燈區 -->
-            <aside class="lights-sidebar">
-                <!-- 金流狀態燈 -->
-                <div class="light-indicator-card">
-                    <span class="light-title">金流防線</span>
-                    <span class="light-badge badge-green" id="light_pay">線上已付</span>
-                </div>
-
-                <!-- 預約取餐時間燈 -->
-                <div class="light-indicator-card">
-                    <span class="light-title">預約取餐</span>
-                    <span class="light-badge badge-amber" id="light_time">12:30</span>
-                    <span class="time-countdown" id="light_countdown">剩 20 分</span>
-                </div>
-
-                <!-- 用餐方式燈 -->
-                <div class="light-indicator-card">
-                    <span class="light-title">用餐方式</span>
-                    <span class="light-badge badge-purple" id="light_type">外帶自取</span>
-                </div>
-            </aside>
-
-            <!-- 右側巨型廚房大字明細與全螢幕手勢工作區 -->
-            <main class="gesture-main-board" id="gestureTouchBoard">
-                <div>
-                    <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer">
-                        <!-- 由 JS 依照訂單自動動態渲染商品、單價與數量 -->
+                <!-- 左側連動亮燈區 -->
+                <aside class="lights-sidebar">
+                    <!-- 金流狀態燈 -->
+                    <div class="light-indicator-card">
+                        <span class="light-title">金流防線</span>
+                        <span class="light-badge badge-green" id="light_pay">線上已付</span>
                     </div>
-                    
-                    <!-- 🎯 廚房一秒對帳：巨型實付總金額防線 -->
-                    <div style="margin-top: 24px; padding-top: 16px; border-top: 2px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 16px; font-weight: 800; color: var(--text-muted);">本單實付合計</span>
-                        <span style="font-size: 38px; font-weight: 900; color: var(--brand-blue);" id="kitchenOrderTotal">$0</span>
-                    </div>
-                </div>
 
-                <!-- 底部手勢手感提示 -->
-                <div class="gesture-hint-footer">
-                    <span>👈 左滑下一單</span>
-                    <span>•</span>
-                    <span>右滑前一單 👉</span>
-                </div>
-            </main>
-           </div>
+                    <!-- 預約取餐時間燈 -->
+                    <div class="light-indicator-card">
+                        <span class="light-title">預約取餐</span>
+                        <span class="light-badge badge-amber" id="light_time">12:30</span>
+                        <span class="time-countdown" id="light_countdown">剩 20 分</span>
+                    </div>
+
+                    <!-- 用餐方式燈 -->
+                    <div class="light-indicator-card">
+                        <span class="light-title">用餐方式</span>
+                        <span class="light-badge badge-purple" id="light_type">外帶自取</span>
+                    </div>
+                </aside>
+
+                <!-- 右側巨型廚房大字明細與全螢幕手勢工作區 -->
+                <main class="gesture-main-board" id="gestureTouchBoard">
+                    <div>
+                        <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer">
+                            <!-- 由 JS 依照訂單自動動態渲染商品、單價與數量 -->
+                        </div>
+
+                        <!-- 🎯 廚房一秒對帳：巨型實付總金額防線 -->
+                        <div
+                            style="margin-top: 24px; padding-top: 16px; border-top: 2px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 16px; font-weight: 800; color: var(--text-muted);">本單實付合計</span>
+                            <span style="font-size: 38px; font-weight: 900; color: var(--brand-blue);"
+                                id="kitchenOrderTotal">$0</span>
+                        </div>
+                    </div>
+
+                    <!-- 底部手勢手感提示 -->
+                    <div class="gesture-hint-footer">
+                        <span>👈 左滑下一單</span>
+                        <span>•</span>
+                        <span>右滑前一單 👉</span>
+                    </div>
+                </main>
+            </div>
         </div>
     </div>
+    <script type="module" src="js/app.js"></script>
     <script src="js/cart-manager.js"></script>
-    <script type="module" src="app.js"></script>
     <script>
         // 🚀 0秒無縫閃轉外掛核心架構
         function bindFastClick(element, callback) {
@@ -428,21 +458,21 @@
         // 🧑‍🍳 廚房實戰假資料庫（加入單價與總計防線）
         const ordersDatabase = {
             "023": {
-                items: [ { name: "木盒便當", price: 120, qty: "x2" }, { name: "大雞腿", price: 65, qty: "x1" } ],
+                items: [{ name: "木盒便當", price: 120, qty: "x2" }, { name: "大雞腿", price: 65, qty: "x1" }],
                 total: "$305",
                 pay: { text: "線上已付", cls: "badge-green" },
                 time: "12:30", countdown: "剩 20 分", timeCls: "badge-amber",
                 type: "外帶自取", typeCls: "badge-purple"
             },
             "022": {
-                items: [ { name: "大排骨", price: 85, qty: "x2" } ],
+                items: [{ name: "大排骨", price: 85, qty: "x2" }],
                 total: "$170",
                 pay: { text: "現場付現", cls: "badge-red" },
                 time: "12:45", countdown: "剩 35 分", timeCls: "badge-amber",
                 type: "內用/05桌", typeCls: "badge-purple"
             },
             "021": {
-                items: [ { name: "鯖魚便當", price: 95, qty: "x1" }, { name: "經典手搖", price: 40, qty: "x1" } ],
+                items: [{ name: "鯖魚便當", price: 95, qty: "x1" }, { name: "經典手搖", price: 40, qty: "x1" }],
                 total: "$135",
                 pay: { text: "線上已付", cls: "badge-green" },
                 time: "13:00", countdown: "剩 50 分", timeCls: "badge-amber",
@@ -462,16 +492,16 @@
 
         function renderOrder(id) {
             const data = ordersDatabase[id];
-            
+
             document.querySelectorAll('.order-tab').forEach(tab => tab.classList.remove('active'));
             document.getElementById(`tab_${id}`).classList.add('active');
 
             lightPay.className = `light-badge ${data.pay.cls}`;
             lightPay.innerText = data.pay.text;
-            
+
             lightTime.innerText = data.time;
             lightCountdown.innerText = data.countdown;
-            
+
             lightType.innerText = data.type;
 
             // 連動更新本單巨型合計金額
@@ -493,7 +523,7 @@
             });
 
             kitchenBillContainer.classList.remove('slide-animate');
-            void kitchenBillContainer.offsetWidth; 
+            void kitchenBillContainer.offsetWidth;
             kitchenBillContainer.classList.add('slide-animate');
         }
 
@@ -541,4 +571,5 @@
         });
     </script>
 </body>
+
 </html>

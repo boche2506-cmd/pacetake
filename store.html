@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
     <!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
-<link rel="icon" type="image/png" href="logoapple.png">
-<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
-<link rel="apple-touch-icon" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="152x152" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="180x180" href="logoapple.png">
-<link rel="apple-touch-icon" sizes="167x167" href="logoapple.png">
-<link rel="stylesheet" href="style.css">
-<style>
+    <link rel="icon" type="image/png" href="png/logoapple.png">
+    <!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
+    <link rel="apple-touch-icon" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="png/logoapple.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
         /* 頂部導航與大字留白 */
         .store {
             padding: 20px 20px 16px 20px;
@@ -116,7 +117,8 @@
         /* 連動下架防線樣式 */
         .food-card.sold-out {
             filter: grayscale(1) opacity(0.5);
-            pointer-events: none; /* 阻斷所有點擊 */
+            pointer-events: none;
+            /* 阻斷所有點擊 */
         }
 
         .sold-out-btn {
@@ -170,39 +172,41 @@
             text-decoration: none;
             box-shadow: var(--shadow-sm);
         }
-</style>
+    </style>
 </head>
+
 <body>
-<div class="phone-wrapper">
-    <div id="buyerView" style="display: block;">
-    <!-- 頂部高級感大字留白區 -->
-    <header id="header-container"></header>
-    <div class="store">
-        <div class="store-header-info" id="storeHeaderInfo">
-            <h1 id="storeNameText">正在載入雲端店家...</h1>
-            <div class="store-meta">
-                <span id="storeAddressText">📍 讀取地址中...</span>
-                <span>•</span>
-                <span>⚡ 0.05 km</span>
+    <div class="phone-wrapper">
+        <div id="buyerView" style="display: block;">
+            <!-- 頂部高級感大字留白區 -->
+            <header id="header-container"></header>
+            <div class="store">
+                <div class="store-header-info" id="storeHeaderInfo">
+                    <h1 id="storeNameText">正在載入雲端店家...</h1>
+                    <div class="store-meta">
+                        <span id="storeAddressText">📍 讀取地址中...</span>
+                        <span>•</span>
+                        <span>⚡ 0.05 km</span>
+                    </div>
+                </div>
             </div>
+
+            <!-- 中間精品菜單 -->
+            <main class="menu-container" id="menuContainer">
+                <!-- 菜單品項會動態渲染在這裡 -->
+            </main>
+
+            <!-- 底部懸浮欄 -->
+            <footer class="bottom-bar">
+                <div class="cart-summary" id="cartSummaryText">
+                    🛒 購物車已加入<br> 0 項商品 · 總計 $0
+                </div>
+                <a href="cart.html" class="checkout-btn nav-fast" id="checkoutBtn">去結帳 &gt;&gt;</a>
+            </footer>
         </div>
     </div>
-
-    <!-- 中間精品菜單 -->
-    <main class="menu-container" id="menuContainer">
-        <!-- 菜單品項會動態渲染在這裡 -->
-    </main>
-
-    <!-- 底部懸浮欄 -->
-    <footer class="bottom-bar">
-        <div class="cart-summary" id="cartSummaryText">
-            🛒 購物車已加入<br> 0 項商品 · 總計 $0
-        </div>
-        <a href="cart.html" class="checkout-btn nav-fast" id="checkoutBtn">去結帳 &gt;&gt;</a>
-    </footer>
-</div>
-</div>
-<script src="js/cart-manager.js"></script>
-<script type="module" src="app.js"></script>
+    <script type="module" src="js/app.js"></script>
+    <script src="js/cart-manager.js"></script>
 </body>
+
 </html>

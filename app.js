@@ -1135,7 +1135,7 @@ async function initStorePage() {
             // 初始化購物車暫存陣列（先清空本機前一次的殘留舊紀錄，確保乾淨）
             let localCartData = []; 
             localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
-
+            refreshTotalCartUI();
             const cartSummaryText = document.getElementById('cartSummaryText');
 
             // --- 3. 迴圈渲染餐點卡片 (含加減按鈕與備註欄) ---

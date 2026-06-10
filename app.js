@@ -1206,7 +1206,16 @@ async function initStorePage() {
                         if (cartSummaryText) {
                             cartSummaryText.innerText = `🛒 購物車已加入 ${totalQty} 項商品 · 總計 $${totalPrice}`;
                         }
-                    }
+                    // 2. 把 "(0)" 換成 "$總金額"
+    const badge = document.querySelector('.order-badge-count');
+    if (badge) {
+        badge.innerText = `($${totalPrice})`;
+    }
+}
+// 頁面載入完成後執行
+document.addEventListener('DOMContentLoaded', () => {
+    refreshTotalCartUI();
+});
 
                     // 儲存或更新當前項目的數據到記憶體與 localStorage
                     function updateLocalStorageData() {
@@ -1243,6 +1252,7 @@ async function initStorePage() {
                         setTimeout(() => plusBtn.style.transform = "none", 150);
 
                         updateLocalStorageData();
+                        refreshTotalCartUI();
                     });
 
                     // ➖ 點擊減號：減少數量 (最低至 0)
@@ -1257,6 +1267,7 @@ async function initStorePage() {
                             setTimeout(() => minusBtn.style.transform = "none", 150);
 
                             updateLocalStorageData();
+                            refreshTotalCartUI();
                         }
                     });
 

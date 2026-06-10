@@ -52,6 +52,8 @@ html, body {
     justify-content: center; /* 水平置中 */
     overflow: hidden;    /* 隱藏超出視窗的內容，確保整體像紙張一樣 */
     line-height: 1; /* 讓行距跟著字體一起自動調整 */
+    user-select: none;
+    cursor: default;
 }
 
 input, textarea {
@@ -63,6 +65,8 @@ input, textarea {
     box-sizing: border-box;
     max-width: 100%;
     object-fit: contain;
+    user-select: text;
+    cursor: text;
 }
 
 img, .card {

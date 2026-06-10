@@ -1132,12 +1132,6 @@ async function initStorePage() {
                 return;
             }
 
-            // 初始化購物車暫存陣列（先清空本機前一次的殘留舊紀錄，確保乾淨）
-            let localCartData = []; 
-            localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
-            refreshTotalCartUI();
-            const cartSummaryText = document.getElementById('cartSummaryText');
-
             // --- 3. 迴圈渲染餐點卡片 (含加減按鈕與備註欄) ---
             menuList.forEach((item, index) => {
                 const itemId = `item_${index}`;
@@ -1195,79 +1189,32 @@ async function initStorePage() {
                     const qtyDisplay = foodCard.querySelector('.qty-number');
                     const noteInput = foodCard.querySelector('.item-note-input');
 
-                    // 更新本專案局部總合計 UI
-                    function refreshTotalCartUI() {
-                        let totalQty = 0;
-                        let totalPrice = 0;
-                        localCartData.forEach(cartItem => {
-                            totalQty += cartItem.qty;
-                            totalPrice += (cartItem.price * cartItem.qty);
-                        });
-                        if (cartSummaryText) {
-                            cartSummaryText.innerText = `🛒 購物車已加入 ${totalQty} 項商品 · 總計 $${totalPrice}`;
-                        }
-                    // 2. 把 "(0)" 換成 "$總金額"
-    const badge = document.querySelector('.order-badge-count');
-    if (badge) {
-        badge.innerText = `($${totalPrice})`;
-    }
-}
-// 頁面載入完成後執行
-document.addEventListener('DOMContentLoaded', () => {
-    refreshTotalCartUI();
-});
-
-                    // 儲存或更新當前項目的數據到記憶體與 localStorage
-                    function updateLocalStorageData() {
-                        const currentQty = parseInt(qtyDisplay.innerText, 10);
-                        const currentNote = noteInput ? noteInput.value.trim() : "";
-
-                        // 先從現有購物車移除舊紀錄
-                        localCartData = localCartData.filter(i => i.id !== itemId);
-
-                        // 如果數量大於 0，重新推入最新狀態 (攜帶備註欄名 note)
-                        if (currentQty > 0) {
-                            localCartData.push({
-                                id: itemId,
-                                name: itemName,
-                                price: itemPrice,
-                                qty: currentQty,
-                                note: currentNote, // 👈 完美包裝備註，100% 傳給 cart.html
-                                storeId: currentStoreId
-                            });
-                        }
-                        localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
-                        refreshTotalCartUI();
-                    }
-
-                                        // ➕ 點擊加號：增加數量
+                    // ➕ 點擊加號：增加數量
                     plusBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        let count = parseInt(qtyDisplay.innerText, 10);
-                        count += 1;
-                        qtyDisplay.innerText = count;
+    e.preventDefault();
+    let count = parseInt(qtyDisplay.innerText, 10);
+    count += 1;
+    qtyDisplay.innerText = count;
                         
                         // 微調動畫反饋
                         plusBtn.style.transform = "scale(1.2)";
                         setTimeout(() => plusBtn.style.transform = "none", 150);
 
-                        updateLocalStorageData();
-                        refreshTotalCartUI();
+                        updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput);
                     });
 
                     // ➖ 點擊減號：減少數量 (最低至 0)
                     minusBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        let count = parseInt(qtyDisplay.innerText, 10);
-                        if (count > 0) {
-                            count -= 1;
-                            qtyDisplay.innerText = count;
+    e.preventDefault();
+    let count = parseInt(qtyDisplay.innerText, 10);
+    if (count > 0) {
+        count -= 1;
+        qtyDisplay.innerText = count;
                             
                             minusBtn.style.transform = "scale(1.2)";
                             setTimeout(() => minusBtn.style.transform = "none", 150);
 
-                            updateLocalStorageData();
-                            refreshTotalCartUI();
+                            updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput);
                         }
                     });
 

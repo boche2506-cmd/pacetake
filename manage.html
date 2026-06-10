@@ -439,46 +439,41 @@
             </section>
 
             <!-- 菜單與售罄管理 -->
-            <section>
-                <div class="section-title">菜單商品與售罄增刪管理</div>
-                <div class="menu-management-list" id="menuManagementList">
-                    
-                    <!-- 商品 1 -->
-                    <div class="manage-food-card">
-                        <div class="food-img">🍱</div>
-                        <div class="food-info-fields">
-                            <div class="food-name-txt">招牌木盒便當</div>
-                            <div class="food-price-txt">$120</div>
+           <div class="section-title">菜單商品上架</div>
+            <div class="menu-upload-list" id="menuUploadList">
+                <div class="menu-item-row">
+                    <div class="menu-item">
+                        <div class="img-upload-box" onclick="triggerUpload(this)">
+                            <input type="file" class="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                            <img class="preview-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
+                            <div class="upload-placeholder" style="font-size: 8cqw; width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">📷<span>上傳照片</span></div>
                         </div>
-                        <div class="manage-actions">
-                            <label class="toggle-switch">
-                                <input type="checkbox" class="soldout-toggle">
-                                <span class="slider"></span>
-                            </label>
-                            <button class="delete-btn">🗑️ 刪除</button>
+                        <div class="item-fields" style="width: 100%; gap: 0.5cqw;">
+                            <input type="text" class="input-style item-name-input" style="height:8cqw; width: 100%; padding: 0 2cqw;" placeholder="品項名稱" required>
+                            <div class="price-input-wrapper">
+                                <span class="price-symbol">$</span>
+                                <input type="number" class="input-style price-input" style="height:8cqw; width: 100%;padding-left:5cqw;" placeholder="金額" min="0" required>
+                            </div>
                         </div>
-                    </div>
-
-                    <!-- 商品 2 -->
-                    <div class="manage-food-card">
-                        <div class="food-img">🍗</div>
-                        <div class="food-info-fields">
-                            <div class="food-name-txt">酥炸大雞腿便當</div>
-                            <div class="food-price-txt">$135</div>
-                        </div>
-                        <div class="manage-actions">
-                            <label class="toggle-switch">
-                                <input type="checkbox" class="soldout-toggle">
-                                <span class="slider"></span>
-                            </label>
-                            <button class="delete-btn">🗑️ 刪除</button>
+                        <div class="item-right-ctrls" style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
+                            <div class="drag-handle" style="width: 8cqw; height: 17cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">☰</div>
                         </div>
                     </div>
-
+                    <div class="remark"style="width: 100%; gap: 0.5cqw">
+                        <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 95%;"; placeholder="備註">
+                        <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                    </div>
                 </div>
-                <button class="add-item-btn" id="addItemCardBtn">＋ 新增品項</button>
-            </section>
-
+            </div>
+                <button type="button" class="add-row-btn" id="addItemRowBtn" style="width: 100%; height: 10cqw;">＋ 新增下一個品項</button>
+                        <div class="manage-actions">
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="soldout-toggle">
+                                <span class="slider"></span>
+                            </label>
+                            <button class="delete-btn">🗑️ 刪除</button>
+                        </div>
+                    
             <!-- 地推專用 QR Code 貼紙區 (效能解放優化) -->
             <section>
                 <div class="section-title">地推專用數位門牌貼紙</div>
@@ -490,55 +485,10 @@
             </section>
         </main>
     </div>
-
+    <script src="js/cart-manager.js"></script>
+    <script type="module" src="app.js"></script>
     <script>
-        // 🚀 0秒無縫閃轉外掛核心架構
-        function bindFastClick(element, callback) {
-            if (!element) return;
-            let triggered = false;
-            function trigger(e) {
-                if (!triggered) {
-                    triggered = true;
-                    setTimeout(() => { triggered = false; }, 300);
-                    callback(e);
-                }
-                e.preventDefault();
-            }
-            element.addEventListener('touchstart', trigger, { passive: false });
-            element.addEventListener('mousedown', trigger);
-        }
-
-        // 🌓 系統全局膚色同步防線
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        function initTheme() {
-            const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        }
-        bindFastClick(themeToggleBtn, () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('pacetake-theme', newTheme);
-        });
-        initTheme();
-
-        // 🧑‍💼 用戶頭像下拉控制
-        const avatarMenuBtn = document.getElementById('avatarMenuBtn');
-        const userDropdown = document.getElementById('userDropdown');
-        
-        bindFastClick(avatarMenuBtn, (e) => {
-            e.stopPropagation();
-            const isOpen = userDropdown.style.display === 'block';
-            userDropdown.style.display = isOpen ? 'none' : 'block';
-        });
-
-        document.addEventListener('mousedown', (e) => {
-            if (!userDropdown.contains(e.target) && e.target !== avatarMenuBtn) {
-                userDropdown.style.display = 'none';
-            }
-        });
-
-        // 🗑️ 刪除與動態售罄開關事件委派綁定
+            // 🗑️ 刪除與動態售罄開關事件委派綁定
         const menuManagementList = document.getElementById('menuManagementList');
         
         menuManagementList.addEventListener('click', (e) => {
@@ -606,17 +556,6 @@
             document.body.removeChild(downloadLink);
             URL.revokeObjectURL(blobUrl);
         });
-
-        // 全局相對路徑跳轉無縫對接
-        const navElements = document.querySelectorAll('.nav-fast');
-        navElements.forEach(elem => {
-            bindFastClick(elem, () => {
-                const dest = elem.getAttribute('href');
-                if (dest && dest !== '#') {
-                    window.location.href = dest;
-                }
-            });
-        });
-    </script>
+</script>
 </body>
 </html>

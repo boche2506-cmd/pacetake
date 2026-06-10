@@ -336,7 +336,8 @@
     </form>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
+    <script src="js/cart-manager.js"></script>
+    <script type="module" src="app.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
@@ -371,20 +372,13 @@
 
         // 🛒 1. 從 localStorage 載入買家在 index.html 選購的真實購物車資料
         function loadCartFromStorage() {
-            try {
-                const storedCart = localStorage.getItem('pacetake_cart');
-                if (storedCart) {
-                    cartData = JSON.parse(storedCart);
+            cartData = getCartData();
                     // 順便提取這部購物車是屬於哪一個店家的，用來去雲端看店家的金流開關
                     if(cartData.length > 0 && cartData[0].storeId) {
                         targetStoreId = cartData[0].storeId;
                     }
-                }
-            } catch (e) {
-                console.error("購物車解析失敗", e);
-            }
-            renderCart();
-        }
+    renderCart();
+}
 
         // 🎨 2. 動態渲染點餐明細與計算總額
        function renderCart() {
@@ -399,7 +393,7 @@
         finalTotalAmount = 0;
 
         // 💡 關鍵：購物車空了，呼叫更新按鈕計數為 (0)
-        updateBottomCartBadge(0);
+        updateBottomCartBadge(totalQty);
         return;
     }
 
@@ -448,24 +442,7 @@
         initPaymentSelection(true, true);
     }
 } // 👈 這裡才是 renderCart 真正的結尾！
-
-// 💡 負責更新按鈕文字的函式（獨立在外面，完全正確）
-function updateBottomCartBadge(count) {
-    const badge = document.querySelector('.order-badge-count');
-    if (!badge) return;
-
-    // 超過 99 顯示 99+
-    const displayCount = count > 99 ? '99+' : count;
-    badge.innerText = `(${displayCount})`;
     
-    // 如果購物車內有東西，可以讓括號數字變色提醒
-    if (count > 0) {
-        badge.style.color = 'var(--brand-green, #52c41a)'; 
-    } else {
-        badge.style.color = 'inherit'; 
-    }
-}
-     
         // 🏪 3. 核心智慧連動防線：去 Firebase 撈店家設定，決定誰長灰、誰當預設值
         async function checkStorePaymentConfig(storeId) {
             const payOptCredit = document.getElementById('payOptCredit');

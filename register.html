@@ -12,8 +12,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="logoapple.png">
 <link rel="apple-touch-icon" sizes="167x167" href="logoapple.png">
 <link rel="stylesheet" href="style.css">
-</head>
-<body>
 <style>
 
          /* 填表區域 */
@@ -269,6 +267,48 @@
             gap: 0.5cqw;
         }
 
+        .soldout-slider {
+            position: relative;
+            display: inline-block;
+            width: 8cqw;
+            height: 15%w;
+        }
+
+        .soldout-slider input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .soldout-toggle {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #CBD5E1;
+            transition: .2s;
+            border-radius: 6cqw;
+        }
+
+        .soldout-toggle::before {
+            position: absolute;
+            content: "";
+            height: 4cqw;
+            width: 4cqw;
+            left: 1cqw;
+            bottom: 1cqw;
+            background-color: white;
+            transition: .2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .soldout-toggle {
+            background-color: var(--brand-blue);
+        }
+
+        input:checked + .soldout-toggle::before {
+            transform: translateX(5cqw);
+        }
+
         .img-upload-box {
             width: 17cqw;
             height: 17cqw;
@@ -477,9 +517,12 @@
             from { opacity: 0; transform: translateY(1cqw); }
             to { opacity: 1; transform: translateY(0); }
         }
-    </style>
+</style>
+</head>
+<body>
     <div class="phone-wrapper">
-        <div id="header-container" style="padding: 2cqw; flex-shrink: 0;"></div>    
+        <div id="buyerView" style="display: block;">
+        <header id="header-container"></header>   
             <div class="input-group">
                 <label>店鋪聯絡電話</label>
                 <input type="tel" id="shopPhone" class="input-style" placeholder="請輸入店鋪或老闆的手機號碼" required pattern="[0-9]{9,10}">
@@ -556,12 +599,15 @@
                             </div>
                         </div>
                         <div class="item-right-ctrls" style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
-                            <div class="drag-handle" style="width: 8cqw; height: 17cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">☰</div>
+                            <div class="drag-handle" style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">☰</div>
+                            <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
                         </div>
                     </div>
                     <div class="remark"style="width: 100%; gap: 0.5cqw">
-                        <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 95%;"; placeholder="備註">
-                        <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                        <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 85%;"; placeholder="備註">
+                        <label class="soldout-slider"><input type="checkbox" id="toggleCash">
+                                <span class="soldout-toggle"></span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -583,7 +629,9 @@
             </div>
         </div>
     </div>
+    </div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHDVR703MLCYGLAi_TtFdDM1gaauKV8sQ&libraries=geocoding&language=zh-TW"></script>
+    <script src="js/cart-manager.js"></script>
     <script type="module" src="app.js"></script>
 </body>
 </html>

@@ -2,9 +2,17 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>快拿自取街 pacetake.tw - 確認結帳</title>
-    <style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PACE 派思 pacetake.tw - 買家首頁</title>
+    <!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
+<link rel="icon" type="image/png" href="logoapple.png">
+<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
+<link rel="apple-touch-icon" href="logoapple.png">
+<link rel="apple-touch-icon" sizes="152x152" href="logoapple.png">
+<link rel="apple-touch-icon" sizes="180x180" href="logoapple.png">
+<link rel="apple-touch-icon" sizes="167x167" href="logoapple.png">
+<link rel="stylesheet" href="style.css">
+<style>
         /* 全局變數與主題防線 */
         :root {
             --bg-global: #F8FAFC;
@@ -256,16 +264,13 @@
     </style>
 </head>
 <body>
-
     <div class="phone-wrapper">
-        <header class="header">
+        <div id="buyerView" style="display: block;">
+        <header id="header-container"></header>
             <a href="index.html" class="back-btn">⬅️ 返回首頁</a>
             <h1>確認結帳</h1>
             <button class="theme-toggle" id="themeToggleBtn">🌓</button>
-        </header>
-
         <main class="content">
-            
             <div>
                 <div class="section-title">📋 取貨聯絡資訊 (老闆接單安全防線)</div>
                 <div class="bill-card" style="display: flex; flex-direction: column; gap: 12px;">
@@ -327,7 +332,7 @@
             </button>
         </footer>
     </div>
-
+</div>
     <form id="newebpayForm" method="post" action="https://ccore.newebpay.com/MPG/mpg_gateway" style="display:none;">
         <input type="text" name="MerchantID" id="formMerchantID">
         <input type="text" name="TradeInfo" id="formTradeInfo">

@@ -2,11 +2,17 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>快拿自取街 pacetake.tw - 訂單追蹤</title>
-    <!-- 精品藍色便當純代碼 SVG Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%2280%22%20height%3D%2255%22%20rx%3D%2210%22%20fill%3D%22%230066FF%22%2F%3E%3Cpath%20d%3D%22M25%2030%20V15%20Q25%2010%2035%2010%20H65%20Q75%2010%2075%2015%20V30%22%20fill%3D%22none%22%20stroke%3D%22%230066FF%22%20stroke-width%3D%228%22%2F%3E%3Cline%20x1%3D%2210%22%20y1%3D%2255%22%20x2%3D%2290%22%20y2%3D%2255%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%224%22%2F%3E%3C/svg%3E">
-    <style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PACE 派思 pacetake.tw - 買家首頁</title>
+    <!-- 1. 給電腦版、手機版 Chrome 瀏覽器標籤頁使用的標準圖示 -->
+<link rel="icon" type="image/png" href="logoapple.png">
+<!-- 2. 給 Apple iOS 系統（Safari/Chrome）加入主畫面與我的最愛使用的圖示 -->
+<link rel="apple-touch-icon" href="logoapple.png">
+<link rel="apple-touch-icon" sizes="152x152" href="logoapple.png">
+<link rel="apple-touch-icon" sizes="180x180" href="logoapple.png">
+<link rel="apple-touch-icon" sizes="167x167" href="logoapple.png">
+<link rel="stylesheet" href="style.css">
+<style>
         /* 全局變數與主題防線 */
         :root {
             --bg-global: #F8FAFC;
@@ -233,12 +239,12 @@
             text-decoration: none;
             box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
         }
-    </style>
+</style>
 </head>
 <body>
-
     <div class="phone-wrapper">
-        <header class="header">
+        <div id="buyerView" style="display: block;">
+<header id="header-container"></header>
             <a href="index.html" class="back-btn nav-fast">🏠 回首頁</a>
             <h1 style="font-size: 18px; font-weight: 800;">點單預約狀態</h1>
             <button class="theme-toggle" id="themeToggleBtn">🌓</button>
@@ -291,6 +297,7 @@
             <!-- GPS 導航自取大鈕 -->
             <a href="https://google.com" class="nav-btn">📍 導航前往：池上木盒便當 - 信義店</a>
         </main>
+    </div>
     </div>
     <script src="js/cart-manager.js"></script>
     <script type="module" src="app.js"></script>

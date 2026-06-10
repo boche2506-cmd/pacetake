@@ -12,9 +12,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="logoapple.png">
 <link rel="apple-touch-icon" sizes="167x167" href="logoapple.png">
 <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <style>
+<style>
         /* 頂部導航與大字留白 */
         .store {
             padding: 20px 20px 16px 20px;
@@ -172,8 +170,11 @@
             text-decoration: none;
             box-shadow: var(--shadow-sm);
         }
-    </style>
+</style>
+</head>
+<body>
 <div class="phone-wrapper">
+    <div id="buyerView" style="display: block;">
     <!-- 頂部高級感大字留白區 -->
     <header id="header-container"></header>
     <div class="store">
@@ -199,6 +200,7 @@
         </div>
         <a href="cart.html" class="checkout-btn nav-fast" id="checkoutBtn">去結帳 &gt;&gt;</a>
     </footer>
+</div>
 </div>
 <script src="js/cart-manager.js"></script>
 <script type="module" src="app.js"></script>

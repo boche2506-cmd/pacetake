@@ -12,8 +12,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="logoapple.png">
 <link rel="apple-touch-icon" sizes="167x167" href="logoapple.png">
 <link rel="stylesheet" href="style.css">
-</head>
-<body>
 <style>
 /* 👑 頂部全區常駐吸附天花板 (Sticky) */
 
@@ -345,9 +343,9 @@ footer .status-indicator.active {
     display: inline-block;       /* 讓它像文字一樣乖乖排在後面 */
     transition: color 0.2s ease; /* 變色時有個淡淡的過渡感 */
 }
-
-
 </style>
+</head>
+<body>
 <div class="phone-wrapper">
 <div id="buyerView" style="display: block;">
 <header id="header-container"></header>
@@ -478,6 +476,8 @@ footer .status-indicator.active {
         <div class="modal-title" style="color: var(--brand-blue); font-weight: 700;">📍 目前位置</div>
         <div class="modal-desc-address" id="modalAddressText" style="margin-bottom: 0.5cqw; margin-top: 0.5cqw;">尚未獲取定位，請開啟 GPS。</div>
         <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; margin-top: 5cqw; border: none; width: 50%; height: 30%; border-radius: 2cqw; font-size: 5cqw; font-weight: 700; cursor: pointer;">確認</button>
-    </div></div></div><script type="module" src="app.js"></script>
+    </div></div></div>
+<script src="js/cart-manager.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>

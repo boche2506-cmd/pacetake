@@ -562,12 +562,19 @@ document.getElementById('shopAddress')?.addEventListener('blur', () => {
                             </div>
                         </div>
                         <div class="item-right-ctrls" style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
-                            <div class="drag-handle" style="width: 8cqw; height: 17cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">☰</div>
+                            <div class="drag-handle" style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">☰</div>
+                            <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
                         </div>
                     </div>
-                    <div class="remark"style="width: 100%;">
-                        <input type="text" class="input-style" style="height: 8cqw; width: 100%"; placeholder="備註">
-                        <button type="button" class="del-row-btn" onclick="deleteRow(this)" style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                    <div class="remark"style="width: 100%; gap: 0.5cqw">
+                        <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 95%;"; placeholder="備註">
+                        <label class="toggle-switch">
+                                <input type="checkbox" class="soldout-toggle">
+                                <span class="slider">
+                                <span class="on-text">販售中</span>
+                                <span class="off-text">暫停</span>
+                                </span>
+                        </label>
                     </div>
             `;
             menuUploadList.appendChild(newRow);
@@ -894,6 +901,20 @@ function onDragEnd() {
     window.removeEventListener('touchend', onDragEnd);
 }
 
+menuManagementList.addEventListener('change', (e) => {
+    // 監聽 change 事件，因為 checkbox 是透過 'change' 觸發的
+    if (e.target.classList.contains('soldout-toggle')) {
+        const isChecked = e.target.checked;
+        const card = e.target.closest('.menu-item-row');
+        
+        if (isChecked) {
+            card.classList.add('sold-out');
+        } else {
+            card.classList.remove('sold-out');
+        }
+    }
+});
+
 // ==========================================
 // 7. Window 全域綁定區 (給 HTML onclick 呼叫)
 // ==========================================
@@ -1139,9 +1160,11 @@ async function initStorePage() {
                 const itemPrice = parseInt(item.price, 10) || 0;
                 const itemImg = item.image || '';
                 const isSoldOut = storeData.status === "offline";
-
+                const menuData = JSON.parse(localStorage.getItem('pacetake_menu')) || {};
+                const isLocalSoldOut = menuData[itemId]?.isSoldOut || false;
+                const finalIsSoldOut = (isSoldOut || isLocalSoldOut);
                 const foodCard = document.createElement('div');
-                foodCard.className = `food-card ${isSoldOut ? 'sold-out' : ''}`;
+                foodCard.className = `food-card ${finalIsSoldOut ? 'sold-out' : ''}`;
                 foodCard.setAttribute('data-price', itemPrice);
                 foodCard.setAttribute('data-id', itemId);
                 foodCard.setAttribute('data-name', itemName);
@@ -1156,14 +1179,13 @@ async function initStorePage() {
                     <div class="food-main-row" style="display: flex; width: 100%; align-items: center;">
                         <div class="food-img">${imgElement}</div>
                         <div class="food-info" style="flex: 1; margin-left: 3cqw;">
-                            <div class="food-name">${itemName} ${isSoldOut ? '(暫停供應)' : ''}</div>
+                            <div class="food-name">${itemName} ${finalIsSoldOut ? '(暫停供應)' : ''}</div>
                             <div class="food-price">$${itemPrice}</div>
                         </div>
                         <div class="action-container">
-                            ${isSoldOut 
-                                ? `<button class="add-cart-btn sold-out-btn" disabled>🔴 暫停供應</button>`
-                                : `
-                                  <div class="quantity-control-panel" style="display: flex; align-items: center; gap: 2cqw; background: var(--bg-secondary); border-radius: 50%; padding: 1cqw 2cqw; border: 0.2cqw solid var(--border-color);">
+                                  ${finalIsSoldOut 
+                          ? `<button class="add-cart-btn sold-out-btn" disabled>🔴 暫停供應</button>`
+                             : ` <div class="quantity-control-panel" style="display: flex; align-items: center; gap: 2cqw; background: var(--bg-secondary); border-radius: 50%; padding: 1cqw 2cqw; border: 0.2cqw solid var(--border-color);">
                                       <button class="minus-btn" style="border: none; background: transparent; font-size: 4cqw; padding: 1cqw 3cqw; cursor: pointer; color: var(--text-main); font-weight: bold;">-</button>
                                       <span class="qty-number" style="font-size: 3.5cqw; font-weight: bold; min-width: 4cqw; text-align: center;">0</span>
                                       <button class="plus-btn" style="border: none; background: transparent; font-size: 4cqw; padding: 1cqw 3cqw; cursor: pointer; color: var(--brand-blue); font-weight: bold;">+</button>
@@ -1173,7 +1195,7 @@ async function initStorePage() {
                         </div>
                     </div>
                     <!-- 💡【核心改動三】：每道菜下方專屬的精緻備註欄 -->
-                    ${isSoldOut ? '' : `
+                    ${finalIsSoldOut ? '' : `
                     <div class="note-wrapper" style="width: 100%; margin-top: 2.5cqw; border-top: 0.2cqw dashed var(--border-color); padding-top: 2cqw;">
                         <input type="text" class="item-note-input" placeholder="✍️ 填寫去冰、微辣、不加蔥等客製化備註..." style="width: 100%; background: var(--bg-global); border: 0.2cqw solid var(--border-color); border-radius: 1.5cqw; padding: 1.5cqw 2.5cqw; font-size: 3cqw; color: var(--text-main); outline: none;">
                     </div>
@@ -1183,11 +1205,11 @@ async function initStorePage() {
                 menuContainer.appendChild(foodCard);
 
                 // --- 4. 數值與購物車核心聯動邏輯 ---
-                if (!isSoldOut) {
-                    const plusBtn = foodCard.querySelector('.plus-btn');
-                    const minusBtn = foodCard.querySelector('.minus-btn');
-                    const qtyDisplay = foodCard.querySelector('.qty-number');
-                    const noteInput = foodCard.querySelector('.item-note-input');
+                if (!finalIsSoldOut) {
+    const plusBtn = foodCard.querySelector('.plus-btn');
+    const minusBtn = foodCard.querySelector('.minus-btn');
+    const qtyDisplay = foodCard.querySelector('.qty-number');
+    const noteInput = foodCard.querySelector('.item-note-input');
 
                     // ➕ 點擊加號：增加數量
                     plusBtn.addEventListener('click', (e) => {

@@ -1,21 +1,21 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/Firebasejs/9.23.0/Firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/Firebasejs/9.23.0/Firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/Firebasejs/9.23.0/Firebase-firestore.js";
 
 // ==========================================
 // 1. Firebase 設定與初始化
 // ==========================================
-const firebaseConfig = {
+const FirebaseConfig = {
     apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
-    authDomain: "pacetake-c6e1e.firebaseapp.com",
+    authDomain: "pacetake-c6e1e.Firebaseapp.com",
     projectId: "pacetake-c6e1e",
-    storageBucket: "pacetake-c6e1e.firebasestorage.app",
+    storageBucket: "pacetake-c6e1e.Firebasestorage.app",
     messagingSenderId: "1052980235056",
     appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
     measurementId: "G-888XL8JTHW",
 };
 
-export const app = initializeApp(firebaseConfig);
+export const app = initializeApp(FirebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const provider = new GoogleAuthProvider();
@@ -1174,7 +1174,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         try {
             let storeData = null;
             // ... (保持你原有的 Firebase 讀取邏輯不變) ...
-            const firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
+            const FirebaseFirestore = window.Firebase ? window.Firebase.firestore() : null;
             if (typeof db !== 'undefined') {
                 try {
                     if (typeof doc === 'function' && typeof getDoc === 'function') {
@@ -1185,7 +1185,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 } catch (innerErr) { }
             }
             if (!storeData) {
-                const fallbackDb = typeof db !== 'undefined' ? db : firebaseFirestore;
+                const fallbackDb = typeof db !== 'undefined' ? db : FirebaseFirestore;
                 if (fallbackDb && typeof fallbackDb.collection === 'function') {
                     const docSnap = await fallbackDb.collection("stores").doc(currentStoreId).get();
                     if (docSnap.exists) storeData = docSnap.data();

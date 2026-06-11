@@ -216,29 +216,27 @@
 
 <body>
     <div class="phone-wrapper">
-        <div id="buyerView" style="display: block;">
-            <!-- 頂部高級感大字留白區 -->
+        <div id="buyerView">
             <header id="header-container"></header>
+
             <div class="store">
                 <div class="store-header-info" id="storeHeaderInfo">
-                    <h1 id="storeNameText">正在載入雲端店家...</h1>
+                    <h1 id="storeNameText">載入中...</h1>
                 </div>
                 <div class="store-meta">
-                    <span id="storeAddressText">📍 讀取地址中...</span>
+                    <span id="storeAddressText">📍 載入中...</span>
                     <span>•</span>
-                    <span>⚡ 0.05 km</span>
+                    <span id="storeDistanceText">⚡ 計算中...</span>
                 </div>
             </div>
-            <!-- 中間精品菜單 -->
-            <main class="menu-container" id="menuContainer">
-                <!-- 菜單品項會動態渲染在這裡 -->
-            </main>
-            <!-- 底部懸浮欄 -->
+
+            <main class="menu-container" id="menuContainer"></main>
+
             <footer class="bottom-bar">
-                <div class="cart-summary" id="cartSummaryText">
+                <div id="cartSummaryText" class="cart-summary">
                     🛒 購物車已加入<br> 0 項商品 · 總計 $0
                 </div>
-                <a href="cart.html" class="checkout-btn nav-fast" id="checkoutBtn">去結帳 &gt;&gt;</a>
+                <a href="cart.html" class="checkout-btn" id="checkoutBtn">去結帳 >></a>
             </footer>
         </div>
     </div>

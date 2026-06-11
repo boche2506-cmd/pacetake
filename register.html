@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,7 @@
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
 
     <link rel="stylesheet" href="style.css">
-<style>
+    <style>
         /* 填表區域 */
         .phone-wrapper {
             display: flex;
@@ -409,6 +410,24 @@
             padding-left: 5cqw;
         }
 
+        .new-size {
+            height: 17cqw;
+            width: 8cqw;
+            color: var(--text-muted);
+            background-color: var(--bg-global);
+            border: 0.2cqw solid var(--border-color);
+            font-size: 3.5cqw;
+            font-weight: 500;
+            padding: 0.5cqw;
+            border-radius: 2cqw;
+            cursor: pointer;
+            line-height: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+
+        }
+
         /* 👑 刪除與排序移到右側控制區 */
         .item-right-ctrls {
             display: flex;
@@ -676,6 +695,7 @@
                                         required>
                                 </div>
                             </div>
+                            <button type="button" class="new-size" onclick="toggleSizeFields(this)">如需規格</button>
                             <div class="item-right-ctrls"
                                 style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
                                 <div class="drag-handle"
@@ -684,6 +704,19 @@
                                 <button type="button" class="del-row-btn" onclick="deleteRow(this)"
                                     style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
                             </div>
+                        </div>
+                        <div class="new-size-price"style="display: none; height: 8cqw; width: 100%; flex-direction: row; justify-content: space-around; gap: 1cqw;">
+                            <span class="price-symbol">大$</span>
+                            <input type="number" class="input-style price-input-large" style="height:8cqw; flex: 1;"
+                                placeholder="金額" min="0">
+
+                            <span class="price-symbol">中$</span>
+                            <input type="number" class="input-style price-input-medium" style="height:8cqw; flex: 1;"
+                                placeholder="金額" min="0">
+
+                            <span class="price-symbol">小$</span>
+                            <input type="number" class="input-style price-input-small" style="height:8cqw; flex: 1;"
+                                placeholder="金額" min="0">
                         </div>
                         <div class="remark" style="width: 100%; gap: 1cqw">
                             <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 80%;"

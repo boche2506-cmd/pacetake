@@ -70,10 +70,10 @@ input, textarea {
 }
 
 img, .card {
-    height: auto;
-    max-width: 100%; /* 圖片與卡片絕對不超過父容器寬度 */
-    display: block;   /* 避免圖片下方產生多餘的空隙 */
-    object-fit: contain;
+    width: 100%;      /* 圖片寬度填滿容器 */
+    height: 100%;     /* 圖片高度填滿容器 */
+    object-fit: contain; /* 關鍵：確保完整顯示，不裁切，短邊留空 */
+    background-color: transparent;
 }
 
 /* ==========================================================================

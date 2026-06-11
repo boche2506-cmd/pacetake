@@ -568,6 +568,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                                         required>
                                 </div>
                             </div>
+                            <button type="button" class="new-size" onclick="toggleSizeFields(this)">如需規格</button>
                             <div class="item-right-ctrls"
                                 style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
                                 <div class="drag-handle"
@@ -576,6 +577,19 @@ window.addEventListener('DOMContentLoaded', async () => {
                                 <button type="button" class="del-row-btn" onclick="deleteRow(this)"
                                     style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
                             </div>
+                        </div>
+                        <div class="new-size-price"style="display: none; height: 8cqw; width: 100%; flex-direction: row; justify-content: space-around; gap: 1cqw;">
+                            <span class="price-symbol">大$</span>
+                            <input type="number" class="input-style price-input-large" style="height:8cqw; flex: 1;"
+                                placeholder="金額" min="0">
+
+                            <span class="price-symbol">中$</span>
+                            <input type="number" class="input-style price-input-medium" style="height:8cqw; flex: 1;"
+                                placeholder="金額" min="0">
+
+                            <span class="price-symbol">小$</span>
+                            <input type="number" class="input-style price-input-small" style="height:8cqw; flex: 1;"
+                                placeholder="金額" min="0">
                         </div>
                         <div class="remark" style="width: 100%; gap: 1cqw">
                             <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 80%;"
@@ -933,11 +947,11 @@ if (menuUploadList) {
 
 function toggleSizeFields(btn) {
     // 1. 找到當前這列餐點的根容器
-    const menuItem = btn.closest('.menu-item');
-    
+    const menuItem = btn.closest('.menu-item-row');
+
     // 2. 找到原本的金額欄位 (原本的 price-input)
     const mainPriceInput = menuItem.querySelector('.price-input');
-    
+
     // 3. 找到我們剛剛新增的規格容器 (new-size-price)
     const sizePriceContainer = menuItem.querySelector('.new-size-price');
 
@@ -945,7 +959,7 @@ function toggleSizeFields(btn) {
     if (sizePriceContainer.style.display === 'none' || sizePriceContainer.style.display === '') {
         // 啟用規格模式
         sizePriceContainer.style.display = 'flex';
-        
+
         // 禁止輸入原始金額，並加上橫線效果
         mainPriceInput.disabled = true;
         mainPriceInput.style.textDecoration = 'line-through';
@@ -954,11 +968,12 @@ function toggleSizeFields(btn) {
     } else {
         // 恢復原始模式
         sizePriceContainer.style.display = 'none';
-        
+
         // 恢復原始金額欄位
         mainPriceInput.disabled = false;
         mainPriceInput.style.textDecoration = 'none';
         mainPriceInput.style.backgroundColor = 'transparent';
+        mainPriceInput.setAttribute('required', 'required'); // 恢復必填
     }
 }
 

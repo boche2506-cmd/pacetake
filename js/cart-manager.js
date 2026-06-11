@@ -104,8 +104,33 @@ window.syncCartFromDOM = function() {
     refreshTotalCartUI();
 };
 
+// 5. 頁面載入時：將 LocalStorage 的資料「回填」到 DOM 上 (新增這個函式)
+function initCartDOMState() {
+    const localCartData = getCartData();
+    
+    localCartData.forEach(item => {
+        // 尋找對應的卡片 (透過 data-id)
+        const card = document.querySelector(`.food-card[data-id="${item.id}"]`);
+        if (card) {
+            // 找到該卡片的數量顯示區
+            const qtyDisplay = card.querySelector('.qty-number');
+            const noteInput = card.querySelector('.item-note-input');
+            
+            if (qtyDisplay) {
+                qtyDisplay.innerText = item.qty;
+            }
+            if (noteInput) {
+                noteInput.value = item.note || "";
+            }
+        }
+    });
+}
+
 // 頁面載入時自動執行 UI 同步
-document.addEventListener('DOMContentLoaded', refreshTotalCartUI);
+document.addEventListener('DOMContentLoaded', () => {
+    initCartDOMState();   // 1. 先把數量填回 DOM
+    refreshTotalCartUI(); // 2. 再計算總金額
+});
 
 // 全域導出方法，方便外部調用
 window.getCartData = getCartData;

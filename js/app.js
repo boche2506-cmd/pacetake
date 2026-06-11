@@ -1304,5 +1304,5 @@ window.addEventListener('DOMContentLoaded', async () => {
     } else {
         initStorePage();
     }
-    window.toggleSizeFields = toggleSizeFields;
 });
+window.toggleSizeFields = toggleSizeFields;

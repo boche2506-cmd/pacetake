@@ -76,7 +76,7 @@ let gpsPinBtn, addressDetailLightbox, modalAddressText, closeAddressModalBtn;
 let shopCity, shopDistrict, finalName, finalAddress, fullAddress;
 
 // 4. 資料庫與邏輯處理 (狀態變數)
-let user, userDoc, currentRole = "buyer", currentStoreId, storeData;
+let user, userDoc, currentRole, currentStoreId, storeData;
 let activeDragItem = null, menuHTML = '';
 let currentTheme, newTheme, savedTheme;
 let lat, lng, distanceHtml, dist, card, code;
@@ -86,7 +86,7 @@ let isSizeMode, itemObj, isCashPayEnabled, isOnlinePayEnabled;
 let itemId, itemName, itemPrice, itemImg, isSoldOut, menuData, isLocalSoldOut, finalIsSoldOut;
 
 // 5. 臨時運算與輔助變數
-let parser, newheader, togglePasswordVisibility, type, opt;
+let parser, newheader, togglePasswordVisibility, type, opt, themeToggleBtn;
 let result, email, password, geocode, location;
 let searchKeyword, filtered, matchCity, matchDist, NameToSearch, matchKeyword;
 let NameVal, NameEl, addrEl, distEl, menuList;
@@ -289,41 +289,45 @@ function bindheaderEvents() {
     }
 }
 
-function loadheader() {
+async function loadheader() {
     console.log("[PACE DEBUG] loadheader() started.");
-    headerContainer = document.getElementById('header-Container');
+    
+    // 1. 確保找到容器
+    const headerContainer = document.getElementById('header-Container');
     if (!headerContainer) {
         console.warn("[PACE DEBUG] #header-Container not found.");
         return;
     }
-    fetch('header.html')
-        .then(response => {
-            if (!response.ok) throw new Error('找不到 header.html');
-            return response.text();
-        })
-        .then(htmlData => {
-            // 1. 將讀取到的文字轉換成真正的 DOM 節點
-            parser = new DOMParser();
-            htmlDoc = parser.parseFromString(htmlData, 'text/html');
-            newheader = doc.querySelector('header');
 
-            if (newheader) {
-                // 2. 用 header.html 的 <header> 直接「取代」掉 index.html 的 #header-Container
-                headerContainer.replaceWith(newheader);
-                console.log("[PACE DEBUG] header HTML loaded and replaced.");
+    try {
+        // 2. 獲取資料
+        const response = await fetch('header.html');
+        if (!response.ok) throw new Error('找不到 header.html');
+        const htmlData = await response.text();
 
-                // 3. 後續的事件綁定與初始化依然能正常運作
-                bindheaderEvents();
-                initTheme();
-            } else {
-                console.error('[PACE DEBUG] 在 header.html 中找不到 <header> 標籤');
-            }
+        // 3. 解析 DOM (這裡修正了變數名稱，統一使用 htmlDoc)
+        const parser = new DOMParser();
+        const htmlDoc = parser.parseFromString(htmlData, 'text/html');
+        const newheader = htmlDoc.querySelector('header');
 
-        })
-        .catch(error => {
-            console.error('[PACE DEBUG] 載入 header 失敗：', error);
-        });
-} loadheader();
+        // 4. 執行取代
+        if (newheader) {
+            headerContainer.replaceWith(newheader);
+            console.log("[PACE DEBUG] header HTML loaded and replaced.");
+
+            // 5. 確保 DOM 更新後才綁定事件
+            bindheaderEvents();
+            initTheme();
+        } else {
+            console.error('[PACE DEBUG] 在 header.html 中找不到 <header> 標籤');
+        }
+    } catch (error) {
+        console.error('[PACE DEBUG] 載入 header 失敗：', error);
+    }
+}
+
+// 呼叫方式：建議確保 DOM 載入完成再呼叫
+document.addEventListener('DOMContentLoaded', loadheader);
 // ==========================================
 // 5. 資料處理與渲染
 // ==========================================
@@ -331,75 +335,81 @@ function loadheader() {
 async function fetchStoresFromfirebase() {
     try {
         console.log("[PACE DEBUG] Fetching stores.");
-        querySnapshot = await getDocs(collection(db, "stores"));
-        allStores = [];
+        // 加入 const 宣告
+        const querySnapshot = await getDocs(collection(db, "stores"));
+        const allStores = []; // 區域變數，安全！
+        
         querySnapshot.forEach((doc) => {
             allStores.push({ id: doc.id, ...doc.data() });
         });
-        filterAndRenderStores();
-        renderAdminTable();
+        
+        // 渲染前確認有資料
+        filterAndRenderStores(allStores); 
+        renderAdminTable(allStores);
     } catch (error) {
         console.error("讀取店家失敗：", error);
-        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
+        const storeContainer = document.getElementById('storeContainer'); // 確保抓到容器
+        if (storeContainer) storeContainer.innerHTML = '<div style="color:var(--brand-red);">❌ 無法取得店家資料</div>';
     }
 }
 
-function filterAndRenderStores() {
+// 傳入 allStores 參數，讓函式不需要依賴全域變數
+function filterAndRenderStores(allStores) {
+    const storeContainer = document.getElementById('storeContainer');
     if (!storeContainer) return;
 
-    // 1. 抓取篩選條件
-    citySelect = document.getElementById('citySelect');
-    districtSelect = document.getElementById('districtSelect');
-    globalSearchInput = document.getElementById('globalSearchInput');
+    // 1. 安全抓取篩選條件
+    const citySelect = document.getElementById('citySelect');
+    const districtSelect = document.getElementById('districtSelect');
+    const globalSearchInput = document.getElementById('globalSearchInput');
 
-    selectedCity = citySelect ? citySelect.value : '';
-    selectedDist = districtSelect ? districtSelect.value : '';
-    searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
+    const selectedCity = citySelect ? citySelect.value : '';
+    const selectedDist = districtSelect ? districtSelect.value : '';
+    const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
 
-    // 2. 進行篩選
-    filtered = allStores.filter(store => {
-        matchCity = !selectedCity || store.city === selectedCity;
-        matchDist = !selectedDist || store.district === selectedDist;
-        NameToSearch = store.shopName || store.Name || '';
-        matchKeyword = !searchKeyword || NameToSearch.toLowerCase().includes(searchKeyword);
+    // 2. 篩選
+    const filtered = allStores.filter(store => {
+        const matchCity = !selectedCity || store.city === selectedCity;
+        const matchDist = !selectedDist || store.district === selectedDist;
+        const nameToSearch = (store.shopName || store.Name || '').toLowerCase();
+        const matchKeyword = !searchKeyword || nameToSearch.includes(searchKeyword);
         return matchCity && matchDist && matchKeyword;
     });
 
-    // 3. 如果找不到店家，顯示提示並結束
     if (filtered.length === 0) {
-        storeContainer.innerHTML = '<div class="loading-Spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
+        storeContainer.innerHTML = '<div>🍃 此商圈目前尚無合作店家進駐喔！</div>';
         return;
     }
 
-    // 4. 清空畫面並開始渲染卡片
     storeContainer.innerHTML = "";
 
     filtered.forEach(store => {
         if (store.status === "offline") return;
 
-        // 基本資料準備
-        finalName = store.shopName || store.Name || '未命名店家';
-        finalAddress = store.shopAddress || store.address || '';
-        takeoutSupported = store.isCashPayEnabled !== false;
-        paySupported = store.isOnlinePayEnabled !== false;
+        // 這裡確保變數被正確宣告
+        const finalName = store.shopName || store.Name || '未命名店家';
+        const finalAddress = store.shopAddress || store.address || '';
+        
+        // 處理支付/外帶邏輯
+        const isCashPay = store.isCashPayEnabled !== false;
+        const isOnlinePay = store.isOnlinePayEnabled !== false;
 
-        // 照片處理 (優先顯示 shopLogo)
-        logoData = store.shopLogo || store.emoji || '🏪';
-        finalLogoHtml = logoData;
+        // 照片邏輯
+        let logoData = store.shopLogo || store.emoji || '🏪';
+        let finalLogoHtml = logoData;
         if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
             finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         }
 
-        // 距離計算處理
-        distanceHtml = "<span>⚡ 距離未知</span>";
-        // 確保 buyerLat/Lng 已定義且店家有座標
-        if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
-            dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
+        // 距離計算防錯
+        let distanceHtml = "<span>⚡ 距離未知</span>";
+        if (typeof buyerLat !== 'undefined' && store.lat) {
+            const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
             distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
         }
 
         // 生成卡片
-        card = document.createElement('a');
+        const card = document.createElement('a');
         card.href = `store.html?storeId=${store.id}`;
         card.className = 'store-card';
         card.innerHTML = `
@@ -410,8 +420,8 @@ function filterAndRenderStores() {
                     <div class="store-meta">📍 ${finalAddress} • ${distanceHtml}</div>
                 </div>
                 <div class="store-tags">
-                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
-                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
+                    <span class="tag-time ${isCashPay ? '' : 'inactive'}">💵 現金支付</span>
+                    <span class="tag-pay ${isOnlinePay ? '' : 'inactive'}">💳 支援行動支付</span>
                 </div>
             </div>
         `;
@@ -1162,7 +1172,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 確保只有在 register.html 才執行這段檢查
-    if (window.location.pathName.includes('register.html')) {
+    if (window.location.pathname.includes('register.html')) {
         shopSubmitBtn, lat, lng
         // 你的原本的檢查邏輯
         shopSubmitBtn = document.getElementById('shopSubmitBtn');

@@ -1,21 +1,21 @@
-import { initializeApp } from "https://www.gstatic.com/Firebasejs/9.23.0/Firebase-app.js";
-import { getauth, signInWithPopup, GoogleauthProvider, signOut, onauthStateChanged, signInWithEmailAndPassword, createuserWithEmailAndPassword } from "https://www.gstatic.com/Firebasejs/9.23.0/Firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/Firebasejs/9.23.0/Firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getauth, signInWithPopup, GoogleauthProvider, signOut, onauthStateChanged, signInWithEmailAndPassword, createuserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 // ==========================================
-// 1. Firebase 設定與初始化
+// 1. firebase 設定與初始化
 // ==========================================
-const FirebaseConfig = {
+const firebaseConfig = {
     apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
-    authDomain: "pacetake-c6e1e.Firebaseapp.com",
+    authDomain: "pacetake-c6e1e.firebaseapp.com",
     projectId: "pacetake-c6e1e",
-    storageBucket: "pacetake-c6e1e.Firebasestorage.app",
+    storageBucket: "pacetake-c6e1e.firebasestorage.app",
     messagingSenderId: "1052980235056",
     appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
     measurementId: "G-888XL8JTHW",
 };
 
-export const app = initializeApp(FirebaseConfig);
+export const app = initializeApp(firebaseConfig);
 export const auth = getauth(app);
 export const db = getFirestore(app);
 export const provider = new GoogleauthProvider();
@@ -90,7 +90,7 @@ let parser, newheader, togglePasswordVisibility, type, opt;
 let result, email, password, geocode, location;
 let searchKeyword, filtered, matchCity, matchDist, NameToSearch, matchKeyword;
 let NameVal, NameEl, addrEl, distEl, menuList;
-let FirebaseFirestore, docRef, docSnap, querySnapshot, fallbackDb;
+let firebaseFirestore, docRef, docSnap, querySnapshot, fallbackDb;
 let tbody, tr, handle, currentY, siblings, nextSibling, box, isChecked, menuItem;
 let MAX_WIDTH, scaleSize, ctx, compressedDataUrl;
 let urlParams, logoEl, shopLogoData, finalLogoHtml, count, plusBtn, minusBtn;
@@ -186,7 +186,7 @@ async function handleuserSyncAndRoleRouting(user) {
     }
 
     updateUIForuser(user, currentRole);
-    fetchStoresFromFirebase();
+    fetchStoresFromfirebase();
 }
 
 function updateUIForuser(user, currentRole) {
@@ -328,7 +328,7 @@ function loadheader() {
 // 5. 資料處理與渲染
 // ==========================================
 
-async function fetchStoresFromFirebase() {
+async function fetchStoresFromfirebase() {
     try {
         console.log("[PACE DEBUG] Fetching stores.");
         querySnapshot = await getDocs(collection(db, "stores"));
@@ -632,11 +632,11 @@ window.previewImage = function (input) {
 };
 
 window.deleteStore = async function (storeId) {
-    if (confirm("⚠️ 確定要從 Firebase 徹底刪除這個店家嗎？(刪除後無法恢復)")) {
+    if (confirm("⚠️ 確定要從 firebase 徹底刪除這個店家嗎？(刪除後無法恢復)")) {
         try {
             await deleteDoc(doc(db, "stores", storeId));
             alert("🗑️ 店家已從雲端刪除！");
-            fetchStoresFromFirebase();
+            fetchStoresFromfirebase();
         } catch (error) {
             console.error("刪除店家失敗:", error);
             alert("刪除失敗，請檢查網路或資料庫權限！");
@@ -665,7 +665,7 @@ window.issuePromoCode = async function () {
             code: code.trim(), createdBy: currentuserId, createdAt: new Date().toISOString(),
             isActive: true, usedBy: null
         });
-        alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！`);
+        alert(`🎟️ 邀請碼「${code}」已成功寫入 firebase！`);
     } catch (error) {
         console.error("邀請碼發行失敗:", error);
         alert("發行失敗，請檢查您的系統權限配置！");
@@ -694,8 +694,8 @@ async function initStorePage() {
 
     try {
         storeData = null;
-        // ... (保持你原有的 Firebase 讀取邏輯不變) ...
-        FirebaseFirestore = window.Firebase ? window.Firebase.firestore() : null;
+        // ... (保持你原有的 firebase 讀取邏輯不變) ...
+        firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
         if (typeof db !== 'undefined') {
             try {
                 if (typeof doc === 'function' && typeof getDoc === 'function') {
@@ -706,7 +706,7 @@ async function initStorePage() {
             } catch (innerErr) { }
         }
         if (!storeData) {
-            fallbackDb = typeof db !== 'undefined' ? db : FirebaseFirestore;
+            fallbackDb = typeof db !== 'undefined' ? db : firebaseFirestore;
             if (fallbackDb && typeof fallbackDb.collection === 'function') {
                 docSnap = await fallbackDb.collection("stores").doc(currentStoreId).get();
                 if (docSnap.exists) storeData = docSnap.data();
@@ -865,7 +865,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     globalSearchInput = document.getElementById('globalSearchInput');
     menuUploadList = document.getElementById('menuUploadList');
 
-    // 監聽 Firebase 登入狀態
+    // 監聽 firebase 登入狀態
     onauthStateChanged(auth, (user) => {
         if (user) {
             console.log("[PACE DEBUG] auth state: Logged in", user.uid);
@@ -887,7 +887,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
             if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
             renderDynamicMenu('guest');
-            fetchStoresFromFirebase();
+            fetchStoresFromfirebase();
         }
     });
 
@@ -1313,7 +1313,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                     menu: [], createdAt: new Date().toISOString()
                 });
                 alert("✅ 店家已成功新增至雲端！");
-                fetchStoresFromFirebase();
+                fetchStoresFromfirebase();
             } catch (error) {
                 console.error("新增店家失敗:", error);
                 alert("新增失敗，請檢查網路或資料庫權限！");

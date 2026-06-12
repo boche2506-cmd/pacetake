@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getauth, signInWithPopup, GoogleauthProvider, signOut, onauthStateChanged, signInWithEmailAndPassword, createuserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 // ==========================================
@@ -16,9 +16,9 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
-export const auth = getauth(app);
+export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const provider = new GoogleauthProvider();
+export const provider = new GoogleAuthProvider();
 
 // ==========================================
 // 2. 全域核心變數與資料
@@ -866,7 +866,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     menuUploadList = document.getElementById('menuUploadList');
 
     // 監聽 firebase 登入狀態
-    onauthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("[PACE DEBUG] auth state: Logged in", user.uid);
             handleuserSyncAndRoleRouting(user);
@@ -973,7 +973,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             } catch (loginError) {
                 if (loginError.code === "auth/user-not-found" || loginError.code === "auth/invalid-credential") {
                     try {
-                        result = await createuserWithEmailAndPassword(auth, email, password);
+                        result = await createUserWithEmailAndPassword(auth, email, password);
                         await handleuserSyncAndRoleRouting(result.user);
                     } catch (regError) {
                         alert("註冊密碼強度不足，或帳號已被佔用！");

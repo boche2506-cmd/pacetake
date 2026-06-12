@@ -284,8 +284,8 @@ function bindheaderEvents() {
     }
 
     // 同步當前使用者狀態到 header
-    if (auth.currentuser) {
-        updateUIForuser(auth.currentuser, 'buyer'); // 角色會由 handleuserSyncAndRoleRouting 修正
+    if (auth.currentUser) {
+        updateUIForuser(auth.currentUser, 'buyer'); // 角色會由 handleuserSyncAndRoleRouting 修正
     }
 }
 
@@ -442,7 +442,7 @@ function getBrowserLocation() {
                 if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
                 if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
                 // 💡【新增這行】定位成功後，立刻重新渲染首頁卡片來顯示距離！
-                filterAndRenderStores();
+                filterAndRenderStores(allStores);
             },
             (error) => {
                 currentBuyerAddress = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
@@ -455,7 +455,7 @@ function getBrowserLocation() {
     }
 }
 
-function renderAdminTable() {
+function renderAdminTable(allStores) {
     tbody = document.getElementById('adminStoreTableBody');
     if (!tbody) return;
     tbody.innerHTML = '';
@@ -949,7 +949,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                     });
                 }
             }
-            filterAndRenderStores();
+            filterAndRenderStores(allStores);
         });
     }
     if (districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
@@ -1029,7 +1029,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.log("[PACE] 使用 Google API 查詢：", fullAddress);
 
         // 初始化 Google Geocoder
-        geocoder = new google.maps.Geocoder();
+        const geocoder = new google.maps.Geocoder();
 
         geocoder.geocode({ 'address': fullAddress }, (results, status) => {
             if (status === 'OK') {
@@ -1200,7 +1200,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         shopSubmitBtn.addEventListener('click', async (e) => {
             e.preventDefault();
 
-            user = auth.currentuser;
+            user = auth.currentUser;
             if (!user) { alert("【PACE 提示】開鋪前請先登入帳號喔！"); return; }
 
             // 1. 基本資訊與防呆

@@ -62,17 +62,188 @@ let citySelect, districtSelect, gpsPinBtn, addressDetailLightbox, modalAddressTe
 let menuUploadList = null;
 let activeDragItem = null;
 
+// --- 2. 初始化函式 (負責把那 17 行活化) ---
+    // 全部直接宣告在全域，不用包進任何函式
+const userNameDisplay = document.getElementById('userNameDisplay');
+const storeContainer = document.getElementById('store-container');
+const googleLoginAction = document.getElementById('googleLoginAction');
+const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
+const emailFormSection = document.getElementById('emailFormSection');
+const customReturnBtn = document.getElementById('customReturnBtn');
+const loginEmailInput = document.getElementById('loginEmail');
+const loginPasswordInput = document.getElementById('loginPassword');
+const emailLoginAction = document.getElementById('emailLoginAction');
+const citySelect = document.getElementById('citySelect');
+const districtSelect = document.getElementById('districtSelect');
+const gpsPinBtn = document.getElementById('gpsPinBtn');
+const addressDetailLightbox = document.getElementById('addressDetailLightbox');
+const modalAddressText = document.getElementById('modalAddressText');
+const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
+const globalSearchInput = document.getElementById('globalSearchInput');
+const menuUploadList = document.getElementById('menuUploadList');
+
+// 接著是下面那 6 行
+const toggleOnline = document.getElementById('toggleOnline');
+const toggleCash = document.getElementById('toggleCash');
+const newebpayContainer = document.getElementById('newebpayContainer');
+const cashWarningModal = document.getElementById('cashWarningModal');
+const warningConfirmBtn = document.getElementById('warningConfirmBtn');
+const warningCancelBtn = document.getElementById('warningCancelBtn');
+
 // ==========================================
 // 3. 核心功能函式
 // ==========================================
+// 監聽 Firebase 登入狀態
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
+        handleUserSyncAndRoleRouting(user);
+    } else {
+        console.log("[PACE DEBUG] Auth state: Logged out");
+        loginBtn = document.getElementById('loginBtn');
+        avatarBtn = document.getElementById('avatarBtn');
+        dropdownMenu = document.getElementById('dropdownMenu');
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (avatarBtn) {
+            avatarBtn.style.display = 'none';
+            dropdownMenu.style.display = 'none';
+            dropdownMenu.innerHTML = '';
+        }
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        if (statusDot) statusDot.classList.remove('active');
+        if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
+        if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
+        renderDynamicMenu('guest');
+        fetchStoresFromFirebase();
+    }
+});
+async function handleUserSyncAndRoleRouting(user) {
+    if (!user) return;
+    currentUserId = user.uid;
+    console.log("[PACE DEBUG] User synced:", user.uid);
 
-function renderheader() {
-    const headerContainer = document.getElementById('header');
-    if (!headerContainer) return;
+    let currentRole = "buyer";
+    try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+            currentRole = userDoc.data().role || "buyer";
+        } else {
+            await setDoc(doc(db, "users", user.uid), {
+                uid: user.uid,
+                email: user.email,
+                role: "buyer",
+                createdAt: new Date().toISOString()
+            });
+        }
+    } catch (e) {
+        console.error("Role routing error:", e);
+    }
 
-    headerContainer.innerHTML = `
-        
+    updateUIForUser(user, currentRole);
+    fetchStoresFromFirebase();
+}
+function initTheme() {
+    console.log("[PACE DEBUG] 函式被呼叫了！");
+    const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeToggleBtn = document.getElementById('themeToggleBtn');
+    if (themeToggleBtn) {
+        themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    }
+}
+
+function updateUIForUser(user, currentRole) {
+    loginBtn = document.getElementById('loginBtn');
+    avatarBtn = document.getElementById('avatarBtn');
+    loginLightbox = document.getElementById('loginLightbox');
+    userNameDisplay = document.getElementById('userNameDisplay');
+
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (avatarBtn) avatarBtn.style.display = 'flex';
+    if (loginLightbox) loginLightbox.style.display = 'none';
+
+    if (userNameDisplay) {
+        if (currentRole === "admin") {
+            userNameDisplay.innerHTML = `👑 總管`;
+        } else if (currentRole === "seller") {
+            userNameDisplay.innerHTML = `🏪 老闆`;
+        } else {
+            userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
+        }
+    }
+
+    const userAvatarImg = document.getElementById('userAvatarImg');
+    const defaultIcon = document.getElementById('defaultIcon');
+    if (user.photoURL && userAvatarImg && defaultIcon) {
+        userAvatarImg.src = user.photoURL;
+        userAvatarImg.style.display = 'block';
+        defaultIcon.style.display = 'none';
+    } else if (defaultIcon) {
+        if (userAvatarImg) userAvatarImg.style.display = 'none';
+        defaultIcon.style.display = 'block';
+    }
+
+    const statusText = document.getElementById('statusText');
+    const statusDot = document.getElementById('statusDot');
+    if (statusDot) statusDot.classList.add('active');
+    if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
+
+    renderDynamicMenu(currentRole);
+}
+
+function renderDynamicMenu(role) {
+    const menuContainer = document.getElementById('dropdownMenu');
+    if (!menuContainer) return;
+
+    let menuHTML = '';
+
+    menuHTML += `
+        <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
+        <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
     `;
+
+    if (role === 'buyer' || role === 'admin') {
+        menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
+    }
+
+    if (role === 'seller' || role === 'admin') {
+        menuHTML += `
+            <div class="menu-divider"></div>
+            <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
+            <a href="manage.html" class="nav-fast">⚙️ 店舖管理</a>
+            <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
+        `;
+    }
+
+    if (role === 'admin') {
+        menuHTML += `
+            <div class="menu-divider"></div>
+            <a href="javascript:void(0)" onclick="window.toggleView('admin')" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
+            <a href="javascript:void(0)" onclick="window.issuePromoCode()" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
+            
+        `;
+    }
+
+    menuHTML += `
+        <div class="menu-divider"></div>
+        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
+    `;
+
+    dropdownMenu.innerHTML = menuHTML;
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            console.log("[PACE DEBUG] Logout clicked.");
+            try {
+                await signOut(auth);
+                location.reload();
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+        });
+    }
 }
 
 async function fetchStoresFromFirebase() {
@@ -219,159 +390,6 @@ function renderAdminTable() {
     });
 }
 
-// 監聽 Firebase 登入狀態
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
-        handleUserSyncAndRoleRouting(user);
-    } else {
-        console.log("[PACE DEBUG] Auth state: Logged out");
-        loginBtn = document.getElementById('loginBtn');
-        avatarBtn = document.getElementById('avatarBtn');
-        dropdownMenu = document.getElementById('dropdownMenu');
-        if (loginBtn) loginBtn.style.display = 'block';
-        if (avatarBtn) {
-            avatarBtn.style.display = 'none';
-            dropdownMenu.style.display = 'none';
-            dropdownMenu.innerHTML = '';
-        }
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
-        if (statusDot) statusDot.classList.remove('active');
-        if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
-        if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
-        renderDynamicMenu('guest');
-        fetchStoresFromFirebase();
-    }
-});
-
-function initTheme() {
-    const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    themeToggleBtn = document.getElementById('themeToggleBtn');
-    if (themeToggleBtn) {
-        themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-    }
-}
-
-function renderDynamicMenu(role) {
-    const menuContainer = document.getElementById('dropdownMenu');
-    if (!menuContainer) return;
-
-    let menuHTML = '';
-
-    menuHTML += `
-        <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
-        <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
-    `;
-
-    if (role === 'buyer' || role === 'admin') {
-        menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
-    }
-
-    if (role === 'seller' || role === 'admin') {
-        menuHTML += `
-            <div class="menu-divider"></div>
-            <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
-            <a href="manage.html" class="nav-fast">⚙️ 店舖管理</a>
-            <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
-        `;
-    }
-
-    if (role === 'admin') {
-        menuHTML += `
-            <div class="menu-divider"></div>
-            <a href="javascript:void(0)" onclick="window.toggleView('admin')" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
-            <a href="javascript:void(0)" onclick="window.issuePromoCode()" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
-            
-        `;
-    }
-
-    menuHTML += `
-        <div class="menu-divider"></div>
-        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
-    `;
-
-    dropdownMenu.innerHTML = menuHTML;
-
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            console.log("[PACE DEBUG] Logout clicked.");
-            try {
-                await signOut(auth);
-                location.reload();
-            } catch (error) {
-                console.error("Logout error:", error);
-            }
-        });
-    }
-}
-
-async function handleUserSyncAndRoleRouting(user) {
-    if (!user) return;
-    currentUserId = user.uid;
-    console.log("[PACE DEBUG] User synced:", user.uid);
-
-    let currentRole = "buyer";
-    try {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-            currentRole = userDoc.data().role || "buyer";
-        } else {
-            await setDoc(doc(db, "users", user.uid), {
-                uid: user.uid,
-                email: user.email,
-                role: "buyer",
-                createdAt: new Date().toISOString()
-            });
-        }
-    } catch (e) {
-        console.error("Role routing error:", e);
-    }
-
-    updateUIForUser(user, currentRole);
-    fetchStoresFromFirebase();
-}
-
-function updateUIForUser(user, currentRole) {
-    loginBtn = document.getElementById('loginBtn');
-    avatarBtn = document.getElementById('avatarBtn');
-    loginLightbox = document.getElementById('loginLightbox');
-    userNameDisplay = document.getElementById('userNameDisplay');
-
-    if (loginBtn) loginBtn.style.display = 'none';
-    if (avatarBtn) avatarBtn.style.display = 'flex';
-    if (loginLightbox) loginLightbox.style.display = 'none';
-
-    if (userNameDisplay) {
-        if (currentRole === "admin") {
-            userNameDisplay.innerHTML = `👑 總管`;
-        } else if (currentRole === "seller") {
-            userNameDisplay.innerHTML = `🏪 老闆`;
-        } else {
-            userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
-        }
-    }
-
-    const userAvatarImg = document.getElementById('userAvatarImg');
-    const defaultIcon = document.getElementById('defaultIcon');
-    if (user.photoURL && userAvatarImg && defaultIcon) {
-        userAvatarImg.src = user.photoURL;
-        userAvatarImg.style.display = 'block';
-        defaultIcon.style.display = 'none';
-    } else if (defaultIcon) {
-        if (userAvatarImg) userAvatarImg.style.display = 'none';
-        defaultIcon.style.display = 'block';
-    }
-
-    const statusText = document.getElementById('statusText');
-    const statusDot = document.getElementById('statusDot');
-    if (statusDot) statusDot.classList.add('active');
-    if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
-
-    renderDynamicMenu(currentRole);
-}
 
 // ==========================================
 // 📍 計算兩點經緯度距離 (回傳公里數)
@@ -428,36 +446,10 @@ function bindHeaderEvents() {
         });
     }
 
-    // 同步當前使用者狀態到 Header
     if (auth.currentUser) {
         updateUIForUser(auth.currentUser, 'buyer'); // 角色會由 handleUserSyncAndRoleRouting 修正
     }
 }
-
-window.toggleSizeFields = toggleSizeFields;
-// 優先執行 Header 載入
-loadheader();
-
-// 非 Header 元件抓取
-userNameDisplay = document.getElementById('userNameDisplay');
-storeContainer = document.getElementById('store-container');
-googleLoginAction = document.getElementById('googleLoginAction');
-toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
-emailFormSection = document.getElementById('emailFormSection');
-customReturnBtn = document.getElementById('customReturnBtn');
-loginEmailInput = document.getElementById('loginEmail');
-loginPasswordInput = document.getElementById('loginPassword');
-emailLoginAction = document.getElementById('emailLoginAction');
-citySelect = document.getElementById('citySelect');
-districtSelect = document.getElementById('districtSelect');
-gpsPinBtn = document.getElementById('gpsPinBtn');
-addressDetailLightbox = document.getElementById('addressDetailLightbox');
-modalAddressText = document.getElementById('modalAddressText');
-closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
-globalSearchInput = document.getElementById('globalSearchInput');
-menuUploadList = document.getElementById('menuUploadList');
-
-
 
 // 頁面固定元件事件綁定
 if (customReturnBtn) customReturnBtn.addEventListener('click', () => {
@@ -602,13 +594,6 @@ document.getElementById('shopAddress')?.addEventListener('blur', () => {
     });
 });
 
-const toggleOnline = document.getElementById('toggleOnline');
-const toggleCash = document.getElementById('toggleCash');
-const newebpayContainer = document.getElementById('newebpayContainer');
-const cashWarningModal = document.getElementById('cashWarningModal');
-const warningConfirmBtn = document.getElementById('warningConfirmBtn');
-const warningCancelBtn = document.getElementById('warningCancelBtn');
-
 if (newebpayContainer) {
     newebpayContainer.innerHTML = `
             <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
@@ -663,9 +648,10 @@ if (addItemRowBtn && menuUploadList) {
     addItemRowBtn.addEventListener('click', () => {
         console.log("[PACE DEBUG] Add item row clicked.");
         const newRow = document.createElement('div');
-        newRow.className = 'menu-item-row';
+        newRow.className = 'menu-upload-list';
         newRow.innerHTML = `
-                    <div class="menu-item">
+                <div class="menu-item-row">
+                        <div class="menu-item">
                             <div class="img-upload-box" onclick="triggerUpload(this)">
                                 <input type="file" class="image-input" accept="image/*" style="display: none;"
                                     onchange="previewImage(this)">
@@ -723,6 +709,7 @@ if (addItemRowBtn && menuUploadList) {
                                 </span>
                             </label>
                         </div>
+                    </div>
             `;
         menuUploadList.appendChild(newRow);
         makeItemDraggable(newRow);
@@ -860,13 +847,7 @@ if (shopSubmitBtn) {
 }
 
 // ==========================================
-// 5. 資料處理與渲染
-// ==========================================
-
-
-
-// ==========================================
-// 6. 拖曳菜單專屬函式區 (賣家)
+// 拖曳菜單專屬函式區 (賣家)
 // ==========================================
 function makeItemDraggable(row) {
     const handle = row.querySelector('.drag-handle');

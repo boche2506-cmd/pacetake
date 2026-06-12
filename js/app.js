@@ -86,7 +86,7 @@ let isSizeMode, itemObj, isCashPayEnabled, isOnlinePayEnabled;
 let itemId, itemName, itemPrice, itemImg, isSoldOut, menuData, isLocalSoldOut, finalIsSoldOut;
 
 // 5. 臨時運算與輔助變數
-let parser, doc, newheader, togglePasswordVisibility, type, opt;
+let parser, newheader, togglePasswordVisibility, type, opt;
 let result, email, password, geocode, location;
 let searchKeyword, filtered, matchCity, matchDist, NameToSearch, matchKeyword;
 let NameVal, NameEl, addrEl, distEl, menuList;
@@ -304,7 +304,7 @@ function loadheader() {
         .then(htmlData => {
             // 1. 將讀取到的文字轉換成真正的 DOM 節點
             parser = new DOMParser();
-            doc = parser.parseFromString(htmlData, 'text/html');
+            htmlDoc = parser.parseFromString(htmlData, 'text/html');
             newheader = doc.querySelector('header');
 
             if (newheader) {

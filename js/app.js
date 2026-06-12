@@ -93,8 +93,8 @@ let NameVal, NameEl, addrEl, distEl, menuList;
 let firebaseFirestore, docRef, docSnap, querySnapshot, fallbackDb;
 let tbody, tr, handle, currentY, siblings, nextSibling, box, isChecked, menuItem;
 let MAX_WIDTH, scaleSize, ctx, compressedDataUrl;
-let urlParams, logoEl, shopLogoData, finalLogoHtml, count, plusBtn, minusBtn;
-let foodCard, finalNameVal, finalAddres; // 修正拼字命名
+let urlParams, logoEl, shopLogoData, finalLogoHtml, count, plusBtn, minusBtn, logoData;
+let foodCard, finalNameVal, finalAddres,htmlDoc; // 修正拼字命名
 
 // ==========================================
 // 3. 核心功能函式

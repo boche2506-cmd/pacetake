@@ -134,7 +134,7 @@ img, .card {
 }
 
 .header {
-    height: 18%;
+    height: 16%;
     max-width: 100%;
     display: flex;
     flex-direction: column; 

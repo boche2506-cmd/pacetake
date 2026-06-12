@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
-
     <!-- Favicon & Apple Touch Icon -->
     <link rel="icon" type="image/png" href="png/logoapple.png" sizes="180x180">
     <link rel="apple-touch-icon" href="png/logoapple.png">
     <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
-
     <link rel="stylesheet" href="style.css">
-<style>
+    <style>
         /* 全局變數與主題防線 (全面對齊系統規範) */
         :root {
             --bg-global: #F8FAFC;
@@ -339,18 +338,27 @@
     <div class="phone-wrapper">
         <!-- 頂部一體化導覽列 -->
         <div id="buyerView" style="display: block;">
-            <header class="header">
-                <!-- 最左側：巨型盲操營業開關 -->
-                <button class="status-toggle-btn" id="shopStatusToggle">🟢 營業中</button>
-
-                <!-- 右側快速跳轉群組與日夜同步鈕 -->
-                <div class="nav-right-group">
-                    <button class="theme-toggle" id="themeToggleBtn">🌓</button>
-                    <a href="index.html" class="nav-btn nav-fast">🏠 首頁</a>
-                    <a href="manage.html" class="nav-btn nav-fast">⚙️ 管理</a>
+            <header id="header">
+                <div class="pace-logo">
+                    <a href="index.html" class="logo-link">
+                        <img src="png/pace3.png" alt="派思 官方網站">
+                    </a>
+                    <span id="defaultIcon" class="avatar-icon">👤</span>
+                    <img id="userAvatarImg" src=""
+                        style="font-weight: 500; display: none; border-radius: 50%;font-size: 4.25cqw; height: 75%; max-width: 30%; flex-direction: row; justify-content: flex-end; align-items: flex-end;">
+                </div>
+                <div class="two">
+                    <div class="pace">
+                        <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+                        <span>店內價外帶自取/點餐系統</span>
+                    </div>
+                    <button class="login-btn" id="loginBtn">登入/註冊</button>
+                    <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+                        <span class="user-name" id="userNameDisplay"></span></button>
+                    <div class="dropdown-menu" id="dropdownMenu"></div>
                 </div>
             </header>
-
+            <button class="status-toggle-btn" id="shopStatusToggle">🟢 營業中</button>
             <!-- 橫向滑動列：訂單編號常亮 -->
             <div class="order-tabs-scroll" id="orderTabsContainer">
                 <div class="order-tab active" id="tab_023">#023</div>
@@ -409,8 +417,8 @@
             </div>
         </div>
     </div>
-    <script type="module" src="js/app.js"></script>
     <script src="js/cart-manager.js"></script>
+    <script type="module" src="js/app.js"></script>
     <script>
         // 🚀 0秒無縫閃轉外掛核心架構
         function bindFastClick(element, callback) {

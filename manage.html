@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
-
     <!-- Favicon & Apple Touch Icon -->
     <link rel="icon" type="image/png" href="png/logoapple.png" sizes="180x180">
     <link rel="apple-touch-icon" href="png/logoapple.png">
     <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
-
     <link rel="stylesheet" href="style.css">
-<style>
+    <style>
         /* 全局變數與主題防線 */
         :root {
             --bg-global: #F8FAFC;
@@ -433,25 +432,25 @@
     <div class="phone-wrapper">
         <!-- 頂部導覽列 -->
         <div id="buyerView" style="display: block;">
-            <header id="header-Container"></header>
-            <div class="nav-left-group">
-                <a href="seller.html" class="back-btn nav-fast">🧑‍🍳 接單後台</a>
-                <a href="index.html" class="back-btn nav-fast">🏠 首頁</a>
-            </div>
-
-            <div class="control-panel">
-                <button class="theme-toggle" id="themeToggleBtn">🌓</button>
-                <button class="avatar-btn" id="avatarMenuBtn">🧑‍💼 帳號</button>
-
-                <!-- 用戶下拉選單 (內建當前頁面高亮) -->
-                <div class="dropdown-menu" id="userDropdown">
-                    <a href="index.html" class="nav-fast">🛒 我的訂單</a>
-                    <a href="register.html" class="nav-fast">💼 月費開店</a>
-                    <div class="menu-divider"></div>
-                    <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
-                    <a href="manage.html" class="nav-fast current-page">⚙️ 後台管理</a>
+            <header id="header">
+                <div class="pace-logo">
+                    <a href="index.html" class="logo-link">
+                        <img src="png/pace3.png" alt="派思 官方網站">
+                    </a>
+                    <span id="defaultIcon" class="avatar-icon">👤</span>
+                    <img id="userAvatarImg" src=""
+                        style="font-weight: 500; display: none; border-radius: 50%;font-size: 4.25cqw; height: 75%; max-width: 30%; flex-direction: row; justify-content: flex-end; align-items: flex-end;">
                 </div>
-            </div>
+                <div class="two">
+                    <div class="pace">
+                        <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+                        <span>店內價外帶自取/點餐系統</span>
+                    </div>
+                    <button class="login-btn" id="loginBtn">登入/註冊</button>
+                    <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+                        <span class="user-name" id="userNameDisplay"></span></button>
+                    <div class="dropdown-menu" id="dropdownMenu"></div>
+                </div>
             </header>
 
             <main class="main-content">
@@ -540,10 +539,10 @@
             </main>
         </div>
     </div>
-    <script type="module" src="js/app.js"></script>
     <script src="js/cart-manager.js"></script>
+    <script type="module" src="js/app.js"></script>
     <script>
-       
+
         // 💾 QR Code 效能解放優化：即時高速原生 API 生成並下載 SVG
         const generateDownloadBtn = document.getElementById('generateDownloadBtn');
         bindFastClick(generateDownloadBtn, () => {

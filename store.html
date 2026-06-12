@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PACE 派思 pacetake.tw 首頁</title>
+    <title>PACE 派思 pacetake.tw - 買家首頁</title>
     <!-- Favicon & Apple Touch Icon -->
     <link rel="icon" type="image/png" href="png/logoapple.png" sizes="180x180">
     <link rel="apple-touch-icon" href="png/logoapple.png">
@@ -217,7 +217,26 @@
 <body>
     <div class="phone-wrapper">
         <div id="buyerView">
-            <header id="header-Container"></header>
+            <header id="header">
+                <div class="pace-logo">
+                    <a href="index.html" class="logo-link">
+                        <img src="png/pace3.png" alt="派思 官方網站">
+                    </a>
+                    <span id="defaultIcon" class="avatar-icon">👤</span>
+                    <img id="userAvatarImg" src=""
+                        style="font-weight: 500; display: none; border-radius: 50%;font-size: 4.25cqw; height: 75%; max-width: 30%; flex-direction: row; justify-content: flex-end; align-items: flex-end;">
+                </div>
+                <div class="two">
+                    <div class="pace">
+                        <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+                        <span>店內價外帶自取/點餐系統</span>
+                    </div>
+                    <button class="login-btn" id="loginBtn">登入/註冊</button>
+                    <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+                        <span class="user-name" id="userNameDisplay"></span></button>
+                    <div class="dropdown-menu" id="dropdownMenu"></div>
+                </div>
+            </header>
 
             <div class="store">
                 <div class="store-header-info" id="storeHeaderInfo">
@@ -240,8 +259,8 @@
             </footer>
         </div>
     </div>
-    <script type="module" src="js/app.js"></script>
     <script src="js/cart-manager.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 
 </html>

@@ -1,483 +1,611 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
-
     <!-- Favicon & Apple Touch Icon -->
     <link rel="icon" type="image/png" href="png/logoapple.png" sizes="180x180">
     <link rel="apple-touch-icon" href="png/logoapple.png">
     <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
-
     <link rel="stylesheet" href="style.css">
-<style>
-/* 👑 頂部全區常駐吸附天花板 (Sticky) */
+    <style>
+        /* 👑 頂部全區常駐吸附天花板 (Sticky) */
 
-* {
-    box-sizing: border-box;
-}
+        * {
+            box-sizing: border-box;
+        }
 
-.sticky-top-group {
-    /* 這裡的高度與寬度原本是 15% 和 100%，我們用 cqw 重新定義它們的比例 */
-    height: 12%;
-    max-width: 100%;               
-    display: flex;
-    flex-direction: column; 
-    justify-content: flex-start;   /* 改用 space-between 讓上下兩列自動均分上下空間 */
-    align-items: stretch;
-    box-sizing: border-box;
-    border-bottom: 0.2cqw solid var(--border-color);
-    padding: 0 2cqw 2cqw;          /* 使用 cqw 控制外襯 padding */
-}
+        .sticky-top-group {
+            /* 這裡的高度與寬度原本是 15% 和 100%，我們用 cqw 重新定義它們的比例 */
+            height: 12%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            /* 改用 space-between 讓上下兩列自動均分上下空間 */
+            align-items: stretch;
+            box-sizing: border-box;
+            border-bottom: 0.2cqw solid var(--border-color);
+            padding: 0 2cqw 2cqw;
+            /* 使用 cqw 控制外襯 padding */
+        }
 
-/* 上層：位置列 */
-.location-bar {
-    height: 55%;
-    max-width: 100%; 
-    display: flex;
-    flex-direction: row; 
-    justify-content: space-between; 
-    align-items: center; 
-    box-sizing: border-box;
-    gap: 2cqw;                   /* 元件間距改用 cqw */
-}
+        /* 上層：位置列 */
+        .location-bar {
+            height: 55%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            gap: 2cqw;
+            /* 元件間距改用 cqw */
+        }
 
-/* 📍 目前位置按鈕 */
-.gps-trigger-btn {
-    font-size: 4cqw;           /* 字體改用 cqw */
-    color: var(--brand-blue);
-    background-color: var(--card-bg);
-    border: 0.3cqw solid var(--border-color); /* 邊框粗細 cqw */
-    border-radius: 5cqw;         /* 圓角改用 cqw */
-    cursor: pointer;    
-    white-space: nowrap; 
-    box-shadow: var(--shadow-sm);
-    height: 80%;                 /* 讓它在 location-bar 裡自然撐高 */
-    width: 34%;                /* 給予固定的 cqw 寬度 */
-    display: flex;
-    flex-direction: row;
-    justify-content: center; 
-    align-items: center;
-    box-sizing: border-box; 
-    line-height: 1;
-}
+        /* 📍 目前位置按鈕 */
+        .gps-trigger-btn {
+            font-size: 4cqw;
+            /* 字體改用 cqw */
+            color: var(--brand-blue);
+            background-color: var(--card-bg);
+            border: 0.3cqw solid var(--border-color);
+            /* 邊框粗細 cqw */
+            border-radius: 5cqw;
+            /* 圓角改用 cqw */
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: var(--shadow-sm);
+            height: 80%;
+            /* 讓它在 location-bar 裡自然撐高 */
+            width: 34%;
+            /* 給予固定的 cqw 寬度 */
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            line-height: 1;
+        }
 
-/* 下拉選單群組 (縣市 + 區域) */
-.location-select-group {
-    height: 80%;
-    width: 66%;                /* 與 GPS 按鈕加起來剛好分配總寬度 */
-    gap: 2cqw;                 /* 縣市和區域中間的間距 */
-    display: flex;
-    flex-direction: row; 
-    justify-content: space-between; 
-    align-items: center; 
-    box-sizing: border-box;
-}
+        /* 下拉選單群組 (縣市 + 區域) */
+        .location-select-group {
+            height: 80%;
+            width: 66%;
+            /* 與 GPS 按鈕加起來剛好分配總寬度 */
+            gap: 2cqw;
+            /* 縣市和區域中間的間距 */
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
 
-/* 縣市、區域下拉選單本體 */
-.nav-select {
-    border-radius: 5cqw;       /* 圓角改用 cqw */
-    border: 0.3cqw solid var(--border-color);
-    background-color: var(--bg-global);
-    color: var(--text-main);
-    font-size: 4cqw;           /* 字體與按鈕對齊 */
-    outline: none;            
-    cursor: pointer;          
-    height: 100%;
-    width: 50%;
-    padding: 0 2cqw;             /* 讓裡面的文字不會太貼邊框 */
-    box-sizing: border-box;
-    line-height: 1;
-}
+        /* 縣市、區域下拉選單本體 */
+        .nav-select {
+            border-radius: 5cqw;
+            /* 圓角改用 cqw */
+            border: 0.3cqw solid var(--border-color);
+            background-color: var(--bg-global);
+            color: var(--text-main);
+            font-size: 4cqw;
+            /* 字體與按鈕對齊 */
+            outline: none;
+            cursor: pointer;
+            height: 100%;
+            width: 50%;
+            padding: 0 2cqw;
+            /* 讓裡面的文字不會太貼邊框 */
+            box-sizing: border-box;
+            line-height: 1;
+        }
 
-/* 下層：搜尋列外殼 */
-.search {
-    height: 45%;
-    width: 100%; 
-    display: flex;
-    flex-direction: row; 
-    justify-content: center; 
-    align-items: center; 
-    box-sizing: border-box;
-    line-height: 1;
-}
+        /* 下層：搜尋列外殼 */
+        .search {
+            height: 45%;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            line-height: 1;
+        }
 
-/* 搜尋框大盒子 */
-.search-box {
-    height: 100%;
-    width: 95%; 
-    background-color: var(--bg-global);
-    border: 0.3cqw solid var(--border-color);
-    border-radius: 5cqw;       /* 圓角改用 cqw */
-    display: flex;
-    align-items: center;
-    padding: 0 3cqw;             /* 左右內襯 */
-    box-sizing: border-box;
-    gap: 1.5cqw;                 /* 放大鏡圖示與輸入框的間距 */
-}
+        /* 搜尋框大盒子 */
+        .search-box {
+            height: 100%;
+            width: 95%;
+            background-color: var(--bg-global);
+            border: 0.3cqw solid var(--border-color);
+            border-radius: 5cqw;
+            /* 圓角改用 cqw */
+            display: flex;
+            align-items: center;
+            padding: 0 3cqw;
+            /* 左右內襯 */
+            box-sizing: border-box;
+            gap: 1.5cqw;
+            /* 放大鏡圖示與輸入框的間距 */
+        }
 
-/* 🔍 放大鏡 Emoji */
-.search-box span {
-    font-size: 4cqw;             /* 稍微放大一點比較好看 */
-}
+        /* 🔍 放大鏡 Emoji */
+        .search-box span {
+            font-size: 4cqw;
+            /* 稍微放大一點比較好看 */
+        }
 
-/* 輸入框文字本體 */
-.search-box input {
-    width: 100%;                 /* 撐滿剩下的空間 */
-    border: none;       
-    background: none;   
-    font-size: 5cqw;           /* 字體改用 cqw */
-    color: var(--text-main);
-    outline: none;
-    text-align: left;
-    padding: 0;
-}
+        /* 輸入框文字本體 */
+        .search-box input {
+            width: 100%;
+            /* 撐滿剩下的空間 */
+            border: none;
+            background: none;
+            font-size: 5cqw;
+            /* 字體改用 cqw */
+            color: var(--text-main);
+            outline: none;
+            text-align: left;
+            padding: 0;
+        }
 
-/* ==========================================================================
+        /* ==========================================================================
    7. 店家列表 (Store List)
    ========================================================================== */
-/* 店家列表大容器（佔畫面高55%） */
-.store-list {
-    height: 57%;
-    max-width: 100%;               
-    overflow-y: auto;       
-    display: flex;
-    flex-direction: column;
-    gap: 1cqw;                   /* 卡片與卡片之間的間距改用 cqw */
-    padding: 2cqw 3cqw 2cqw 4cqw; /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
-    box-sizing: border-box;
-}
+        /* 店家列表大容器（佔畫面高55%） */
+        .store-list {
+            height: 57%;
+            max-width: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1cqw;
+            /* 卡片與卡片之間的間距改用 cqw */
+            padding: 2cqw 3cqw 2cqw 4cqw;
+            /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
+            box-sizing: border-box;
+        }
 
-/* 店家單一卡片 */
-.store-card {
-    /* height: 35%; */            /* ❌ 建議移除百分比高度，因為內容物（圖片、文字、標籤）*/
-                                 /* 改用 cqw 後，讓卡片高度被內容自然撐開（或改用 min-height） */
-    min-height: 24cqw;           /* 💡 新增：設定最小高度，確保卡片視覺比例穩固 */
-    width: 100%;                 /* 撐滿 store-list 的寬度（扣除 padding） */
-    display: flex;
-    align-items: center;
-    gap: 3cqw;                   /* 圖片與文字區塊的間距 */
-    background-color: var(--card-bg);
-    border: 0.3cqw solid var(--border-color);
-    border-radius: 4cqw;         /* 圓角改用 cqw */
-    text-decoration: none;
-    color: inherit;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    padding: 1cqw;             /* 卡片內部內襯改用 cqw */
-    box-sizing: border-box;
-}
+        /* 店家單一卡片 */
+        .store-card {
+            /* height: 35%; */
+            /* ❌ 建議移除百分比高度，因為內容物（圖片、文字、標籤）*/
+            /* 改用 cqw 後，讓卡片高度被內容自然撐開（或改用 min-height） */
+            min-height: 24cqw;
+            /* 💡 新增：設定最小高度，確保卡片視覺比例穩固 */
+            width: 100%;
+            /* 撐滿 store-list 的寬度（扣除 padding） */
+            display: flex;
+            align-items: center;
+            gap: 3cqw;
+            /* 圖片與文字區塊的間距 */
+            background-color: var(--card-bg);
+            border: 0.3cqw solid var(--border-color);
+            border-radius: 4cqw;
+            /* 圓角改用 cqw */
+            text-decoration: none;
+            color: inherit;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            padding: 1cqw;
+            /* 卡片內部內襯改用 cqw */
+            box-sizing: border-box;
+        }
 
-.store-card:hover {
-    transform: translateY(-0.5cqw);
-    box-shadow: 0 1cqw 3cqw rgba(0,0,0,0.06);
-}
+        .store-card:hover {
+            transform: translateY(-0.5cqw);
+            box-shadow: 0 1cqw 3cqw rgba(0, 0, 0, 0.06);
+        }
 
-/* 左側店家圖示外殼 */
-.store-img {
-    width: 14cqw;                /* 依比例放大/縮小 */
-    height: 14cqw;
-    background-color: var(--bg-global);
-    border-radius: 3cqw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 6cqw;             /* 裡面的 Emoji 大小 */
-    flex-shrink: 0;              /* 💡 關鍵：強迫圖片絕對不能被右邊的文字擠壓變形 */
-}
+        /* 左側店家圖示外殼 */
+        .store-img {
+            width: 14cqw;
+            /* 依比例放大/縮小 */
+            height: 14cqw;
+            background-color: var(--bg-global);
+            border-radius: 3cqw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6cqw;
+            /* 裡面的 Emoji 大小 */
+            flex-shrink: 0;
+            /* 💡 關鍵：強迫圖片絕對不能被右邊的文字擠壓變形 */
+        }
 
-/* 右側文字資訊大外殼 */
-.store-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-grow: 1;                /* 💡 關鍵：讓文字區塊拿走剩下的所有寬度，點點點才會精準生效 */
-    overflow: hidden;            /* 💡 關鍵：防止內部文字把外殼撐開 */
-    gap: 1.5cqw;
-}
+        /* 右側文字資訊大外殼 */
+        .store-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-grow: 1;
+            /* 💡 關鍵：讓文字區塊拿走剩下的所有寬度，點點點才會精準生效 */
+            overflow: hidden;
+            /* 💡 關鍵：防止內部文字把外殼撐開 */
+            gap: 1.5cqw;
+        }
 
-.store {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-grow: 1;                /* 💡 關鍵：讓文字區塊拿走剩下的所有寬度，點點點才會精準生效 */
-    overflow: hidden;            /* 💡 關鍵：防止內部文字把外殼撐開 */
-    gap: 1.5cqw;
-}
+        .store {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-grow: 1;
+            /* 💡 關鍵：讓文字區塊拿走剩下的所有寬度，點點點才會精準生效 */
+            overflow: hidden;
+            /* 💡 關鍵：防止內部文字把外殼撐開 */
+            gap: 1.5cqw;
+        }
 
-/* 店家名稱 */
-.store-name {
-    font-size: 6cqw;           /* 字體改用 cqw */
-    font-weight: 600;
-    color: var(--text-main);
-    white-space: nowrap;   
-    overflow: hidden;            /* 💡 新增：隱藏超出部分 */
-    text-overflow: ellipsis;     /* 超出顯示 ... */
-}
+        /* 店家名稱 */
+        .store-name {
+            font-size: 6cqw;
+            /* 字體改用 cqw */
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            /* 💡 新增：隱藏超出部分 */
+            text-overflow: ellipsis;
+            /* 超出顯示 ... */
+        }
 
-/* 📍 店家地址/距離（你要的太長顯示...設定在這裡） */
-.store-meta {
-    font-size: 3cqw;             /* 字體改用 cqw */
-    color: var(--text-muted);
-    white-space: nowrap;   
-    overflow: hidden;            /* 💡 關鍵：隱藏超出寬度的字 */
-    text-overflow: ellipsis;     /* 💡 關鍵：超出部分自動變成 ... */
-    max-width: 100%;             /* 💡 關鍵：限制最大寬度為父層的 100% */
-}
+        /* 📍 店家地址/距離（你要的太長顯示...設定在這裡） */
+        .store-meta {
+            font-size: 3cqw;
+            /* 字體改用 cqw */
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            /* 💡 關鍵：隱藏超出寬度的字 */
+            text-overflow: ellipsis;
+            /* 💡 關鍵：超出部分自動變成 ... */
+            max-width: 100%;
+            /* 💡 關鍵：限制最大寬度為父層的 100% */
+        }
 
-/* 標籤容器 (現金支付 / 支援行動支付) */
-.store-tags {
-    display: flex;
-    gap: 1.5cqw;
-    flex-wrap: wrap;    
-}
+        /* 標籤容器 (現金支付 / 支援行動支付) */
+        .store-tags {
+            display: flex;
+            gap: 1.5cqw;
+            flex-wrap: wrap;
+        }
 
-/* 標籤本體 */
-.store-tags span {
-    font-size: 2.5cqw;           /* 字體改用 cqw */
-    font-weight: 600;
-    padding: 0.5cqw 1.5cqw;      /* 內襯改用 cqw */
-    border-radius: 1.5cqw;       /* 圓角改用 cqw */
-    white-space: nowrap;         /* 確保標籤內的字（如：現金支付）不會自己斷行 */
-}
+        /* 標籤本體 */
+        .store-tags span {
+            font-size: 2.5cqw;
+            /* 字體改用 cqw */
+            font-weight: 600;
+            padding: 0.5cqw 1.5cqw;
+            /* 內襯改用 cqw */
+            border-radius: 1.5cqw;
+            /* 圓角改用 cqw */
+            white-space: nowrap;
+            /* 確保標籤內的字（如：現金支付）不會自己斷行 */
+        }
 
-.tag-time {
-    background-color: rgba(0, 98, 255, 0.08);
-    color: var(--brand-blue);
-}
+        .tag-time {
+            background-color: rgba(0, 98, 255, 0.08);
+            color: var(--brand-blue);
+        }
 
-.tag-pay {
-    background-color: rgba(16, 185, 129, 0.08);
-    color: var(--brand-green);
-}
+        .tag-pay {
+            background-color: rgba(16, 185, 129, 0.08);
+            color: var(--brand-green);
+        }
 
-.tag-time.inactive,
-.tag-pay.inactive {
-    opacity: 0.25;          
-    filter: grayscale(100%); 
-    cursor: not-allowed;    
-}
+        .tag-time.inactive,
+        .tag-pay.inactive {
+            opacity: 0.25;
+            filter: grayscale(100%);
+            cursor: not-allowed;
+        }
 
-/* ==========================================================================
+        /* ==========================================================================
    8. 底部懸浮列 (Bottom Bar)
    ========================================================================== */
-/* 底部大盒子 */
-.bottom-bar {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    height: 15%;                  /* 保留你原本佔外殼的 15% 高度比例 */
-    max-width: 100%;
-    background-color: var(--blur-bg);
-    border-top: 0.3cqw solid var(--border-color); /* 邊框 cqw */
-    padding: 1cqw 2cqw;           /* 左右微調內襯，讓留白更好看 */
-    box-sizing: border-box;
-    flex-shrink: 0;
-}
+        /* 底部大盒子 */
+        .bottom-bar {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            height: 15%;
+            /* 保留你原本佔外殼的 15% 高度比例 */
+            max-width: 100%;
+            background-color: var(--blur-bg);
+            border-top: 0.3cqw solid var(--border-color);
+            /* 邊框 cqw */
+            padding: 1cqw 2cqw;
+            /* 左右微調內襯，讓留白更好看 */
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
 
-/* 左側：訂單狀態訊息區塊 */
-.status-msg {
-    height: 60%;
-    max-width: 65%;
-    font-size: 4.5cqw;              /* 字體改用 cqw */
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 2cqw;                    /* 發光圓點與文字的間距 */
-    text-decoration: none;
-    line-height: 1;             /* 💡 新增：給予舒適的行高，讓兩行字並存時不擁擠 */
-}
+        /* 左側：訂單狀態訊息區塊 */
+        .status-msg {
+            height: 60%;
+            max-width: 65%;
+            font-size: 4.5cqw;
+            /* 字體改用 cqw */
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 2cqw;
+            /* 發光圓點與文字的間距 */
+            text-decoration: none;
+            line-height: 1;
+            /* 💡 新增：給予舒適的行高，讓兩行字並存時不擁擠 */
+        }
 
-/* 🔴 預設未啟用狀態的狀態點 */
-footer .status-indicator {
-    width: 1.5cqw;                /* 改用 cqw，維持漂亮的正圓形比例 */
-    height: 1.5cqw;
-    border-radius: 50%;
-    background-color: #ff4d4f;
-    box-shadow: 0 0 1.5cqw #ff4d4f; /* 陰影發光改用 cqw */
-    flex-shrink: 0;               /* 確保圓點絕不被文字擠壓扁掉 */
-}
+        /* 🔴 預設未啟用狀態的狀態點 */
+        footer .status-indicator {
+            width: 1.5cqw;
+            /* 改用 cqw，維持漂亮的正圓形比例 */
+            height: 1.5cqw;
+            border-radius: 50%;
+            background-color: #ff4d4f;
+            box-shadow: 0 0 1.5cqw #ff4d4f;
+            /* 陰影發光改用 cqw */
+            flex-shrink: 0;
+            /* 確保圓點絕不被文字擠壓扁掉 */
+        }
 
-/* 🟢 進行中（Active）狀態點 */
-footer .status-indicator.active {
-    width: 1.5cqw;
-    height: 1.5cqw;
-    border-radius: 50%;
-    background-color: #52c41a;
-    box-shadow: 0 0 1.5cqw #52c41a;
-    flex-shrink: 0;
-}
+        /* 🟢 進行中（Active）狀態點 */
+        footer .status-indicator.active {
+            width: 1.5cqw;
+            height: 1.5cqw;
+            border-radius: 50%;
+            background-color: #52c41a;
+            box-shadow: 0 0 1.5cqw #52c41a;
+            flex-shrink: 0;
+        }
 
-/* 右側：🛒 結帳按鈕 */
-.cart-status-btn {
-    background-color: var(--brand-blue);
-    color: white;
-    border: none;
-    border-radius: 5cqw;          /* 膠囊形圓角改用 cqw */
-    font-size: 5cqw;            /* 按鈕字體大小調成跟上方 header 差不多 */
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;       /* 內置內容垂直置中 */
-    justify-content: center; 
-    align-items: center;
-    text-decoration: none;
-    box-shadow: var(--shadow-sm);
-    height: 45%;
-    max-width: 35%;
-    padding: 0 2cqw;
-    box-sizing: border-box;
-    white-space: nowrap;          /* 確保結帳文字絕對不折行 */
-}
+        /* 右側：🛒 結帳按鈕 */
+        .cart-status-btn {
+            background-color: var(--brand-blue);
+            color: white;
+            border: none;
+            border-radius: 5cqw;
+            /* 膠囊形圓角改用 cqw */
+            font-size: 5cqw;
+            /* 按鈕字體大小調成跟上方 header 差不多 */
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            /* 內置內容垂直置中 */
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+            height: 45%;
+            max-width: 35%;
+            padding: 0 2cqw;
+            box-sizing: border-box;
+            white-space: nowrap;
+            /* 確保結帳文字絕對不折行 */
+        }
 
-/* 順手幫你保留的 badge 設定（未來如果有泡泡通知顯示數字可以用） */
-.order-badge-count {
-    font-size: 3.5cqw;           /* 與「結 帳」字體等高 */
-    font-weight: 600;            /* 數字加粗比較好辨識 */
-    margin-left: 1cqw;           /* 與「帳」字保持一個舒服的小間距 */
-    display: inline-block;       /* 讓它像文字一樣乖乖排在後面 */
-    transition: color 0.2s ease; /* 變色時有個淡淡的過渡感 */
-}
-</style>
+        /* 順手幫你保留的 badge 設定（未來如果有泡泡通知顯示數字可以用） */
+        .order-badge-count {
+            font-size: 3.5cqw;
+            /* 與「結 帳」字體等高 */
+            font-weight: 600;
+            /* 數字加粗比較好辨識 */
+            margin-left: 1cqw;
+            /* 與「帳」字保持一個舒服的小間距 */
+            display: inline-block;
+            /* 讓它像文字一樣乖乖排在後面 */
+            transition: color 0.2s ease;
+            /* 變色時有個淡淡的過渡感 */
+        }
+    </style>
 </head>
+
 <body>
-<div class="phone-wrapper">
-<div id="buyerView" style="display: block;">
-<header id="header-Container"></header>
-<div class="sticky-top-group">
-            <div class="location-bar">
-            <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
-            <div class="location-select-group">
-            <select class="nav-select" id="citySelect">
-                        <option value="">選擇縣市</option>
-                        <option value="臺北市">臺北市</option>
-                        <option value="新北市">新北市</option>
-                        <option value="基隆市">基隆市</option>
-                        <option value="桃園市">桃園市</option>
-                        <option value="新竹市">新竹市</option>
-                        <option value="新竹縣">新竹縣</option>
-                        <option value="苗栗縣">苗栗縣</option>
-                        <option value="台中市">台中市</option>
-                        <option value="彰化縣">彰化縣</option>
-                        <option value="南投縣">南投縣</option>
-                        <option value="雲林縣">雲林縣</option>
-                        <option value="嘉義市">嘉義市</option>
-                        <option value="嘉義縣">嘉義縣</option>
-                        <option value="台南市">台南市</option>
-                        <option value="高雄市">高雄市</option>
-                        <option value="屏東縣">屏東縣</option>
-                        <option value="宜蘭縣">宜蘭縣</option>
-                        <option value="花蓮縣">花蓮縣</option>
-                        <option value="臺東縣">臺東縣</option>
-                        <option value="澎湖縣">澎湖縣</option>
-                        <option value="金門縣">金門縣</option>
-                        <option value="連江縣">連江縣</option>
-                    </select>
-                    <select class="nav-select" id="districtSelect">
-                        <option value="">選擇區域</option>
-                    </select>
-                 </div>
-              </div>
-             <div class="search">
-            <div class="search-box">
-                <span>🔍</span>
-                <input type="text" id="globalSearchInput" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
-            </div>
-          </div>
-        </div>
-    <main class="store-list" id="store-Container">
-        <div class="loading-spinner" id="loading-Spinner">⚡ 正在連線雲端資料庫...</div>
-    </main>
-    <footer class="bottom-bar">
-    <a href="orders.html" class="status-msg">
-        <div class="status-indicator active" id="statusDot"></div>
-        <span id="statusText">您目前沒有進行中的訂單喔！</span>
-    </a>
-    <a href="cart.html" class="cart-status-btn nav-fast">
-        <span>🛒結 帳<span class="order-badge-count">(0)</span></span>
-    </a>
-  </footer>
-  </div>
-<!-- ========================================== -->
-<!-- 🔮 派思核心控制台 (Admin 視圖) -->     
-<!-- ========================================== -->
-<div id="adminView" style="display: none; padding: 0.25cqw; background: #121212; color: #e0e0e0; min-height: 100vh; overflow: auto; font-family: sans-serif;">
-    
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.125cqw solid #333; padding-bottom: 0.5cqw;">
-        <h1 style="color: #4dadff; margin: 0; font-size: 0.75cqw;">🔮 派思最高意志控制台</h1>
-        <button onclick="window.toggleView('buyer')" style="padding: 0.5cqw 1cqw; background: #ff4d4d; color: white; border: none; border-radius: 0.375cqw; cursor: pointer; font-weight: bold; font-size: 0.75cqw; transition: 0.2s;">
-            🧑‍💼 返回一般買家視圖
-        </button>
-    </div> <div style="background: #1e1e1e; padding: 0.25cqw; border-radius: 0.5cqw; margin-bottom: 0.25cqw; border: 0.2cqw solid #2d2d2d;overflow-y: auto;">
-        <h3 style="color: #ffca28; margin-top: 0;">➕ 新增全新店家</h3>
-        <p style="color: #aaa; font-size: 0.75cqw; margin-bottom: 0.25cqw;">請輸入店家資訊，新增後將立即同步至 Firebase 雲端資料庫。</p>   
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25cqw; margin-bottom: 0.25cqw;">
-            <input type="text" id="adminNewStoreName" placeholder="店家名稱 (*必填)" style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
-            <input type="text" id="adminNewStorePhone" placeholder="聯絡電話 (*必填)" style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
-            <input type="text" id="adminNewStoreCity" placeholder="縣市 (如: 基隆市) (*必填)" style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
-            <input type="text" id="adminNewStoreDistrict" placeholder="區域 (如: 七堵區) (*必填)" style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
-            <input type="text" id="adminNewStoreAddress" placeholder="詳細地址 (*必填)" style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw; grid-column: span 2;">
-
-        </div>
-        <button id="adminSubmitStoreBtn" style="width: 10cqw; padding: 0.25cqw; background: #059669; color: white; border: none; border-radius: 0.25cqw; font-weight: bold; cursor: pointer; transition: 0.2s;">✅ 確認新增店家至雲端</button>
-    </div> <div style="background: #1e1e1e; padding: 0.25cqw; border-radius: 0.5cqw; border: 0.2cqw solid #2d2d2d; overflow-x: auto;">
-        <h3 style="color: #4da5ff; margin-top: 0;"> 📋 目前雲端店家總覽</h3>
-        <table style="width: 10cqw; border-collapse: collapse; margin-top: 0.5cqw; text-align: left; font-size: 0.75cqw;">
-            <tr style="background: #2d2d2d; color: #fff;">
-                <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a;">店家名稱</th>
-                <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a;">詳細地址</th>
-                <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a;">聯絡電話</th>
-                <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a; text-align: center;">核心操作</th>
-            </tr>
-            <tbody id="adminStoreTableBody">
-                <tr><td colspan="4" style="text-align: center; padding: 0.25cqw; color: #888;">正在載入雲端資料...</td></tr>
-            </tbody>
-        </table>
-    </div> </div> <div class="lightbox-modal" id="loginLightbox" style="display: none;">
-    <div class="modal-card">
-        <div class="modal-title" style=" font-weight: 600; color: var(--text-main);">加入PACE 派思</div>
-                <button class="modal-btn google" id="googleLoginAction" style="box-shadow: 0 0.2cqw 0.125 rgba(0,0,0,0.05);">
-            <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:0.5cqw;">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-            </svg>
-            Google 登入
-        </button>
-
-        <button id="toggleEmailFormBtn" style="display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 5cqw; background-color: white; border: 0.2cqw solid #e5e7eb; border-radius: 2cqw; padding: 3cqw 0; font-size: 4cqw; font-weight: 600; color: #374151; cursor: pointer; box-shadow: 0 0.5cqw 2cqw rgba(0,0,0,0.05);">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.5cqw;">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-            使用電子郵件登入
-        </button>
-        <div id="emailFormSection" style="display: none; margin-top: 5cqw; text-align: left; height: 100%; box-sizing: border-box; background-color: var(--bg-Container); border: 0.2cqw solid var(--border-color); ">
-            <div style="margin-bottom: 1cqw;">
-                <label for="loginEmail" style="display:block; margin: bottom 5cqw; font-size:5cqw; color:#6b7280; font-weight:700;">電子郵件</label>
-                <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username" style="width: 100%; box-sizing: border-box; padding: 2cqw; border:0.2cqw solid #e5e7eb; border-radius:2cqw; box-sizing:border-box; font-size:5cqw; background-color:#f9fafb; color: #111111;">
-            </div> <div style="margin-bottom:10cqw;">
-                <label for="loginPassword" style="display:block; margin-bottom:0.25cqw; font-size:5cqw; color:#6b7280; font-weight:500;">密碼</label>
-                <div style="position: relative; display: flex; align-items: center;">
-                    <input type="password" id="loginPassword" placeholder="請輸入密碼" autocomplete="current-password" style="width: 100%; padding:0.25cqw 0.75cqw; border:0.2cqw solid #e5e7eb; border-radius:2cqw; box-sizing:border-box; font-size:5cqw; background-color:#f9fafb; color: #111111;">
-                    <button type="button" id="togglePasswordVisibility" style="position: absolute; right: 5cqw; background: none; border: none; cursor: pointer; font-size: 5cqw; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
+    <div class="phone-wrapper">
+        <div id="buyerView" style="display: block;">
+            <header id="header">
+                <div class="pace-logo">
+                    <a href="index.html" class="logo-link">
+                        <img src="png/pace3.png" alt="派思 官方網站">
+                    </a>
+                    <span id="defaultIcon" class="avatar-icon">👤</span>
+                    <img id="userAvatarImg" src=""
+                        style="font-weight: 500; display: none; border-radius: 50%;font-size: 4.25cqw; height: 75%; max-width: 30%; flex-direction: row; justify-content: flex-end; align-items: flex-end;">
                 </div>
-            </div> <button id="emailLoginAction" style="background-color: #059669; color: white; border: none; width: 100%; padding: 0.25cqw; border-radius: 0.5cqw; font-size: 5cqw; font-weight: 700; cursor: pointer; box-shadow: 0 0.25cqw 0.5cqw rgba(255, 255, 255, 0.15);">電子郵件登入 / 註冊</button>
-        </div><span class="modal-close" id="customReturnBtn" style="margin-top: 0.5cqw; text-decoration: underline; cursor: pointer; display: block; text-align: center;">暫時返回</span>
-    </div> </div> <div class="lightbox-modal" id="addressDetailLightbox" style="display: none;">
-    <div class="modal-card">
-        <div class="modal-title" style="color: var(--brand-blue); font-weight: 700;">📍 目前位置</div>
-        <div class="modal-desc-address" id="modalAddressText" style="margin-bottom: 0.5cqw; margin-top: 0.5cqw;">尚未獲取定位，請開啟 GPS。</div>
-        <button class="close-modal-btn" id="closeAddressModalBtn" style="background-color: var(--brand-blue); color: white; margin-top: 5cqw; border: none; width: 50%; height: 30%; border-radius: 2cqw; font-size: 5cqw; font-weight: 700; cursor: pointer;">確認</button>
-    </div></div></div>
-<script type="module" src="js/app.js"></script>
-<script src="js/cart-manager.js"></script>
+                <div class="two">
+                    <div class="pace">
+                        <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+                        <span>店內價外帶自取/點餐系統</span>
+                    </div>
+                    <button class="login-btn" id="loginBtn">登入/註冊</button>
+                    <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+                        <span class="user-name" id="userNameDisplay"></span></button>
+                    <div class="dropdown-menu" id="dropdownMenu"></div>
+                </div>
+            </header>
+            <div class="sticky-top-group">
+
+                <div class="location-bar">
+                    <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
+                    <div class="location-select-group">
+                        <select class="nav-select" id="citySelect">
+                            <option value="">選擇縣市</option>
+                            <option value="臺北市">臺北市</option>
+                            <option value="新北市">新北市</option>
+                            <option value="基隆市">基隆市</option>
+                            <option value="桃園市">桃園市</option>
+                            <option value="新竹市">新竹市</option>
+                            <option value="新竹縣">新竹縣</option>
+                            <option value="苗栗縣">苗栗縣</option>
+                            <option value="台中市">台中市</option>
+                            <option value="彰化縣">彰化縣</option>
+                            <option value="南投縣">南投縣</option>
+                            <option value="雲林縣">雲林縣</option>
+                            <option value="嘉義市">嘉義市</option>
+                            <option value="嘉義縣">嘉義縣</option>
+                            <option value="台南市">台南市</option>
+                            <option value="高雄市">高雄市</option>
+                            <option value="屏東縣">屏東縣</option>
+                            <option value="宜蘭縣">宜蘭縣</option>
+                            <option value="花蓮縣">花蓮縣</option>
+                            <option value="臺東縣">臺東縣</option>
+                            <option value="澎湖縣">澎湖縣</option>
+                            <option value="金門縣">金門縣</option>
+                            <option value="連江縣">連江縣</option>
+                        </select>
+                        <select class="nav-select" id="districtSelect">
+                            <option value="">選擇區域</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="search">
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <input type="text" id="globalSearchInput" placeholder="搜尋商圈美味小吃、店家名稱..." autocomplete="off">
+                    </div>
+                </div>
+            </div>
+            <main class="store-list" id="store-Container">
+                <div class="loading-spinner" id="loading-Spinner">⚡ 正在連線雲端資料庫...</div>
+            </main>
+            <footer class="bottom-bar">
+                <a href="orders.html" class="status-msg">
+                    <div class="status-indicator active" id="statusDot"></div>
+                    <span id="statusText">您目前沒有進行中的訂單喔！</span>
+                </a>
+                <a href="cart.html" class="cart-status-btn nav-fast">
+                    <span>🛒結 帳<span class="order-badge-count">(0)</span></span>
+                </a>
+            </footer>
+        </div>
+        <!-- ========================================== -->
+        <!-- 🔮 派思核心控制台 (Admin 視圖) -->
+        <!-- ========================================== -->
+        <div id="adminView"
+            style="display: none; padding: 0.25cqw; background: #121212; color: #e0e0e0; min-height: 100vh; overflow: auto; font-family: sans-serif;">
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.125cqw solid #333; padding-bottom: 0.5cqw;">
+                <h1 style="color: #4dadff; margin: 0; font-size: 0.75cqw;">🔮 派思最高意志控制台</h1>
+                <button onclick="window.toggleView('buyer')"
+                    style="padding: 0.5cqw 1cqw; background: #ff4d4d; color: white; border: none; border-radius: 0.375cqw; cursor: pointer; font-weight: bold; font-size: 0.75cqw; transition: 0.2s;">
+                    🧑‍💼 返回一般買家視圖
+                </button>
+            </div>
+            <div
+                style="background: #1e1e1e; padding: 0.25cqw; border-radius: 0.5cqw; margin-bottom: 0.25cqw; border: 0.2cqw solid #2d2d2d;overflow-y: auto;">
+                <h3 style="color: #ffca28; margin-top: 0;">➕ 新增全新店家</h3>
+                <p style="color: #aaa; font-size: 0.75cqw; margin-bottom: 0.25cqw;">請輸入店家資訊，新增後將立即同步至 Firebase 雲端資料庫。
+                </p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25cqw; margin-bottom: 0.25cqw;">
+                    <input type="text" id="adminNewStoreName" placeholder="店家名稱 (*必填)"
+                        style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
+                    <input type="text" id="adminNewStorePhone" placeholder="聯絡電話 (*必填)"
+                        style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
+                    <input type="text" id="adminNewStoreCity" placeholder="縣市 (如: 基隆市) (*必填)"
+                        style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
+                    <input type="text" id="adminNewStoreDistrict" placeholder="區域 (如: 七堵區) (*必填)"
+                        style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
+                    <input type="text" id="adminNewStoreAddress" placeholder="詳細地址 (*必填)"
+                        style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw; grid-column: span 2;">
+
+                </div>
+                <button id="adminSubmitStoreBtn"
+                    style="width: 10cqw; padding: 0.25cqw; background: #059669; color: white; border: none; border-radius: 0.25cqw; font-weight: bold; cursor: pointer; transition: 0.2s;">✅
+                    確認新增店家至雲端</button>
+            </div>
+            <div
+                style="background: #1e1e1e; padding: 0.25cqw; border-radius: 0.5cqw; border: 0.2cqw solid #2d2d2d; overflow-x: auto;">
+                <h3 style="color: #4da5ff; margin-top: 0;"> 📋 目前雲端店家總覽</h3>
+                <table
+                    style="width: 10cqw; border-collapse: collapse; margin-top: 0.5cqw; text-align: left; font-size: 0.75cqw;">
+                    <tr style="background: #2d2d2d; color: #fff;">
+                        <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a;">店家名稱</th>
+                        <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a;">詳細地址</th>
+                        <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a;">聯絡電話</th>
+                        <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a; text-align: center;">核心操作</th>
+                    </tr>
+                    <tbody id="adminStoreTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 0.25cqw; color: #888;">正在載入雲端資料...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="lightbox-modal" id="loginLightbox" style="display: none;">
+            <div class="modal-card">
+                <div class="modal-title" style=" font-weight: 600; color: var(--text-main);">加入PACE 派思</div>
+                <button class="modal-btn google" id="googleLoginAction"
+                    style="box-shadow: 0 0.2cqw 0.125 rgba(0,0,0,0.05);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:0.5cqw;">
+                        <path fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                        <path fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                    </svg>
+                    Google 登入
+                </button>
+
+                <button id="toggleEmailFormBtn"
+                    style="display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 5cqw; background-color: white; border: 0.2cqw solid #e5e7eb; border-radius: 2cqw; padding: 3cqw 0; font-size: 4cqw; font-weight: 600; color: #374151; cursor: pointer; box-shadow: 0 0.5cqw 2cqw rgba(0,0,0,0.05);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.5cqw;">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    使用電子郵件登入
+                </button>
+                <div id="emailFormSection"
+                    style="display: none; margin-top: 5cqw; text-align: left; height: 100%; box-sizing: border-box; background-color: var(--bg-Container); border: 0.2cqw solid var(--border-color); ">
+                    <div style="margin-bottom: 1cqw;">
+                        <label for="loginEmail"
+                            style="display:block; margin: bottom 5cqw; font-size:5cqw; color:#6b7280; font-weight:700;">電子郵件</label>
+                        <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username"
+                            style="width: 100%; box-sizing: border-box; padding: 2cqw; border:0.2cqw solid #e5e7eb; border-radius:2cqw; box-sizing:border-box; font-size:5cqw; background-color:#f9fafb; color: #111111;">
+                    </div>
+                    <div style="margin-bottom:10cqw;">
+                        <label for="loginPassword"
+                            style="display:block; margin-bottom:0.25cqw; font-size:5cqw; color:#6b7280; font-weight:500;">密碼</label>
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <input type="password" id="loginPassword" placeholder="請輸入密碼"
+                                autocomplete="current-password"
+                                style="width: 100%; padding:0.25cqw 0.75cqw; border:0.2cqw solid #e5e7eb; border-radius:2cqw; box-sizing:border-box; font-size:5cqw; background-color:#f9fafb; color: #111111;">
+                            <button type="button" id="togglePasswordVisibility"
+                                style="position: absolute; right: 5cqw; background: none; border: none; cursor: pointer; font-size: 5cqw; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
+                        </div>
+                    </div> <button id="emailLoginAction"
+                        style="background-color: #059669; color: white; border: none; width: 100%; padding: 0.25cqw; border-radius: 0.5cqw; font-size: 5cqw; font-weight: 700; cursor: pointer; box-shadow: 0 0.25cqw 0.5cqw rgba(255, 255, 255, 0.15);">電子郵件登入
+                        / 註冊</button>
+                </div><span class="modal-close" id="customReturnBtn"
+                    style="margin-top: 0.5cqw; text-decoration: underline; cursor: pointer; display: block; text-align: center;">暫時返回</span>
+            </div>
+        </div>
+        <div class="lightbox-modal" id="addressDetailLightbox" style="display: none;">
+            <div class="modal-card">
+                <div class="modal-title" style="color: var(--brand-blue); font-weight: 700;">📍 目前位置</div>
+                <div class="modal-desc-address" id="modalAddressText"
+                    style="margin-bottom: 0.5cqw; margin-top: 0.5cqw;">尚未獲取定位，請開啟 GPS。</div>
+                <button class="close-modal-btn" id="closeAddressModalBtn"
+                    style="background-color: var(--brand-blue); color: white; margin-top: 5cqw; border: none; width: 50%; height: 30%; border-radius: 2cqw; font-size: 5cqw; font-weight: 700; cursor: pointer;">確認</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/cart-manager.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
+
 </html>

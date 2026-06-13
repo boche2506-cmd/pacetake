@@ -56,12 +56,12 @@ const areaData = {
 
 // UI 變數宣告
 let themeToggleBtn, loginBtn, avatarBtn, dropdownMenu;
-let loginLightbox;
+let loginLightbox, userNameDisplay;
 let activeDragItem = null;
 
 // --- 2. 初始化函式 (負責把那 17 行活化) ---
     // 全部直接宣告在全域，不用包進任何函式
-const userNameDisplay = document.getElementById('userNameDisplay');
+userNameDisplay = document.getElementById('userNameDisplay');
 const storeContainer = document.getElementById('store-container');
 const googleLoginAction = document.getElementById('googleLoginAction');
 const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');

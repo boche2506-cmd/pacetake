@@ -62,7 +62,7 @@ let activeDragItem = null;
 // --- 2. 初始化函式 (負責把那 17 行活化) ---
 // 全部直接宣告在全域，不用包進任何函式
 userNameDisplay = document.getElementById('userNameDisplay');
-const storeContainer = document.getElementById('store-container');
+const storeContainer = document.getElementById('store-Container');
 const googleLoginAction = document.getElementById('googleLoginAction');
 const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
 const emailFormSection = document.getElementById('emailFormSection');
@@ -349,28 +349,32 @@ function filterAndRenderStores() {
 }
 
 function getBrowserLocation() {
-    gpsPinBtn = document.getElementById('gpsPinBtn');
-    modalAddressText = document.getElementById('modalAddressText');
+    const gpsPinBtn = document.getElementById('gpsPinBtn');
+    const modalAddressText = document.getElementById('modalAddressText');
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                buyerLat = position.coords.latitude;
-                buyerLng = position.coords.longitude;
-                currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
+                const buyerLat = position.coords.latitude;
+                const buyerLng = position.coords.longitude;
+                const currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
+                
                 if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
                 if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
-                // 💡【新增這行】定位成功後，立刻重新渲染首頁卡片來顯示距離！
-                filterAndRenderStores();
+                
+                // 確認函數存在再呼叫
+                if (typeof filterAndRenderStores === 'function') {
+                    filterAndRenderStores();
+                }
             },
             (error) => {
-                currentBuyerAddress = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
+                const errorMsg = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
                 if (gpsPinBtn) gpsPinBtn.innerText = "📍 無法定位";
-                if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
+                if (modalAddressText) modalAddressText.innerText = errorMsg;
             }
         );
     } else {
-        currentBuyerAddress = "您的裝置不支援 GPS 定位裝置。";
+        if (modalAddressText) modalAddressText.innerText = "您的裝置不支援 GPS 定位裝置。";
     }
 }
 
@@ -467,7 +471,7 @@ document.addEventListener('change', (e) => {
         reader.readAsDataURL(file);
     }
 });
-
+// [頁面選單與燈箱操作]
 function bindHeaderEvents() {
     console.log("[PACE DEBUG] bindHeaderEvents() started.");
     loginBtn = document.getElementById('loginBtn');
@@ -499,7 +503,7 @@ function bindHeaderEvents() {
     }
 }
 
-// 頁面固定元件事件綁定
+// [登入與身分認證程序]
 if (customReturnBtn) customReturnBtn.addEventListener('click', () => {
     console.log("[PACE DEBUG] Custom return clicked.");
     loginLightbox = document.getElementById('loginLightbox');
@@ -521,6 +525,8 @@ if (togglePasswordVisibility && loginPasswordInput) {
         this.textContent = type === 'password' ? '👁️' : '🙈';
     });
 }
+
+// 店家清單篩選與顯示邏輯
 
 if (gpsPinBtn) {
     gpsPinBtn.addEventListener('click', () => {
@@ -552,7 +558,7 @@ if (citySelect) {
 }
 if (districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
 if (globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
-
+// [使用者狀態與 UI 初始化]
 if (googleLoginAction) {
     googleLoginAction.addEventListener('click', async () => {
         console.log("[PACE DEBUG] Google login action.");
@@ -687,19 +693,20 @@ if (warningCancelBtn) {
     });
 }
 
+const seatingToggle = document.querySelector('.seating-toggle');
+const hasSeating = seatingToggle?.checked ?? false;
+
 if (menuUploadList) {
     document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
 }
-
 const addItemRowBtn = document.getElementById('addItemRowBtn');
 if (addItemRowBtn && menuUploadList) {
     addItemRowBtn.addEventListener('click', () => {
         console.log("[PACE DEBUG] Add item row clicked.");
         const newRow = document.createElement('div');
-        newRow.className = 'menu-upload-list';
+        newRow.className = 'menu-item-row';
         newRow.innerHTML = `
-                <div class="menu-item-row">
-                        <div class="menu-item">
+                <div class="menu-item">
                             <div class="img-upload-box" id="uploadBox">
                                 <input type="file" id="imageInput" class="image-input" accept="image/*"
                                     style="display: none;">
@@ -734,7 +741,8 @@ if (addItemRowBtn && menuUploadList) {
                             <div class="price-input-wrapper">
                                 <span class="price-symbol">大$</span>
                                 <input type="number" class="input-style price-input-large"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0" required>
+                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
+                                    required>
                             </div>
                             <div class="price-input-wrapper">
                                 <span class="price-symbol">中$</span>
@@ -744,7 +752,8 @@ if (addItemRowBtn && menuUploadList) {
                             <div class="price-input-wrapper">
                                 <span class="price-symbol">小$</span>
                                 <input type="number" class="input-style price-input-small"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0" required>
+                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
+                                    required>
                             </div>
                         </div>
                         <div class="remark" style="width: 100%; gap: 1cqw">
@@ -757,7 +766,6 @@ if (addItemRowBtn && menuUploadList) {
                                 </span>
                             </label>
                         </div>
-                    </div>
             `;
         menuUploadList.appendChild(newRow);
         makeItemDraggable(newRow);
@@ -872,6 +880,7 @@ if (shopSubmitBtn) {
                 HashKey: hashKeyValue,
                 HashIV: hashIvValue
             },
+            hasSeating: hasSeating,
             menuList: menuItems, // 這是剛剛打包好的菜單陣列
             createdAt: new Date().toISOString()
         };
@@ -921,13 +930,23 @@ function startDrag(e, row) {
 function onDragMove(e) {
     if (!activeDragItem || !menuUploadList) return;
     if (e.cancelable) e.preventDefault();
-    const currentY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-    const siblings = [...menuUploadList.querySelectorAll('.menu-item-row:not([style*="dashed"])')];
-    const nextSibling = siblings.find(sibling => {
-        const box = sibling.getBoundingClientRect();
-        return currentY <= box.top + box.height / 2;
+
+    const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+
+    // 使用 requestAnimationFrame 優化效能
+    requestAnimationFrame(() => {
+        const siblings = [...menuUploadList.querySelectorAll('.menu-item-row')].filter(el => el !== activeDragItem);
+        const nextSibling = siblings.find(sibling => {
+            const box = sibling.getBoundingClientRect();
+            return clientY <= box.top + box.height / 2;
+        });
+
+        if (nextSibling && activeDragItem !== nextSibling) {
+            menuUploadList.insertBefore(activeDragItem, nextSibling);
+        } else if (!nextSibling && activeDragItem !== menuUploadList.lastElementChild) {
+            menuUploadList.appendChild(activeDragItem);
+        }
     });
-    nextSibling ? menuUploadList.insertBefore(activeDragItem, nextSibling) : menuUploadList.appendChild(activeDragItem);
 }
 
 function onDragEnd() {
@@ -940,6 +959,8 @@ function onDragEnd() {
     window.removeEventListener('touchmove', onDragMove);
     window.removeEventListener('touchend', onDragEnd);
 }
+// 拖曳菜單專屬函式區 (賣家)結束
+// ==========================================
 
 // === 將這段整段替換掉原本的 menuManagementList.addEventListener ===
 // 💡 加上 if 判斷安全守護，確保只有在有該元素的頁面才執行，避免 store.html 崩潰
@@ -1258,5 +1279,9 @@ async function initStorePage() {
         console.error("[PACE ERROR] 崩潰：", error);
     }
 }
-
+// 同步初始化 (即時執行程式碼)
 initThemeSystem();
+bindHeaderEvents();
+initStorePage();
+getBrowserLocation();
+

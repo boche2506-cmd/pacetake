@@ -60,7 +60,7 @@ let loginLightbox, userNameDisplay;
 let activeDragItem = null;
 
 // --- 2. 初始化函式 (負責把那 17 行活化) ---
-    // 全部直接宣告在全域，不用包進任何函式
+// 全部直接宣告在全域，不用包進任何函式
 userNameDisplay = document.getElementById('userNameDisplay');
 const storeContainer = document.getElementById('store-container');
 const googleLoginAction = document.getElementById('googleLoginAction');
@@ -151,10 +151,11 @@ function initTheme() {
 }
 
 function updateUIForUser(user, currentRole) {
-    loginBtn = document.getElementById('loginBtn');
-    avatarBtn = document.getElementById('avatarBtn');
-    loginLightbox = document.getElementById('loginLightbox');
-    userNameDisplay = document.getElementById('userNameDisplay');
+    // 這裡加上 const，確保這些變數只屬於這個函式
+    const loginBtn = document.getElementById('loginBtn');
+    const avatarBtn = document.getElementById('avatarBtn');
+    const loginLightbox = document.getElementById('loginLightbox');
+    const userNameDisplay = document.getElementById('userNameDisplay');
 
     if (loginBtn) loginBtn.style.display = 'none';
     if (avatarBtn) avatarBtn.style.display = 'flex';
@@ -227,7 +228,7 @@ function renderDynamicMenu(role) {
         <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
     `;
 
-    dropdownMenu.innerHTML = menuHTML;
+    menuContainer.innerHTML = menuHTML;
 
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {

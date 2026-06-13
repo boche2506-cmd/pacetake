@@ -311,7 +311,7 @@ function filterAndRenderStores() {
         const finalAddress = store.shopAddress || store.address || '';
         const takeoutSupported = store.isCashPayEnabled !== false;
         const paySupported = store.isOnlinePayEnabled !== false;
-
+        const seatingSupported = store.isSeatingAvailable !== false;
         // 照片處理 (優先顯示 shopLogo)
         const logoData = store.shopLogo || store.emoji || '🏪';
         let finalLogoHtml = logoData;
@@ -341,6 +341,7 @@ function filterAndRenderStores() {
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
                     <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
+                    <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用座位</span>
                 </div>
             </div>
         `;
@@ -358,10 +359,10 @@ function getBrowserLocation() {
                 const buyerLat = position.coords.latitude;
                 const buyerLng = position.coords.longitude;
                 const currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
-                
+
                 if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
                 if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
-                
+
                 // 確認函數存在再呼叫
                 if (typeof filterAndRenderStores === 'function') {
                     filterAndRenderStores();

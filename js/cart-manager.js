@@ -51,51 +51,46 @@ function updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qty
 
     // 跨店檢查：若購物車已有其他店家的商品，提示使用者
     if (localCartData.length > 0 && localCartData[0].storeId !== currentStoreId) {
-        if (confirm("您目前的購物車已有其他店家的商品，加入此商品將會清空前店清單，確定繼續嗎？")) {
-            localCartData = []; 
+        if (confirm("⚠️ 您的購物車內已有其他店家的商品，加入此商品將會清空前店清單，確定要繼續嗎？")) {
+            localCartData = []; // 使用者點確定才清空
         } else {
-            qtyDisplay.innerText = 0; // 使用者取消則將數量歸零
-            return; 
+            // 使用者點取消，我們不更新購物車，同時要把目前的數字改回購物車裡紀錄的值（或歸零）
+            // 這樣就不會發生「數字變了但購物車沒清」的情況
+            const originalItem = localCartData.find(i => i.id === itemId);
+            qtyDisplay.innerText = originalItem ? originalItem.qty : 0;
+            return;
         }
     }
 
-    // 更新該商品在陣列中的狀態
+    // ... 後面繼續執行儲存邏輯 (更新陣列 -> 存入 localStorage -> 刷新 UI)
     localCartData = localCartData.filter(i => i.id !== itemId);
     if (currentQty > 0) {
-        localCartData.push({ 
-            id: itemId, 
-            name: itemName, 
-            price: itemPrice, 
-            qty: currentQty, 
-            note: currentNote, 
-            storeId: currentStoreId 
-        });
+        localCartData.push({ id: itemId, name: itemName, price: itemPrice, qty: currentQty, note: currentNote, storeId: currentStoreId });
     }
-    
     localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
     refreshTotalCartUI();
 }
 
 // 4. 批次同步：抓取頁面上所有的餐點卡片並更新 (原第一段邏輯)
-window.syncCartFromDOM = function() {
+window.syncCartFromDOM = function () {
     const cards = document.querySelectorAll('.food-card');
     const newCartData = [];
-    
+
     cards.forEach(card => {
         const qtyElement = card.querySelector('.qty-number');
         if (!qtyElement) return;
-        
+
         const qty = parseInt(qtyElement.innerText, 10);
-        
+
         if (qty > 0) {
             const id = card.getAttribute('data-id');
             const price = parseInt(card.getAttribute('data-price'), 10);
             const name = card.getAttribute('data-name');
             const storeId = card.getAttribute('data-store-id'); // 建議在 HTML 加入此屬性
-            
+
             const noteInput = card.querySelector('.item-note-input');
             const note = noteInput ? noteInput.value : '';
-            
+
             newCartData.push({ id, name, price, qty, note, storeId });
         }
     });
@@ -107,21 +102,18 @@ window.syncCartFromDOM = function() {
 // 5. 頁面載入時：將 LocalStorage 的資料「回填」到 DOM 上 (新增這個函式)
 function initCartDOMState() {
     const localCartData = getCartData();
-    
+    // 從頁面獲取當前商店 ID (假設 HTML 中有設定 body 的 data-store-id)
+    const currentStoreId = document.body.getAttribute('data-store-id');
     localCartData.forEach(item => {
-        // 尋找對應的卡片 (透過 data-id)
+        // 關鍵：如果該商品不是這間店的，直接跳過，不進行回填
+        if (item.storeId !== currentStoreId) return;
         const card = document.querySelector(`.food-card[data-id="${item.id}"]`);
         if (card) {
-            // 找到該卡片的數量顯示區
             const qtyDisplay = card.querySelector('.qty-number');
             const noteInput = card.querySelector('.item-note-input');
-            
-            if (qtyDisplay) {
-                qtyDisplay.innerText = item.qty;
-            }
-            if (noteInput) {
-                noteInput.value = item.note || "";
-            }
+
+            if (qtyDisplay) qtyDisplay.innerText = item.qty;
+            if (noteInput) noteInput.value = item.note || "";
         }
     });
 }

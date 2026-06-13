@@ -228,13 +228,12 @@ function renderDynamicMenu(role) {
     }
 
     if (role === 'admin') {
-        menuHTML += `
-            <div class="menu-divider"></div>
-            <a href="javascript:void(0)" onclick="window.toggleView('admin')" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
-            <a href="javascript:void(0)" onclick="window.issuePromoCode()" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
-            
-        `;
-    }
+    menuHTML += `
+        <div class="menu-divider"></div>
+        <a href="javascript:void(0)" data-action="toggleAdmin" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
+        <a href="javascript:void(0)" data-action="issuePromo" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
+    `;
+}
 
     menuHTML += `
         <div class="menu-divider"></div>
@@ -378,34 +377,6 @@ function getBrowserLocation() {
         if (modalAddressText) modalAddressText.innerText = "您的裝置不支援 GPS 定位裝置。";
     }
 }
-
-function renderAdminTable() {
-    const tbody = document.getElementById('adminStoreTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    if (allStores.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1cqw; color:#aaa;">目前雲端尚無店家資料</td></tr>';
-        return;
-    }
-    allStores.forEach(store => {
-        const finalName = store.shopName || store.name || '未命名店家';
-        const finalAddress = store.shopAddress || store.address || '';
-        const phone = store.phone || '無資料';
-        const statusText = store.status === 'offline' ? '🔴 下線' : '🟢 上線';
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
-            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
-            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #bbb;">${phone}</td>
-            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; text-align: center; color: ${store.status === 'offline' ? '#ef4444' : '#10b981'}; font-weight: bold;">${statusText}</td>
-            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; text-align: center;">
-                <button onclick="window.deleteStore('${store.id}')" style="padding: 1cqw 2cqw; background: #ef4444; color: white; border: none; border-radius: 1cqw; cursor: pointer; font-weight: bold;">刪除</button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
 
 // ==========================================
 // 📍 計算兩點經緯度距離 (回傳公里數)
@@ -1031,6 +1002,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// 1. 新增店家邏輯
 const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
 if (adminSubmitStoreBtn) {
     adminSubmitStoreBtn.addEventListener('click', async () => {
@@ -1068,7 +1040,8 @@ if (adminSubmitStoreBtn) {
     });
 }
 
-window.deleteStore = async function (storeId) {
+// 2. 刪除店家邏輯 (模組化版本)
+async function deleteStore(storeId) {
     if (confirm("⚠️ 確定要從 Firebase 徹底刪除這個店家嗎？(刪除後無法恢復)")) {
         try {
             await deleteDoc(doc(db, "stores", storeId));
@@ -1079,24 +1052,62 @@ window.deleteStore = async function (storeId) {
             alert("刪除失敗，請檢查網路或資料庫權限！");
         }
     }
-};
+}
 
+// 3. 渲染表格邏輯
+function renderAdminTable() {
+    const tbody = document.getElementById('adminStoreTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    if (allStores.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1cqw; color:#aaa;">目前雲端尚無店家資料</td></tr>';
+        return;
+    }
+    
+    allStores.forEach(store => {
+        const finalName = store.shopName || store.name || '未命名店家';
+        const finalAddress = store.shopAddress || store.address || '';
+        const phone = store.phone || '無資料';
+        const statusText = store.status === 'offline' ? '🔴 下線' : '🟢 上線';
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
+            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
+            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #bbb;">${phone}</td>
+            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; text-align: center; color: ${store.status === 'offline' ? '#ef4444' : '#10b981'}; font-weight: bold;">${statusText}</td>
+            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; text-align: center;">
+                <button class="delete-btn" data-id="${store.id}" style="padding: 1cqw 2cqw; background: #ef4444; color: white; border: none; border-radius: 1cqw; cursor: pointer; font-weight: bold;">刪除</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// 4. 事件委派：統一處理表格內的所有「刪除」按鈕點擊 (取代原本的 onclick)
+const tbody = document.getElementById('adminStoreTableBody');
+if (tbody) {
+    tbody.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-btn')) {
+            const storeId = e.target.getAttribute('data-id');
+            deleteStore(storeId);
+        }
+    });
+}
+
+// 5. 視圖切換
 const toggleBuyerBtn = document.getElementById('toggleBuyerViewBtn');
-
 if (toggleBuyerBtn) {
     toggleBuyerBtn.addEventListener('click', () => {
         const adminEl = document.getElementById('adminView');
         const buyerEl = document.getElementById('buyerView');
-
-        // 強制切換為買家視圖
         if (adminEl) adminEl.style.display = 'none';
         if (buyerEl) buyerEl.style.display = 'block';
-
-        // 如果需要滾動回頂部
         window.scrollTo(0, 0);
     });
 }
 
+// 6. 發行邀請碼
 window.issuePromoCode = async function () {
     const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
     if (!code || code.trim() === "") return;
@@ -1280,6 +1291,22 @@ async function initStorePage() {
         console.error("[PACE ERROR] 崩潰：", error);
     }
 }
+
+// 統一處理所有動態生成的按鈕點擊
+document.addEventListener('click', (e) => {
+    const action = e.target.getAttribute('data-action');
+    
+    if (action === 'toggleAdmin') {
+        // 呼叫原本的切換邏輯
+        toggleView('admin'); 
+    }
+    
+    if (action === 'issuePromo') {
+        // 呼叫邀請碼發行函式
+        issuePromoCode();
+    }
+});
+
 // 同步初始化 (即時執行程式碼)
 initThemeSystem();
 bindHeaderEvents();

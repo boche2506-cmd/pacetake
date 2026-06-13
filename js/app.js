@@ -55,11 +55,8 @@ const areaData = {
 };
 
 // UI 變數宣告
-let themeToggleBtn, loginBtn, avatarBtn, dropdownMenu, userNameDisplay, storeContainer;
-let loginLightbox, googleLoginAction, toggleEmailFormBtn, emailFormSection, customReturnBtn;
-let loginEmailInput, loginPasswordInput, emailLoginAction;
-let citySelect, districtSelect, gpsPinBtn, addressDetailLightbox, modalAddressText, closeAddressModalBtn, globalSearchInput;
-let menuUploadList = null;
+let themeToggleBtn, loginBtn, avatarBtn, dropdownMenu;
+let loginLightbox;
 let activeDragItem = null;
 
 // --- 2. 初始化函式 (負責把那 17 行活化) ---

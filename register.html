@@ -273,6 +273,23 @@
             gap: 0.5cqw;
         }
 
+        .seating {
+            width: 100%;
+            height: 8cqw;
+            display: flex;
+            justify-content: flex-start;
+            flex-direction: row;
+            align-items: center;
+            gap: 1cqw;
+            color: var(--text-main);
+            background-color: var(--bg-global);
+            border: 0.2cqw solid var(--border-color);
+            border-radius: 2cqw;
+            padding: 0 2cqw;
+            font-size: 4cqw;
+        }
+
+        .seating-toggle-switch,
         .menu-soldout-switch {
             position: relative;
             display: inline-block;
@@ -280,10 +297,12 @@
             height: 7cqw;
         }
 
+        .seating-toggle-switch input,
         .menu-soldout-switch input {
             display: none;
         }
 
+        .seating-toggle-switch .toggle-slider,
         .menu-soldout-switch .toggle-slider {
             position: absolute;
             cursor: pointer;
@@ -316,36 +335,60 @@
             transition: 0.4s;
         }
 
+        .seating-toggle-switch .toggle-slider::before {
+            position: absolute;
+            content: "";
+            height: 5cqw;
+            width: 5cqw;
+            left: 1.5cqw;
+            /* 圓圈初始在左邊 */
+            bottom: 1cqw;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.4s;
+        }
+
         .menu-soldout-switch .on-text {
             display: block;
             margin-left: 5cqw;
             /* 把字往右擠，閃開左邊的白圈圈 */
         }
 
+        .seating-toggle-switch .on-text {
+            display: block;
+            margin-left: 5cqw;
+            /* 把字往右擠，閃開左邊的白圈圈 */
+        }
+
+        .seating-toggle-switch .off-text,
         .menu-soldout-switch .off-text {
             display: none;
         }
 
         /* 6. 勾選狀態 (變紅色、圓圈右移、文字替換) */
+        .seating-toggle:checked+.toggle-slider,
         .menu-soldout-toggle:checked+.toggle-slider {
             background-color: #ff4d4f;
             /* 變成紅色 */
         }
 
+        .seating-toggle:checked+.toggle-slider::before,
         .menu-soldout-toggle:checked+.toggle-slider::before {
             transform: translateX(10cqw);
             /* 把白圈圈推到最右邊 (75 - 22 - 8 = 45) */
         }
 
+        .seating-toggle:checked+.toggle-slider .on-text,
         .menu-soldout-toggle:checked+.toggle-slider .on-text {
             display: none;
             /* 隱藏販售中 */
         }
 
+        .seating-toggle:checked+.toggle-slider .off-text,
         .menu-soldout-toggle:checked+.toggle-slider .off-text {
             display: block;
             /* 顯示暫停 */
-            margin-right: 5cqw;
+            margin-right: 6cqw;
             /* 把字往左擠，閃開右邊的白圈圈 */
         }
 
@@ -691,6 +734,17 @@
                     <label class="toggle-switch"><input type="checkbox" id="toggleCash"><span
                             class="slider"></span></label>
                 </div>
+                <div class="seating">
+                    <label class="seating-toggle-switch"><input type="checkbox" class="seating-toggle" checked>
+                        <span class="toggle-slider">
+                            <span class="on-text">開放中</span>
+                            <span class="off-text">無提供</span>
+                        </span>
+                    </label>
+                    <span style="font-size: 4cqw; font-weight: 600; line-height: 1;">
+                        是否有提供內用座位
+                    </span>
+                </div>
             </div>
             <div class="form-section">
                 <div class="section-title">菜單商品上架</div>
@@ -731,7 +785,8 @@
                             <div class="price-input-wrapper">
                                 <span class="price-symbol">大$</span>
                                 <input type="number" class="input-style price-input-large"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0" required>
+                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
+                                    required>
                             </div>
                             <div class="price-input-wrapper">
                                 <span class="price-symbol">中$</span>
@@ -741,7 +796,8 @@
                             <div class="price-input-wrapper">
                                 <span class="price-symbol">小$</span>
                                 <input type="number" class="input-style price-input-small"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0" required>
+                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
+                                    required>
                             </div>
                         </div>
                         <div class="remark" style="width: 100%; gap: 1cqw">
@@ -780,8 +836,8 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHDVR703MLCYGLAi_TtFdDM1gaauKV8sQ&libraries=geocoding&language=zh-TW&libraries=geocoding&language=zh-TW&loading=async"
         async defer>
         </script>
-    <script type="module" src="js/app.js"></script>
     <script src="js/cart-manager.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 
 </html>

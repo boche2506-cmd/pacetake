@@ -377,10 +377,7 @@
         <input type="text" name="TradeSha" id="formTradeSha">
         <input type="text" name="Version" value="2.0">
     </form>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script type="module" src="js/app.js"></script>
-    <script src="js/cart-manager.js"></script>
     <script>
         // 藍新測試金鑰配置
         const NEWEBPAY_CONFIG = {
@@ -769,6 +766,8 @@
         // 初始化載入購物車
         loadCartFromStorage();
     </script>
+    <script src="js/cart-manager.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 
 </html>

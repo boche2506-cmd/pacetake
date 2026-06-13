@@ -72,7 +72,8 @@ input, textarea {
 }
 
 .input-style:not(:placeholder-shown) {
-    background-color: #ffffff; /* 已輸入時變回白色 */
+    background-color: var(--bg-Container);
+    color:var(--text-main);
 }
 
 img, .card {

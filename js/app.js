@@ -55,7 +55,7 @@ const areaData = {
 };
 
 // UI 變數宣告
-let themeToggleBtn, loginBtn, avatarBtn, dropdownMenu;
+let loginBtn, avatarBtn, dropdownMenu;
 let loginLightbox, userNameDisplay;
 let activeDragItem = null;
 
@@ -140,13 +140,26 @@ async function handleUserSyncAndRoleRouting(user) {
     updateUIForUser(user, currentRole);
     fetchStoresFromFirebase();
 }
-function initTheme() {
-    console.log("[PACE DEBUG] 函式被呼叫了！");
+
+function initThemeSystem() {
+    const toggleBtn = document.getElementById('themeToggleBtn');
+
+    // 1. 初始化：網頁載入時套用顏色
     const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
-    themeToggleBtn = document.getElementById('themeToggleBtn');
-    if (themeToggleBtn) {
-        themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+    if (toggleBtn) {
+        toggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+        // 2. 綁定事件：只有當按鈕存在時，才註冊點擊事件
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('pacetake-theme', newTheme);
+            toggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        });
     }
 }
 
@@ -407,23 +420,60 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 // 4. 初始化與事件綁定
 // ==========================================
 
+// 初始化：設定上傳區塊的事件綁定
+// 直接在整個網頁範圍監聽點擊
+document.addEventListener('click', (e) => {
+    // 如果點到的是上傳盒子 (img-upload-box 或 shop-logo-box)
+    const box = e.target.closest('.img-upload-box, .shop-logo-box');
+    if (box) {
+        const input = box.querySelector('.image-input');
+        if (input) input.click();
+    }
+});
+
+// 直接在整個網頁範圍監聽 change
+document.addEventListener('change', (e) => {
+    // 如果觸發的是 .image-input
+    if (e.target.classList.contains('image-input')) {
+        const input = e.target;
+        const box = input.closest('.img-upload-box, .shop-logo-box');
+        if (!box) return;
+
+        const file = input.files[0];
+        if (!file) return;
+
+        const img = box.querySelector('.preview-img');
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            const tempImg = new Image();
+            tempImg.src = event.target.result;
+            tempImg.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const scaleSize = MAX_WIDTH / tempImg.width;
+                canvas.width = tempImg.width > MAX_WIDTH ? MAX_WIDTH : tempImg.width;
+                canvas.height = tempImg.width > MAX_WIDTH ? tempImg.height * scaleSize : tempImg.height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+
+                if (img) {
+                    img.src = canvas.toDataURL('image/jpeg', 0.7);
+                    img.style.display = 'block';
+                }
+            };
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
 function bindHeaderEvents() {
     console.log("[PACE DEBUG] bindHeaderEvents() started.");
-    themeToggleBtn = document.getElementById('themeToggleBtn');
     loginBtn = document.getElementById('loginBtn');
     avatarBtn = document.getElementById('avatarBtn');
     dropdownMenu = document.getElementById('dropdownMenu');
     loginLightbox = document.getElementById('loginLightbox');
-
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('pacetake-theme', newTheme);
-            themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-        });
-    }
 
     if (avatarBtn && dropdownMenu) {
         avatarBtn.addEventListener('click', (e) => {
@@ -650,9 +700,9 @@ if (addItemRowBtn && menuUploadList) {
         newRow.innerHTML = `
                 <div class="menu-item-row">
                         <div class="menu-item">
-                            <div class="img-upload-box" onclick="triggerUpload(this)">
-                                <input type="file" class="image-input" accept="image/*" style="display: none;"
-                                    onchange="previewImage(this)">
+                            <div class="img-upload-box" id="uploadBox">
+                                <input type="file" id="imageInput" class="image-input" accept="image/*"
+                                    style="display: none;">
                                 <img class="preview-img" src=""
                                     style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
                                 <div class="upload-placeholder"
@@ -661,21 +711,21 @@ if (addItemRowBtn && menuUploadList) {
                             </div>
                             <div class="item-fields" style="width: 100%; gap: 0.5cqw;">
                                 <input type="text" class="input-style item-name-input"
-                                    style="height:8cqw; width: 100%; padding: 0 2cqw;" placeholder="品項名稱" required>
+                                    style="height:8cqw; width: 100%; padding: 0 2cqw;" placeholder="品項名稱(必填)" required>
                                 <div class="price-input-wrapper">
                                     <span class="price-symbol">$</span>
                                     <input type="number" class="input-style price-input"
-                                        style="height:8cqw; width: 100%;padding-left:5cqw;" placeholder="金額" min="0"
+                                        style="height:8cqw; width: 100%;padding-left:5cqw;" placeholder="金額(必填)" min="0"
                                         required>
                                 </div>
                             </div>
-                            <button type="button" class="new-size" onclick="toggleSizeFields(this)">如需規格</button>
+                            <button type="button" class="new-size">如需規格</button>
                             <div class="item-right-ctrls"
                                 style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
                                 <div class="drag-handle"
                                     style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
                                     ☰</div>
-                                <button type="button" class="del-row-btn" onclick="deleteRow(this)"
+                                <button type="button" class="del-row-btn"
                                     style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
                             </div>
                         </div>
@@ -684,17 +734,17 @@ if (addItemRowBtn && menuUploadList) {
                             <div class="price-input-wrapper">
                                 <span class="price-symbol">大$</span>
                                 <input type="number" class="input-style price-input-large"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額" min="0" required>
+                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0" required>
                             </div>
                             <div class="price-input-wrapper">
                                 <span class="price-symbol">中$</span>
                                 <input type="number" class="input-style price-input-medium"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額" min="0" required>
+                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額" min="0">
                             </div>
                             <div class="price-input-wrapper">
                                 <span class="price-symbol">小$</span>
                                 <input type="number" class="input-style price-input-small"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額" min="0" required>
+                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0" required>
                             </div>
                         </div>
                         <div class="remark" style="width: 100%; gap: 1cqw">
@@ -910,100 +960,54 @@ if (menuUploadList) {
     });
 }
 
-function toggleSizeFields(btn) {
-    // 1. 找到當前這列餐點的根容器
-    const menuItem = btn.closest('.menu-item-row');
+document.addEventListener('click', (e) => {
+    // 判斷點擊的是否為「如需規格」按鈕
+    if (e.target.classList.contains('new-size')) {
+        const btn = e.target;
+        const menuItem = btn.closest('.menu-item-row');
 
-    // 2. 找到原本的金額欄位 (原本的 price-input)
-    const mainPriceInput = menuItem.querySelector('.price-input');
+        if (!menuItem) return;
 
-    // 3. 找到我們剛剛新增的規格容器 (new-size-price)
-    const sizePriceContainer = menuItem.querySelector('.new-size-price');
+        const mainPriceInput = menuItem.querySelector('.price-input');
+        const sizePriceContainer = menuItem.querySelector('.new-size-price');
 
-    // 4. 切換狀態：如果顯示就隱藏，如果隱藏就顯示
-    if (sizePriceContainer.style.display === 'none' || sizePriceContainer.style.display === '') {
-        // 啟用規格模式
-        sizePriceContainer.style.display = 'flex';
+        if (!mainPriceInput || !sizePriceContainer) return;
 
-        // 禁止輸入原始金額，並加上橫線效果
-        mainPriceInput.disabled = true;
-        mainPriceInput.style.textDecoration = 'line-through';
-        mainPriceInput.style.backgroundColor = '#f0f0f0'; // 加點灰底表示不可用
-        mainPriceInput.required = false;
-    } else {
-        // 恢復原始模式
-        sizePriceContainer.style.display = 'none';
+        // 切換顯示狀態
+        const isHidden = sizePriceContainer.style.display === 'none' || sizePriceContainer.style.display === '';
 
-        // 恢復原始金額欄位
-        mainPriceInput.disabled = false;
-        mainPriceInput.style.textDecoration = 'none';
-        mainPriceInput.style.backgroundColor = '';
-        mainPriceInput.required = true;
+        sizePriceContainer.style.display = isHidden ? 'flex' : 'none';
+
+        // 切換原始金額欄位的狀態
+        mainPriceInput.disabled = isHidden;
+        mainPriceInput.style.textDecoration = isHidden ? 'line-through' : 'none';
+        mainPriceInput.style.backgroundColor = isHidden ? 'var(--bg-Container)' : '';
+        mainPriceInput.required = !isHidden;
     }
-}
+});
 
 // ==========================================
 // 7. Window 全域綁定區 (給 HTML onclick 呼叫)
 // ==========================================
 
-window.deleteRow = function (btn) {
-    menuUploadList = document.getElementById('menuUploadList');
-    if (!menuUploadList) return;
-    const rows = menuUploadList.querySelectorAll('.menu-item-row');
-    if (rows.length <= 1) { alert("報告老闆，店裡至少要留一項商品才能開張喔！"); return; }
-    btn.closest('.menu-item-row').remove();
-};
+document.addEventListener('click', (e) => {
+    // 檢查是否點擊到了刪除按鈕
+    if (e.target.classList.contains('del-row-btn')) {
+        const menuUploadList = document.getElementById('menuUploadList');
+        if (!menuUploadList) return;
 
-window.triggerUpload = function (box) {
-    const fileInput = box.querySelector('.image-input');
-    if (fileInput) fileInput.click();
-};
+        const rows = menuUploadList.querySelectorAll('.menu-item-row');
 
-//「避免使用者上傳太大張的照片導致網頁卡頓或伺服器負擔」
-window.previewImage = function (input) {
-    const box = input.parentElement;
-    const img = box.querySelector('.preview-img');
-    const placeholder = box.querySelector('.upload-placeholder');
+        // 檢查是否只剩最後一行
+        if (rows.length <= 1) {
+            alert("報告老闆，店裡至少要留一項商品才能開張喔！");
+            return;
+        }
 
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-            const tempImg = new Image();
-            tempImg.src = e.target.result;
-
-            tempImg.onload = function () {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800; // 限制最大寬度為 800px，你可以自行調整
-                const scaleSize = MAX_WIDTH / tempImg.width;
-
-                // 如果圖片大於設定寬度，才進行縮小
-                if (tempImg.width > MAX_WIDTH) {
-                    canvas.width = MAX_WIDTH;
-                    canvas.height = tempImg.height * scaleSize;
-                } else {
-                    canvas.width = tempImg.width;
-                    canvas.height = tempImg.height;
-                }
-
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
-
-                // 將圖片轉為 base64，品質設為 0.7 (70%)
-                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-
-                // 更新預覽區
-                img.src = compressedDataUrl;
-                img.style.display = 'block';
-                if (placeholder) placeholder.style.display = 'none';
-
-                console.log("[PACE] 圖片壓縮完成，新尺寸:", canvas.width, "x", canvas.height);
-            };
-        };
-        reader.readAsDataURL(file);
+        // 刪除該行
+        e.target.closest('.menu-item-row').remove();
     }
-};
+});
 
 const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
 if (adminSubmitStoreBtn) {
@@ -1055,18 +1059,21 @@ window.deleteStore = async function (storeId) {
     }
 };
 
-window.toggleView = function (view) {
-    const adminEl = document.getElementById('adminView');
-    const buyerEl = document.getElementById('buyerView');
-    if (view === 'admin') {
-        if (adminEl) adminEl.style.display = 'block';
-        if (buyerEl) buyerEl.style.display = 'none';
-        window.scrollTo(0, 0);
-    } else {
+const toggleBuyerBtn = document.getElementById('toggleBuyerViewBtn');
+
+if (toggleBuyerBtn) {
+    toggleBuyerBtn.addEventListener('click', () => {
+        const adminEl = document.getElementById('adminView');
+        const buyerEl = document.getElementById('buyerView');
+
+        // 強制切換為買家視圖
         if (adminEl) adminEl.style.display = 'none';
         if (buyerEl) buyerEl.style.display = 'block';
-    }
-};
+
+        // 如果需要滾動回頂部
+        window.scrollTo(0, 0);
+    });
+}
 
 window.issuePromoCode = async function () {
     const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
@@ -1251,3 +1258,5 @@ async function initStorePage() {
         console.error("[PACE ERROR] 崩潰：", error);
     }
 }
+
+initThemeSystem();

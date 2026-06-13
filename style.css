@@ -165,8 +165,8 @@ img, .card {
 }
 
 .avatar-icon {
-    font-size: 14cqw;
-    height: 70%; 
+    font-size: 10cqw;
+    height: 50%; 
     max-width: 30%;    
     display: flex;
     flex-direction: row; 

@@ -470,6 +470,10 @@ function bindHeaderEvents() {
             if (loginLightbox) loginLightbox.style.display = 'flex';
         });
     }
+
+    //if (auth.currentUser) {
+   //     updateUIForUser(auth.currentUser, 'buyer'); // 角色會由 handleUserSyncAndRoleRouting 修正
+   // }
 }
 
 // [登入與身分認證程序]
@@ -797,7 +801,8 @@ if (shopSubmitBtn) {
         const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
         const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
         const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
-
+        const isCashPayEnabled = document.getElementById('adminNewStoreHasTakeout') ? document.getElementById('adminNewStoreHasTakeout').checked : true;
+        const isOnlinePayEnabled = document.getElementById('adminNewStoreHasPay') ? document.getElementById('adminNewStoreHasPay').checked : true;
         // --- 然後才是你上面的 shopData 定義 ---
 
         // 2. 菜單打包 (乾淨版)
@@ -1010,9 +1015,7 @@ if (adminSubmitStoreBtn) {
         const address = document.getElementById('adminNewStoreAddress')?.value.trim() || '';
         const inviteCode = document.getElementById('adminNewStoreInviteCode')?.value.trim() || '';
         const status = document.getElementById('adminNewStoreStatus')?.value || 'online';
-        const isCashPayEnabled = document.getElementById('adminNewStoreHasTakeout') ? document.getElementById('adminNewStoreHasTakeout').checked : true;
-        const isOnlinePayEnabled = document.getElementById('adminNewStoreHasPay') ? document.getElementById('adminNewStoreHasPay').checked : true;
-
+        
         if (!name || !district || !address) {
             alert("⚠️ 店名、區域、詳細地址為必填項目！");
             return;

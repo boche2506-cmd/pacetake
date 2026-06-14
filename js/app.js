@@ -228,12 +228,12 @@ function renderDynamicMenu(role) {
     }
 
     if (role === 'admin') {
-    menuHTML += `
+        menuHTML += `
         <div class="menu-divider"></div>
         <a href="javascript:void(0)" data-action="toggleAdmin" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
         <a href="javascript:void(0)" data-action="issuePromo" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
     `;
-}
+    }
 
     menuHTML += `
         <div class="menu-divider"></div>
@@ -1063,13 +1063,13 @@ function renderAdminTable() {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1cqw; color:#aaa;">目前雲端尚無店家資料</td></tr>';
         return;
     }
-    
+
     allStores.forEach(store => {
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
         const phone = store.phone || '無資料';
         const statusText = store.status === 'offline' ? '🔴 下線' : '🟢 上線';
-        
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
@@ -1082,7 +1082,6 @@ function renderAdminTable() {
         `;
         tbody.appendChild(tr);
     });
-    renderAdminTable();
 }
 
 // 4. 事件委派：統一處理表格內的所有「刪除」按鈕點擊 (取代原本的 onclick)
@@ -1293,9 +1292,50 @@ async function initStorePage() {
     }
 }
 
-// 同步初始化 (即時執行程式碼)
+// ==========================================
+// 🎯 模組化啟動入口 (直接替換原本檔案最末端)
+// ==========================================
+
+// 1. 基礎 UI 與導覽列初始化
 initThemeSystem();
 bindHeaderEvents();
-initStorePage();
-getBrowserLocation();
-renderAdminTable();
+
+// 2. 頁面專屬邏輯判斷執行
+const menuContainer = document.getElementById('menuContainer');
+const storeListContainer = document.getElementById('store-Container');
+const adminTable = document.getElementById('adminStoreTableBody');
+
+if (menuContainer) {
+    initStorePage(); // 僅在點餐頁執行
+}
+
+if (storeListContainer) {
+    getBrowserLocation(); // 僅在首頁執行定位
+    fetchStoresFromFirebase(); // 僅在首頁獲取店家列表
+}
+
+if (adminTable) {
+    renderAdminTable(); // 僅在管理頁執行
+}
+
+// 3. 登入按鈕事件綁定 (Module 模式下需手動綁定)
+document.getElementById('googleLoginAction')?.addEventListener('click', async () => {
+    try {
+        const result = await signInWithPopup(auth, provider);
+        handleUserSyncAndRoleRouting(result.user);
+    } catch (error) {
+        console.error("Google Login Error:", error);
+    }
+});
+
+document.getElementById('emailLoginAction')?.addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail')?.value;
+    const password = document.getElementById('loginPassword')?.value;
+    if (!email || !password) return;
+    try {
+        const result = await signInWithEmailAndPassword(auth, email, password);
+        handleUserSyncAndRoleRouting(result.user);
+    } catch (error) {
+        console.error("Email Login Error:", error);
+    }
+});

@@ -1101,8 +1101,8 @@ if (toggleBuyerBtn) {
     toggleBuyerBtn.addEventListener('click', () => {
         const adminEl = document.getElementById('adminView');
         const buyerEl = document.getElementById('buyerView');
-        if (adminEl) adminEl.style.display = 'none';
-        if (buyerEl) buyerEl.style.display = 'block';
+        if (adminEl) adminEl.style.display = 'block';
+        if (buyerEl) buyerEl.style.display = 'none';
         window.scrollTo(0, 0);
     });
 }
@@ -1292,50 +1292,9 @@ async function initStorePage() {
     }
 }
 
-// ==========================================
-// 🎯 模組化啟動入口 (直接替換原本檔案最末端)
-// ==========================================
-
-// 1. 基礎 UI 與導覽列初始化
+// 同步初始化 (即時執行程式碼)
 initThemeSystem();
 bindHeaderEvents();
-
-// 2. 頁面專屬邏輯判斷執行
-const menuContainer = document.getElementById('menuContainer');
-const storeListContainer = document.getElementById('store-Container');
-const adminTable = document.getElementById('adminStoreTableBody');
-
-if (menuContainer) {
-    initStorePage(); // 僅在點餐頁執行
-}
-
-if (storeListContainer) {
-    getBrowserLocation(); // 僅在首頁執行定位
-    fetchStoresFromFirebase(); // 僅在首頁獲取店家列表
-}
-
-if (adminTable) {
-    renderAdminTable(); // 僅在管理頁執行
-}
-
-// 3. 登入按鈕事件綁定 (Module 模式下需手動綁定)
-document.getElementById('googleLoginAction')?.addEventListener('click', async () => {
-    try {
-        const result = await signInWithPopup(auth, provider);
-        handleUserSyncAndRoleRouting(result.user);
-    } catch (error) {
-        console.error("Google Login Error:", error);
-    }
-});
-
-document.getElementById('emailLoginAction')?.addEventListener('click', async () => {
-    const email = document.getElementById('loginEmail')?.value;
-    const password = document.getElementById('loginPassword')?.value;
-    if (!email || !password) return;
-    try {
-        const result = await signInWithEmailAndPassword(auth, email, password);
-        handleUserSyncAndRoleRouting(result.user);
-    } catch (error) {
-        console.error("Email Login Error:", error);
-    }
-});
+initStorePage();
+getBrowserLocation();
+renderAdminTable();

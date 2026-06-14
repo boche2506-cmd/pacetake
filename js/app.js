@@ -437,7 +437,7 @@ document.addEventListener('change', (e) => {
 
                 if (img) {
                     img.src = canvas.toDataURL('image/jpeg', 0.7);
-                    img.style.display = 'block';
+                    img.classList.add('is-loaded');
                 }
             };
         };

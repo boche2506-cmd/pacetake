@@ -571,9 +571,7 @@ if (emailLoginAction) {
         }
     });
 }
-// 在你的 handleUserSyncAndRoleRouting 函式中加入這行
-const userDoc = await getDoc(doc(db, "users", user.uid));
-console.log("當前使用者資料:", userDoc.data()); // 檢查這裡的 role 是否真的等於 'admin'
+
 // 賣家註冊專區初始化
 const shopCity = document.getElementById('shopCity');
 const shopDistrict = document.getElementById('shopDistrict');

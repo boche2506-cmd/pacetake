@@ -437,7 +437,7 @@ document.addEventListener('change', (e) => {
 
                 if (img) {
                     img.src = canvas.toDataURL('image/jpeg', 0.7);
-                    img.classList.add('is-loaded');
+                    img.style.display = 'block';
                 }
             };
         };
@@ -684,9 +684,9 @@ if (addItemRowBtn && menuUploadList) {
                                 <input type="file" id="imageInput" class="image-input" accept="image/*"
                                     style="display: none;">
                                 <img class="preview-img" src=""
-                                    style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
+                                    style="display: none; position: absolute; width: 100%; height: 100%; object-fit: contain; border-radius: 2cqw;">
                                 <div class="upload-placeholder"
-                                    style="font-size: 8cqw; width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    style="font-size: 8cqw;  width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">
                                     📷<span>上傳照片</span></div>
                             </div>
                             <div class="item-fields" style="width: 100%; gap: 0.5cqw;">
@@ -1098,10 +1098,10 @@ if (tbody) {
 
 // 5. 視圖切換
 // 統一處理所有的視圖切換邏輯
-window.toggleView = function(view) {
+window.toggleView = function (view) {
     const adminEl = document.getElementById('adminView');
     const buyerEl = document.getElementById('buyerView');
-    
+
     if (view === 'admin') {
         if (adminEl) adminEl.style.display = 'block';
         if (buyerEl) buyerEl.style.display = 'none';
@@ -1140,12 +1140,12 @@ window.issuePromoCode = async function () {
 document.addEventListener('click', (e) => {
     // 檢查點擊的元素有沒有 data-action 屬性
     const action = e.target.getAttribute('data-action');
-    
+
     // 如果標籤是 toggleAdmin，就切換後台
     if (action === 'toggleAdmin') {
-        window.toggleView('admin'); 
+        window.toggleView('admin');
     }
-    
+
     // 如果標籤是 issuePromo，就執行邀請碼功能
     if (action === 'issuePromo') {
         window.issuePromoCode();

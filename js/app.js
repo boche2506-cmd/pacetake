@@ -1297,5 +1297,4 @@ initThemeSystem();
 bindHeaderEvents();
 initStorePage();
 getBrowserLocation();
-
-
+renderAdminTable();

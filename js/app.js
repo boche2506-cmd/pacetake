@@ -471,9 +471,9 @@ function bindHeaderEvents() {
         });
     }
 
-    if (auth.currentUser) {
-        updateUIForUser(auth.currentUser, 'buyer'); // 角色會由 handleUserSyncAndRoleRouting 修正
-    }
+    //if (auth.currentUser) {
+   //     updateUIForUser(auth.currentUser, 'buyer'); // 角色會由 handleUserSyncAndRoleRouting 修正
+   // }
 }
 
 // [登入與身分認證程序]
@@ -1126,7 +1126,7 @@ window.issuePromoCode = async function () {
     const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
     if (!code || code.trim() === "") return;
     try {
-        await setDoc(doc(db, "promo_Codes", code.trim()), {
+        await setDoc(doc(db, "promo_codes", code.trim()), {
             code: code.trim(), createdBy: currentUserId, createdAt: new Date().toISOString(),
             isActive: true, usedBy: null
         });

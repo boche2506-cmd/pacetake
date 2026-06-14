@@ -1292,25 +1292,10 @@ async function initStorePage() {
     }
 }
 
-// 統一處理所有動態生成的按鈕點擊
-document.addEventListener('click', (e) => {
-    const action = e.target.getAttribute('data-action');
-    
-    if (action === 'toggleAdmin') {
-        // 呼叫原本的切換邏輯
-        toggleView('admin'); 
-    }
-    
-    if (action === 'issuePromo') {
-        // 呼叫邀請碼發行函式
-        issuePromoCode();
-    }
-});
-
 // 同步初始化 (即時執行程式碼)
 initThemeSystem();
 bindHeaderEvents();
 initStorePage();
 getBrowserLocation();
-renderAdminTable();
+
 

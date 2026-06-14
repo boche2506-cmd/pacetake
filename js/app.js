@@ -1101,8 +1101,8 @@ if (toggleBuyerBtn) {
     toggleBuyerBtn.addEventListener('click', () => {
         const adminEl = document.getElementById('adminView');
         const buyerEl = document.getElementById('buyerView');
-        if (adminEl) adminEl.style.display = 'block';
-        if (buyerEl) buyerEl.style.display = 'none';
+        if (adminEl) adminEl.style.display = 'none';
+        if (buyerEl) buyerEl.style.display = 'block';
         window.scrollTo(0, 0);
     });
 }
@@ -1122,6 +1122,21 @@ window.issuePromoCode = async function () {
         alert("發行失敗，請檢查您的系統權限配置！");
     }
 };
+
+document.addEventListener('click', (e) => {
+    // 檢查點擊的元素有沒有 data-action 屬性
+    const action = e.target.getAttribute('data-action');
+    
+    // 如果標籤是 toggleAdmin，就切換後台
+    if (action === 'toggleAdmin') {
+        window.toggleView('admin'); 
+    }
+    
+    // 如果標籤是 issuePromo，就執行邀請碼功能
+    if (action === 'issuePromo') {
+        window.issuePromoCode();
+    }
+});
 
 window.addEventListener('DOMContentLoaded', () => {
     const topGroup = document.querySelector('.sticky-top-group');
@@ -1146,6 +1161,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     }
 });
+
 
 // ==========================================
 // 🎯 PACE 專屬：store.html 終極完美動態渲染模組 (含首頁卡片替換、加減鍵、備註欄)

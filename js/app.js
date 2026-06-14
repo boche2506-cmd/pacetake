@@ -336,12 +336,13 @@ function filterAndRenderStores() {
                 <div class="store">
                     <div class="store-name">${finalName}</div>
                     <div class="store-meta">📍 ${finalAddress} • ${distanceHtml}</div>
-                </div>
+                
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
                     <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
                     <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用座位</span>
                 </div>
+            </div>
             </div>
         `;
         storeContainer.appendChild(card);

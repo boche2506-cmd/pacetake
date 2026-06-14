@@ -1123,14 +1123,10 @@ if (toggleBuyerBtn) {
 
 // 6. 發行邀請碼
 window.issuePromoCode = async function () {
-    if (!currentUser || currentUser.role !== 'admin') {
-        alert("❌ 權限不足：僅限管理員執行此操作！");
-        return;
-    }
     const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
     if (!code || code.trim() === "") return;
     try {
-        await setDoc(doc(db, "promo_codes", code.trim()), {
+        await setDoc(doc(db, "promo_Codes", code.trim()), {
             code: code.trim(), createdBy: currentUserId, createdAt: new Date().toISOString(),
             isActive: true, usedBy: null
         });

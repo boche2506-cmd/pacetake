@@ -1096,14 +1096,27 @@ if (tbody) {
 }
 
 // 5. 視圖切換
+// 統一處理所有的視圖切換邏輯
+window.toggleView = function(view) {
+    const adminEl = document.getElementById('adminView');
+    const buyerEl = document.getElementById('buyerView');
+    
+    if (view === 'admin') {
+        if (adminEl) adminEl.style.display = 'block';
+        if (buyerEl) buyerEl.style.display = 'none';
+        window.scrollTo(0, 0);
+    } else {
+        if (adminEl) adminEl.style.display = 'none';
+        if (buyerEl) buyerEl.style.display = 'block';
+        window.scrollTo(0, 0); // 建議加上滾動回頂部，讓體驗一致
+    }
+};
+
+// 綁定「返回一般買家視圖」按鈕
 const toggleBuyerBtn = document.getElementById('toggleBuyerViewBtn');
 if (toggleBuyerBtn) {
     toggleBuyerBtn.addEventListener('click', () => {
-        const adminEl = document.getElementById('adminView');
-        const buyerEl = document.getElementById('buyerView');
-        if (adminEl) adminEl.style.display = 'none';
-        if (buyerEl) buyerEl.style.display = 'block';
-        window.scrollTo(0, 0);
+        window.toggleView('buyer');
     });
 }
 

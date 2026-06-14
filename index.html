@@ -24,12 +24,12 @@
             max-width: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: flex-end; 
             /* 改用 space-between 讓上下兩列自動均分上下空間 */
             align-items: stretch;
             box-sizing: border-box;
             border-bottom: 0.2cqw solid var(--border-color);
-            padding: 0 2cqw 2cqw;
+            padding: 0 2cqw 1cqw;
             /* 使用 cqw 控制外襯 padding */
         }
 
@@ -165,7 +165,7 @@
             flex-direction: column;
             gap: 0.5cqw;
             /* 卡片與卡片之間的間距改用 cqw */
-            padding: 2cqw 1.5cqw 2cqw 2.5cqw;
+            padding: 1cqw 1.5cqw 2cqw 2.5cqw;
             /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
             box-sizing: border-box;
         }
@@ -175,7 +175,7 @@
             /* height: 35%; */
             /* ❌ 建議移除百分比高度，因為內容物（圖片、文字、標籤）*/
             /* 改用 cqw 後，讓卡片高度被內容自然撐開（或改用 min-height） */
-            min-height: 24cqw;
+            min-height: 23cqw;
             /* 💡 新增：設定最小高度，確保卡片視覺比例穩固 */
             width: 100%;
             /* 撐滿 store-list 的寬度（扣除 padding） */
@@ -221,6 +221,7 @@
 
         /* 右側文字資訊大外殼 */
         .store-info {
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -233,6 +234,8 @@
         }
 
         .store {
+            height: 100%;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -248,7 +251,7 @@
         .store-name {
             font-size: 6cqw;
             /* 字體改用 cqw */
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-main);
             white-space: nowrap;
             overflow: hidden;
@@ -259,14 +262,10 @@
 
         /* 📍 店家地址/距離（你要的太長顯示...設定在這裡） */
         .store-meta {
-            font-size: 3cqw;
+            font-size: 3.5cqw;
             /* 字體改用 cqw */
             color: var(--text-muted);
             white-space: nowrap;
-            overflow: hidden;
-            /* 💡 關鍵：隱藏超出寬度的字 */
-            text-overflow: ellipsis;
-            /* 💡 關鍵：超出部分自動變成 ... */
             max-width: 100%;
             /* 💡 關鍵：限制最大寬度為父層的 100% */
         }
@@ -280,7 +279,7 @@
 
         /* 標籤本體 */
         .store-tags span {
-            font-size: 3cqw;
+            font-size: 3.25cqw;
             /* 字體改用 cqw */
             font-weight: 500;
             padding: 0.25cqw 1cqw;

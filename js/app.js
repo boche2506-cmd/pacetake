@@ -1082,6 +1082,7 @@ function renderAdminTable() {
         `;
         tbody.appendChild(tr);
     });
+    renderAdminTable();
 }
 
 // 4. 事件委派：統一處理表格內的所有「刪除」按鈕點擊 (取代原本的 onclick)

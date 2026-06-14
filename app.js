@@ -1298,4 +1298,3 @@ bindHeaderEvents();
 initStorePage();
 getBrowserLocation();
 renderAdminTable();
-

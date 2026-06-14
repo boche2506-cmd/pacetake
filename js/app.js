@@ -470,10 +470,6 @@ function bindHeaderEvents() {
             if (loginLightbox) loginLightbox.style.display = 'flex';
         });
     }
-
-    //if (auth.currentUser) {
-   //     updateUIForUser(auth.currentUser, 'buyer'); // 角色會由 handleUserSyncAndRoleRouting 修正
-   // }
 }
 
 // [登入與身分認證程序]

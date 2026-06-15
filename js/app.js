@@ -779,7 +779,29 @@ if (shopSubmitBtn) {
     shopSubmitBtn.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        // 1. 基本資訊與防呆
+        // --- 1. 嚴謹的身分確認與權限檢查 ---
+        const user = auth.currentUser;
+        if (!user) {
+            alert("⚠️ 請先登入帳號！");
+            return;
+        }
+
+        // 先檢查該用戶是否已經是賣家，防止重複開鋪
+        try {
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+            
+            if (userDoc.exists() && userDoc.data().role === "seller") {
+                alert("您已經擁有店舖了，將為您前往賣家後台。");
+                window.location.href = "seller.html";
+                return;
+            }
+        } catch (err) {
+            console.error("權限檢查失敗:", err);
+            return;
+        }
+
+        // --- 2. 基本資訊與防呆 ---
         const name = document.getElementById('shopName')?.value.trim();
         const phone = document.getElementById('shopPhone')?.value.trim();
         const city = document.getElementById('shopCity')?.value;
@@ -790,7 +812,7 @@ if (shopSubmitBtn) {
             alert("⚠️ 請填寫完整的店舖資訊！");
             return;
         }
-        // 1. (續) 補上剛剛漏掉的變數抓取
+
         const lat = document.getElementById('shopLat')?.value.trim() || '';
         const lng = document.getElementById('shopLng')?.value.trim() || '';
         const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
@@ -805,20 +827,18 @@ if (shopSubmitBtn) {
         const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
         const isCashPayEnabled = document.getElementById('adminNewStoreHasTakeout') ? document.getElementById('adminNewStoreHasTakeout').checked : true;
         const isOnlinePayEnabled = document.getElementById('adminNewStoreHasPay') ? document.getElementById('adminNewStoreHasPay').checked : true;
-        // --- 然後才是你上面的 shopData 定義 ---
 
-        // 2. 菜單打包 (乾淨版)
+        // --- 3. 菜單打包 ---
         const menuRows = document.querySelectorAll('.menu-item-row');
         const menuItems = [];
 
         menuRows.forEach((row, index) => {
             const nameVal = row.querySelector('.item-name-input').value.trim();
-            if (!nameVal) return; // 沒填品項名就跳過
+            if (!nameVal) return;
 
             const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';
-
             let itemObj = {
-                id: `item_${index}`, // 這裡加上唯一的識別 ID，確保回填對應精準
+                id: `item_${index}`,
                 name: nameVal,
                 note: row.querySelector('.item-note-input').value.trim(),
                 image: row.querySelector('.preview-img').src
@@ -835,17 +855,12 @@ if (shopSubmitBtn) {
                 itemObj.priceType = 'single';
                 itemObj.price = parseInt(row.querySelector('.price-input').value) || 0;
             }
-            menuItems.push(itemObj); // 只在這裡 push 一次
+            menuItems.push(itemObj);
         });
 
+        // --- 4. 邀請碼驗證 ---
         if (inviteCode) {
-            // 1. 查詢是否存在該代碼
-            const promoQuery = query(
-                collection(db, "promo_codes"),
-                where("code", "==", inviteCode),
-                where("isActive", "==", true)
-            );
-
+            const promoQuery = query(collection(db, "promo_codes"), where("code", "==", inviteCode), where("isActive", "==", true));
             const querySnapshot = await getDocs(promoQuery);
 
             if (querySnapshot.empty) {
@@ -853,20 +868,11 @@ if (shopSubmitBtn) {
                 return;
             }
 
-            // 2. 取得該文件
             const promoDoc = querySnapshot.docs[0];
-            const promoRef = promoDoc.ref;
-
-            // 3. 更新狀態
-            await updateDoc(promoRef, {
-                isActive: false,
-                usedBy: user.uid
-            });
-
-            console.log("✅ 邀請碼已成功兌換！");
+            await updateDoc(promoDoc.ref, { isActive: false, usedBy: user.uid });
         }
 
-        // 3. 組裝資料物件 (這裡填入所有你剛剛抓取的欄位)
+        // --- 5. 資料組裝與送出 ---
         const shopData = {
             sellerUid: user.uid,
             shopName: name,
@@ -880,30 +886,20 @@ if (shopSubmitBtn) {
             prepareTime: prepareTime,
             isOnlinePayEnabled: isOnlinePayEnabled,
             isCashPayEnabled: isCashPayEnabled,
-            // 這是你原本有的金流設定
-            newebpayConfig: {
-                MerchantID: merchantIdValue,
-                HashKey: hashKeyValue,
-                HashIV: hashIvValue
-            },
-            hasSeating: hasSeating,
-            menuList: menuItems, // 這是剛剛打包好的菜單陣列
+            newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
+            menuList: menuItems,
             createdAt: new Date().toISOString()
         };
 
-        // 4. 送出
         shopSubmitBtn.disabled = true;
         try {
             await setDoc(doc(db, "stores", user.uid), shopData);
-
-            // 權限更新
-            const userDocRef = doc(db, "users", user.uid);
-            await updateDoc(userDocRef, { role: "seller" });
+            await updateDoc(doc(db, "users", user.uid), { role: "seller" });
 
             alert("🎉 開張成功！");
             window.location.href = "seller.html";
         } catch (dbError) {
-            alert("錯誤：" + dbError.message);
+            alert("系統錯誤：" + dbError.message);
             shopSubmitBtn.disabled = false;
         }
     });

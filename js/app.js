@@ -499,6 +499,15 @@ if (togglePasswordVisibility && loginPasswordInput) {
     });
 }
 
+// 在共用 JS 中定義此函式
+export function getHasSeatingStatus() {
+    // 使用 querySelector 搭配你的原始 Class 名稱
+    const seatingToggle = document.querySelector('.seating-toggle');
+
+    // 如果該頁面有這個 toggle，就回傳它的 checked 狀態，沒有則預設 false
+    return seatingToggle ? seatingToggle.checked : false;
+}
+
 // 店家清單篩選與顯示邏輯
 
 if (gpsPinBtn) {
@@ -666,9 +675,6 @@ if (warningCancelBtn) {
     });
 }
 
-const seatingToggle = document.querySelector('.seating-toggle');
-const hasSeating = seatingToggle?.checked ?? false;
-
 if (menuUploadList) {
     document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
 }
@@ -774,9 +780,6 @@ if (shopSubmitBtn) {
     shopSubmitBtn.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        const user = auth.currentUser;
-        if (!user) { alert("【PACE 提示】開鋪前請先登入帳號喔！"); return; }
-
         // 1. 基本資訊與防呆
         const name = document.getElementById('shopName')?.value.trim();
         const phone = document.getElementById('shopPhone')?.value.trim();
@@ -835,6 +838,35 @@ if (shopSubmitBtn) {
             }
             menuItems.push(itemObj); // 只在這裡 push 一次
         });
+
+        if (inviteCode) {
+            // 1. 查詢是否存在該代碼
+            const promoQuery = query(
+                collection(db, "promo_codes"),
+                where("code", "==", inviteCode),
+                where("isActive", "==", true)
+            );
+
+            const querySnapshot = await getDocs(promoQuery);
+
+            if (querySnapshot.empty) {
+                alert("❌ 無效的邀請碼或已被使用！");
+                return;
+            }
+
+            // 2. 取得該文件
+            const promoDoc = querySnapshot.docs[0];
+            const promoRef = promoDoc.ref;
+
+            // 3. 更新狀態
+            await updateDoc(promoRef, {
+                isActive: false,
+                usedBy: user.uid
+            });
+
+            console.log("✅ 邀請碼已成功兌換！");
+        }
+
         // 3. 組裝資料物件 (這裡填入所有你剛剛抓取的欄位)
         const shopData = {
             sellerUid: user.uid,

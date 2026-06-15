@@ -54,6 +54,65 @@
             gap: 8px;
         }
 
+        #menuContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 10px;
+        }
+
+        /* 卡片基礎樣式 */
+        .food-card {
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .food-main-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .food-img {
+            width: 60px;
+            height: 60px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .food-info {
+            flex: 1;
+            margin: 0 15px;
+        }
+
+        .quantity-control-panel {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-number {
+            min-width: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .note-wrapper input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            /* 重要：防止 padding 撐破版面 */
+        }
+
         /* 中間精品菜單區 */
         .menu-Container {
             height: 55%;

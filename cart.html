@@ -378,7 +378,11 @@
         <input type="text" name="Version" value="2.0">
     </form>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script>
+    <script type="module">
+        import { db, auth } from './js/app.js';
+        import { doc, getDoc, setDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getCartData } from './js/cart-manager.js';
         // 藍新測試金鑰配置
         const NEWEBPAY_CONFIG = {
             MerchantID: "MS159240719",
@@ -765,9 +769,9 @@
 
         // 初始化載入購物車
         loadCartFromStorage();
+        window.loadCartFromStorage = loadCartFromStorage;
+        window.selectPayment = selectPayment;
     </script>
-    <script src="js/cart-manager.js"></script>
-    <script type="module" src="js/app.js"></script>
 </body>
 
 </html>

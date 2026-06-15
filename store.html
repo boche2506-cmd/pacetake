@@ -63,33 +63,29 @@
 
         /* 卡片基礎樣式 */
         .food-card {
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 15px;
             background: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .food-main-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 12px;
             margin-bottom: 10px;
         }
 
-        .food-img {
+        .food-img img {
             width: 60px;
             height: 60px;
-            background: #f0f0f0;
+            object-fit: cover;
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .food-info {
             flex: 1;
-            margin: 0 15px;
         }
 
         .quantity-control-panel {
@@ -98,19 +94,33 @@
             gap: 10px;
         }
 
-        .qty-number {
-            min-width: 20px;
-            text-align: center;
-            font-weight: bold;
+        .minus-btn,
+        .plus-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: #eee;
+            font-size: 1.2em;
+            cursor: pointer;
         }
 
-        .note-wrapper input {
+        .qty-number {
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .note-wrapper {
+            margin-top: 5px;
+        }
+
+        .item-note-input {
             width: 100%;
             padding: 8px;
-            border: 1px solid #ddd;
+            border: 1px solid #eee;
             border-radius: 6px;
-            box-sizing: border-box;
-            /* 重要：防止 padding 撐破版面 */
+            font-size: 0.9em;
         }
 
         /* 中間精品菜單區 */
@@ -171,9 +181,37 @@
         }
 
         .food-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-main);
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .size-options {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .size-btn {
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            color: #555;
+            transition: all 0.2s;
+            background: #f9f9f9;
+        }
+
+        .size-btn input {
+            display: none;
+        }
+
+        .size-btn:has(input:checked) {
+            background: #ff5722;
+            color: white;
+            border-color: #ff5722;
+            font-weight: bold;
         }
 
         .food-price {
@@ -184,7 +222,8 @@
 
         /* 按鈕基本結構 */
         .action-Container {
-            flex-shrink: 0;
+            display: flex;
+            align-items: center;
         }
 
         .add-cart-btn {

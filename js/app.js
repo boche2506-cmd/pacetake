@@ -790,7 +790,7 @@ if (shopSubmitBtn) {
         try {
             const userDocRef = doc(db, "users", user.uid);
             const userDoc = await getDoc(userDocRef);
-            
+
             if (userDoc.exists() && userDoc.data().role === "seller") {
                 alert("您已經擁有店舖了，將為您前往賣家後台。");
                 window.location.href = "seller.html";
@@ -825,9 +825,9 @@ if (shopSubmitBtn) {
         const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
         const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
         const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
-        const isCashPayEnabled = document.getElementById('adminNewStoreHasTakeout') ? document.getElementById('adminNewStoreHasTakeout').checked : true;
-        const isOnlinePayEnabled = document.getElementById('adminNewStoreHasPay') ? document.getElementById('adminNewStoreHasPay').checked : true;
-
+        // 修改這裡，對應你 HTML 裡的 ID: toggleCash 和 toggleOnline
+        const isCashPayEnabled = document.getElementById('toggleCash') ? document.getElementById('toggleCash').checked : false;
+        const isOnlinePayEnabled = document.getElementById('toggleOnline') ? document.getElementById('toggleOnline').checked : false;
         // --- 3. 菜單打包 ---
         const menuRows = document.querySelectorAll('.menu-item-row');
         const menuItems = [];
@@ -1251,33 +1251,65 @@ async function initStorePage() {
         menuContainer.innerHTML = "";
 
         menuList.forEach((item, index) => {
-            const itemId = `item_${index}`;
+            // 確保 ID 格式與你的 cart-manager 一致
+            const itemId = `${currentStoreId}|||item_${index}`;
+
+            // 1. 抓取購物車存檔資料
+            const cartData = JSON.parse(localStorage.getItem('pacetake_cart')) || [];
+            const savedItem = cartData.find(c => c.id === itemId);
+            const qty = savedItem ? savedItem.qty : 0;
+            const note = savedItem ? savedItem.note : "";
+
+            // 2. 判斷並產生 HTML
+            let priceHTML = '';
+            let basePrice = 0;
+
+            if (item.priceType === 'multi') {
+                // 多尺寸按鈕 (Radio)
+                basePrice = item.prices.large || 0; // 預設價格
+                priceHTML = `
+            <div class="size-options" data-id="${itemId}" style="display:flex; gap:5px; margin:5px 0;">
+                <label class="size-btn"><input type="radio" name="size_${itemId}" value="large" data-price="${item.prices.large}" checked> 大 $${item.prices.large}</label>
+                ${item.prices.medium ? `<label class="size-btn"><input type="radio" name="size_${itemId}" value="medium" data-price="${item.prices.medium}"> 中 $${item.prices.medium}</label>` : ''}
+                <label class="size-btn"><input type="radio" name="size_${itemId}" value="small" data-price="${item.prices.small}"> 小 $${item.prices.small}</label>
+            </div>
+        `;
+            } else {
+                // 單一價格
+                basePrice = parseInt(item.price) || 0;
+                priceHTML = `<div class="food-price" style="font-weight:bold; color:#ff5722;">$${basePrice}</div>`;
+            }
+
+            // 3. 建立並填入卡片
             const foodCard = document.createElement('div');
             foodCard.className = 'food-card';
             foodCard.dataset.id = itemId;
-            foodCard.dataset.price = parseInt(item.price) || 0; // 存入價格供後續計算
+            foodCard.dataset.price = basePrice; // 存入基礎價格供後續計算
 
             foodCard.innerHTML = `
-                <div class="food-main-row">
-                    <div class="food-img">${item.image ? `<img src="${item.image}" class="preview-img">` : '🍱'}</div>
-                    <div class="food-info">
-                        <div class="food-name">${item.name || '未命名'}</div>
-                        <div class="food-price">$${parseInt(item.price) || 0}</div>
-                    </div>
-                    <div class="action-Container">
-                        <div class="quantity-control-panel">
-                            <button class="minus-btn" data-id="${itemId}">-</button>
-                            <span class="qty-number" id="qty_${itemId}">0</span>
-                            <button class="plus-btn" data-id="${itemId}">+</button>
-                        </div>
-                    </div>
+        <div class="food-main-row">
+            <div class="food-img">${item.image ? `<img src="${item.image}" class="preview-img" style="width:50px; height:50px; object-fit:cover;">` : '🍱'}</div>
+            <div class="food-info">
+                <div class="food-name">${item.name || '未命名'}</div>
+                ${priceHTML}
+            </div>
+            <div class="action-Container">
+                <div class="quantity-control-panel">
+                    <button class="minus-btn" data-id="${itemId}">-</button>
+                    <span class="qty-number" id="qty_${itemId}">${qty}</span>
+                    <button class="plus-btn" data-id="${itemId}">+</button>
                 </div>
-                <div class="note-wrapper">
-                    <input type="text" class="item-note-input" placeholder="✍️ 填寫客製化備註...">
-                </div>
-            `;
+            </div>
+        </div>
+        <div class="note-wrapper">
+            <input type="text" class="item-note-input" placeholder="✍️ 填寫客製化備註..." value="${note}">
+        </div>
+    `;
+
             menuContainer.appendChild(foodCard);
         });
+
+
 
         // --- 事件綁定 ---
         menuContainer.addEventListener('click', (e) => {
@@ -1296,29 +1328,36 @@ async function initStorePage() {
 
         // --- 在 initStorePage 的最後面 ---
         setTimeout(() => {
-            // 1. 取得購物車資料
+            // 1. 取得當前商店 ID (這確保了我們只處理這家店的購物車)
+            const currentStoreId = document.body.getAttribute('data-store-id');
             const cartData = JSON.parse(localStorage.getItem('pacetake_cart')) || [];
 
-            // 2. 遍歷購物車，將數字回填到 UI
-            cartData.forEach(cartItem => {
-                // 尋找對應的 DOM 元素 (根據你的 data-id)
-                const card = document.querySelector(`.food-card[data-id="${cartItem.id}"]`);
+            // 2. 過濾資料：只處理屬於這家店的項目
+            const currentStoreItems = cartData.filter(item => {
+                // 如果你的 item.id 裡面含有 |||，拆解它來比對；否則直接比對 storeId 屬性
+                const itemStoreId = item.id.includes('|||') ? item.id.split('|||')[0] : item.storeId;
+                return String(itemStoreId).trim() === String(currentStoreId).trim();
+            });
+
+            // 3. 遍歷並回填
+            currentStoreItems.forEach(cartItem => {
+                const parts = cartItem.id.split('|||');
+                const rawItemId = parts.length > 1 ? parts[1] : cartItem.id;
+
+                const card = document.querySelector(`.food-card[data-id="${rawItemId}"]`);
+
                 if (card) {
                     const qtyDisplay = card.querySelector('.qty-number');
                     const noteInput = card.querySelector('.item-note-input');
 
-                    // 回填數量
                     if (qtyDisplay) qtyDisplay.innerText = cartItem.qty;
-                    // 回填備註
                     if (noteInput) noteInput.value = cartItem.note || '';
                 }
             });
 
-            // 3. 確保底部結帳欄位也更新
             if (typeof refreshTotalCartUI === 'function') refreshTotalCartUI();
-
-            console.log("[PACE DEBUG] 狀態回填完成，UI 已同步。");
-        }, 200); // 給它多一點點時間，確保 DOM 完全畫完
+            console.log("[PACE DEBUG] 已鎖定店家:", currentStoreId, "購物車同步完成。");
+        }, 200);
 
     } catch (error) {
         console.error("[PACE ERROR] 頁面渲染失敗：", error);

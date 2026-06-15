@@ -21,13 +21,6 @@
             overflow-y: auto;
         }
 
-        .form-Container {
-            padding: 2cqw;
-            display: flex;
-            flex-direction: column;
-            gap: 1cqw;
-        }
-
         .section {
             overflow-y: auto;
         }
@@ -644,7 +637,7 @@
                     <div class="pace-avatar-icon">
                         <span id="defaultIcon" class="avatar-icon">👤</span>
                         <img id="userAvatarImg" src=""
-                            style="display: none; border-radius: 50%;height: 15cqw; width: 15cqw;">
+                            style="display: none; border-radius: 50%;height: 13cqw; width: 13cqw;">
                     </div>
                 </div>
                 <div class="two">
@@ -835,8 +828,11 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHDVR703MLCYGLAi_TtFdDM1gaauKV8sQ&libraries=geocoding&language=zh-TW&loading=async"
         async defer>
         </script>
-    <script src="js/cart-manager.js"></script>
-    <script type="module" src="js/app.js"></script>
+    <script type="module">
+        import { db, auth } from './js/app.js';
+        import { doc, getDoc, setDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getCartData } from './js/cart-manager.js';</script>
 </body>
 
 </html>

@@ -12,169 +12,6 @@
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 全局變數與主題防線 */
-        :root {
-            --bg-global: #F8FAFC;
-            --bg-Container: #FFFFFF;
-            --border-color: #E2E8F0;
-            --text-main: #0F172A;
-            --text-muted: #64748B;
-            --brand-blue: #0066FF;
-            --brand-red: #EF4444;
-            --brand-green: #10B981;
-            --card-bg: #FFFFFF;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
-            --highlight-bg: #E2E8F0;
-        }
-
-        [data-theme="dark"] {
-            --bg-global: #0A0A0A;
-            --bg-Container: #111111;
-            --border-color: #262626;
-            --text-main: #F5F5F5;
-            --text-muted: #A3A3A3;
-            --brand-blue: #3B82F6;
-            --brand-red: #F87171;
-            --brand-green: #34D399;
-            --card-bg: #1C1C1E;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
-            --highlight-bg: #262626;
-        }
-
-        /* 基礎重設 */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-global);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            transition: background-color 0.15s ease;
-        }
-
-        /* 手機直屏精品大外框與細邊界 */
-        .phone-wrapper {
-            width: 100%;
-            max-width: 430px;
-            min-height: 100vh;
-            background-color: var(--bg-Container);
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md);
-            position: relative;
-            padding-bottom: 40px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* 頂部導航 */
-        .header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-left-group {
-            display: flex;
-            gap: 6px;
-        }
-
-        .back-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-main);
-            cursor: pointer;
-            text-decoration: none;
-            background-color: var(--card-bg);
-        }
-
-        .control-panel {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            position: relative;
-        }
-
-        .theme-toggle {
-            background: none;
-            border: 1px solid var(--border-color);
-            font-size: 14px;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-            background-color: var(--card-bg);
-        }
-
-        .avatar-btn {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-main);
-            cursor: pointer;
-        }
-
-        /* 下拉選單與當前頁面高亮 */
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 38px;
-            right: 0;
-            width: 180px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            box-shadow: var(--shadow-md);
-            z-index: 100;
-            padding: 4px;
-        }
-
-        .dropdown-menu a {
-            display: block;
-            width: 100%;
-            padding: 10px 12px;
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 13px;
-            border-radius: 8px;
-        }
-
-        /* 強制高亮反黑當前頁面 */
-        .dropdown-menu a.current-page {
-            background-color: var(--highlight-bg);
-            font-weight: 800;
-            border-left: 3px solid var(--brand-blue);
-        }
-
-        .menu-divider {
-            height: 1px;
-            background-color: var(--border-color);
-            margin: 4px 0;
-        }
-
         /* 帳務記帳本區塊 */
         .main-content {
             padding: 20px;
@@ -440,7 +277,7 @@
                     <div class="pace-avatar-icon">
                         <span id="defaultIcon" class="avatar-icon">👤</span>
                         <img id="userAvatarImg" src=""
-                            style="display: none; border-radius: 50%;height: 15cqw; width: 15cqw;">
+                            style="display: none; border-radius: 50%;height: 13cqw; width: 13cqw;">
                     </div>
                 </div>
                 <div class="two">
@@ -541,7 +378,11 @@
             </main>
         </div>
     </div>
-    <script>
+    <script type="module">
+        import { db, auth } from './js/app.js';
+        import { doc, getDoc, setDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getCartData } from './js/cart-manager.js';
         // 💾 QR Code 效能解放優化：即時高速原生 API 生成並下載 SVG
         const generateDownloadBtn = document.getElementById('generateDownloadBtn');
         bindFastClick(generateDownloadBtn, () => {
@@ -579,8 +420,6 @@
             URL.revokeObjectURL(blobUrl);
         });
     </script>
-    <script src="js/cart-manager.js"></script>
-    <script type="module" src="js/app.js"></script>
 </body>
 
 </html>

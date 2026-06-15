@@ -225,7 +225,7 @@
                     <div class="pace-avatar-icon">
                         <span id="defaultIcon" class="avatar-icon">👤</span>
                         <img id="userAvatarImg" src=""
-                            style="display: none; border-radius: 50%;height: 15cqw; width: 15cqw;">
+                            style="display: none; border-radius: 50%;height: 13cqw; width: 13cqw;">
                     </div>
                 </div>
                 <div class="two">
@@ -261,8 +261,11 @@
             </footer>
         </div>
     </div>
-    <script src="js/cart-manager.js"></script>
-    <script type="module" src="js/app.js"></script>
+    <script type="module">
+        import { db, auth } from './js/app.js';
+        import { doc, getDoc, setDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getCartData } from './js/cart-manager.js';</script>
 </body>
 
 </html>

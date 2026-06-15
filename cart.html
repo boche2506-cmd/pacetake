@@ -12,103 +12,6 @@
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 全局變數與主題防線 */
-        :root {
-            --bg-global: #F8FAFC;
-            --bg-container: #FFFFFF;
-            --border-color: #E2E8F0;
-            --text-main: #0F172A;
-            --text-muted: #64748B;
-            --brand-blue: #0066FF;
-            --card-bg: #FFFFFF;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
-        }
-
-        [data-theme="dark"] {
-            --bg-global: #0A0A0A;
-            --bg-container: #111111;
-            --border-color: #262626;
-            --text-main: #F5F5F5;
-            --text-muted: #A3A3A3;
-            --brand-blue: #3B82F6;
-            --card-bg: #1C1C1E;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-global);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            transition: background-color 0.15s ease;
-        }
-
-        .phone-wrapper {
-            width: 100%;
-            max-width: 430px;
-            min-height: 100vh;
-            background-color: var(--bg-container);
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md);
-            position: relative;
-            padding-bottom: 120px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            padding: 24px 20px 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .back-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-main);
-            cursor: pointer;
-            text-decoration: none;
-            background-color: var(--card-bg);
-        }
-
-        .header h1 {
-            font-size: 20px;
-            font-weight: 800;
-        }
-
-        .theme-toggle {
-            background: none;
-            border: 1px solid var(--border-color);
-            font-size: 16px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-            background-color: var(--card-bg);
-        }
 
         .content {
             padding: 20px;
@@ -282,7 +185,7 @@
                     <div class="pace-avatar-icon">
                         <span id="defaultIcon" class="avatar-icon">👤</span>
                         <img id="userAvatarImg" src=""
-                            style="display: none; border-radius: 50%;height: 15cqw; width: 15cqw;">
+                            style="display: none; border-radius: 50%;height: 13cqw; width: 13cqw;">
                     </div>
                 </div>
                 <div class="two">

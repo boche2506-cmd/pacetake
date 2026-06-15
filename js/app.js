@@ -335,7 +335,7 @@ function filterAndRenderStores() {
             <div class="store-info">
                 <div class="store">
                     <div class="store-name">${finalName}</div>
-                    <div class="store-meta">📍 ${finalAddress} • ${distanceHtml}</div>
+                    <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml}</div>
                 
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
@@ -472,8 +472,8 @@ function bindHeaderEvents() {
     }
 
     //if (auth.currentUser) {
-   //     updateUIForUser(auth.currentUser, 'buyer'); // 角色會由 handleUserSyncAndRoleRouting 修正
-   // }
+    //     updateUIForUser(auth.currentUser, 'buyer'); // 角色會由 handleUserSyncAndRoleRouting 修正
+    // }
 }
 
 // [登入與身分認證程序]
@@ -1015,7 +1015,7 @@ if (adminSubmitStoreBtn) {
         const address = document.getElementById('adminNewStoreAddress')?.value.trim() || '';
         const inviteCode = document.getElementById('adminNewStoreInviteCode')?.value.trim() || '';
         const status = document.getElementById('adminNewStoreStatus')?.value || 'online';
-        
+
         if (!name || !district || !address) {
             alert("⚠️ 店名、區域、詳細地址為必填項目！");
             return;
@@ -1187,7 +1187,8 @@ async function initStorePage() {
 
     const urlParams = new URLSearchParams(window.location.search);
     const currentStoreId = urlParams.get('storeId');
-
+    // 【新增這一行】這樣 initCartDOMState() 裡的 getAttribute 才能抓到正確的 ID
+    document.body.setAttribute('data-store-id', currentStoreId);
     if (!currentStoreId) {
         alert("❌ 找不到店家資訊，將返回首頁！");
         window.location.href = "index.html";
@@ -1303,15 +1304,18 @@ async function initStorePage() {
 
                     if (noteInput) {
                         noteInput.addEventListener('input', () => {
-                            if (typeof updateLocalStorageData === 'function') updateLocalStorageData();
+                            if (typeof updateLocalStorageData === 'function') {
+                                updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput);
+                            }
                         });
                     }
                 }
             });
 
             // 【關鍵】渲染完成後，執行一次狀態回填
+            console.log("[PACE DEBUG] 開始進行狀態回填...");
             if (typeof initCartDOMState === 'function') {
-                initCartDOMState();
+                initCartDOMState(); // 確保 DOM 已經產生，現在抓得到 element 了
                 refreshTotalCartUI();
             }
         };

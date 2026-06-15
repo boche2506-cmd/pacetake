@@ -122,10 +122,10 @@ export function initCartDOMState() {
 }
 
 // --- 4. 初始化與全域掛載 ---
-document.addEventListener('DOMContentLoaded', () => {
-    initCartDOMState();
-    refreshTotalCartUI();
-});
+//document.addEventListener('DOMContentLoaded', () => {
+//    initCartDOMState();
+//    refreshTotalCartUI();
+//});
 
 window.getCartData = getCartData;
 window.refreshTotalCartUI = refreshTotalCartUI;

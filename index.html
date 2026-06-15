@@ -175,7 +175,7 @@
             /* height: 35%; */
             /* ❌ 建議移除百分比高度，因為內容物（圖片、文字、標籤）*/
             /* 改用 cqw 後，讓卡片高度被內容自然撐開（或改用 min-height） */
-            min-height: 23cqw;
+            min-height: 24cqw;
             /* 💡 新增：設定最小高度，確保卡片視覺比例穩固 */
             width: 100%;
             /* 撐滿 store-list 的寬度（扣除 padding） */
@@ -217,11 +217,13 @@
             object-fit: contain;
             /* 關鍵：確保完整顯示，不裁切，短邊留空 */
             display: block;
+            box-sizing: border-box;
         }
 
         /* 右側文字資訊大外殼 */
         .store-info {
             height: 100%;
+            max-width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -258,16 +260,23 @@
             /* 💡 新增：隱藏超出部分 */
             text-overflow: ellipsis;
             /* 超出顯示 ... */
+            line-height: 1.1;
         }
 
         /* 📍 店家地址/距離（你要的太長顯示...設定在這裡） */
         .store-meta {
+            height: 45%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around; 
+            align-items: flex-start;
             font-size: 3.5cqw;
             /* 字體改用 cqw */
             color: var(--text-muted);
             white-space: nowrap;
             max-width: 100%;
             /* 💡 關鍵：限制最大寬度為父層的 100% */
+            line-height: 1.1;
         }
 
         /* 標籤容器 (現金支付 / 支援行動支付) */
@@ -275,6 +284,7 @@
             display: flex;
             gap: 0.5cqw;
             flex-wrap: wrap;
+            line-height: 1.1;
         }
 
         /* 標籤本體 */
@@ -288,21 +298,25 @@
             /* 圓角改用 cqw */
             white-space: nowrap;
             /* 確保標籤內的字（如：現金支付）不會自己斷行 */
+            line-height: 1.1;
         }
 
         .tag-seating {
             background-color: rgba(255, 145, 0, 0.08);
             color: var(--brand-orange);
+            line-height: 1.1;
         }
 
         .tag-time {
             background-color: rgba(0, 98, 255, 0.08);
             color: var(--brand-blue);
+            line-height: 1.1;
         }
 
         .tag-pay {
             background-color: rgba(16, 185, 129, 0.08);
             color: var(--brand-green);
+            line-height: 1.1;
         }
 
         .tag-seating.inactive,

@@ -1,10 +1,11 @@
 /**
- * 🛒 購物車管理核心 (合併版)
- * 整合了單一商品更新、跨店檢查以及全頁面批次同步功能
+ * 🛒 購物車管理核心
  */
+import { db } from './app.js';
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-// 1. 讀取購物車資料 (從 LocalStorage 取得陣列)
-function getCartData() {
+// --- 1. 資料處理區 ---
+export function getCartData() {
     try {
         const data = localStorage.getItem('pacetake_cart');
         return data ? JSON.parse(data) : [];
@@ -14,8 +15,8 @@ function getCartData() {
     }
 }
 
-// 2. 更新 UI 介面 (Badge 與 總計文字)
-function refreshTotalCartUI() {
+// --- 2. UI 渲染區 ---
+export function refreshTotalCartUI() {
     const localCartData = getCartData();
     let totalQty = 0;
     let totalPrice = 0;
@@ -25,44 +26,78 @@ function refreshTotalCartUI() {
         totalPrice += (item.price * item.qty);
     });
 
-    // 更新導覽列或按鈕上的金額 Badge
     const badge = document.querySelector('.order-badge-count');
-    if (badge) {
-        badge.innerText = `($${totalPrice})`;
-    }
+    if (badge) badge.innerText = `($${totalPrice})`;
 
-    // 更新頁面內的購物車摘要文字 (例如：🛒 已加入 2 項 · 總計 $200)
     const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
     if (cartSummaryText) {
-        // 支援兩種顯示格式
-        if (cartSummaryText.id === 'cartSummaryText') {
-            cartSummaryText.innerHTML = `🛒 購物車已加入<br> ${totalQty} 項商品 · 總計 $${totalPrice}`;
-        } else {
-            cartSummaryText.innerText = `🛒 已加入 ${totalQty} 項 · 總計 $${totalPrice}`;
-        }
+        cartSummaryText.innerHTML = cartSummaryText.id === 'cartSummaryText' 
+            ? `🛒 購物車已加入<br> ${totalQty} 項商品 · 總計 $${totalPrice}`
+            : `🛒 已加入 ${totalQty} 項 · 總計 $${totalPrice}`;
     }
 }
 
-// 3. 處理單一商品更新與跨店警告
-function updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput) {
+// --- 3. 業務邏輯區 ---
+export async function checkoutToFirebase(buyerPhone, sellerUid) {
+    const localCartData = getCartData();
+    if (localCartData.length === 0) return alert("購物車是空的");
+
+    const totalAmount = localCartData.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+    try {
+        await addDoc(collection(db, "orders"), {
+            items: localCartData,
+            buyerPhone: buyerPhone,
+            sellerUid: sellerUid,
+            totalAmount: totalAmount,
+            status: 'pending',
+            createdAt: serverTimestamp()
+        });
+        localStorage.removeItem('pacetake_cart');
+        refreshTotalCartUI();
+        alert("訂單已送出！");
+    } catch (e) {
+        console.error("訂單送出失敗: ", e);
+    }
+}
+
+export function syncCartFromDOM() {
+    const cards = document.querySelectorAll('.food-card');
+    const newCartData = [];
+    cards.forEach(card => {
+        const qtyElement = card.querySelector('.qty-number');
+        if (!qtyElement) return;
+        const qty = parseInt(qtyElement.innerText, 10);
+        if (qty > 0) {
+            newCartData.push({
+                id: card.getAttribute('data-id'),
+                name: card.getAttribute('data-name'),
+                price: parseInt(card.getAttribute('data-price'), 10),
+                qty: qty,
+                note: card.querySelector('.item-note-input')?.value || '',
+                storeId: card.getAttribute('data-store-id')
+            });
+        }
+    });
+    localStorage.setItem('pacetake_cart', JSON.stringify(newCartData));
+    refreshTotalCartUI();
+}
+
+export function updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput) {
     let localCartData = getCartData();
     const currentQty = parseInt(qtyDisplay.innerText, 10);
     const currentNote = noteInput ? noteInput.value.trim() : "";
 
-    // 跨店檢查：若購物車已有其他店家的商品，提示使用者
     if (localCartData.length > 0 && localCartData[0].storeId !== currentStoreId) {
         if (confirm("⚠️ 您的購物車內已有其他店家的商品，加入此商品將會清空前店清單，確定要繼續嗎？")) {
-            localCartData = []; // 使用者點確定才清空
+            localCartData = [];
         } else {
-            // 使用者點取消，我們不更新購物車，同時要把目前的數字改回購物車裡紀錄的值（或歸零）
-            // 這樣就不會發生「數字變了但購物車沒清」的情況
             const originalItem = localCartData.find(i => i.id === itemId);
             qtyDisplay.innerText = originalItem ? originalItem.qty : 0;
             return;
         }
     }
 
-    // ... 後面繼續執行儲存邏輯 (更新陣列 -> 存入 localStorage -> 刷新 UI)
     localCartData = localCartData.filter(i => i.id !== itemId);
     if (currentQty > 0) {
         localCartData.push({ id: itemId, name: itemName, price: itemPrice, qty: currentQty, note: currentNote, storeId: currentStoreId });
@@ -71,62 +106,30 @@ function updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qty
     refreshTotalCartUI();
 }
 
-// 4. 批次同步：抓取頁面上所有的餐點卡片並更新 (原第一段邏輯)
-window.syncCartFromDOM = function () {
-    const cards = document.querySelectorAll('.food-card');
-    const newCartData = [];
-
-    cards.forEach(card => {
-        const qtyElement = card.querySelector('.qty-number');
-        if (!qtyElement) return;
-
-        const qty = parseInt(qtyElement.innerText, 10);
-
-        if (qty > 0) {
-            const id = card.getAttribute('data-id');
-            const price = parseInt(card.getAttribute('data-price'), 10);
-            const name = card.getAttribute('data-name');
-            const storeId = card.getAttribute('data-store-id'); // 建議在 HTML 加入此屬性
-
-            const noteInput = card.querySelector('.item-note-input');
-            const note = noteInput ? noteInput.value : '';
-
-            newCartData.push({ id, name, price, qty, note, storeId });
-        }
-    });
-
-    localStorage.setItem('pacetake_cart', JSON.stringify(newCartData));
-    refreshTotalCartUI();
-};
-
-// 5. 頁面載入時：將 LocalStorage 的資料「回填」到 DOM 上 (新增這個函式)
-function initCartDOMState() {
+export function initCartDOMState() {
     const localCartData = getCartData();
-    // 從頁面獲取當前商店 ID (假設 HTML 中有設定 body 的 data-store-id)
     const currentStoreId = document.body.getAttribute('data-store-id');
     localCartData.forEach(item => {
-        // 關鍵：如果該商品不是這間店的，直接跳過，不進行回填
         if (item.storeId !== currentStoreId) return;
         const card = document.querySelector(`.food-card[data-id="${item.id}"]`);
         if (card) {
             const qtyDisplay = card.querySelector('.qty-number');
             const noteInput = card.querySelector('.item-note-input');
-
             if (qtyDisplay) qtyDisplay.innerText = item.qty;
             if (noteInput) noteInput.value = item.note || "";
         }
     });
 }
 
-// 頁面載入時自動執行 UI 同步
+// --- 4. 初始化與全域掛載 ---
 document.addEventListener('DOMContentLoaded', () => {
-    initCartDOMState();   // 1. 先把數量填回 DOM
-    refreshTotalCartUI(); // 2. 再計算總金額
+    initCartDOMState();
+    refreshTotalCartUI();
 });
 
-// 全域導出方法，方便外部調用
 window.getCartData = getCartData;
 window.refreshTotalCartUI = refreshTotalCartUI;
+window.checkoutToFirebase = checkoutToFirebase;
+window.syncCartFromDOM = syncCartFromDOM;
 window.updateLocalStorageData = updateLocalStorageData;
-// 保留舊有名稱相容性，或指向新邏輯
-window.updateLocalStorageFromDOM = window.syncCartFromDOM;
+window.updateLocalStorageFromDOM = syncCartFromDOM;

@@ -809,13 +809,14 @@ if (shopSubmitBtn) {
         const menuRows = document.querySelectorAll('.menu-item-row');
         const menuItems = [];
 
-        menuRows.forEach(row => {
+        menuRows.forEach((row, index) => {
             const nameVal = row.querySelector('.item-name-input').value.trim();
             if (!nameVal) return; // 沒填品項名就跳過
 
             const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';
 
             let itemObj = {
+                id: `item_${index}`, // 這裡加上唯一的識別 ID，確保回填對應精準
                 name: nameVal,
                 note: row.querySelector('.item-note-input').value.trim(),
                 image: row.querySelector('.preview-img').src
@@ -1180,148 +1181,121 @@ window.addEventListener('DOMContentLoaded', () => {
 // 🎯 PACE 專屬：store.html 終極完美動態渲染模組 (含首頁卡片替換、加減鍵、備註欄)
 // ==========================================
 async function initStorePage() {
+    console.log("[PACE DEBUG] 啟動點餐頁面終極渲染程序...");
+
     const menuContainer = document.getElementById('menuContainer');
     if (!menuContainer) return;
 
-    console.log("[PACE DEBUG] 啟動點餐頁面終極渲染程序...");
-
     const urlParams = new URLSearchParams(window.location.search);
     const currentStoreId = urlParams.get('storeId');
-    // 【新增這一行】這樣 initCartDOMState() 裡的 getAttribute 才能抓到正確的 ID
-    document.body.setAttribute('data-store-id', currentStoreId);
+
     if (!currentStoreId) {
-        alert("❌ 找不到店家資訊，將返回首頁！");
+        alert("❌ 找不到店家資訊");
         window.location.href = "index.html";
         return;
     }
+    document.body.setAttribute('data-store-id', currentStoreId);
 
     try {
+        // --- 這裡放回你原有的 Firebase 讀取邏輯 ---
         let storeData = null;
-        // ... (保持你原有的 Firebase 讀取邏輯不變) ...
         const firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
-        if (typeof db !== 'undefined') {
-            try {
-                if (typeof doc === 'function' && typeof getDoc === 'function') {
-                    const docRef = doc(db, "stores", currentStoreId);
-                    const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) storeData = docSnap.data();
-                }
-            } catch (innerErr) { }
-        }
-        if (!storeData) {
-            const fallbackDb = typeof db !== 'undefined' ? db : firebaseFirestore;
-            if (fallbackDb && typeof fallbackDb.collection === 'function') {
-                const docSnap = await fallbackDb.collection("stores").doc(currentStoreId).get();
-                if (docSnap.exists) storeData = docSnap.data();
-            } else if (fallbackDb && typeof fallbackDb.doc === 'function') {
-                const docSnap = await fallbackDb.doc("stores/" + currentStoreId).get();
-                if (typeof docSnap.data === 'function') storeData = docSnap.data();
-            }
+
+        // 嘗試用 v9 寫法讀取
+        if (typeof db !== 'undefined' && typeof doc === 'function') {
+            const docSnap = await getDoc(doc(db, "stores", currentStoreId));
+            if (docSnap.exists()) storeData = docSnap.data();
         }
 
-        // --- 2. 開始渲染畫面 ---
-        if (storeData) {
-            // 基礎資訊填入
-            const nameEl = document.getElementById('storeNameText');
-            const addrEl = document.getElementById('storeAddressText');
-            const distEl = document.getElementById('storeDistanceText');
+        // 如果 v9 沒讀到，嘗試用 v8 寫法讀取
+        if (!storeData && firebaseFirestore) {
+            const docSnap = await firebaseFirestore.collection("stores").doc(currentStoreId).get();
+            if (docSnap.exists) storeData = docSnap.data();
+        }
 
-            if (nameEl) nameEl.innerText = storeData.shopName || storeData.name || '未命名店家';
-            if (addrEl) addrEl.innerText = '📍 ' + (storeData.shopAddress || storeData.address || '');
-            if (distEl) distEl.innerText = '⚡ ' + (typeof dist !== 'undefined' ? dist + ' km' : '0.05 km');
+        if (!storeData) throw new Error("無法從資料庫找到該店家資料");
 
-            const menuList = storeData.menuList || storeData.menu || [];
-            menuContainer.innerHTML = "";
+        // --- 渲染邏輯 ---
+        document.getElementById('storeNameText').innerText = storeData.shopName || storeData.name || '未命名店家';
+        document.getElementById('storeAddressText').innerText = '📍 ' + (storeData.shopAddress || storeData.address || '');
+        document.getElementById('storeDistanceText').innerText = '⚡ ' + (typeof dist !== 'undefined' ? dist + ' km' : '0.05 km');
 
-            menuList.forEach((item, index) => {
-                const itemId = `item_${index}`;
-                const itemName = item.name || '未命名商品';
-                const itemPrice = parseInt(item.price, 10) || 0;
-                const itemImg = item.image || '';
-                const isSoldOut = storeData.status === "offline";
-                const menuData = JSON.parse(localStorage.getItem('pacetake_menu')) || {};
-                const isLocalSoldOut = menuData[itemId]?.isSoldOut || false;
-                const finalIsSoldOut = (isSoldOut || isLocalSoldOut);
-                const foodCard = document.createElement('div');
-                foodCard.className = `food-card`;
-                // 👇 補上這些屬性，對應 cart-manager.js 的需求
-                foodCard.setAttribute('data-id', itemId);
-                foodCard.setAttribute('data-price', itemPrice);
-                foodCard.setAttribute('data-name', itemName);
-                foodCard.setAttribute('data-store-id', currentStoreId); // 這是關鍵！
+        const menuList = storeData.menuList || storeData.menu || [];
+        menuContainer.innerHTML = "";
 
-                // 這裡改用 class，讓 CSS 控制排版
-                foodCard.innerHTML = `
-                    <div class="food-main-row">
-                        <div class="food-img">${itemImg ? `<img src="${itemImg}" class="preview-img">` : '🍱'}</div>
-                        <div class="food-info">
-                            <div class="food-name">${itemName} ${finalIsSoldOut ? '(暫停供應)' : ''}</div>
-                            <div class="food-price">$${itemPrice}</div>
-                        </div>
-                        <div class="action-Container">
-                            ${finalIsSoldOut
-                        ? `<button class="add-cart-btn sold-out-btn" disabled>🔴 暫停供應</button>`
-                        : `<div class="quantity-control-panel">
-                                    <button class="minus-btn" data-id="${itemId}">-</button>
-                                    <span class="qty-number" id="qty_${itemId}">0</span>
-                                    <button class="plus-btn" data-id="${itemId}">+</button>
-                                  </div>`
-                    }
+        menuList.forEach((item, index) => {
+            const itemId = `item_${index}`;
+            const foodCard = document.createElement('div');
+            foodCard.className = 'food-card';
+            foodCard.dataset.id = itemId;
+            foodCard.dataset.price = parseInt(item.price) || 0; // 存入價格供後續計算
+
+            foodCard.innerHTML = `
+                <div class="food-main-row">
+                    <div class="food-img">${item.image ? `<img src="${item.image}" class="preview-img">` : '🍱'}</div>
+                    <div class="food-info">
+                        <div class="food-name">${item.name || '未命名'}</div>
+                        <div class="food-price">$${parseInt(item.price) || 0}</div>
+                    </div>
+                    <div class="action-Container">
+                        <div class="quantity-control-panel">
+                            <button class="minus-btn" data-id="${itemId}">-</button>
+                            <span class="qty-number" id="qty_${itemId}">0</span>
+                            <button class="plus-btn" data-id="${itemId}">+</button>
                         </div>
                     </div>
-                    ${finalIsSoldOut ? '' : `
-                        <div class="note-wrapper">
-                            <input type="text" class="item-note-input" placeholder="✍️ 填寫客製化備註...">
-                        </div>
-                    `}
-                `;
+                </div>
+                <div class="note-wrapper">
+                    <input type="text" class="item-note-input" placeholder="✍️ 填寫客製化備註...">
+                </div>
+            `;
+            menuContainer.appendChild(foodCard);
+        });
 
-                menuContainer.appendChild(foodCard);
+        // --- 事件綁定 ---
+        menuContainer.addEventListener('click', (e) => {
+            if (!e.target.matches('.plus-btn, .minus-btn')) return;
+            const card = e.target.closest('.food-card');
+            const qtyDisplay = card.querySelector('.qty-number');
+            const noteInput = card.querySelector('.item-note-input');
 
-                // --- 4. 功能綁定 ---
-                if (!finalIsSoldOut) {
-                    const plusBtn = foodCard.querySelector('.plus-btn');
-                    const minusBtn = foodCard.querySelector('.minus-btn');
-                    const qtyDisplay = foodCard.querySelector('.qty-number');
-                    const noteInput = foodCard.querySelector('.item-note-input');
+            let count = parseInt(qtyDisplay.innerText);
+            if (e.target.matches('.plus-btn')) count++;
+            else if (count > 0) count--;
+            qtyDisplay.innerText = count;
 
-                    plusBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        let count = parseInt(qtyDisplay.innerText, 10) + 1;
-                        qtyDisplay.innerText = count;
-                        if (typeof updateLocalStorageData === 'function') updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput);
-                    });
+            updateLocalStorageData(card.dataset.id, card.querySelector('.food-name').innerText, card.dataset.price, currentStoreId, qtyDisplay, noteInput);
+        });
 
-                    minusBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        let count = parseInt(qtyDisplay.innerText, 10);
-                        if (count > 0) {
-                            count -= 1;
-                            qtyDisplay.innerText = count;
-                            if (typeof updateLocalStorageData === 'function') updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput);
-                        }
-                    });
+        // --- 在 initStorePage 的最後面 ---
+        setTimeout(() => {
+            // 1. 取得購物車資料
+            const cartData = JSON.parse(localStorage.getItem('pacetake_cart')) || [];
 
-                    if (noteInput) {
-                        noteInput.addEventListener('input', () => {
-                            if (typeof updateLocalStorageData === 'function') {
-                                updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput);
-                            }
-                        });
-                    }
+            // 2. 遍歷購物車，將數字回填到 UI
+            cartData.forEach(cartItem => {
+                // 尋找對應的 DOM 元素 (根據你的 data-id)
+                const card = document.querySelector(`.food-card[data-id="${cartItem.id}"]`);
+                if (card) {
+                    const qtyDisplay = card.querySelector('.qty-number');
+                    const noteInput = card.querySelector('.item-note-input');
+
+                    // 回填數量
+                    if (qtyDisplay) qtyDisplay.innerText = cartItem.qty;
+                    // 回填備註
+                    if (noteInput) noteInput.value = cartItem.note || '';
                 }
             });
 
-            // 【關鍵】渲染完成後，執行一次狀態回填
-            console.log("[PACE DEBUG] 開始進行狀態回填...");
-            if (typeof initCartDOMState === 'function') {
-                initCartDOMState(); // 確保 DOM 已經產生，現在抓得到 element 了
-                refreshTotalCartUI();
-            }
-        };
-    }
-    catch (error) {
-        console.error("[PACE ERROR] 崩潰：", error);
+            // 3. 確保底部結帳欄位也更新
+            if (typeof refreshTotalCartUI === 'function') refreshTotalCartUI();
+
+            console.log("[PACE DEBUG] 狀態回填完成，UI 已同步。");
+        }, 200); // 給它多一點點時間，確保 DOM 完全畫完
+
+    } catch (error) {
+        console.error("[PACE ERROR] 頁面渲染失敗：", error);
+        menuContainer.innerHTML = "<p>無法載入店家菜單，請檢查網路連線。</p>";
     }
 }
 

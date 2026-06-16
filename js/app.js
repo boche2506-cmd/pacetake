@@ -392,6 +392,52 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
+// 店家清單篩選與顯示邏輯
+
+if (gpsPinBtn) {
+    gpsPinBtn.addEventListener('click', () => {
+        console.log("[PACE DEBUG] GPS Pin clicked.");
+        getBrowserLocation();
+        if (addressDetailLightbox) addressDetailLightbox.style.display = 'flex';
+    });
+}
+if (closeAddressModalBtn) closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
+
+if (citySelect) {
+    Object.keys(areaData).forEach(city => {
+        const opt = document.createElement('option');
+        opt.value = city; opt.innerText = city; citySelect.appendChild(opt);
+    });
+    citySelect.addEventListener('change', () => {
+        const selectedCity = citySelect.value;
+        if (districtSelect) {
+            districtSelect.innerHTML = '<option value="">選擇區域</option>';
+            if (areaData[selectedCity]) {
+                areaData[selectedCity].forEach(dist => {
+                    const opt = document.createElement('option');
+                    opt.value = dist; opt.innerText = dist; districtSelect.appendChild(opt);
+                });
+            }
+        }
+        filterAndRenderStores();
+    });
+}
+if (districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
+if (globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
+// [使用者狀態與 UI 初始化]
+if (googleLoginAction) {
+    googleLoginAction.addEventListener('click', async () => {
+        console.log("[PACE DEBUG] Google login action.");
+        try {
+            const result = await signInWithPopup(auth, provider);
+            await handleUserSyncAndRoleRouting(result.user);
+        } catch (error) {
+            console.error("Google 登入失敗：", error);
+            alert("連線失敗，請檢查網路服務！");
+        }
+    });
+}
+
 // ==========================================
 // 4. 初始化與事件綁定
 // ==========================================
@@ -507,51 +553,6 @@ export function getHasSeatingStatus() {
     return seatingToggle ? seatingToggle.checked : false;
 }
 
-// 店家清單篩選與顯示邏輯
-
-if (gpsPinBtn) {
-    gpsPinBtn.addEventListener('click', () => {
-        console.log("[PACE DEBUG] GPS Pin clicked.");
-        getBrowserLocation();
-        if (addressDetailLightbox) addressDetailLightbox.style.display = 'flex';
-    });
-}
-if (closeAddressModalBtn) closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
-
-if (citySelect) {
-    Object.keys(areaData).forEach(city => {
-        const opt = document.createElement('option');
-        opt.value = city; opt.innerText = city; citySelect.appendChild(opt);
-    });
-    citySelect.addEventListener('change', () => {
-        const selectedCity = citySelect.value;
-        if (districtSelect) {
-            districtSelect.innerHTML = '<option value="">選擇區域</option>';
-            if (areaData[selectedCity]) {
-                areaData[selectedCity].forEach(dist => {
-                    const opt = document.createElement('option');
-                    opt.value = dist; opt.innerText = dist; districtSelect.appendChild(opt);
-                });
-            }
-        }
-        filterAndRenderStores();
-    });
-}
-if (districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
-if (globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
-// [使用者狀態與 UI 初始化]
-if (googleLoginAction) {
-    googleLoginAction.addEventListener('click', async () => {
-        console.log("[PACE DEBUG] Google login action.");
-        try {
-            const result = await signInWithPopup(auth, provider);
-            await handleUserSyncAndRoleRouting(result.user);
-        } catch (error) {
-            console.error("Google 登入失敗：", error);
-            alert("連線失敗，請檢查網路服務！");
-        }
-    });
-}
 
 if (emailLoginAction) {
     emailLoginAction.addEventListener('click', async () => {
@@ -877,6 +878,10 @@ if (shopSubmitBtn) {
             sellerUid: user.uid,
             shopName: name,
             shopPhone: phone,
+            city: city,
+            district: district,
+            detailAddress: detailAddress,
+            // 雖然你有獨立欄位，但保留 shopAddress 也很方便前端直接顯示
             shopAddress: `${city}${district}${detailAddress}`,
             shopLat: lat,
             shopLng: lng,
@@ -1370,15 +1375,22 @@ async function initStorePage() {
 // ==========================================
 
 // 1. UI 互動監聽綁定
-citySelect.addEventListener('change', filterAndRenderStores);
-districtSelect.addEventListener('change', filterAndRenderStores);
-globalSearchInput.addEventListener('input', filterAndRenderStores);
+function setupEventListeners() {
+    const city = document.getElementById('citySelect');
+    const dist = document.getElementById('districtSelect');
+    const search = document.getElementById('globalSearchInput');
 
+    if (city) city.addEventListener('change', filterAndRenderStores);
+    if (dist) dist.addEventListener('change', filterAndRenderStores);
+    if (search) search.addEventListener('input', filterAndRenderStores);
+
+    console.log("監聽器設定完成");
+}
 // 2. 系統初始化
 initThemeSystem();
 bindHeaderEvents();
 initStorePage();
-
+setupEventListeners();
 // 3. 獲取資料與位置
 getBrowserLocation(); // 內部會觸發 filterAndRenderStores
 fetchStoresFromFirebase(); // 內部會觸發 filterAndRenderStores

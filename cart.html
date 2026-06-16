@@ -281,11 +281,11 @@
         <input type="text" name="Version" value="2.0">
     </form>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script type="module" src="./app.js"></script>
+    <script type="module" src="./cart-manager.js"></script>
     <script type="module">
-        import { db, auth } from './js/app.js';
-        import { doc, getDoc, setDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getCartData } from './js/cart-manager.js';
+        import { app, auth, db, provider, getHasSeatingStatus } from './app.js';
+        import { getCartData, updateLocalStorageData, initCartDOMState, refreshTotalCartUI, checkoutToFirebase, } from './cart-manager.js';
         // 藍新測試金鑰配置
         const NEWEBPAY_CONFIG = {
             MerchantID: "MS159240719",

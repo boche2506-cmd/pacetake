@@ -268,7 +268,7 @@
             height: 45%;
             display: flex;
             flex-direction: column;
-            justify-content: space-around; 
+            justify-content: space-around;
             align-items: flex-start;
             font-size: 3.5cqw;
             /* 字體改用 cqw */
@@ -629,12 +629,8 @@
             </div>
         </div>
     </div>
-    <script type="module">
-        import { db, auth } from './js/app.js';
-        import { doc, getDoc, setDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getCartData } from './js/cart-manager.js';
-    </script>
+    <script type="module" src="./app.js"></script>
+    <script type="module" src="./cart-manager.js"></script>
 </body>
 
 </html>

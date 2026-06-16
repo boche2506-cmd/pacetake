@@ -148,11 +148,11 @@
             </main>
         </div>
     </div>
+    <script type="module" src="./app.js"></script>
+    <script type="module" src="./cart-manager.js"></script>
     <script type="module">
-        import { db, auth } from './js/app.js';
-        import { doc, getDoc, setDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getCartData } from './js/cart-manager.js';
+        import { app, auth, db, provider, getHasSeatingStatus } from './app.js';
+        import { getCartData, updateLocalStorageData, initCartDOMState, refreshTotalCartUI, checkoutToFirebase, } from './cart-manager.js';
         function bindFastClick(element, callback) {
             if (!element) return;
             let triggered = false;

@@ -12,7 +12,6 @@
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        
         /* 最左側：巨型盲操營業開關 */
         .status-toggle-btn {
             background-color: rgba(16, 185, 129, 0.1);
@@ -340,12 +339,11 @@
             </div>
         </div>
     </div>
+    <script type="module" src="./app.js"></script>
+    <script type="module" src="./cart-manager.js"></script>
     <script type="module">
-        import { db, auth } from './js/app.js';
-        import { doc, getDoc, setDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getCartData } from './js/cart-manager.js';
-        
+        import { app, auth, db, provider, getHasSeatingStatus } from './app.js';
+        import { getCartData, updateLocalStorageData, initCartDOMState, refreshTotalCartUI, checkoutToFirebase, } from './cart-manager.js';
 
         // 🟢 🔴 最左側巨型營業狀態切換防線
         const shopStatusToggle = document.getElementById('shopStatusToggle');

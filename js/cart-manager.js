@@ -1,8 +1,13 @@
 /**
  * 🛒 購物車管理核心
  */
-import { db } from './app.js';
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+// 1. 匯入「鑰匙」(來自 app.js 的連線通道)
+import { app, auth, db, provider, getHasSeatingStatus } from './app.js';
+
+// 2. [執行區]：確認資源載入後，立即執行邏輯來除錯或開始工作
+console.log("資料庫連線狀況：", db); 
+const isSeating = getHasSeatingStatus();
+console.log("目前座位狀態：", isSeating);
 
 // --- 1. 資料處理區 ---
 export function getCartData() {
@@ -10,14 +15,8 @@ export function getCartData() {
         const raw = localStorage.getItem('pacetake_cart');
         if (!raw) return [];
         const data = JSON.parse(raw);
-        
-        // 強制濾除任何包裹結構，只回傳純陣列
-        if (Array.isArray(data)) return data;
-        if (data && Array.isArray(data.menuList)) return data.menuList;
-        
-        return [];
+        return Array.isArray(data) ? data : [];
     } catch (e) {
-        console.error("購物車資料讀取錯誤:", e);
         return [];
     }
 }
@@ -38,9 +37,7 @@ export function refreshTotalCartUI() {
 
     const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
     if (cartSummaryText) {
-        cartSummaryText.innerHTML = cartSummaryText.id === 'cartSummaryText'
-            ? `🛒 購物車已加入<br> ${totalQty} 項商品 · 總計 $${totalPrice}`
-            : `🛒 已加入 ${totalQty} 項 · 總計 $${totalPrice}`;
+        cartSummaryText.innerHTML = `🛒 已加入 ${totalQty} 項 · 總計 $${totalPrice}`;
     }
 }
 
@@ -68,38 +65,15 @@ export async function checkoutToFirebase(buyerPhone, sellerUid) {
     }
 }
 
-export function syncCartFromDOM() {
-    const cards = document.querySelectorAll('.food-card');
-    const newCartData = [];
-    cards.forEach(card => {
-        const qtyElement = card.querySelector('.qty-number');
-        if (!qtyElement) return;
-        const qty = parseInt(qtyElement.innerText, 10);
-        if (qty > 0) {
-            newCartData.push({
-                id: card.getAttribute('data-id'),
-                name: card.getAttribute('data-name'),
-                price: parseInt(card.getAttribute('data-price'), 10),
-                qty: qty,
-                note: card.querySelector('.item-note-input')?.value || '',
-                storeId: card.getAttribute('data-store-id')
-            });
-        }
-    });
-    localStorage.setItem('pacetake_cart', JSON.stringify(newCartData));
-    refreshTotalCartUI();
-}
-
-export function updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput) {
+// 這是你現在使用的唯一更新函式
+export function updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput, card) {
     let localCartData = getCartData();
     const currentQty = parseInt(qtyDisplay.innerText, 10);
     const currentNote = noteInput ? noteInput.value.trim() : "";
-
-    // 【修正點】：使用 "|||" 作為分隔符，避免未來 ID 衝突
     const uniqueId = `${currentStoreId}|||${itemId}`;
 
     if (localCartData.length > 0 && String(localCartData[0].storeId).trim() !== String(currentStoreId).trim()) {
-        if (confirm("⚠️ 您的購物車內已有其他店家的商品，加入此商品將會清空前店清單，確定要繼續嗎？")) {
+        if (confirm("⚠️ 購物車內已有其他店家的商品，加入此商品將會清空前店清單，確定繼續嗎？")) {
             localCartData = [];
         } else {
             const originalItem = localCartData.find(i => i.id === uniqueId);
@@ -109,56 +83,45 @@ export function updateLocalStorageData(itemId, itemName, itemPrice, currentStore
     }
 
     localCartData = localCartData.filter(i => i.id !== uniqueId);
-    
+
     if (currentQty > 0) {
-        localCartData.push({ 
-            id: uniqueId, // 存入的是帶有店家ID的完整 Key
-            name: itemName, 
-            price: itemPrice, 
-            qty: currentQty, 
-            note: currentNote, 
-            storeId: currentStoreId 
+        localCartData.push({
+            id: uniqueId,
+            name: itemName,
+            price: itemPrice,
+            qty: currentQty,
+            note: currentNote,
+            storeId: currentStoreId,
+            size: card.querySelector('input[type="radio"]:checked')?.value || null
         });
     }
-    
+
     localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
-    if (typeof refreshTotalCartUI === 'function') refreshTotalCartUI();
+    refreshTotalCartUI();
 }
 
 export function initCartDOMState() {
-    const cartItems = getCartData(); 
+    const cartItems = getCartData();
     const currentStoreId = document.body.getAttribute('data-store-id');
-
     if (!cartItems || cartItems.length === 0) return;
 
     cartItems.forEach(item => {
         if (String(item.storeId || "").trim() !== String(currentStoreId || "").trim()) return;
 
-        // 2. 【修正點】：用我們剛剛設定的分隔符 "|||" 來拆解，取出最後那一段
         const parts = item.id.split('|||');
-        const rawItemId = parts[1]; // 這裡直接拿到 item_0
-
-        // 3. 找 DOM
+        const rawItemId = parts[1];
         const card = document.querySelector(`.food-card[data-id="${rawItemId}"]`);
-        
+
         if (card) {
             const qtyDisplay = card.querySelector('.qty-number');
             const noteInput = card.querySelector('.item-note-input');
-            if (qtyDisplay && item.qty !== undefined) qtyDisplay.innerText = item.qty;
-            if (noteInput && item.note !== undefined) noteInput.value = item.note;
+            if (qtyDisplay) qtyDisplay.innerText = item.qty;
+            if (noteInput) noteInput.value = item.note;
+
+            if (item.size) {
+                const radioToSelect = card.querySelector(`input[value="${item.size}"]`);
+                if (radioToSelect) radioToSelect.checked = true;
+            }
         }
     });
 }
-
-// --- 4. 初始化與全域掛載 ---
-//document.addEventListener('DOMContentLoaded', () => {
-//    initCartDOMState();
-//    refreshTotalCartUI();
-//});
-
-window.getCartData = getCartData;
-window.refreshTotalCartUI = refreshTotalCartUI;
-window.checkoutToFirebase = checkoutToFirebase;
-window.syncCartFromDOM = syncCartFromDOM;
-window.updateLocalStorageData = updateLocalStorageData;
-window.updateLocalStorageFromDOM = syncCartFromDOM;

@@ -1,6 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getCartData, updateLocalStorageData, initCartDOMState, refreshTotalCartUI, checkoutToFirebase, } from './cart-manager.js';
+// 在你的網頁 script 或其他 JS 檔案中：
+// 接下來就可以直接呼叫這些函式了
+// 例如：
 // ==========================================
 // 1. firebase 設定與初始化
 // ==========================================
@@ -1184,30 +1188,32 @@ document.addEventListener('click', (e) => {
     }
 });
 
-window.addEventListener('DOMContentLoaded', () => {
+// 封裝成一個獨立的初始化函式
+function initPullToRefresh() {
     const topGroup = document.querySelector('.sticky-top-group');
     let startY = 0;
+    let isReloading = false; // 加入鎖定開關，防止連點
 
     if (topGroup) {
-        // 監聽手指按下的瞬間
         topGroup.addEventListener('touchstart', (e) => {
             startY = e.touches[0].pageY;
+            isReloading = false;
         }, { passive: true });
 
-        // 監聽手指往下滑動的距離
         topGroup.addEventListener('touchmove', (e) => {
+            if (isReloading) return;
+
             const currentY = e.touches[0].pageY;
             const pullDistance = currentY - startY;
 
-            // 💡 當在頂端列「往下拉」超過 80px 時，直接重新整理網頁！
             if (pullDistance > 80) {
+                isReloading = true;
                 console.log("[PACE] 偵測到上層下拉，觸發重新整理！");
                 location.reload();
             }
         }, { passive: true });
     }
-});
-
+}
 
 // ==========================================
 // 🎯 PACE 專屬：store.html 終極完美動態渲染模組 (含首頁卡片替換、加減鍵、備註欄)
@@ -1322,13 +1328,33 @@ async function initStorePage() {
             const card = e.target.closest('.food-card');
             const qtyDisplay = card.querySelector('.qty-number');
             const noteInput = card.querySelector('.item-note-input');
+            const priceType = card.dataset.priceType || (card.querySelector('.size-options') ? 'multi' : 'single');
+
+            let currentPrice = 0;
+
+            if (priceType === 'multi') {
+                // 抓取被選中的那個 radio 的價格
+                const selectedRadio = card.querySelector('input[type="radio"]:checked');
+                currentPrice = selectedRadio ? parseInt(selectedRadio.dataset.price) : 0;
+            } else {
+                // 單一價格模式
+                currentPrice = parseInt(card.dataset.price) || 0;
+            }
 
             let count = parseInt(qtyDisplay.innerText);
             if (e.target.matches('.plus-btn')) count++;
             else if (count > 0) count--;
             qtyDisplay.innerText = count;
 
-            updateLocalStorageData(card.dataset.id, card.querySelector('.food-name').innerText, card.dataset.price, currentStoreId, qtyDisplay, noteInput);
+            updateLocalStorageData(
+                card.dataset.id,
+                card.querySelector('.food-name').innerText,
+                currentPrice,
+                currentStoreId,
+                qtyDisplay,
+                noteInput,
+                card // 補上這個 card
+            );
         });
 
         // --- 在 initStorePage 的最後面 ---
@@ -1374,26 +1400,24 @@ async function initStorePage() {
 // 🚀 初始化區塊
 // ==========================================
 
-// 1. UI 互動監聽綁定
-function setupEventListeners() {
-    const city = document.getElementById('citySelect');
-    const dist = document.getElementById('districtSelect');
-    const search = document.getElementById('globalSearchInput');
-
-    if (city) city.addEventListener('change', filterAndRenderStores);
-    if (dist) dist.addEventListener('change', filterAndRenderStores);
-    if (search) search.addEventListener('input', filterAndRenderStores);
-
-    console.log("監聽器設定完成");
+// 1. 將所有邏輯封裝在一個啟動函式裡
+function startApp() {
+    initThemeSystem();
+    bindHeaderEvents();
+    initStorePage();
+    setupEventListeners();
+    
+    getBrowserLocation();
+    fetchStoresFromFirebase();
+    renderAdminTable();
+    
+    initCartDOMState();
+    refreshTotalCartUI();
+    initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
+    
+    console.log("系統初始化完成");
 }
-// 2. 系統初始化
-initThemeSystem();
-bindHeaderEvents();
-initStorePage();
-setupEventListeners();
-// 3. 獲取資料與位置
-getBrowserLocation(); // 內部會觸發 filterAndRenderStores
-fetchStoresFromFirebase(); // 內部會觸發 filterAndRenderStores
 
-// 4. 管理後台渲染
-renderAdminTable();
+// 2. 為了絕對安全，同時運用 DOMContentLoaded
+// 這不是多餘的，這是為了應對不同瀏覽器載入行為的「防禦性編程」
+document.addEventListener('DOMContentLoaded', startApp);

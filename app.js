@@ -895,6 +895,7 @@ if (shopSubmitBtn) {
             isOnlinePayEnabled: isOnlinePayEnabled,
             isCashPayEnabled: isCashPayEnabled,
             newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
+            hasSeating: getHasSeatingStatus(),
             menuList: menuItems,
             createdAt: new Date().toISOString()
         };

@@ -339,11 +339,8 @@
             </div>
         </div>
     </div>
-    <script type="module" src="./app.js"></script>
-    <script type="module" src="./cart-manager.js"></script>
+    <script type="module" src="app.js"></script>
     <script type="module">
-        import { app, auth, db, provider, getHasSeatingStatus } from './app.js';
-        import { getCartData, updateLocalStorageData, initCartDOMState, refreshTotalCartUI, checkoutToFirebase, } from './cart-manager.js';
 
         // 🟢 🔴 最左側巨型營業狀態切換防線
         const shopStatusToggle = document.getElementById('shopStatusToggle');

@@ -12,7 +12,6 @@
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
     <link rel="stylesheet" href="style.css">
     <style>
-
         .content {
             padding: 20px;
             display: flex;
@@ -281,11 +280,8 @@
         <input type="text" name="Version" value="2.0">
     </form>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script type="module" src="./app.js"></script>
-    <script type="module" src="./cart-manager.js"></script>
+    <script type="module" src="app.js"></script>
     <script type="module">
-        import { app, auth, db, provider, getHasSeatingStatus } from './app.js';
-        import { getCartData, updateLocalStorageData, initCartDOMState, refreshTotalCartUI, checkoutToFirebase, } from './cart-manager.js';
         // 藍新測試金鑰配置
         const NEWEBPAY_CONFIG = {
             MerchantID: "MS159240719",

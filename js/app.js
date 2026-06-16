@@ -355,8 +355,8 @@ function getBrowserLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                const buyerLat = position.coords.latitude;
-                const buyerLng = position.coords.longitude;
+                buyerLat = position.coords.latitude;
+                buyerLng = position.coords.longitude;
                 const currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
 
                 if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
@@ -1365,9 +1365,23 @@ async function initStorePage() {
     }
 }
 
-// 同步初始化 (即時執行程式碼)
+// ==========================================
+// 🚀 初始化區塊
+// ==========================================
+
+// 1. UI 互動監聽綁定
+citySelect.addEventListener('change', filterAndRenderStores);
+districtSelect.addEventListener('change', filterAndRenderStores);
+globalSearchInput.addEventListener('input', filterAndRenderStores);
+
+// 2. 系統初始化
 initThemeSystem();
 bindHeaderEvents();
 initStorePage();
-getBrowserLocation();
+
+// 3. 獲取資料與位置
+getBrowserLocation(); // 內部會觸發 filterAndRenderStores
+fetchStoresFromFirebase(); // 內部會觸發 filterAndRenderStores
+
+// 4. 管理後台渲染
 renderAdminTable();

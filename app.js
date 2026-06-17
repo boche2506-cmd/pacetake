@@ -1298,23 +1298,25 @@ async function initStorePage() {
             foodCard.dataset.price = basePrice; // 存入基礎價格供後續計算
 
             foodCard.innerHTML = `
-        <div class="food-main-row">
-            <div class="food-img">${item.image ? `<img src="${item.image}" class="preview-img" style="width:50px; height:50px; object-fit:cover;">` : '🍱'}</div>
-            <div class="food-info">
-                <div class="food-name">${item.name || '未命名'}</div>
-                ${priceHTML}
-            </div>
-            <div class="action-Container">
-                <div class="quantity-control-panel">
+            <div class="food-info-Container">
+                <div class="food-main-row">
+                    <div class="food-img">${item.image ? `<img src="${item.image}" >` : '🍱'}</div>
+                    <div class="food-info">
+                        <div class="food-name">${item.name || '未命名'}</div>${priceHTML}
+                    </div>
+                </div>    
+                <div class="action-Container">
+                    <div class="quantity-control-panel">
                     <button class="minus-btn" data-id="${itemId}">-</button>
                     <span class="qty-number" id="qty_${itemId}">${qty}</span>
                     <button class="plus-btn" data-id="${itemId}">+</button>
+                    </div>
+                </div>
+                <div class="note-wrapper">
+                    <input type="text" class="item-note-input" placeholder="✍️ 填寫客製化備註..." value="${note}">
                 </div>
             </div>
-        </div>
-        <div class="note-wrapper">
-            <input type="text" class="item-note-input" placeholder="✍️ 填寫客製化備註..." value="${note}">
-        </div>
+        
     `;
 
             menuContainer.appendChild(foodCard);
@@ -1457,8 +1459,19 @@ export function updateLocalStorageData(itemId, itemName, itemPrice, currentStore
     let localCartData = getCartData();
     const currentQty = parseInt(qtyDisplay.innerText, 10);
     const currentNote = noteInput ? noteInput.value.trim() : "";
-    const uniqueId = `${currentStoreId}|||${itemId}`;
 
+    const sizeArea = card.querySelector('.new-size-price');
+    const isSizeMode = sizeArea && sizeArea.style.display === 'flex';
+    let selectedSize = 'none';
+
+    if (isSizeMode) {
+        const checkedRadio = card.querySelector('input[type="radio"]:checked');
+        selectedSize = checkedRadio ? checkedRadio.value : 'large';
+    }
+
+    const uniqueId = `${currentStoreId}|||${itemId}|||${selectedSize}`;
+
+    // 1. 先處理店家檢查
     if (localCartData.length > 0 && String(localCartData[0].storeId).trim() !== String(currentStoreId).trim()) {
         if (confirm("⚠️ 購物車內已有其他店家的商品，加入此商品將會清空前店清單，確定繼續嗎？")) {
             localCartData = [];
@@ -1469,8 +1482,10 @@ export function updateLocalStorageData(itemId, itemName, itemPrice, currentStore
         }
     }
 
+    // 2. 統一在這裡過濾舊項目 (僅需執行一次)
     localCartData = localCartData.filter(i => i.id !== uniqueId);
 
+    // 3. 加入新紀錄
     if (currentQty > 0) {
         localCartData.push({
             id: uniqueId,
@@ -1479,7 +1494,7 @@ export function updateLocalStorageData(itemId, itemName, itemPrice, currentStore
             qty: currentQty,
             note: currentNote,
             storeId: currentStoreId,
-            size: card.querySelector('input[type="radio"]:checked')?.value || null
+            size: selectedSize !== 'none' ? selectedSize : null
         });
     }
 
@@ -1497,6 +1512,7 @@ export function initCartDOMState() {
 
         const parts = item.id.split('|||');
         const rawItemId = parts[1];
+        const sizeValue = parts[2]; // 這是儲存的規格
         const card = document.querySelector(`.food-card[data-id="${rawItemId}"]`);
 
         if (card) {

@@ -487,6 +487,8 @@ document.addEventListener('change', (e) => {
                     img.src = canvas.toDataURL('image/jpeg', 0.7);
                     img.style.display = 'block';
                 }
+                localStorage.setItem('selected_store_logo', resultImgData);
+                console.log("[DEBUG] Logo 已存入 LocalStorage");
             };
         };
         reader.readAsDataURL(file);

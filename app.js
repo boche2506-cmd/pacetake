@@ -1407,21 +1407,27 @@ async function initStorePage() {
     }
 }
 
-function renderPageLogo() {
-    const savedLogo = localStorage.getItem('selected_store_logo');
+async function renderPageLogo() {
     const target = document.getElementById('logo-wrapper');
+    if (!target) return;
 
-    if (!target) return; // 如果找不到盒子就跳出，防止報錯
+    // 1. 先看 LocalStorage
+    let savedLogo = localStorage.getItem('selected_store_logo');
 
+    // 2. 如果沒有，嘗試從 Firebase 的 storeData 抓 (如果有全域變數)
+    if (!savedLogo && typeof storeData !== 'undefined' && storeData.logo) {
+        savedLogo = storeData.logo;
+        localStorage.setItem('selected_store_logo', savedLogo); // 存回 LocalStorage 以便下次使用
+    }
+
+    // 3. 渲染邏輯
     if (savedLogo) {
-        // 如果有存到 Logo 資料，就把它噴進去
         if (savedLogo.startsWith('data:image') || savedLogo.startsWith('http')) {
             target.innerHTML = `<img src="${savedLogo}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         } else {
             target.innerText = savedLogo;
         }
     } else {
-        // 如果沒有存到 (使用者直接連到這頁)，可以顯示預設值
         target.innerText = '🏪';
     }
 }

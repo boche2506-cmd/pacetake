@@ -87,7 +87,7 @@
             box-sizing: border-box;
             line-height: 1.1;
             color: var(--text-main);
-            font-size: 3.5cqw;
+            font-size: 3.75cqw;
         }
 
         .menu-Container {
@@ -105,7 +105,7 @@
 
         /* 卡片基礎樣式 */
         .food-card {
-            min-height: 24cqw;
+            min-height: 34cqw;
             width: 100%;
             background-color: var(--card-bg);
             border: 0.3cqw solid var(--border-color);
@@ -122,19 +122,41 @@
             align-items: stretch;
         }
 
-        .food-main-row {
-            height: 80%;
-            max-width: 100%;
+        .food-img-info {
+            height: 24cqw;
+            width: 100%;
+            border-radius: 4cqw;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            padding: 0.5cqw;
+            box-sizing: border-box;
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: stretch;
-            gap: 1cqw;
+        }
+
+        .card-note-display {
+            height: 100%;
+            max-width: 100%;
+            font-size: 4cqw;
+            font-weight: 600;
+            color: var(--text-muted);
+            line-height: 1.1;
+            /* 讓行距跟著字體一起自動調整 */
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            box-sizing: border-box;
+            white-space: nowrap;
+            padding: 0 2cqw;
         }
 
         .food-img {
             height: 100%;
-            width: 25%;
+            width: 23%;
             background-color: var(--bg-global);
             border-radius: 3cqw;
             display: flex;
@@ -152,38 +174,44 @@
 
         .food-info {
             height: 100%;
-            width: 75%;
+            width: 77%;
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
+            justify-content: space-between;
+            align-items: flex-start;
             box-sizing: border-box;
-            padding: 1cqw;
         }
 
         .quantity-control-panel {
+            height: 52%;
+            width: 100%;
             display: flex;
+            flex-direction: row;
+            justify-content: space-around;
             align-items: center;
-            justify-content: flex-start;
             line-height: 1.1;
         }
 
         .note-wrapper {
-            height: 20%;
+            height: 5cqw;
             width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: flex-start;
-            line-height: 1.1;
             box-sizing: border-box;
         }
 
-        .item-note-input {
-            height: 100%;
+        .input-style {
             width: 100%;
-            border: 0.2cqw solid #eee;
-            border-radius: 4cqw;
+            height: 100%;
+            color: var(--text-main);
+            background-color: var(--bg-global);
+            border: 0.2cqw solid var(--border-color);
+            border-radius: 2cqw;
+            padding: 0 2cqw;
             font-size: 4cqw;
+            outline: none;
             line-height: 1.1;
         }
 
@@ -198,7 +226,7 @@
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: center;
             line-height: 1.1;
         }
@@ -225,76 +253,36 @@
 
         .size-options {
             display: flex;
-            gap: 1cqw;
+            gap: 2cqw;
         }
 
         .size-row {
+            height: 13cqw;
+            width: 20cqw;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            margin: 5px 0;
         }
 
-        .size-btn {
+        .size-label,
+        .food-price {
+            height: 48%;
+            width: 100%;
             border: 0.2cqw solid #ddd;
-            padding: 1cqw 2cqw;
+            padding: 0.5cqw 1cqw;
             border-radius: 1.5cqw;
             cursor: pointer;
             font-size: 4.25cqw;
-            color: #555;
-            transition: all 0.2s;
-            background: #f9f9f9;
-        }
-
-        .size-btn input {
-            display: none;
-        }
-
-        .size-btn:has(input:checked) {
-            background: #ff5722;
             color: white;
+            transition: all 0.2s;
+            background: #ff5722;
             border-color: #ff5722;
             font-weight: bold;
-        }
-
-        .food-price {
-            font-size: 5cqw;
-            font-weight: 800;
-            color: var(--brand-blue);
-        }
-
-        .add-cart-btn {
-            background-color: var(--bg-global);
-            border: 0.2cqw solid var(--border-color);
-            color: var(--text-main);
-            padding: 2cqw 3cqw;
-            border-radius: 5cqw;
-            font-size: 3cqw;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
+            flex-direction: row;
+            justify-content: center;
             align-items: center;
-            gap: 1cqw
-        }
-
-        .add-cart-btn:active {
-            transform: scale(0.92);
-        }
-
-        /* 連動下架防線樣式 */
-        .food-card.sold-out {
-            filter: grayscale(1) opacity(0.5);
-            pointer-events: none;
-            /* 阻斷所有點擊 */
-        }
-
-        .sold-out-btn {
-            background-color: #E2E8F0;
-            border: 0.2cqw solid #CBD5E1;
-            color: var(--brand-red);
-            font-weight: bold;
-            cursor: not-allowed;
         }
 
         [data-theme="dark"] .sold-out-btn {

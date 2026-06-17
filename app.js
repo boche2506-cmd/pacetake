@@ -1276,66 +1276,38 @@ async function initStorePage() {
             let basePrice = 0;
 
             if (item.priceType === 'multi') {
-                // 我們直接寫死三個規格，這樣最簡單好讀
+                // 多尺寸按鈕 (Radio)
+                basePrice = item.prices.large || 0; // 預設價格
                 priceHTML = `
-        <div class="size-row">
-            <span class="size-label">大 $${item.prices.large}</span>
-            <div class="quantity-control-panel">
-                <button class="minus-btn" data-id="${itemId}_large">-</button>
-                <span class="qty-number" id="qty_${itemId}_large">0</span>
-                <button class="plus-btn" data-id="${itemId}_large">+</button>
+            <div class="size-options" data-id="${itemId}" style="display:flex; gap:5px; margin:5px 0;">
+                <label class="size-btn"><input type="radio" name="size_${itemId}" value="large" data-price="${item.prices.large}" checked> 大 $${item.prices.large}</label>
+                ${item.prices.medium ? `<label class="size-btn"><input type="radio" name="size_${itemId}" value="medium" data-price="${item.prices.medium}"> 中 $${item.prices.medium}</label>` : ''}
+                <label class="size-btn"><input type="radio" name="size_${itemId}" value="small" data-price="${item.prices.small}"> 小 $${item.prices.small}</label>
             </div>
-        </div>
-        <div class="size-row">
-            <span class="size-label">中 $${item.prices.medium}</span>
-            <div class="quantity-control-panel">
-                <button class="minus-btn" data-id="${itemId}_medium">-</button>
-                <span class="qty-number" id="qty_${itemId}_medium">0</span>
-                <button class="plus-btn" data-id="${itemId}_medium">+</button>
-            </div>
-        </div>
-        <div class="size-row">
-            <span class="size-label">小 $${item.prices.small}</span>
-            <div class="quantity-control-panel">
-                <button class="minus-btn" data-id="${itemId}_small">-</button>
-                <span class="qty-number" id="qty_${itemId}_small">0</span>
-                <button class="plus-btn" data-id="${itemId}_small">+</button>
-            </div>
-        </div>
-    `;
+        `;
             } else {
-                // 單一價格：這裡必須補上加減按鈕的 HTML，否則會消失
+                // 單一價格
                 basePrice = parseInt(item.price) || 0;
-                priceHTML = `
-        <div class="size-row">
-            <span class="food-price" style="font-weight:bold; color:#ff5722;">$${basePrice}</span>
-            <div class="quantity-control-panel">
-                <button class="minus-btn" data-id="${itemId}">-</button>
-                <span class="qty-number" id="qty_${itemId}">0</span>
-                <button class="plus-btn" data-id="${itemId}">+</button>
-            </div>
-        </div>
-    `;
+                priceHTML = `<div class="food-price" style="font-weight:bold; color:#ff5722;">$${basePrice}</div>`;
             }
 
             // 3. 建立並填入卡片
             const foodCard = document.createElement('div');
             foodCard.className = 'food-card';
             foodCard.dataset.id = itemId;
-
-            // --- 🎯 在這裡加入這些屬性 ---
-            foodCard.dataset.price = basePrice; // 存入單一價格 (給非多規格商品用)
-            foodCard.dataset.largePrice = item.prices?.large || 0;
-            foodCard.dataset.mediumPrice = item.prices?.medium || 0;
-            foodCard.dataset.smallPrice = item.prices?.small || 0;
-            // ----------------------------
+            foodCard.dataset.price = basePrice; // 存入基礎價格供後續計算
 
             foodCard.innerHTML = `
                 <div class="food-main-row">
                     <div class="food-img">${item.image ? `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; position: absolute;">` : '🍱'}</div>
                     <div class="food-info">
                         <div class="food-name">${item.name || '未命名'}</div>${priceHTML}
-                </div>
+                        <div class="quantity-control-panel">
+                        <button class="minus-btn" data-id="${itemId}">-</button>
+                        <span class="qty-number" id="qty_${itemId}">${qty}</span>
+                        <button class="plus-btn" data-id="${itemId}">+</button>
+                        </div>
+                    </div>
                 </div>    
                 <div class="note-wrapper">
                 <input type="text" class="item-note-input" placeholder="✍️ 填寫客製化備註..." value="${note}">
@@ -1349,57 +1321,69 @@ async function initStorePage() {
         // --- 事件綁定 ---
         menuContainer.addEventListener('click', (e) => {
             if (!e.target.matches('.plus-btn, .minus-btn')) return;
-
-            const clickedBtn = e.target;
-            const itemId = clickedBtn.dataset.id; // 這現在是類似 'storeId|||item_0_large' 的格式
-            const card = clickedBtn.closest('.food-card');
-            const qtyDisplay = clickedBtn.parentElement.querySelector('.qty-number');
+            const card = e.target.closest('.food-card');
+            const qtyDisplay = card.querySelector('.qty-number');
             const noteInput = card.querySelector('.item-note-input');
+            const priceType = card.dataset.priceType || (card.querySelector('.size-options') ? 'multi' : 'single');
 
-            // 計算數量
+            let currentPrice = 0;
+
+            if (priceType === 'multi') {
+                // 抓取被選中的那個 radio 的價格
+                const selectedRadio = card.querySelector('input[type="radio"]:checked');
+                currentPrice = selectedRadio ? parseInt(selectedRadio.dataset.price) : 0;
+            } else {
+                // 單一價格模式
+                currentPrice = parseInt(card.dataset.price) || 0;
+            }
+
             let count = parseInt(qtyDisplay.innerText);
             if (e.target.matches('.plus-btn')) count++;
             else if (count > 0) count--;
             qtyDisplay.innerText = count;
 
-            // --- 動態獲取價格 ---
-            // 邏輯：從 itemId 的後綴判斷價格
-            let currentPrice = 0;
-            // 從 card 的資料庫來源獲取原始商品資訊 (假設你原本的 item 資料在渲染時有存入)
-            // 這裡我們簡單一點：直接用 data-id 判斷規格
-            if (itemId.includes('_large')) currentPrice = parseInt(card.dataset.largePrice || 0);
-            else if (itemId.includes('_medium')) currentPrice = parseInt(card.dataset.mediumPrice || 0);
-            else if (itemId.includes('_small')) currentPrice = parseInt(card.dataset.smallPrice || 0);
-            else currentPrice = parseInt(card.dataset.price || 0); // 單一價格
-
             updateLocalStorageData(
-                itemId, // 傳入精確的規格 ID
+                card.dataset.id,
                 card.querySelector('.food-name').innerText,
                 currentPrice,
                 currentStoreId,
                 qtyDisplay,
                 noteInput,
-                card
+                card // 補上這個 card
             );
         });
 
         // --- 在 initStorePage 的最後面 ---
         setTimeout(() => {
+            // 1. 取得當前商店 ID (這確保了我們只處理這家店的購物車)
             const currentStoreId = document.body.getAttribute('data-store-id');
             const cartData = JSON.parse(localStorage.getItem('pacetake_cart')) || [];
 
-            cartData.forEach(cartItem => {
-                // cartItem.id 現在可能是 'storeId|||item_0_large'
-                // 我們要找的是頁面上對應那個按鈕的 span
-                const qtyDisplay = document.getElementById(`qty_${cartItem.id}`);
+            // 2. 過濾資料：只處理屬於這家店的項目
+            const currentStoreItems = cartData.filter(item => {
+                // 如果你的 item.id 裡面含有 |||，拆解它來比對；否則直接比對 storeId 屬性
+                const itemStoreId = item.id.includes('|||') ? item.id.split('|||')[0] : item.storeId;
+                return String(itemStoreId).trim() === String(currentStoreId).trim();
+            });
 
-                if (qtyDisplay) {
-                    qtyDisplay.innerText = cartItem.qty;
+            // 3. 遍歷並回填
+            currentStoreItems.forEach(cartItem => {
+                const parts = cartItem.id.split('|||');
+                const rawItemId = parts.length > 1 ? parts[1] : cartItem.id;
+
+                const card = document.querySelector(`.food-card[data-id="${rawItemId}"]`);
+
+                if (card) {
+                    const qtyDisplay = card.querySelector('.qty-number');
+                    const noteInput = card.querySelector('.item-note-input');
+
+                    if (qtyDisplay) qtyDisplay.innerText = cartItem.qty;
+                    if (noteInput) noteInput.value = cartItem.note || '';
                 }
             });
 
             if (typeof refreshTotalCartUI === 'function') refreshTotalCartUI();
-            console.log("[PACE DEBUG] 購物車規格同步完成。");
+            console.log("[PACE DEBUG] 已鎖定店家:", currentStoreId, "購物車同步完成。");
         }, 200);
 
     } catch (error) {
@@ -1490,27 +1474,41 @@ export function updateLocalStorageData(itemId, itemName, itemPrice, currentStore
     const currentQty = parseInt(qtyDisplay.innerText, 10);
     const currentNote = noteInput ? noteInput.value.trim() : "";
 
-    // 1. 店家檢查邏輯
+    const sizeArea = card.querySelector('.new-size-price');
+    const isSizeMode = sizeArea && sizeArea.style.display === 'flex';
+    let selectedSize = 'none';
+
+    if (isSizeMode) {
+        const checkedRadio = card.querySelector('input[type="radio"]:checked');
+        selectedSize = checkedRadio ? checkedRadio.value : 'large';
+    }
+
+    const uniqueId = `${currentStoreId}|||${itemId}|||${selectedSize}`;
+
+    // 1. 先處理店家檢查
     if (localCartData.length > 0 && String(localCartData[0].storeId).trim() !== String(currentStoreId).trim()) {
         if (confirm("⚠️ 購物車內已有其他店家的商品，加入此商品將會清空前店清單，確定繼續嗎？")) {
             localCartData = [];
         } else {
-            // --- 修正點：取消時，必須將畫面上的數字改回 0 (因為沒加入購物車) ---
-            qtyDisplay.innerText = "0"; 
+            const originalItem = localCartData.find(i => i.id === uniqueId);
+            qtyDisplay.innerText = originalItem ? originalItem.qty : 0;
             return;
         }
     }
 
-    // 2. 其餘邏輯保持不變...
-    localCartData = localCartData.filter(i => i.id !== itemId);
+    // 2. 統一在這裡過濾舊項目 (僅需執行一次)
+    localCartData = localCartData.filter(i => i.id !== uniqueId);
+
+    // 3. 加入新紀錄
     if (currentQty > 0) {
         localCartData.push({
-            id: itemId,
+            id: uniqueId,
             name: itemName,
             price: itemPrice,
             qty: currentQty,
             note: currentNote,
-            storeId: currentStoreId
+            storeId: currentStoreId,
+            size: selectedSize !== 'none' ? selectedSize : null
         });
     }
 
@@ -1524,13 +1522,23 @@ export function initCartDOMState() {
     if (!cartItems || cartItems.length === 0) return;
 
     cartItems.forEach(item => {
-        // 確保只回填當前店家的資料
         if (String(item.storeId || "").trim() !== String(currentStoreId || "").trim()) return;
 
-        // 直接透過 ID 找到對應的 span，例如 qty_storeId|||item_0_large
-        const qtyDisplay = document.getElementById(`qty_${item.id}`);
-        if (qtyDisplay) {
-            qtyDisplay.innerText = item.qty;
+        const parts = item.id.split('|||');
+        const rawItemId = parts[1];
+        const sizeValue = parts[2]; // 這是儲存的規格
+        const card = document.querySelector(`.food-card[data-id="${rawItemId}"]`);
+
+        if (card) {
+            const qtyDisplay = card.querySelector('.qty-number');
+            const noteInput = card.querySelector('.item-note-input');
+            if (qtyDisplay) qtyDisplay.innerText = item.qty;
+            if (noteInput) noteInput.value = item.note;
+
+            if (item.size) {
+                const radioToSelect = card.querySelector(`input[value="${item.size}"]`);
+                if (radioToSelect) radioToSelect.checked = true;
+            }
         }
     });
 }

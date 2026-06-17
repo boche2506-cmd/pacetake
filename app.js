@@ -1298,27 +1298,21 @@ async function initStorePage() {
             foodCard.dataset.price = basePrice; // 存入基礎價格供後續計算
 
             foodCard.innerHTML = `
-            <div class="food-info-Container">
                 <div class="food-main-row">
-                    <div class="food-img">${item.image ? `<img src="${item.image}" >` : '🍱'}</div>
+                    <div class="food-img">${item.image ? `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; position: absolute;">` : '🍱'}</div>
                     <div class="food-info">
                         <div class="food-name">${item.name || '未命名'}</div>${priceHTML}
+                        <div class="quantity-control-panel">
+                        <button class="minus-btn" data-id="${itemId}">-</button>
+                        <span class="qty-number" id="qty_${itemId}">${qty}</span>
+                        <button class="plus-btn" data-id="${itemId}">+</button>
+                        </div>
                     </div>
                 </div>    
-                <div class="action-Container">
-                    <div class="quantity-control-panel">
-                    <button class="minus-btn" data-id="${itemId}">-</button>
-                    <span class="qty-number" id="qty_${itemId}">${qty}</span>
-                    <button class="plus-btn" data-id="${itemId}">+</button>
-                    </div>
-                </div>
                 <div class="note-wrapper">
-                    <input type="text" class="item-note-input" placeholder="✍️ 填寫客製化備註..." value="${note}">
+                <input type="text" class="item-note-input" placeholder="✍️ 填寫客製化備註..." value="${note}">
                 </div>
-            </div>
-        
     `;
-
             menuContainer.appendChild(foodCard);
         });
 
@@ -1397,6 +1391,26 @@ async function initStorePage() {
         menuContainer.innerHTML = "<p>無法載入店家菜單，請檢查網路連線。</p>";
     }
 }
+
+function renderPageLogo() {
+    const savedLogo = localStorage.getItem('selected_store_logo');
+    const target = document.getElementById('logo-wrapper');
+
+    if (!target) return; // 如果找不到盒子就跳出，防止報錯
+
+    if (savedLogo) {
+        // 如果有存到 Logo 資料，就把它噴進去
+        if (savedLogo.startsWith('data:image') || savedLogo.startsWith('http')) {
+            target.innerHTML = `<img src="${savedLogo}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
+        } else {
+            target.innerText = savedLogo;
+        }
+    } else {
+        // 如果沒有存到 (使用者直接連到這頁)，可以顯示預設值
+        target.innerText = '🏪';
+    }
+}
+
 /** * 🛒 購物車管理核心 */
 // --- 1. 資料處理區 ---
 export function getCartData() {
@@ -1537,12 +1551,12 @@ function startApp() {
     initThemeSystem();
     bindHeaderEvents();
     initStorePage();
-    setupEventListeners();
     getBrowserLocation();
     fetchStoresFromFirebase();
     renderAdminTable();
     initCartDOMState();
     refreshTotalCartUI();
+    renderPageLogo();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
     console.log("系統初始化完成");
 }

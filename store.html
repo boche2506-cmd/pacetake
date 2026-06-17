@@ -24,7 +24,7 @@
             align-items: stretch;
             box-sizing: border-box;
             border-bottom: 0.2cqw solid var(--border-color);
-            padding: 0 2cqw 1cqw;
+            padding: 1cqw;
             /* 使用 cqw 控制外襯 padding */
         }
 
@@ -33,157 +33,30 @@
             max-width: 100%;
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             box-sizing: border-box;
             gap: 2cqw;
             /* 元件間距改用 cqw */
         }
 
-        .store-header-info h1 {
-            font-size: 6cqw;
-            font-weight: 800;
-            letter-spacing: -0.5cqw;
-            color: var(--text-main);
-        }
-
-        .store-meta {
-            height: 45%;
-            width: 100%;
+        .store-logo-display {
+            width: 13cqw;
+            /* 你想要的寬度 */
+            height: 13cqw;
+            /* 你想要的高度 */
+            object-fit: contain;
             display: flex;
-            flex-direction: row;
+            align-items: center;
             justify-content: center;
-            align-items: center;
-            box-sizing: border-box;
-            line-height: 1;
+            border-radius: 3cqw;
         }
 
-        /* 卡片基礎樣式 */
-        .food-card {
-            min-height: 24cqw;
-            width: 100%;
-            gap: 0.5cqw;
-            background-color: var(--card-bg);
-            border: 0.3cqw solid var(--border-color);
-            border-radius: 4cqw;
-            text-decoration: none;
-            color: inherit;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            padding: 0.25cqw;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: stretch;
-        }
-
-        .food-main-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-        
-        .food-info-Container {
-            height: 62.5%;
-            max-width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between; 
-            align-items: stretch;
-        }
-
-        .food-info {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between; 
-            align-items: stretch; 
-            flex: 1;
-        }
-
-        .quantity-control-panel {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .minus-btn,
-        .plus-btn {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: none;
-            background: #eee;
-            font-size: 1.2em;
-            cursor: pointer;
-        }
-
-        .qty-number {
-            font-weight: bold;
-            min-width: 20px;
-            text-align: center;
-        }
-
-        .note-wrapper {
-            height: 18.75%;
-            max-width: 100%;
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: center;
-        }
-
-        .item-note-input {
-            height: 100%;
-            max-width: 100%;
-            border: 0.2cqw solid #eee;
-            border-radius: 4cqw;
-            font-size: 3.5cqw;
-            line-height: 1.1;
-            margin-top: 3cqw; 
-        }
-
-        /* 中間精品菜單區 */
-        .menu-Container {
-            height: 60%;
-            max-width: 100%;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5cqw;
-            /* 卡片與卡片之間的間距改用 cqw */
-            padding: 1cqw 1.5cqw 2cqw 2.5cqw;
-            /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
-            box-sizing: border-box;
-        }
-
-        .food-card {
-            min-height: 24cqw;
-            /* 💡 新增：設定最小高度，確保卡片視覺比例穩固 */
-            width: 100%;
-            /* 撐滿 store-list 的寬度（扣除 padding） */
-            display: flex;
-            align-items: center;
-            gap: 3cqw;
-            /* 圖片與文字區塊的間距 */
-            background-color: var(--card-bg);
-            border: 0.3cqw solid var(--border-color);
-            border-radius: 4cqw;
-            /* 圓角改用 cqw */
-            text-decoration: none;
-            color: inherit;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            padding: 1cqw;
-            /* 卡片內部內襯改用 cqw */
-            box-sizing: border-box;
-        }
-
-        .food-img {
-            width: 15cqw;
+        /* 確保塞進去的圖片能填滿盒子 */
+        .store-logo-display img {
+            width: 13cqw;
             /* 依比例放大/縮小 */
-            height: 15cqw;
+            height: 13cqw;
             background-color: var(--bg-global);
             border-radius: 3cqw;
             display: flex;
@@ -198,12 +71,143 @@
             box-sizing: border-box;
         }
 
+        .store-header-info h1 {
+            font-size: 6cqw;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .store-meta {
+            height: 45%;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            line-height: 1.1;
+            color: var(--text-main);
+            font-size: 3.5cqw;
+        }
+
+        .menu-Container {
+            height: 60%;
+            max-width: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5cqw;
+            /* 卡片與卡片之間的間距改用 cqw */
+            padding: 1cqw 1.5cqw 2cqw 2.5cqw;
+            /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
+            box-sizing: border-box;
+        }
+
+        /* 卡片基礎樣式 */
+        .food-card {
+            min-height: 24cqw;
+            width: 100%;
+            background-color: var(--card-bg);
+            border: 0.3cqw solid var(--border-color);
+            border-radius: 4cqw;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            padding: 0.5cqw;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: stretch;
+        }
+
+        .food-main-row {
+            height: 80%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 1cqw;
+        }
+
+        .food-img {
+            height: 100%;
+            width: 25%;
+            background-color: var(--bg-global);
+            border-radius: 3cqw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5cqw;
+            /* 裡面的 Emoji 大小 */
+            flex-shrink: 0;
+            object-fit: contain;
+            /* 關鍵：確保完整顯示，不裁切，短邊留空 */
+            display: block;
+            box-sizing: border-box;
+            position: relative;
+        }
+
         .food-info {
+            height: 100%;
+            width: 75%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            box-sizing: border-box;
+            padding: 1cqw;
+        }
+
+        .quantity-control-panel {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            line-height: 1.1;
+        }
+
+        .note-wrapper {
+            height: 20%;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            flex-grow: 1;
-            gap: 6px;
+            align-items: flex-start;
+            line-height: 1.1;
+            box-sizing: border-box;
+        }
+
+        .item-note-input {
+            height: 100%;
+            width: 100%;
+            border: 0.2cqw solid #eee;
+            border-radius: 4cqw;
+            font-size: 4cqw;
+            line-height: 1.1;
+        }
+
+        .minus-btn,
+        .plus-btn {
+            width: 6cqw;
+            height: 6cqw;
+            border-radius: 50%;
+            border: none;
+            background: #eee;
+            font-size: 6cqw;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+            line-height: 1.1;
+        }
+
+        .qty-number {
+            font-weight: bold;
+            min-width: 5cqw;
+            text-align: center;
+            color: var(--text-main);
         }
 
         .food-name {
@@ -221,16 +225,15 @@
 
         .size-options {
             display: flex;
-            gap: 8px;
-            margin-top: 5px;
+            gap: 1cqw;
         }
 
         .size-btn {
-            border: 1px solid #ddd;
-            padding: 6px 10px;
-            border-radius: 6px;
+            border: 0.2cqw solid #ddd;
+            padding: 1cqw 2cqw;
+            border-radius: 1.5cqw;
             cursor: pointer;
-            font-size: 0.85em;
+            font-size: 4.25cqw;
             color: #555;
             transition: all 0.2s;
             background: #f9f9f9;
@@ -248,32 +251,24 @@
         }
 
         .food-price {
-            font-size: 18px;
+            font-size: 5cqw;
             font-weight: 800;
             color: var(--brand-blue);
         }
 
-        /* 按鈕基本結構 */
-        .action-Container {
-            height: 18.75%;
-            max-width: 100%;
-            display: flex;
-            align-items: center;
-        }
-
         .add-cart-btn {
             background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
+            border: 0.2cqw solid var(--border-color);
             color: var(--text-main);
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 2cqw 3cqw;
+            border-radius: 5cqw;
+            font-size: 3cqw;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 1cqw
         }
 
         .add-cart-btn:active {
@@ -289,7 +284,7 @@
 
         .sold-out-btn {
             background-color: #E2E8F0;
-            border: 1px solid #CBD5E1;
+            border: 0.2cqw solid #CBD5E1;
             color: var(--brand-red);
             font-weight: bold;
             cursor: not-allowed;
@@ -303,31 +298,24 @@
 
         /* 底部懸浮欄 */
         .bottom-bar {
-            height: 10%;
-            max-width: 100%;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-around;
-            align-items: center;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 20cqw;
-            width: 100%;
-            background-color: var(--blur-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-color);
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            padding: 0 2cqw;
-            z-index: 90;
+            height: 12%;
+            /* 保留你原本佔外殼的 15% 高度比例 */
+            max-width: 100%;
+            background-color: var(--blur-bg);
+            border-top: 0.3cqw solid var(--border-color);
+            /* 邊框 cqw */
+            padding: 1cqw 2cqw;
+            /* 左右微調內襯，讓留白更好看 */
+            box-sizing: border-box;
+            flex-shrink: 0;
         }
 
         .cart-summary {
-            font-size: 14px;
+            font-size: 4cqw;
             font-weight: 600;
             color: var(--text-main);
         }
@@ -336,9 +324,9 @@
             background-color: var(--brand-blue);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 22px;
-            font-size: 14px;
+            padding: 4cqw;
+            border-radius: 6cqw;
+            font-size: 4cqw;
             font-weight: 700;
             cursor: pointer;
             text-decoration: none;
@@ -375,11 +363,11 @@
 
             <div class="store">
                 <div class="store-header-info" id="storeHeaderInfo">
+                    <div id="logo-wrapper" class="store-logo-display"></div>
                     <h1 id="storeNameText">載入中...</h1>
                 </div>
                 <div class="store-meta">
                     <span id="storeAddressText">📍 載入中...</span>
-                    <span>•</span>
                     <span id="storeDistanceText">⚡ 計算中...</span>
                 </div>
             </div>

@@ -12,10 +12,9 @@
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 頂部導航與大字留白 */
         .store {
             /* 這裡的高度與寬度原本是 15% 和 100%，我們用 cqw 重新定義它們的比例 */
-            height: 12%;
+            height: 11%;
             max-width: 100%;
             display: flex;
             flex-direction: column;
@@ -29,15 +28,32 @@
         }
 
         .store-header-info {
-            height: 55%;
+            height: 53%;
             max-width: 100%;
             display: flex;
             flex-direction: row;
-            justify-content: flex-start;
+            justify-content: space-between;
             align-items: center;
             box-sizing: border-box;
             gap: 2cqw;
             /* 元件間距改用 cqw */
+        }
+
+        .fav-icon {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            height: 100%;
+            max-width: 100%;
+            font-size: 6cqw;
+            padding: 1cqw;
+            background-color: transparent;
+            border: transparent;
+            border-radius: 50%;
+            color: var(--text-main);
+            cursor: pointer;
         }
 
         .store-logo-display {
@@ -91,14 +107,14 @@
         }
 
         .menu-Container {
-            height: 60%;
+            height: 62%;
             max-width: 100%;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 0.5cqw;
             /* 卡片與卡片之間的間距改用 cqw */
-            padding: 1cqw 1.5cqw 2cqw 2.5cqw;
+            padding: 1cqw 1.5cqw 1cqw 1cqw;
             /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
             box-sizing: border-box;
         }
@@ -217,7 +233,7 @@
             width: 20cqw;
             display: flex;
             flex-direction: column;
-            justify-content: space-around; 
+            justify-content: space-around;
             align-items: center;
         }
 
@@ -226,7 +242,7 @@
             width: 20cqw;
             display: flex;
             flex-direction: column;
-            justify-content: space-around; 
+            justify-content: space-around;
             align-items: center;
         }
 
@@ -275,22 +291,7 @@
             padding: 0 2cqw;
         }
 
-        .card-note-display {
-            height: 5cqw;
-            max-width: 100%;
-            font-size: 4cqw;
-            font-weight: 600;
-            color: var(--text-muted);
-            line-height: 1.1;
-            /* 讓行距跟著字體一起自動調整 */
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: center;
-            box-sizing: border-box;
-            white-space: nowrap;
-            padding: 0 2cqw;
-        }
+
 
         .input-style {
             width: 100%;
@@ -403,6 +404,9 @@
                 <div class="store-header-info" id="storeHeaderInfo">
                     <div id="logo-wrapper" class="store-logo-display"></div>
                     <h1 id="storeNameText">載入中...</h1>
+                    <button id="favorite-btn" class="fav-icon" aria-label="加入最愛">
+                        <span id="heart-icon">🤍</span>
+                    </button>
                 </div>
                 <div class="store-meta">
                     <span id="storeAddressText">📍 載入中...</span>

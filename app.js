@@ -165,6 +165,56 @@ function initThemeSystem() {
     }
 }
 
+export function initFavoriteSystem(storeId, storeName) {
+    const favBtn = document.getElementById('favorite-btn');
+    const heartIcon = document.getElementById('heart-icon');
+
+    if (!favBtn) return; // 如果頁面沒有這個按鈕，直接跳出
+
+    // 1. 初始化：檢查該使用者是否已經收藏過此商家
+    const checkStatus = async () => {
+        const user = auth.currentUser;
+        if (!user) return; // 沒登入就不用查了
+
+        const favRef = doc(db, "users", user.uid, "favorites", storeId);
+        const docSnap = await getDoc(favRef);
+
+        if (docSnap.exists()) {
+            heartIcon.textContent = '❤️'; // 已收藏：實心
+        } else {
+            heartIcon.textContent = '🤍'; // 未收藏：空心
+        }
+    };
+
+    checkStatus();
+
+    // 2. 綁定事件
+    favBtn.addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("請先登入才能收藏喔！");
+            return;
+        }
+
+        const favRef = doc(db, "users", user.uid, "favorites", storeId);
+        const isCurrentlyFavorite = heartIcon.textContent === '❤️';
+
+        if (isCurrentlyFavorite) {
+            // 如果已收藏，點擊則刪除
+            await deleteDoc(favRef);
+            heartIcon.textContent = '🤍';
+        } else {
+            // 如果未收藏，點擊則新增
+            await setDoc(favRef, {
+                shopName: storeName,
+                addedAt: serverTimestamp(),
+                sellerUid: storeId // 你之前設計的欄位
+            });
+            heartIcon.textContent = '❤️';
+        }
+    });
+}
+
 function updateUIForUser(user, currentRole) {
     // 這裡加上 const，確保這些變數只屬於這個函式
     const loginBtn = document.getElementById('loginBtn');
@@ -1573,6 +1623,7 @@ function startApp() {
     initCartDOMState();
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
+    initFavoriteSystem();
     console.log("系統初始化完成");
 }
 

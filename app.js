@@ -216,7 +216,7 @@ function renderDynamicMenu(role) {
         <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
     `;
 
-    if (role === 'buyer' || role === 'admin'|| !role) {
+    if (role === 'buyer' || role === 'admin' || !role) {
         menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
     }
 
@@ -1317,21 +1317,21 @@ async function initStorePage() {
             // 2. 判斷並產生 HTML
             let priceHTML = '';
             let basePrice = 0;
-
+            const hasMedium = item.prices && item.prices.medium;
             if (item.priceType === 'multi') {
                 // 我們直接寫死三個規格，這樣最簡單好讀
                 priceHTML = `
         <div class="size-options">
         <div class="size-row">
-            <span class="size-label">大 $${item.prices.large}</span>
+            <span class="size-label" style="font-weight:bold;">大 $${item.prices.large}</span>
             <div class="quantity-control-panel">
                 <button class="minus-btn" data-id="${itemId}_large">-</button>
                 <span class="qty-number" id="qty_${itemId}_large">0</span>
                 <button class="plus-btn" data-id="${itemId}_large">+</button>
             </div>
         </div>
-        <div class="size-row">
-            <span class="size-label">中 $${item.prices.medium}</span>
+        <div class="size-row" style="${!hasMedium ? 'opacity: 0.5; pointer-events: none;' : ''}">
+            <span class="size-label" style="font-weight:bold;">中 $${item.prices.medium}</span>
             <div class="quantity-control-panel">
                 <button class="minus-btn" data-id="${itemId}_medium">-</button>
                 <span class="qty-number" id="qty_${itemId}_medium">0</span>
@@ -1339,7 +1339,7 @@ async function initStorePage() {
             </div>
         </div>
         <div class="size-row">
-            <span class="size-label">小 $${item.prices.small}</span>
+            <span class="size-label" style="font-weight:bold;">小 $${item.prices.small}</span>
             <div class="quantity-control-panel">
                 <button class="minus-btn" data-id="${itemId}_small">-</button>
                 <span class="qty-number" id="qty_${itemId}_small">0</span>
@@ -1352,7 +1352,7 @@ async function initStorePage() {
                 // 單一價格：這裡必須補上加減按鈕的 HTML，否則會消失
                 basePrice = parseInt(item.price) || 0;
                 priceHTML = `
-        <div class="size-row">
+        <div class="one-size-row">
             <span class="food-price" style="font-weight:bold;">$${basePrice}</span>
             <div class="quantity-control-panel">
                 <button class="minus-btn" data-id="${itemId}">-</button>

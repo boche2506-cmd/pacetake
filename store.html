@@ -122,22 +122,6 @@
             align-items: stretch;
         }
 
-        .food-img-info {
-            height: 24cqw;
-            width: 100%;
-            border-radius: 4cqw;
-            text-decoration: none;
-            color: inherit;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            padding: 0.5cqw;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: stretch;
-            gap:2cqw;
-        }
-
         .card-note-display {
             height: 5cqw;
             max-width: 100%;
@@ -155,12 +139,28 @@
             padding: 0 2cqw;
         }
 
+        .food-img-info {
+            height: 24cqw;
+            width: 100%;
+            border-radius: 4cqw;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            padding: 0.5cqw;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: stretch;
+            gap: 2cqw;
+        }
+
         .food-img {
-            height: 100%;
-            width: 23%;
+            padding: 0.5cqw;
+            height: 23cqw;
+            width: 23cqw;
             background-color: var(--bg-global);
             border-radius: 3cqw;
-            display: flex;
             align-items: center;
             justify-content: center;
             font-size: 5cqw;
@@ -174,8 +174,8 @@
         }
 
         .food-info {
-            height: 100%;
-            width: 77%;
+            height: 24cqw;
+            width: 76%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -183,8 +183,75 @@
             box-sizing: border-box;
         }
 
+        .food-name {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            height: 35%;
+            max-width: 100%;
+            font-size: 6cqw;
+            /* 字體改用 cqw */
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            /* 💡 新增：隱藏超出部分 */
+            text-overflow: ellipsis;
+            /* 超出顯示 ... */
+            line-height: 1.1;
+        }
+
+        .size-options {
+            height: 65%;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 2cqw;
+        }
+
+        .one-size-row {
+            height: 65%;
+            width: 20cqw;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around; 
+            align-items: center;
+        }
+
+        .size-row {
+            height: 100%;
+            width: 20cqw;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around; 
+            align-items: center;
+        }
+
+        .size-label,
+        .food-price {
+            height: 35%;
+            width: 100%;
+            border: 0.2cqw solid #ddd;
+            border-radius: 1.5cqw;
+            cursor: pointer;
+            font-size: 4.25cqw;
+            color: white;
+            transition: all 0.2s;
+            background: #ff5722;
+            border-color: #ff5722;
+            font-weight: bold;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.1;
+        }
+
         .quantity-control-panel {
-            height: 52%;
+            height: 55%;
             width: 100%;
             display: flex;
             flex-direction: row;
@@ -195,12 +262,34 @@
 
         .note-wrapper {
             height: 5cqw;
-            width: 100%;
+            max-width: 100%;
+            font-size: 4cqw;
+            font-weight: 600;
+            line-height: 1.1;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
             box-sizing: border-box;
+            white-space: nowrap;
+            padding: 0 2cqw;
+        }
+
+        .card-note-display {
+            height: 5cqw;
+            max-width: 100%;
+            font-size: 4cqw;
+            font-weight: 600;
+            color: var(--text-muted);
+            line-height: 1.1;
+            /* 讓行距跟著字體一起自動調整 */
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            box-sizing: border-box;
+            white-space: nowrap;
+            padding: 0 2cqw;
         }
 
         .input-style {
@@ -237,53 +326,6 @@
             min-width: 5cqw;
             text-align: center;
             color: var(--text-main);
-        }
-
-        .food-name {
-            font-size: 6cqw;
-            /* 字體改用 cqw */
-            font-weight: 700;
-            color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
-            /* 💡 新增：隱藏超出部分 */
-            text-overflow: ellipsis;
-            /* 超出顯示 ... */
-            line-height: 1.1;
-        }
-
-        .size-options {
-            display: flex;
-            gap: 2cqw;
-        }
-
-        .size-row {
-            height: 13cqw;
-            width: 20cqw;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .size-label,
-        .food-price {
-            height: 48%;
-            width: 100%;
-            border: 0.2cqw solid #ddd;
-            padding: 0.5cqw 1cqw;
-            border-radius: 1.5cqw;
-            cursor: pointer;
-            font-size: 4.25cqw;
-            color: white;
-            transition: all 0.2s;
-            background: #ff5722;
-            border-color: #ff5722;
-            font-weight: bold;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
         }
 
         [data-theme="dark"] .sold-out-btn {

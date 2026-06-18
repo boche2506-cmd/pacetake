@@ -171,7 +171,7 @@ function initThemeSystem() {
 
 // 收藏按鈕監聽器
 const favBtn = document.getElementById('favorite-btn');
-
+const heartIcon = document.getElementById('heart-icon'); // 加入這一行
 if (favBtn) {
     favBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
@@ -197,8 +197,7 @@ if (favBtn) {
             const docSnap = await getDoc(favRef);
             if (docSnap.exists()) {
                 await deleteDoc(favRef);
-                alert(`💔 已將「${name}」從最愛中移除`);
-                favBtn.innerText = "🤍"; // 按鈕文字變更
+                heartIcon.innerText = "🤍";
             } else {
                 // 如果不存在，執行加入收藏
                 await setDoc(favRef, {
@@ -208,7 +207,7 @@ if (favBtn) {
                 });
                 // 5. 成功提示
                 alert(`❤️ 已成功將「${name}」加入最愛！`);
-                favBtn.innerText = "❤️"; // 給個簡單的回饋
+                fheartIcon.innerText = "❤️"; // 給個簡單的回饋
             }
         } catch (error) {
             console.error("收藏失敗:", error);
@@ -218,27 +217,24 @@ if (favBtn) {
 }
 
 async function checkFavoriteStatus() {
-    const favBtn = document.getElementById('favorite-btn');
+    // 這裡我們抓 span，而不是整個 button
+    const heartIcon = document.getElementById('heart-icon');
     const user = auth.currentUser;
-    const { id } = window.currentStoreInfo; // 我們剛剛存進去的 ID
+    const { id } = window.currentStoreInfo;
 
-    if (favBtn && user && id) {
-        try {
-            // 去資料庫找找看有沒有這一筆紀錄
-            const favRef = doc(db, "users", user.uid, "favorites", id);
-            const docSnap = await getDoc(favRef);
+    if (!heartIcon || !user || !id) return;
 
-            // 如果找到了，就把按鈕改成紅色愛心；沒找到就保持白色
-            if (docSnap.exists()) {
-                favBtn.innerText = "❤️";
-            } else {
-                favBtn.innerText = "🤍";
-            }
-        } catch (error) {
-            console.error("檢查收藏狀態失敗:", error);
-        }
+    const favRef = doc(db, "users", user.uid, "favorites", id);
+    const docSnap = await getDoc(favRef);
+
+    // 如果找到了，就把按鈕改成紅色愛心；沒找到就保持白色
+    if (docSnap.exists()) {
+        heartIcon.innerText = "❤️";
+    } else {
+        heartIcon.innerText = "🤍";
     }
 }
+
 
 function updateUIForUser(user, currentRole) {
     // 這裡加上 const，確保這些變數只屬於這個函式

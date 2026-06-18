@@ -80,6 +80,7 @@ const modalAddressText = document.getElementById('modalAddressText');
 const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
 const globalSearchInput = document.getElementById('globalSearchInput');
 const menuUploadList = document.getElementById('menuUploadList');
+const favoriteContainer = document.getElementById('favoriteContainer');
 
 // 接著是下面那 6 行
 const toggleOnline = document.getElementById('toggleOnline');
@@ -320,38 +321,44 @@ async function fetchStoresFromFirebase() {
     }
 }
 
-function filterAndRenderStores() {
+async function filterAndRenderStores(renderOnlyFavorites = false) {
     if (!storeContainer) return;
+    // 1. 如果是收藏頁面，條件變更
+    let displayList = [];
+    if (renderOnlyFavorites) {
+        // 從 localStorage 或全域變數讀取已收藏的 ID 列表 (假設你已經在某處存了)
+        const myFavIds = getMyFavoriteIds(); // 這需要一個函式幫你抓 ID 列表
+        displayList = allStores.filter(store => myFavIds.includes(store.id));
+    } else {
 
-    // 1. 抓取篩選條件
-    const citySelect = document.getElementById('citySelect');
-    const districtSelect = document.getElementById('districtSelect');
-    const globalSearchInput = document.getElementById('globalSearchInput');
+        // 1. 抓取篩選條件
+        const citySelect = document.getElementById('citySelect');
+        const districtSelect = document.getElementById('districtSelect');
+        const globalSearchInput = document.getElementById('globalSearchInput');
 
-    const selectedCity = citySelect ? citySelect.value : '';
-    const selectedDist = districtSelect ? districtSelect.value : '';
-    const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
+        const selectedCity = citySelect ? citySelect.value : '';
+        const selectedDist = districtSelect ? districtSelect.value : '';
+        const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
 
-    // 2. 進行篩選
-    const filtered = allStores.filter(store => {
-        const matchCity = !selectedCity || store.city === selectedCity;
-        const matchDist = !selectedDist || store.district === selectedDist;
-        const nameToSearch = store.shopName || store.name || '';
-        const matchKeyword = !searchKeyword || nameToSearch.toLowerCase().includes(searchKeyword);
-        return matchCity && matchDist && matchKeyword;
-    });
-
+        displayList = allStores.filter(store => {
+            const matchCity = !selectedCity || store.city === selectedCity;
+            const matchDist = !selectedDist || store.district === selectedDist;
+            const nameToSearch = store.shopName || store.name || '';
+            const matchKeyword = !searchKeyword || nameToSearch.toLowerCase().includes(searchKeyword);
+            return matchCity && matchDist && matchKeyword && store.status !== "offline";
+        });
+    }
     // 3. 如果找不到店家，顯示提示並結束
-    if (filtered.length === 0) {
-        storeContainer.innerHTML = '<div class="loading-Spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
+    if (displayList.length === 0) {
+        storeContainer.innerHTML = renderOnlyFavorites
+            ? '<p>目前沒有收藏店家</p>'
+            : '<div class="loading-Spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
         return;
     }
 
     // 4. 清空畫面並開始渲染卡片
     storeContainer.innerHTML = "";
-
-    filtered.forEach(store => {
-        if (store.status === "offline") return;
+    displayList.forEach(store => {
 
         // 基本資料準備
         const finalName = store.shopName || store.name || '未命名店家';
@@ -403,52 +410,11 @@ function filterAndRenderStores() {
     });
 }
 
-async function fetchAndRenderFavorites() {
-    const container = document.getElementById('favoriteContainer'); // 沿用你原本的 ID
+async function getMyFavoriteIds() {
     const user = auth.currentUser;
-
-    if (!container) return;
-    if (!user) {
-        container.innerHTML = "<p>請先登入以查看收藏清單</p>";
-        return;
-    }
-
-    container.innerHTML = "<p>載入中...</p>";
-
-    try {
-        const favCollectionRef = collection(db, "users", user.uid, "favorites");
-        const snapshot = await getDocs(favCollectionRef);
-
-        if (snapshot.empty) {
-            container.innerHTML = "<p>目前沒有收藏店家</p>";
-            return;
-        }
-
-        container.innerHTML = ''; // 清空載入中提示
-
-        snapshot.forEach(doc => {
-            const data = doc.data(); // 包含 sellerUid, storeName, createdAt
-
-            // --- 這裡沿用你原本商店卡片的結構 ---
-            // 注意：這裡的 class 名稱請對應你原本 CSS 裡的結構
-            const card = document.createElement('div');
-            card.className = 'store-card';
-
-            card.innerHTML = `
-                <div class="store-info">
-                    <h3>${data.storeName}</h3>
-                    <p>收藏於：${data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : '未知時間'}</p>
-                </div>
-                <div class="store-actions">
-                    <button class="btn-go" onclick="window.location.href='store.html?storeId=${data.sellerUid}'">前往店家</button>
-                    <button class="btn-del" onclick="removeFavorite('${data.sellerUid}', this)">取消收藏</button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    } catch (error) {
-        console.error("讀取收藏失敗:", error);
-    }
+    if (!user) return [];
+    const snapshot = await getDocs(collection(db, "users", user.uid, "favorites"));
+    return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
 }
 
 function getBrowserLocation() {
@@ -1698,7 +1664,6 @@ function startApp() {
     initCartDOMState();
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
-    fetchAndRenderFavorites();
     console.log("系統初始化完成");
 }
 

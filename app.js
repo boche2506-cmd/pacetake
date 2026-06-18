@@ -89,6 +89,10 @@ const cashWarningModal = document.getElementById('cashWarningModal');
 const warningConfirmBtn = document.getElementById('warningConfirmBtn');
 const warningCancelBtn = document.getElementById('warningCancelBtn');
 
+window.currentStoreInfo = {
+    id: null,
+    name: null
+};
 // ==========================================
 // 3. 核心功能函式
 // ==========================================
@@ -165,56 +169,47 @@ function initThemeSystem() {
     }
 }
 
-export function initFavoriteSystem(storeId, storeName) {
-    const favBtn = document.getElementById('favorite-btn');
-    const heartIcon = document.getElementById('heart-icon');
+// 收藏按鈕監聽器
+const favBtn = document.getElementById('favorite-btn');
 
-    if (!favBtn) return; // 如果頁面沒有這個按鈕，直接跳出
-
-    // 1. 初始化：檢查該使用者是否已經收藏過此商家
-    const checkStatus = async () => {
-        const user = auth.currentUser;
-        if (!user) return; // 沒登入就不用查了
-
-        const favRef = doc(db, "users", user.uid, "favorites", storeId);
-        const docSnap = await getDoc(favRef);
-
-        if (docSnap.exists()) {
-            heartIcon.textContent = '❤️'; // 已收藏：實心
-        } else {
-            heartIcon.textContent = '🤍'; // 未收藏：空心
-        }
-    };
-
-    checkStatus();
-
-    // 2. 綁定事件
+if (favBtn) {
     favBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
+
+        // 1. 檢查登入
         if (!user) {
-            alert("請先登入才能收藏喔！");
+            alert("⚠️ 請先登入才能收藏店家喔！");
             return;
         }
 
-        const favRef = doc(db, "users", user.uid, "favorites", storeId);
-        const isCurrentlyFavorite = heartIcon.textContent === '❤️';
+        // 2. 檢查是否有店舖資料 (這就是我們剛剛存進 window 的)
+        const { id, name } = window.currentStoreInfo;
+        if (!id) {
+            alert("❌ 系統尚未載入商店資訊，請稍候再試。");
+            return;
+        }
 
-        if (isCurrentlyFavorite) {
-            // 如果已收藏，點擊則刪除
-            await deleteDoc(favRef);
-            heartIcon.textContent = '🤍';
-        } else {
-            // 如果未收藏，點擊則新增
+        // 3. 設定收藏路徑
+        const favRef = doc(db, "users", user.uid, "favorites", id);
+
+        try {
+            // 4. 寫入資料庫
             await setDoc(favRef, {
-                shopName: storeName,
-                addedAt: serverTimestamp(),
-                sellerUid: storeId // 你之前設計的欄位
+                sellerUid: id,
+                storeName: name,
+                addedAt: serverTimestamp()
             });
-            heartIcon.textContent = '❤️';
+
+            // 5. 成功提示
+            alert(`❤️ 已成功將「${name}」加入最愛！`);
+            favBtn.innerText = "已收藏"; // 給個簡單的回饋
+            favBtn.disabled = true;
+        } catch (error) {
+            console.error("收藏失敗:", error);
+            alert("系統錯誤，請稍後再試。");
         }
     });
 }
-
 function updateUIForUser(user, currentRole) {
     // 這裡加上 const，確保這些變數只屬於這個函式
     const loginBtn = document.getElementById('loginBtn');
@@ -1311,6 +1306,11 @@ async function initStorePage() {
         }
 
         if (!storeData) throw new Error("無法從資料庫找到該店家資料");
+        window.currentStoreInfo = {
+            id: currentStoreId,
+            name: storeData.shopName || storeData.name || '未命名店家'
+        };
+        console.log("全域商店資訊已更新：", window.currentStoreInfo);
 
         // --- 渲染邏輯 ---
         // 1. 先抓出 Firebase 的座標 (記得轉成數字)
@@ -1623,7 +1623,6 @@ function startApp() {
     initCartDOMState();
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
-    initFavoriteSystem();
     console.log("系統初始化完成");
 }
 

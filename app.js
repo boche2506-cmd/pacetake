@@ -409,6 +409,54 @@ function filterAndRenderStores() {
     });
 }
 
+async function fetchAndRenderFavorites() {
+    const container = document.getElementById('favoriteContainer'); // 沿用你原本的 ID
+    const user = auth.currentUser;
+
+    if (!container) return;
+    if (!user) {
+        container.innerHTML = "<p>請先登入以查看收藏清單</p>";
+        return;
+    }
+
+    container.innerHTML = "<p>載入中...</p>";
+
+    try {
+        const favCollectionRef = collection(db, "users", user.uid, "favorites");
+        const snapshot = await getDocs(favCollectionRef);
+
+        if (snapshot.empty) {
+            container.innerHTML = "<p>目前沒有收藏店家</p>";
+            return;
+        }
+
+        container.innerHTML = ''; // 清空載入中提示
+
+        snapshot.forEach(doc => {
+            const data = doc.data(); // 包含 sellerUid, storeName, createdAt
+
+            // --- 這裡沿用你原本商店卡片的結構 ---
+            // 注意：這裡的 class 名稱請對應你原本 CSS 裡的結構
+            const card = document.createElement('div');
+            card.className = 'store-card';
+
+            card.innerHTML = `
+                <div class="store-info">
+                    <h3>${data.storeName}</h3>
+                    <p>收藏於：${data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : '未知時間'}</p>
+                </div>
+                <div class="store-actions">
+                    <button class="btn-go" onclick="window.location.href='store.html?storeId=${data.sellerUid}'">前往店家</button>
+                    <button class="btn-del" onclick="removeFavorite('${data.sellerUid}', this)">取消收藏</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    } catch (error) {
+        console.error("讀取收藏失敗:", error);
+    }
+}
+
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');
     const modalAddressText = document.getElementById('modalAddressText');
@@ -1630,6 +1678,7 @@ function startApp() {
     initCartDOMState();
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
+    fetchAndRenderFavorites();
     console.log("系統初始化完成");
 }
 

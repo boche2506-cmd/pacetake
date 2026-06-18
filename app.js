@@ -1702,6 +1702,7 @@ function startApp() {
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
     fetchAndRenderFavorites();
+    checkFavoriteStatus();
     console.log("系統初始化完成");
 }
 

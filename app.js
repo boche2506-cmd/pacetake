@@ -216,7 +216,7 @@ function renderDynamicMenu(role) {
         <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
     `;
 
-    if (role === 'buyer' || role === 'admin') {
+    if (role === 'buyer' || role === 'admin'|| !role) {
         menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
     }
 

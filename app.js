@@ -1531,6 +1531,29 @@ async function initStorePage() {
             );
         });
 
+        async function checkFavoriteStatus() {
+            const favBtn = document.getElementById('favorite-btn');
+            const user = auth.currentUser;
+            const { id } = window.currentStoreInfo; // 我們剛剛存進去的 ID
+
+            if (favBtn && user && id) {
+                try {
+                    // 去資料庫找找看有沒有這一筆紀錄
+                    const favRef = doc(db, "users", user.uid, "favorites", id);
+                    const docSnap = await getDoc(favRef);
+
+                    // 如果找到了，就把按鈕改成紅色愛心；沒找到就保持白色
+                    if (docSnap.exists()) {
+                        favBtn.innerText = "❤️";
+                    } else {
+                        favBtn.innerText = "🤍";
+                    }
+                } catch (error) {
+                    console.error("檢查收藏狀態失敗:", error);
+                }
+            }
+        }
+
         // --- 在 initStorePage 的最後面 ---
         setTimeout(() => {
             const currentStoreId = document.body.getAttribute('data-store-id');

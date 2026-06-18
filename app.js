@@ -262,11 +262,11 @@ function renderDynamicMenu(role) {
         <a href="favorites.html" class="nav-fast">❤️ 我的收藏</a>
     `;
 
-    if (role == 'seller') {
+    if (role === 'admin' || role === 'buyer') {
         menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
     }
 
-    if (role === 'seller' || role === 'admin') {
+    if (role === 'admin' || role === 'seller') {
         menuHTML += `
             <div class="menu-divider"></div>
             <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
@@ -1360,6 +1360,13 @@ async function initStorePage() {
             name: storeData.shopName || storeData.name || '未命名店家'
         };
         console.log("全域商店資訊已更新：", window.currentStoreInfo);
+        if (auth.currentUser) {
+            try {
+                await syncHeartIcon();
+            } catch (err) {
+                console.error("同步愛心狀態失敗:", err);
+            }
+        }
 
         // --- 渲染邏輯 ---
         // 1. 先抓出 Firebase 的座標 (記得轉成數字)
@@ -1547,10 +1554,20 @@ async function initStorePage() {
         // 頁面初始化時，根據 Firebase 狀態更新愛心
         async function syncHeartIcon() {
             const heartIcon = document.getElementById('heart-icon');
-            const favRef = doc(db, "users", auth.currentUser.uid, "favorites", window.currentStoreInfo.id);
-            const docSnap = await getDoc(favRef);
+            if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
+            const user = auth.currentUser;
+            if (!user) {
+                heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
+                return;
+            }
 
-            heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
+            try {
+                const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
+                const docSnap = await getDoc(favRef);
+                heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
+            } catch (e) {
+                console.error("同步愛心失敗:", e);
+            }
         }
 
     } catch (error) {

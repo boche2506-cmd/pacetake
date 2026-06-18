@@ -1242,6 +1242,10 @@ async function initStorePage() {
         if (typeof db !== 'undefined' && typeof doc === 'function') {
             const docSnap = await getDoc(doc(db, "stores", currentStoreId));
             if (docSnap.exists()) storeData = docSnap.data();
+            console.log("Firebase 拿到的資料：", storeData); // <-- 加上這行！
+
+            // 順便檢查一下這裡有沒有值
+            console.log("Logo 欄位的值：", storeData.shopLogo);
         }
 
         // 如果 v9 沒讀到，嘗試用 v8 寫法讀取
@@ -1256,7 +1260,21 @@ async function initStorePage() {
         document.getElementById('storeNameText').innerText = storeData.shopName || storeData.name || '未命名店家';
         document.getElementById('storeAddressText').innerText = '📍 ' + (storeData.shopAddress || storeData.address || '');
         document.getElementById('storeDistanceText').innerText = '⚡ ' + (typeof dist !== 'undefined' ? dist + ' km' : '0.05 km');
+        const savedLogo = localStorage.getItem('selected_store_logo');
+        const target = document.getElementById('logo-wrapper');
 
+        if (!target) return; // 如果找不到盒子就跳出，防止報錯
+        const imageSource = storeData.shopLogo;
+        if (imageSource) {
+            // 檢查是不是 base64 或者正常的 http 網址
+            if (imageSource.startsWith('data:image') || imageSource.startsWith('http')) {
+                target.innerHTML = `<img src="${imageSource}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
+            } else {
+                target.innerText = imageSource;
+            }
+        } else {
+            target.innerText = '🏪';
+        }
         const menuList = storeData.menuList || storeData.menu || [];
         menuContainer.innerHTML = "";
 
@@ -1407,25 +1425,6 @@ async function initStorePage() {
     }
 }
 
-function renderPageLogo() {
-    const savedLogo = localStorage.getItem('selected_store_logo');
-    const target = document.getElementById('logo-wrapper');
-
-    if (!target) return; // 如果找不到盒子就跳出，防止報錯
-
-    if (savedLogo) {
-        // 如果有存到 Logo 資料，就把它噴進去
-        if (savedLogo.startsWith('data:image') || savedLogo.startsWith('http')) {
-            target.innerHTML = `<img src="${savedLogo}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
-        } else {
-            target.innerText = savedLogo;
-        }
-    } else {
-        // 如果沒有存到 (使用者直接連到這頁)，可以顯示預設值
-        target.innerText = '🏪';
-    }
-}
-
 /** * 🛒 購物車管理核心 */
 // --- 1. 資料處理區 ---
 export function getCartData() {
@@ -1547,7 +1546,6 @@ function startApp() {
     renderAdminTable();
     initCartDOMState();
     refreshTotalCartUI();
-    renderPageLogo();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
     console.log("系統初始化完成");
 }

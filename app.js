@@ -322,9 +322,15 @@ function filterAndRenderStores() {
 
         // 距離計算處理
         let distanceHtml = "<span>⚡ 距離未知</span>";
-        // 確保 buyerLat/Lng 已定義且店家有座標
-        if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
-            const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
+        // 這裡我們多加一個轉換，把 Firebase 的字串轉成數字
+        // 注意這裡，我們統一使用 shopLat 和 shopLng (對應你資料庫的名稱)
+        const lat = parseFloat(store.shopLat);
+        const lng = parseFloat(store.shopLng);
+
+        // 只有 Firebase 的資料需要 parseFloat，GPS 變數直接用即可
+        if (buyerLat !== null && buyerLng !== null && !isNaN(lat) && !isNaN(lng)) {
+            // 這裡的 buyerLat 是 GPS 給的數字，lat 是我們轉過的數字，完美！
+            const dist = calculateDistance(buyerLat, buyerLng, lat, lng);
             distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
         }
 

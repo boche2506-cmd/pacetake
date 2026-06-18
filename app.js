@@ -175,66 +175,40 @@ const heartIcon = document.getElementById('heart-icon'); // 加入這一行
 if (favBtn) {
     favBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
-
         // 1. 檢查登入
         if (!user) {
             alert("⚠️ 請先登入才能收藏店家喔！");
             return;
         }
-
         // 2. 檢查是否有店舖資料 (這就是我們剛剛存進 window 的)
         const { id, name } = window.currentStoreInfo;
-        if (!id) {
-            alert("❌ 系統尚未載入商店資訊，請稍候再試。");
-            return;
-        }
-
-        // 3. 設定收藏路徑
         const favRef = doc(db, "users", user.uid, "favorites", id);
 
         try {
-            // 2. 檢查該文件是否存在 (判斷是否已經收藏)
+            // 2. 先抓取當前狀態
             const docSnap = await getDoc(favRef);
+
             if (docSnap.exists()) {
+                // --- 取消收藏邏輯 ---
                 await deleteDoc(favRef);
-                heartIcon.innerText = "🤍";
+                heartIcon.innerText = "🤍"; // 立即更新圖示
+                alert(`💔 已將「${name}」移除`);
             } else {
-                // 如果不存在，執行加入收藏
+                // --- 加入收藏邏輯 ---
                 await setDoc(favRef, {
                     sellerUid: id,
                     storeName: name,
-                    addedAt: serverTimestamp()
+                    createdAt: serverTimestamp()
                 });
-                // 5. 成功提示
-                alert(`❤️ 已成功將「${name}」加入最愛！`);
-                heartIcon.innerText = "❤️"; // 給個簡單的回饋
+                heartIcon.innerText = "❤️"; // 立即更新圖示
+                alert(`❤️ 已將「${name}」加入最愛！`);
             }
         } catch (error) {
-            console.error("收藏失敗:", error);
+            console.error("操作失敗:", error);
             alert("系統錯誤，請稍後再試。");
         }
     });
 }
-
-async function checkFavoriteStatus() {
-    // 這裡我們抓 span，而不是整個 button
-    const heartIcon = document.getElementById('heart-icon');
-    const user = auth.currentUser;
-    const { id } = window.currentStoreInfo;
-
-    if (!heartIcon || !user || !id) return;
-
-    const favRef = doc(db, "users", user.uid, "favorites", id);
-    const docSnap = await getDoc(favRef);
-
-    // 如果找到了，就把按鈕改成紅色愛心；沒找到就保持白色
-    if (docSnap.exists()) {
-        heartIcon.innerText = "❤️";
-    } else {
-        heartIcon.innerText = "🤍";
-    }
-}
-
 
 function updateUIForUser(user, currentRole) {
     // 這裡加上 const，確保這些變數只屬於這個函式
@@ -1570,6 +1544,15 @@ async function initStorePage() {
             console.log("[PACE DEBUG] 購物車規格同步完成。");
         }, 200);
 
+        // 頁面初始化時，根據 Firebase 狀態更新愛心
+        async function syncHeartIcon() {
+            const heartIcon = document.getElementById('heart-icon');
+            const favRef = doc(db, "users", auth.currentUser.uid, "favorites", window.currentStoreInfo.id);
+            const docSnap = await getDoc(favRef);
+
+            heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
+        }
+
     } catch (error) {
         console.error("[PACE ERROR] 頁面渲染失敗：", error);
         menuContainer.innerHTML = "<p>無法載入店家菜單，請檢查網路連線。</p>";
@@ -1699,7 +1682,6 @@ function startApp() {
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
     fetchAndRenderFavorites();
-    checkFavoriteStatus();
     console.log("系統初始化完成");
 }
 

@@ -207,7 +207,7 @@ if (favBtn) {
                 });
                 // 5. 成功提示
                 alert(`❤️ 已成功將「${name}」加入最愛！`);
-                fheartIcon.innerText = "❤️"; // 給個簡單的回饋
+                heartIcon.innerText = "❤️"; // 給個簡單的回饋
             }
         } catch (error) {
             console.error("收藏失敗:", error);

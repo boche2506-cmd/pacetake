@@ -1263,9 +1263,29 @@ async function initStorePage() {
         if (!storeData) throw new Error("無法從資料庫找到該店家資料");
 
         // --- 渲染邏輯 ---
+        // 1. 先抓出 Firebase 的座標 (記得轉成數字)
+        // 1. 先抓出 Firebase 的座標 (記得轉成數字)
+        const sLat = parseFloat(storeData.shopLat || storeData.lat);
+        const sLng = parseFloat(storeData.shopLng || storeData.lng);
+
+        // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
+        let displayDistance = '距離未知'; // 預設值
+
+        if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
+            const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
+            displayDistance = dist.toFixed(1) + ' km';
+        }
+
+        // 3. 把算出來的結果填入 HTML
         document.getElementById('storeNameText').innerText = storeData.shopName || storeData.name || '未命名店家';
         document.getElementById('storeAddressText').innerText = '📍 ' + (storeData.shopAddress || storeData.address || '');
-        document.getElementById('storeDistanceText').innerText = '⚡ ' + (typeof dist !== 'undefined' ? dist + ' km' : '0.05 km');
+
+        // 這裡填入我們算好的 displayDistance
+        const distElement = document.getElementById('storeDistanceText');
+        if (distElement) {
+            distElement.innerText = '⚡ ' + displayDistance;
+        }
+
         const savedLogo = localStorage.getItem('selected_store_logo');
         const target = document.getElementById('logo-wrapper');
 

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PACE 派思 pacetake.tw - 買家首頁</title>
+    <!-- Favicon & Apple Touch Icon -->
+    <link rel="icon" type="image/png" href="png/logoapple.png" sizes="180x180">
+    <link rel="apple-touch-icon" href="png/logoapple.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
+    <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 👑 頂部全區常駐吸附天花板 (Sticky) */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .favorites {
+            height: 3%;
+            max-width: 100%;
+            font-size: 6cqw;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.1;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .store-list {
+            height: 82%;
+            max-width: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5cqw;
+            /* 卡片與卡片之間的間距改用 cqw */
+            padding: 1cqw 1.5cqw 1cqw 1cqw;
+            /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
+            box-sizing: border-box;
+        }
+
+        /* 店家單一卡片 */
+        .store-card {
+            /* height: 35%; */
+            /* ❌ 建議移除百分比高度，因為內容物（圖片、文字、標籤）*/
+            /* 改用 cqw 後，讓卡片高度被內容自然撐開（或改用 min-height） */
+            min-height: 24cqw;
+            /* 💡 新增：設定最小高度，確保卡片視覺比例穩固 */
+            width: 100%;
+            /* 撐滿 store-list 的寬度（扣除 padding） */
+            display: flex;
+            align-items: center;
+            gap: 1cqw;
+            /* 圖片與文字區塊的間距 */
+            background-color: var(--card-bg);
+            border: 0.3cqw solid var(--border-color);
+            border-radius: 4cqw;
+            /* 圓角改用 cqw */
+            text-decoration: none;
+            color: inherit;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            padding: 0.5cqw;
+            /* 卡片內部內襯改用 cqw */
+            box-sizing: border-box;
+        }
+
+        .store-card:hover {
+            transform: translateY(-0.5cqw);
+            box-shadow: 0 1cqw 3cqw rgba(0, 0, 0, 0.06);
+        }
+
+        /* 左側店家圖示外殼 */
+        .store-img {
+            width: 15cqw;
+            /* 依比例放大/縮小 */
+            height: 15cqw;
+            background-color: var(--bg-global);
+            border-radius: 3cqw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5cqw;
+            /* 裡面的 Emoji 大小 */
+            flex-shrink: 0;
+            object-fit: contain;
+            /* 關鍵：確保完整顯示，不裁切，短邊留空 */
+            display: block;
+            box-sizing: border-box;
+        }
+
+        /* 右側文字資訊大外殼 */
+        .store-info {
+            height: 100%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-grow: 1;
+            /* 💡 關鍵：讓文字區塊拿走剩下的所有寬度，點點點才會精準生效 */
+            overflow: hidden;
+            /* 💡 關鍵：防止內部文字把外殼撐開 */
+            gap: 1cqw;
+        }
+
+        .store {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-grow: 1;
+            /* 💡 關鍵：讓文字區塊拿走剩下的所有寬度，點點點才會精準生效 */
+            overflow: hidden;
+            /* 💡 關鍵：防止內部文字把外殼撐開 */
+            gap: 1.5cqw;
+        }
+
+        /* 店家名稱 */
+        .store-name {
+            font-size: 6cqw;
+            /* 字體改用 cqw */
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            /* 💡 新增：隱藏超出部分 */
+            text-overflow: ellipsis;
+            /* 超出顯示 ... */
+            line-height: 1.1;
+        }
+
+        /* 📍 店家地址/距離（你要的太長顯示...設定在這裡） */
+        .store-meta {
+            height: 45%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: flex-start;
+            font-size: 3.5cqw;
+            /* 字體改用 cqw */
+            color: var(--text-muted);
+            white-space: nowrap;
+            max-width: 100%;
+            /* 💡 關鍵：限制最大寬度為父層的 100% */
+            line-height: 1.1;
+        }
+
+        /* 標籤容器 (現金支付 / 支援行動支付) */
+        .store-tags {
+            display: flex;
+            gap: 0.5cqw;
+            flex-wrap: wrap;
+            line-height: 1.1;
+        }
+
+        /* 標籤本體 */
+        .store-tags span {
+            font-size: 3.25cqw;
+            /* 字體改用 cqw */
+            font-weight: 500;
+            padding: 0.25cqw 1cqw;
+            /* 內襯改用 cqw */
+            border-radius: 1.5cqw;
+            /* 圓角改用 cqw */
+            white-space: nowrap;
+            /* 確保標籤內的字（如：現金支付）不會自己斷行 */
+            line-height: 1.1;
+        }
+
+        .tag-seating {
+            background-color: rgba(255, 145, 0, 0.08);
+            color: var(--brand-orange);
+            line-height: 1.1;
+        }
+
+        .tag-time {
+            background-color: rgba(0, 98, 255, 0.08);
+            color: var(--brand-blue);
+            line-height: 1.1;
+        }
+
+        .tag-pay {
+            background-color: rgba(16, 185, 129, 0.08);
+            color: var(--brand-green);
+            line-height: 1.1;
+        }
+
+        .tag-seating.inactive,
+        .tag-time.inactive,
+        .tag-pay.inactive {
+            opacity: 0.25;
+            filter: grayscale(100%);
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone-wrapper">
+        <div id="buyerView" style="display: block;">
+            <header class="header">
+                <div class="pace-logo">
+                    <a href="index.html" class="logo-link">
+                        <img src="png/pace3.png" alt="派思 官方網站">
+                    </a>
+                    <div class="pace-avatar-icon">
+                        <span id="defaultIcon" class="avatar-icon">👤</span>
+                        <img id="userAvatarImg" src=""
+                            style="display: none; border-radius: 50%;height: 13cqw; width: 13cqw;">
+                    </div>
+                </div>
+                <div class="two">
+                    <div class="pace">
+                        <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+                        <span>店內價外帶自取/點餐系統</span>
+                    </div>
+                    <button class="login-btn" id="loginBtn">登入/註冊</button>
+                    <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+                        <span class="user-name" id="userNameDisplay"></span></button>
+                    <div class="dropdown-menu" id="dropdownMenu"></div>
+                </div>
+            </header>
+            <div class="favorites"><span>❤️ 我的收藏</span></div>
+            <main class="store-list" id="store-Container">
+                <div class="loading-spinner" id="loading-Spinner">⚡ 正在連線雲端資料庫...</div>
+            </main>
+        </div>
+    </div>
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>

@@ -265,9 +265,10 @@ function renderDynamicMenu(role) {
     menuHTML += `
         <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
         <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
+        <a href="favorites.html" class="nav-fast">❤️ 我的收藏</a>
     `;
 
-    if (role === 'buyer' || role === 'admin' || !role) {
+    if (role == 'seller') {
         menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
     }
 

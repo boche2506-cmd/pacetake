@@ -193,17 +193,23 @@ if (favBtn) {
         const favRef = doc(db, "users", user.uid, "favorites", id);
 
         try {
-            // 4. 寫入資料庫
-            await setDoc(favRef, {
-                sellerUid: id,
-                storeName: name,
-                addedAt: serverTimestamp()
-            });
-
-            // 5. 成功提示
-            alert(`❤️ 已成功將「${name}」加入最愛！`);
-            favBtn.innerText = "已收藏"; // 給個簡單的回饋
-            favBtn.disabled = true;
+            // 2. 檢查該文件是否存在 (判斷是否已經收藏)
+            const docSnap = await getDoc(favRef);
+            if (docSnap.exists()) {
+                await deleteDoc(favRef);
+                alert(`💔 已將「${name}」從最愛中移除`);
+                favBtn.innerText = "🤍"; // 按鈕文字變更
+            } else {
+                // 如果不存在，執行加入收藏
+                await setDoc(favRef, {
+                    sellerUid: id,
+                    storeName: name,
+                    addedAt: serverTimestamp()
+                });
+                // 5. 成功提示
+                alert(`❤️ 已成功將「${name}」加入最愛！`);
+                favBtn.innerText = "❤️"; // 給個簡單的回饋
+            }
         } catch (error) {
             console.error("收藏失敗:", error);
             alert("系統錯誤，請稍後再試。");

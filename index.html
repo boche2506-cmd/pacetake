@@ -268,7 +268,7 @@
             height: 45%;
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: flex-start;
             font-size: 3.5cqw;
             /* 字體改用 cqw */
@@ -276,7 +276,7 @@
             white-space: nowrap;
             max-width: 100%;
             /* 💡 關鍵：限制最大寬度為父層的 100% */
-            line-height: 1.1;
+            line-height: 1.5;
         }
 
         /* 標籤容器 (現金支付 / 支援行動支付) */
@@ -497,7 +497,6 @@
                 </div>
             </div>
             <main class="store-list" id="store-Container">
-                <div class="loading-spinner" id="loading-Spinner">⚡ 正在連線雲端資料庫...</div>
             </main>
             <footer class="bottom-bar">
                 <a href="orders.html" class="status-msg">

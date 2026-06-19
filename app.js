@@ -375,48 +375,6 @@ window.createStoreCard = function (store, distanceHtml = null) {
     return card;
 };
 
-// 放在 app.js 中，負責渲染最愛清單的函數
-async function renderFavoriteStores() {
-    const favoriteContainer = document.getElementById('favoriteContainer');
-    // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
-    if (!favoriteContainer) return;
-
-    const user = auth.currentUser;
-    if (!user) {
-        favoriteContainer.innerHTML = '<p>請先登入以查看收藏清單。</p>';
-        return;
-    }
-
-    try {
-        // 抓取收藏集合
-        const favCol = collection(db, "users", user.uid, "favorites");
-        const snapshot = await getDocs(favCol);
-
-        if (snapshot.empty) {
-            favoriteContainer.innerHTML = '<div class="loading-Spinner">🍃 您目前還沒有收藏任何店家喔！</div>';
-            return;
-        }
-
-        favoriteContainer.innerHTML = ""; // 清空容器
-
-        snapshot.forEach((doc) => {
-            const store = doc.data();
-            // 直接呼叫我們剛才建立的共用函數
-            const card = window.createStoreCard(store, "❤️ 我的最愛");
-            favoriteContainer.appendChild(card);
-        });
-    } catch (error) {
-        console.error("讀取收藏失敗:", error);
-    }
-}
-
-// 確保登入狀態確認後才執行渲染
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        renderFavoriteStores();
-    }
-});
-
 // index.html
 function filterAndRenderStores() {
     if (!storeContainer) return;
@@ -450,7 +408,7 @@ function filterAndRenderStores() {
 
     filtered.forEach(store => {
         if (store.status === "offline") return;
-
+        const distanceText = getStoreDistanceText(store);
         // 基本資料準備
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
@@ -464,20 +422,64 @@ function filterAndRenderStores() {
             finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         }
 
-        // 距離計算處理
-        let distanceHtml = "<span>⚡ 距離未知</span>";
-        // 確保 buyerLat/Lng 已定義且店家有座標
-        if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
-            const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
-            distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
-        }
+
 
         // 生成卡片
         const dist = (typeof buyerLat !== 'undefined' && store.lat) ? `⚡ ${calculateDistance(buyerLat, buyerLng, store.lat, store.lng).toFixed(1)} km` : "⚡ 距離未知";
-        const card = window.createStoreCard(store, dist);
+        const card = window.createStoreCard(store, dist, `<span>${distanceText}</span>`);
         storeContainer.appendChild(card);
     });
 }
+
+// 距離計算處理 // 確保 buyerLat/Lng 已定義且店家有座標
+function getStoreDistanceText(store) {
+    if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
+        const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
+        distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
+    } return "⚡ 距離未知";
+}
+
+// 放在 app.js 中，負責渲染最愛清單的函數
+async function renderFavoriteStores() {
+    const favoriteContainer = document.getElementById('favoriteContainer');
+    // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
+    if (!favoriteContainer) return;
+
+    const user = auth.currentUser;
+    if (!user) {
+        favoriteContainer.innerHTML = '<p>請先登入以查看收藏清單。</p>';
+        return;
+    }
+
+    try {
+        // 抓取收藏集合
+        const favCol = collection(db, "users", user.uid, "favorites");
+        const snapshot = await getDocs(favCol);
+
+        if (snapshot.empty) {
+            favoriteContainer.innerHTML = '<div class="loading-Spinner">🤍 您目前還沒有收藏任何店家喔！</div>';
+            return;
+        }
+
+        favoriteContainer.innerHTML = ""; // 清空容器
+
+        snapshot.forEach((doc) => {
+            const store = doc.data();
+            // 直接呼叫我們剛才建立的共用函數
+            const card = window.createStoreCard(store, "❤️ 我的最愛");
+            favoriteContainer.appendChild(card);
+        });
+    } catch (error) {
+        console.error("讀取收藏失敗:", error);
+    }
+}
+
+// 確保登入狀態確認後才執行渲染
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        renderFavoriteStores();
+    }
+});
 
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');

@@ -320,7 +320,7 @@ async function fetchStoresFromFirebase() {
         if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
     }
 }
-async function fetchStoresFromFirebase() {
+async function favoritesFromFirebase() {
     try {
         console.log("[PACE DEBUG] favoriteContainer.");
         const querySnapshot = await getDocs(collection(db, "stores"));
@@ -1739,6 +1739,7 @@ function startApp() {
     initStorePage();
     getBrowserLocation();
     fetchStoresFromFirebase();
+    favoritesFromFirebase();
     renderAdminTable();
     initCartDOMState();
     refreshTotalCartUI();

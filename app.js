@@ -322,16 +322,21 @@ async function fetchStoresFromFirebase() {
 }
 
 async function filterAndRenderStores(renderOnlyFavorites = false) {
-    if (!storeContainer) return;
-    // 1. 如果是收藏頁面，條件變更
+    // 1. 決定要用哪一個盒子 (ID 為 store-Container 或 favoriteContainer)
+    // 我們直接讓 'currentContainer' 代表當下那個盒子
+    const currentContainer = renderOnlyFavorites
+        ? document.getElementById('favoriteContainer')
+        : document.getElementById('store-Container');
+
+    // 如果找不到當前的盒子，直接結束
+    if (!currentContainer) return;
+
     let displayList = [];
     if (renderOnlyFavorites) {
-        // 從 localStorage 或全域變數讀取已收藏的 ID 列表 (假設你已經在某處存了)
-        const myFavIds = getMyFavoriteIds(); // 這需要一個函式幫你抓 ID 列表
+        // 因為 getMyFavoriteIds 是 async，一定要加 await！
+        const myFavIds = await getMyFavoriteIds();
         displayList = allStores.filter(store => myFavIds.includes(store.id));
     } else {
-
-        // 1. 抓取篩選條件
         const citySelect = document.getElementById('citySelect');
         const districtSelect = document.getElementById('districtSelect');
         const globalSearchInput = document.getElementById('globalSearchInput');
@@ -348,46 +353,39 @@ async function filterAndRenderStores(renderOnlyFavorites = false) {
             return matchCity && matchDist && matchKeyword && store.status !== "offline";
         });
     }
-    // 3. 如果找不到店家，顯示提示並結束
+
+    // 2. 判斷是否有資料
     if (displayList.length === 0) {
-        storeContainer.innerHTML = renderOnlyFavorites
+        currentContainer.innerHTML = renderOnlyFavorites
             ? '<p>目前沒有收藏店家</p>'
             : '<div class="loading-Spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
         return;
     }
 
-    // 4. 清空畫面並開始渲染卡片
-    storeContainer.innerHTML = "";
+    // 3. 開始渲染 (把原本的 storeContainer 通通改成 currentContainer)
+    currentContainer.innerHTML = "";
     displayList.forEach(store => {
-
-        // 基本資料準備
+        // ... (中間的資料準備邏輯保持不變) ...
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
         const takeoutSupported = store.isCashPayEnabled !== false;
         const paySupported = store.isOnlinePayEnabled !== false;
         const seatingSupported = store.isSeatingAvailable !== false;
-        // 照片處理 (優先顯示 shopLogo)
+
         const logoData = store.shopLogo || store.emoji || '🏪';
         let finalLogoHtml = logoData;
         if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
             finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         }
 
-        // 距離計算處理
         let distanceHtml = "<span>⚡ 距離未知</span>";
-        // 這裡我們多加一個轉換，把 Firebase 的字串轉成數字
-        // 注意這裡，我們統一使用 shopLat 和 shopLng (對應你資料庫的名稱)
         const lat = parseFloat(store.shopLat);
         const lng = parseFloat(store.shopLng);
-
-        // 只有 Firebase 的資料需要 parseFloat，GPS 變數直接用即可
         if (buyerLat !== null && buyerLng !== null && !isNaN(lat) && !isNaN(lng)) {
-            // 這裡的 buyerLat 是 GPS 給的數字，lat 是我們轉過的數字，完美！
             const dist = calculateDistance(buyerLat, buyerLng, lat, lng);
             distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
         }
 
-        // 生成卡片
         const card = document.createElement('a');
         card.href = `store.html?storeId=${store.id}`;
         card.className = 'store-card';
@@ -397,16 +395,16 @@ async function filterAndRenderStores(renderOnlyFavorites = false) {
                 <div class="store">
                     <div class="store-name">${finalName}</div>
                     <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml}</div>
-                
-                <div class="store-tags">
-                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
-                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
-                    <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用座位</span>
+                    <div class="store-tags">
+                        <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
+                        <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
+                        <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用座位</span>
+                    </div>
                 </div>
             </div>
-            </div>
         `;
-        storeContainer.appendChild(card);
+        // 改這裡：把這張卡片塞進 currentContainer
+        currentContainer.appendChild(card);
     });
 }
 

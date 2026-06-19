@@ -320,6 +320,21 @@ async function fetchStoresFromFirebase() {
         if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
     }
 }
+async function fetchStoresFromFirebase() {
+    try {
+        console.log("[PACE DEBUG] favoriteContainer.");
+        const querySnapshot = await getDocs(collection(db, "stores"));
+        allStores = [];
+        querySnapshot.forEach((doc) => {
+            allStores.push({ id: doc.id, ...doc.data() });
+        });
+        favoritesStores();
+        renderAdminTable();
+    } catch (error) {
+        console.error("讀取店家失敗：", error);
+        if (favoriteContainer) favoriteContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
+    }
+}
 // index.html
 function filterAndRenderStores() {
     if (!storeContainer) return;

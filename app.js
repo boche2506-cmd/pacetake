@@ -169,32 +169,12 @@ function initThemeSystem() {
         });
     }
 }
-// 假設這是在你抓到 Firebase 資料之後的回呼函式中
-async function fetchFullStoreData() {
-    const docSnap = await getDoc(storeRef);
-    const data = docSnap.data();
 
-    // --- 這裡就是「事後補」的動作 ---
-    window.currentStoreInfo.shopAddress = data.shopAddress;
-    window.currentStoreInfo.shopLat = data.shopLat;
-    window.currentStoreInfo.shopLng = data.shopLng;
-    window.currentStoreInfo.shopLogo = data.shopLogo;
-    window.currentStoreInfo.isCashPayEnabled = data.isCashPayEnabled;
-    window.currentStoreInfo.isOnlinePayEnabled = data.isOnlinePayEnabled;
-    window.currentStoreInfo.hasSeating = data.hasSeating;
-
-    console.log("現在的 currentStoreInfo 已經長大了：", window.currentStoreInfo);
-}
 // 收藏按鈕監聽器
 const favBtn = document.getElementById('favorite-btn');
 const heartIcon = document.getElementById('heart-icon'); // 加入這一行
 if (favBtn) {
     favBtn.addEventListener('click', async () => {
-        console.log("點擊時 window.currentStoreInfo 的完整狀態:", window.currentStoreInfo);
-        if (window.currentStoreInfo.shopAddress === undefined) {
-            console.error("錯誤：資料還沒補進去！");
-            return; // 這裡直接停止，避免噴出 Firebase 錯誤
-        }
         const user = auth.currentUser;
         // 1. 檢查登入
         if (!user) {
@@ -202,7 +182,19 @@ if (favBtn) {
             return;
         }
         // 2. 檢查是否有店舖資料 (這就是我們剛剛存進 window 的)
-        const { id, name } = window.currentStoreInfo;
+        const {
+            id,
+            name,
+            sellerUid,
+            shopLogo,
+            shopName,
+            shopAddress,
+            shopLat,
+            shopLng,
+            isCashPayEnabled,
+            isOnlinePayEnabled,
+            hasSeating
+        } = window.currentStoreInfo;
         const favRef = doc(db, "users", user.uid, "favorites", id);
 
         try {
@@ -217,16 +209,17 @@ if (favBtn) {
             } else {
                 // --- 加入收藏邏輯 ---
                 await setDoc(favRef, {
-                    sellerUid: window.currentStoreInfo.id,
-                    shopName: window.currentStoreInfo.name,
-                    shopAddress: window.currentStoreInfo.shopAddress,
-                    shopLat: window.currentStoreInfo.shopLat,
-                    shopLng: window.currentStoreInfo.shopLng,
-                    shopLogo: window.currentStoreInfo.shopLogo, // 這應該是一個網址 (URL)
-                    isCashPayEnabled: window.currentStoreInfo.isCashPayEnabled,
-                    isOnlinePayEnabled: window.currentStoreInfo.isOnlinePayEnabled,
-                    hasSeating: window.currentStoreInfo.hasSeating,
-                    createdAt: serverTimestamp() // Firebase 伺服器時間
+                    id,
+                    name,
+                    sellerUid,
+                    shopLogo,
+                    shopName,
+                    shopAddress,
+                    shopLat,
+                    shopLng,
+                    isCashPayEnabled,
+                    isOnlinePayEnabled,
+                    hasSeating
                 });
                 heartIcon.innerText = "❤️"; // 立即更新圖示
                 alert(`❤️ 已將「${name}」加入最愛！`);

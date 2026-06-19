@@ -454,7 +454,7 @@ function favoritesStores() {
 
         // 生成卡片
         const card = document.createElement('a');
-        card.href = `store.html?storeId=${store.id}`;
+        card.href = `favorites.html?storeId=${store.id}`;
         card.className = 'store-card';
         card.innerHTML = `
             <div class="store-img">${finalLogoHtml}</div>

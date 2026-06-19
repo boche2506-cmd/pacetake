@@ -190,6 +190,11 @@ const favBtn = document.getElementById('favorite-btn');
 const heartIcon = document.getElementById('heart-icon'); // 加入這一行
 if (favBtn) {
     favBtn.addEventListener('click', async () => {
+        console.log("點擊時 window.currentStoreInfo 的完整狀態:", window.currentStoreInfo);
+        if (window.currentStoreInfo.shopAddress === undefined) {
+            console.error("錯誤：資料還沒補進去！");
+            return; // 這裡直接停止，避免噴出 Firebase 錯誤
+        }
         const user = auth.currentUser;
         // 1. 檢查登入
         if (!user) {

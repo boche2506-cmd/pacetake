@@ -209,15 +209,20 @@ if (favBtn) {
                 await setDoc(favRef, {
                     sellerUid: store.sellerUid,
                     createdAt: serverTimestamp(),
-                    // 整理後的渲染用資料 (快照)
-                    shopName: store.shopName || store.name || '未命名店家',
-                    shopAddress: store.shopAddress || store.address || '',
-                    shopLogo: store.shopLogo || store.emoji || '🏪',
+
+                    // 對應你從 Firebase 抓出來的正確欄位名稱
+                    shopName: store.shopName || '未命名店家',
+                    shopAddress: store.shopAddress || '',
+                    shopLogo: store.shopLogo || '🏪',
+
+                    // 直接對應你的布林值欄位
                     isCashPayEnabled: store.isCashPayEnabled !== false,
                     isOnlinePayEnabled: store.isOnlinePayEnabled !== false,
-                    hasSeating: store.isSeatingAvailable !== false,
-                    lat: store.lat || null,
-                    lng: store.lng || null
+                    hasSeating: store.hasSeating !== false, // 注意這裡改成你的 hasSeating
+
+                    // 座標欄位 (字串轉成數字，方便後續計算)
+                    lat: parseFloat(store.shopLat) || null,
+                    lng: parseFloat(store.shopLng) || null
                 });
                 heartIcon.innerText = "❤️"; // 立即更新圖示
                 alert(`❤️ 已將「${name}」加入最愛！`);

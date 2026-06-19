@@ -398,7 +398,7 @@ function filterAndRenderStores() {
     });
 }
 // favorites.html
-function filterAndRenderStores() {
+function favoritesStores() {
     if (!favoriteContainer) return;
 
     // 1. 抓取篩選條件

@@ -342,13 +342,13 @@ async function fetchStoresFromFirebase() {
 }
 
 // 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
-window.createStoreCard = function(store, distanceHtml = null) {
+window.createStoreCard = function (store, distanceHtml = null) {
     const finalName = store.shopName || store.name || '未命名店家';
     const finalAddress = store.shopAddress || store.address || '';
     const takeoutSupported = store.isCashPayEnabled !== false;
     const paySupported = store.isOnlinePayEnabled !== false;
     const seatingSupported = store.hasSeating !== false;
-    
+
     const logoData = store.shopLogo || '🏪';
     let finalLogoHtml = logoData;
     if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
@@ -375,6 +375,47 @@ window.createStoreCard = function(store, distanceHtml = null) {
     return card;
 };
 
+// 放在 app.js 中，負責渲染最愛清單的函數
+async function renderFavoriteStores() {
+    const favoriteContainer = document.getElementById('favoriteContainer');
+    // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
+    if (!favoriteContainer) return;
+
+    const user = auth.currentUser;
+    if (!user) {
+        favoriteContainer.innerHTML = '<p>請先登入以查看收藏清單。</p>';
+        return;
+    }
+
+    try {
+        // 抓取收藏集合
+        const favCol = collection(db, "users", user.uid, "favorites");
+        const snapshot = await getDocs(favCol);
+
+        if (snapshot.empty) {
+            favoriteContainer.innerHTML = '<div class="loading-Spinner">🍃 您目前還沒有收藏任何店家喔！</div>';
+            return;
+        }
+
+        favoriteContainer.innerHTML = ""; // 清空容器
+
+        snapshot.forEach((doc) => {
+            const store = doc.data();
+            // 直接呼叫我們剛才建立的共用函數
+            const card = window.createStoreCard(store, "❤️ 我的最愛");
+            favoriteContainer.appendChild(card);
+        });
+    } catch (error) {
+        console.error("讀取收藏失敗:", error);
+    }
+}
+
+// 確保登入狀態確認後才執行渲染
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        renderFavoriteStores();
+    }
+});
 
 // index.html
 function filterAndRenderStores() {
@@ -432,24 +473,8 @@ function filterAndRenderStores() {
         }
 
         // 生成卡片
-        const card = document.createElement('a');
-        card.href = `store.html?storeId=${store.id}`;
-        card.className = 'store-card';
-        card.innerHTML = `
-            <div class="store-img">${finalLogoHtml}</div>
-            <div class="store-info">
-                <div class="store">
-                    <div class="store-name">${finalName}</div>
-                    <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml}</div>
-                
-                <div class="store-tags">
-                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
-                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
-                    <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用座位</span>
-                </div>
-            </div>
-            </div>
-        `;
+        const dist = (typeof buyerLat !== 'undefined' && store.lat) ? `⚡ ${calculateDistance(buyerLat, buyerLng, store.lat, store.lng).toFixed(1)} km` : "⚡ 距離未知";
+        const card = window.createStoreCard(store, dist);
         storeContainer.appendChild(card);
     });
 }
@@ -1252,7 +1277,13 @@ window.toggleView = function (view) {
     }
 };
 
-
+// 綁定「返回一般買家視圖」按鈕
+const toggleBuyerBtn = document.getElementById('toggleBuyerViewBtn');
+if (toggleBuyerBtn) {
+    toggleBuyerBtn.addEventListener('click', () => {
+        window.toggleView('buyer');
+    });
+}
 
 // 6. 發行邀請碼
 window.issuePromoCode = async function () {

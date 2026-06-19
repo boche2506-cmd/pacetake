@@ -189,9 +189,16 @@ if (favBtn) {
             } else {
                 // --- 加入收藏邏輯 ---
                 await setDoc(favRef, {
+                    createdAt: serverTimestamp(),
                     sellerUid: id,
+                    shopLogo: shopLogoData,
                     storeName: name,
-                    createdAt: serverTimestamp()
+                    shopAddress: `${city}${district}${detailAddress}`,
+                    shopLat: lat,
+                    shopLng: lng,
+                    isCashPayEnabled: isCashPayEnabled,
+                    isOnlinePayEnabled: isOnlinePayEnabled,
+                    hasSeating: getHasSeatingStatus(),
                 });
                 heartIcon.innerText = "❤️"; // 立即更新圖示
                 alert(`❤️ 已將「${name}」加入最愛！`);

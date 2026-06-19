@@ -1252,13 +1252,7 @@ window.toggleView = function (view) {
     }
 };
 
-// 綁定「返回一般買家視圖」按鈕
-const toggleBuyerBtn = document.getElementById('toggleBuyerViewBtn');
-if (toggleBuyerBtn) {
-    toggleBuyerBtn.addEventListener('click', () => {
-        window.toggleView('buyer');
-    });
-}
+
 
 // 6. 發行邀請碼
 window.issuePromoCode = async function () {

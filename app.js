@@ -320,72 +320,62 @@ async function fetchStoresFromFirebase() {
         if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
     }
 }
+// index.html
+function filterAndRenderStores() {
+    if (!storeContainer) return;
 
-async function filterAndRenderStores(renderOnlyFavorites = false) {
-    // 1. 決定要用哪一個盒子 (ID 為 store-Container 或 favoriteContainer)
-    // 我們直接讓 'currentContainer' 代表當下那個盒子
-    const currentContainer = renderOnlyFavorites
-        ? document.getElementById('favoriteContainer')
-        : document.getElementById('store-Container');
+    // 1. 抓取篩選條件
+    const citySelect = document.getElementById('citySelect');
+    const districtSelect = document.getElementById('districtSelect');
+    const globalSearchInput = document.getElementById('globalSearchInput');
 
-    // 如果找不到當前的盒子，直接結束
-    if (!currentContainer) return;
+    const selectedCity = citySelect ? citySelect.value : '';
+    const selectedDist = districtSelect ? districtSelect.value : '';
+    const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
 
-    let displayList = [];
-    if (renderOnlyFavorites) {
-        // 因為 getMyFavoriteIds 是 async，一定要加 await！
-        const myFavIds = await getMyFavoriteIds();
-        displayList = allStores.filter(store => myFavIds.includes(store.id));
-    } else {
-        const citySelect = document.getElementById('citySelect');
-        const districtSelect = document.getElementById('districtSelect');
-        const globalSearchInput = document.getElementById('globalSearchInput');
+    // 2. 進行篩選
+    const filtered = allStores.filter(store => {
+        const matchCity = !selectedCity || store.city === selectedCity;
+        const matchDist = !selectedDist || store.district === selectedDist;
+        const nameToSearch = store.shopName || store.name || '';
+        const matchKeyword = !searchKeyword || nameToSearch.toLowerCase().includes(searchKeyword);
+        return matchCity && matchDist && matchKeyword;
+    });
 
-        const selectedCity = citySelect ? citySelect.value : '';
-        const selectedDist = districtSelect ? districtSelect.value : '';
-        const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
-
-        displayList = allStores.filter(store => {
-            const matchCity = !selectedCity || store.city === selectedCity;
-            const matchDist = !selectedDist || store.district === selectedDist;
-            const nameToSearch = store.shopName || store.name || '';
-            const matchKeyword = !searchKeyword || nameToSearch.toLowerCase().includes(searchKeyword);
-            return matchCity && matchDist && matchKeyword && store.status !== "offline";
-        });
-    }
-
-    // 2. 判斷是否有資料
-    if (displayList.length === 0) {
-        currentContainer.innerHTML = renderOnlyFavorites
-            ? '<p>目前沒有收藏店家</p>'
-            : '<div class="loading-Spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
+    // 3. 如果找不到店家，顯示提示並結束
+    if (filtered.length === 0) {
+        storeContainer.innerHTML = '<div class="loading-Spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
         return;
     }
 
-    // 3. 開始渲染 (把原本的 storeContainer 通通改成 currentContainer)
-    currentContainer.innerHTML = "";
-    displayList.forEach(store => {
-        // ... (中間的資料準備邏輯保持不變) ...
+    // 4. 清空畫面並開始渲染卡片
+    storeContainer.innerHTML = "";
+
+    filtered.forEach(store => {
+        if (store.status === "offline") return;
+
+        // 基本資料準備
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
         const takeoutSupported = store.isCashPayEnabled !== false;
         const paySupported = store.isOnlinePayEnabled !== false;
         const seatingSupported = store.isSeatingAvailable !== false;
-
+        // 照片處理 (優先顯示 shopLogo)
         const logoData = store.shopLogo || store.emoji || '🏪';
         let finalLogoHtml = logoData;
         if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
             finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         }
 
+        // 距離計算處理
         let distanceHtml = "<span>⚡ 距離未知</span>";
-        const lat = parseFloat(store.shopLat);
-        const lng = parseFloat(store.shopLng);
-        if (buyerLat !== null && buyerLng !== null && !isNaN(lat) && !isNaN(lng)) {
-            const dist = calculateDistance(buyerLat, buyerLng, lat, lng);
+        // 確保 buyerLat/Lng 已定義且店家有座標
+        if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
+            const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
             distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
         }
 
+        // 生成卡片
         const card = document.createElement('a');
         card.href = `store.html?storeId=${store.id}`;
         card.className = 'store-card';
@@ -395,19 +385,95 @@ async function filterAndRenderStores(renderOnlyFavorites = false) {
                 <div class="store">
                     <div class="store-name">${finalName}</div>
                     <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml}</div>
-                    <div class="store-tags">
-                        <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
-                        <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
-                        <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用座位</span>
-                    </div>
+                
+                <div class="store-tags">
+                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
+                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
+                    <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用座位</span>
                 </div>
             </div>
+            </div>
         `;
-        // 改這裡：把這張卡片塞進 currentContainer
-        currentContainer.appendChild(card);
+        storeContainer.appendChild(card);
     });
 }
+// favorites.html
+function filterAndRenderStores() {
+    if (!favoriteContainer) return;
 
+    // 1. 抓取篩選條件
+    const citySelect = document.getElementById('citySelect');
+    const districtSelect = document.getElementById('districtSelect');
+    const globalSearchInput = document.getElementById('globalSearchInput');
+
+    const selectedCity = citySelect ? citySelect.value : '';
+    const selectedDist = districtSelect ? districtSelect.value : '';
+    const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
+
+    // 2. 進行篩選
+    const filtered = allStores.filter(store => {
+        const matchCity = !selectedCity || store.city === selectedCity;
+        const matchDist = !selectedDist || store.district === selectedDist;
+        const nameToSearch = store.shopName || store.name || '';
+        const matchKeyword = !searchKeyword || nameToSearch.toLowerCase().includes(searchKeyword);
+        return matchCity && matchDist && matchKeyword;
+    });
+
+    // 3. 如果找不到店家，顯示提示並結束
+    if (filtered.length === 0) {
+        favoriteContainer.innerHTML = '<div class="loading-Spinner">🤍 還未收藏店家！</div>';
+        return;
+    }
+
+    // 4. 清空畫面並開始渲染卡片
+    favoriteContainer.innerHTML = "";
+
+    filtered.forEach(store => {
+        if (store.status === "offline") return;
+
+        // 基本資料準備
+        const finalName = store.shopName || store.name || '未命名店家';
+        const finalAddress = store.shopAddress || store.address || '';
+        const takeoutSupported = store.isCashPayEnabled !== false;
+        const paySupported = store.isOnlinePayEnabled !== false;
+        const seatingSupported = store.isSeatingAvailable !== false;
+        // 照片處理 (優先顯示 shopLogo)
+        const logoData = store.shopLogo || store.emoji || '🏪';
+        let finalLogoHtml = logoData;
+        if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
+            finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
+        }
+
+        // 距離計算處理
+        let distanceHtml = "<span>⚡ 距離未知</span>";
+        // 確保 buyerLat/Lng 已定義且店家有座標
+        if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
+            const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
+            distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
+        }
+
+        // 生成卡片
+        const card = document.createElement('a');
+        card.href = `store.html?storeId=${store.id}`;
+        card.className = 'store-card';
+        card.innerHTML = `
+            <div class="store-img">${finalLogoHtml}</div>
+            <div class="store-info">
+                <div class="store">
+                    <div class="store-name">${finalName}</div>
+                    <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml}</div>
+                
+                <div class="store-tags">
+                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
+                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
+                    <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用座位</span>
+                </div>
+            </div>
+            </div>
+        `;
+        favoriteContainer.appendChild(card);
+    });
+}
 async function getMyFavoriteIds() {
     const user = auth.currentUser;
     if (!user) return [];
@@ -1530,7 +1596,7 @@ async function initStorePage() {
                 const docSnap = await getDoc(favRef);
                 heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
             } catch (e) {
-                console.error("同步愛心失敗:", e);
+                console.error("同步收藏失敗:", e);
             }
         }
 

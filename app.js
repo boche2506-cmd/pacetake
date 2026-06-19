@@ -388,7 +388,7 @@ function favoritesStores() {
     }
     favoriteContainer.innerHTML = "";
 
-    filtered.forEach(store => {
+    favoriteStores.forEach(store => {
         if (store.status === "offline") return;
 
         // 基本資料準備
@@ -1677,7 +1677,6 @@ function startApp() {
     initStorePage();
     getBrowserLocation();
     fetchStoresFromFirebase();
-    favoritesFromFirebase();
     renderAdminTable();
     initCartDOMState();
     refreshTotalCartUI();

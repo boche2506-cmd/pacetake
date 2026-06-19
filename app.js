@@ -169,7 +169,22 @@ function initThemeSystem() {
         });
     }
 }
+// 假設這是在你抓到 Firebase 資料之後的回呼函式中
+async function fetchFullStoreData() {
+    const docSnap = await getDoc(storeRef);
+    const data = docSnap.data();
 
+    // --- 這裡就是「事後補」的動作 ---
+    window.currentStoreInfo.shopAddress = data.shopAddress;
+    window.currentStoreInfo.shopLat = data.shopLat;
+    window.currentStoreInfo.shopLng = data.shopLng;
+    window.currentStoreInfo.shopLogo = data.shopLogo;
+    window.currentStoreInfo.isCashPayEnabled = data.isCashPayEnabled;
+    window.currentStoreInfo.isOnlinePayEnabled = data.isOnlinePayEnabled;
+    window.currentStoreInfo.hasSeating = data.hasSeating;
+
+    console.log("現在的 currentStoreInfo 已經長大了：", window.currentStoreInfo);
+}
 // 收藏按鈕監聽器
 const favBtn = document.getElementById('favorite-btn');
 const heartIcon = document.getElementById('heart-icon'); // 加入這一行
@@ -196,8 +211,7 @@ if (favBtn) {
                 alert(`💔 已將「${name}」移除`);
             } else {
                 // --- 加入收藏邏輯 ---
-                
-                console.log("準備存入的資料:", {
+                await setDoc(favRef, {
                     sellerUid: window.currentStoreInfo.id,
                     shopName: window.currentStoreInfo.name,
                     shopAddress: window.currentStoreInfo.shopAddress,

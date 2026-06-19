@@ -196,7 +196,8 @@ if (favBtn) {
                 alert(`💔 已將「${name}」移除`);
             } else {
                 // --- 加入收藏邏輯 ---
-                await setDoc(favRef, {
+                
+                console.log("準備存入的資料:", {
                     sellerUid: window.currentStoreInfo.id,
                     shopName: window.currentStoreInfo.name,
                     shopAddress: window.currentStoreInfo.shopAddress,

@@ -183,7 +183,7 @@ if (favBtn) {
         }
         const data = window.currentStoreInfo || {};
         const { id } = data; // 確保有 id
-        
+
         // 建立要存入的資料物件，並排除可能為 undefined 的欄位
         // 利用 || null 或將其設定為預設空字串，防止 undefined 錯誤
         const favoriteData = {
@@ -1322,8 +1322,12 @@ async function initStorePage() {
 
         if (!storeData) throw new Error("無法從資料庫找到該店家資料");
         window.currentStoreInfo = {
-            id: currentStoreId,
-            name: storeData.shopName || storeData.name || '未命名店家'
+            ...storeData, // 這行會自動把 storeData 的所有欄位全部放入，無需一行行寫
+            id: currentStoreId, // 確保 ID 被正確寫入
+            // 如果需要對特定欄位強制處理 (例如布林值轉型)，可以在下面單獨覆寫：
+            isCashPayEnabled: !!storeData.isCashPayEnabled,
+            isOnlinePayEnabled: !!storeData.isOnlinePayEnabled,
+            hasSeating: !!storeData.hasSeating
         };
         console.log("全域商店資訊已更新：", window.currentStoreInfo);
         if (auth.currentUser) {

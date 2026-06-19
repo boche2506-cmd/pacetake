@@ -323,6 +323,8 @@ function renderDynamicMenu(role) {
     }
 }
 
+// 從firebase抓資料
+
 async function fetchStoresFromFirebase() {
     try {
         console.log("[PACE DEBUG] Fetching stores.");
@@ -338,6 +340,41 @@ async function fetchStoresFromFirebase() {
         if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
     }
 }
+
+// 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
+window.createStoreCard = function(store, distanceHtml = null) {
+    const finalName = store.shopName || store.name || '未命名店家';
+    const finalAddress = store.shopAddress || store.address || '';
+    const takeoutSupported = store.isCashPayEnabled !== false;
+    const paySupported = store.isOnlinePayEnabled !== false;
+    const seatingSupported = store.hasSeating !== false;
+    
+    const logoData = store.shopLogo || '🏪';
+    let finalLogoHtml = logoData;
+    if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
+        finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
+    }
+
+    const card = document.createElement('a');
+    card.href = `store.html?storeId=${store.id}`;
+    card.className = 'store-card';
+    card.innerHTML = `
+        <div class="store-img">${finalLogoHtml}</div>
+        <div class="store-info">
+            <div class="store">
+                <div class="store-name">${finalName}</div>
+                <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml || ''}</div>
+                <div class="store-tags">
+                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金</span>
+                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 行動</span>
+                    <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用</span>
+                </div>
+            </div>
+        </div>
+    `;
+    return card;
+};
+
 
 // index.html
 function filterAndRenderStores() {
@@ -1215,13 +1252,7 @@ window.toggleView = function (view) {
     }
 };
 
-// 綁定「返回一般買家視圖」按鈕
-const toggleBuyerBtn = document.getElementById('toggleBuyerViewBtn');
-if (toggleBuyerBtn) {
-    toggleBuyerBtn.addEventListener('click', () => {
-        window.toggleView('buyer');
-    });
-}
+
 
 // 6. 發行邀請碼
 window.issuePromoCode = async function () {

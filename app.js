@@ -181,57 +181,41 @@ function initThemeSystem() {
 }
 
 // 收藏按鈕監聽器
-const favBtn = document.getElementById('favorite-btn');
-const heartIcon = document.getElementById('heart-icon'); // 加入這一行
-if (favBtn) {
-    favBtn.addEventListener('click', async () => {
-        const user = auth.currentUser;
-        // 1. 檢查登入
-        if (!user) {
-            alert("⚠️ 請先登入才能收藏店家喔！");
-            return;
-        }
-        // 2. 檢查是否有店舖資料 (這就是我們剛剛存進 window 的)
-        const { id, name } = window.currentStoreInfo;
-        const favRef = doc(db, "users", user.uid, "favorites", id);
+// 確保這裡拿到的變數名稱與你的 window.currentStoreInfo 一致
+const storeData = window.currentStoreInfo; 
+const { id, name } = storeData; 
+const favRef = doc(db, "users", user.uid, "favorites", id);
 
-        try {
-            // 2. 先抓取當前狀態
-            const docSnap = await getDoc(favRef);
+try {
+    const docSnap = await getDoc(favRef);
 
-            if (docSnap.exists()) {
-                // --- 取消收藏邏輯 ---
-                await deleteDoc(favRef);
-                heartIcon.innerText = "🤍"; // 立即更新圖示
-                alert(`💔 已將「${name}」移除`);
-            } else {
-                // --- 加入收藏邏輯 ---
-                await setDoc(favRef, {
-                    sellerUid: stores.sellerUid,
-                    createdAt: serverTimestamp(),
+    if (docSnap.exists()) {
+        await deleteDoc(favRef);
+        heartIcon.innerText = "🤍";
+        alert(`💔 已將「${name}」移除`);
+    } else {
+        // --- 加入收藏邏輯 (這裡把 stores 改成 storeData) ---
+        await setDoc(favRef, {
+            sellerUid: storeData.sellerUid, 
+            createdAt: serverTimestamp(),
 
-                    // 對應你從 Firebase 抓出來的正確欄位名稱
-                    shopName: stores.shopName || '未命名店家',
-                    shopAddress: stores.shopAddress || '',
-                    shopLogo: stores.shopLogo || '🏪',
+            shopName: storeData.shopName || '未命名店家',
+            shopAddress: storeData.shopAddress || '',
+            shopLogo: storeData.shopLogo || '🏪',
 
-                    // 直接對應你的布林值欄位
-                    isCashPayEnabled: stores.isCashPayEnabled !== false,
-                    isOnlinePayEnabled: stores.isOnlinePayEnabled !== false,
-                    hasSeating: stores.hasSeating !== false, // 注意這裡改成你的 hasSeating
+            isCashPayEnabled: storeData.isCashPayEnabled !== false,
+            isOnlinePayEnabled: storeData.isOnlinePayEnabled !== false,
+            hasSeating: storeData.hasSeating !== false,
 
-                    // 座標欄位 (字串轉成數字，方便後續計算)
-                    lat: parseFloat(stores.shopLat) || null,
-                    lng: parseFloat(stores.shopLng) || null
-                });
-                heartIcon.innerText = "❤️"; // 立即更新圖示
-                alert(`❤️ 已將「${name}」加入最愛！`);
-            }
-        } catch (error) {
-            console.error("操作失敗:", error);
-            alert("系統錯誤，請稍後再試。");
-        }
-    });
+            lat: parseFloat(storeData.shopLat) || null,
+            lng: parseFloat(storeData.shopLng) || null
+        });
+        heartIcon.innerText = "❤️";
+        alert(`❤️ 已將「${name}」加入最愛！`);
+    }
+} catch (error) {
+    console.error("操作失敗:", error);
+    alert("系統錯誤，請稍後再試。");
 }
 
 function updateUIForUser(user, currentRole) {

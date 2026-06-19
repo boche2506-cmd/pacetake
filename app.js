@@ -3,10 +3,8 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChang
 import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 // 在你的網頁 script 或其他 JS 檔案中：
 // 接下來就可以直接呼叫這些函式了
-// 例如：
-// ==========================================
-// 1. firebase 設定與初始化
-// ==========================================
+// firebase 設定與初始化
+
 const firebaseConfig = {
     apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
     authDomain: "pacetake-c6e1e.firebaseapp.com",
@@ -16,14 +14,14 @@ const firebaseConfig = {
     appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
     measurementId: "G-888XL8JTHW",
 };
+
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const provider = new GoogleAuthProvider();
-// ==========================================
-// 2. 全域核心變數與資料
-// ==========================================
+
 // 全域變數，UI 變數宣告，放在 app.js 最上方
+
 let allStores = [];
 let buyerLat = null;
 let buyerLng = null;
@@ -34,8 +32,10 @@ let currentUserProfile = null;
 let loginBtn, avatarBtn, dropdownMenu;
 let loginLightbox, userNameDisplay;
 let activeDragItem = null;
+
 // --- 初始化函式 (負責把那 17 行活化) ---
 // 全部直接宣告在全域，不用包進任何函式
+
 const areaData = {
     "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
     "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -60,6 +60,7 @@ const areaData = {
     "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
     "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
 };
+
 const storeContainer = document.getElementById('store-Container');
 const googleLoginAction = document.getElementById('googleLoginAction');
 const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
@@ -77,7 +78,6 @@ const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
 const globalSearchInput = document.getElementById('globalSearchInput');
 const menuUploadList = document.getElementById('menuUploadList');
 const favoriteContainer = document.getElementById('favoriteContainer');
-// 接著是下面那 6 行
 const toggleOnline = document.getElementById('toggleOnline');
 const toggleCash = document.getElementById('toggleCash');
 const newebpayContainer = document.getElementById('newebpayContainer');
@@ -89,7 +89,7 @@ window.currentStoreInfo = {
     id: null,
     name: null
 };
-// 3. 核心功能函式
+
 // 監聽 Firebase 登入狀態
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -115,6 +115,7 @@ onAuthStateChanged(auth, (user) => {
         fetchStoresFromFirebase();
     }
 });
+
 // 從 Firebase 獲取使用者資料
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
@@ -144,9 +145,26 @@ async function handleUserSyncAndRoleRouting(user) {
     }
 }
 
+// 從 Firebase 獲取allStores
+async function fetchStoresFromFirebase() {
+    try {
+        console.log("[PACE DEBUG] Fetching stores.");
+        const querySnapshot = await getDocs(collection(db, "stores"));
+        allStores = [];
+        querySnapshot.forEach((doc) => {
+            allStores.push({ id: doc.id, ...doc.data() });
+        });
+        filterAndRenderStores();
+        renderAdminTable();
+    } catch (error) {
+        console.error("讀取店家失敗：", error);
+        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
+    }
+}
+
+// 1. 初始化：網頁載入時套用顏色
 function initThemeSystem() {
     const toggleBtn = document.getElementById('themeToggleBtn');
-    // 1. 初始化：網頁載入時套用顏色
     const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
     if (toggleBtn) {
@@ -237,6 +255,7 @@ function updateUIForUser(user, currentRole) {
     if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
     renderDynamicMenu(currentRole);
 }
+
 function renderDynamicMenu(role) {
     const menuContainer = document.getElementById('dropdownMenu');
     if (!menuContainer) return;
@@ -283,22 +302,6 @@ function renderDynamicMenu(role) {
     }
 }
 
-async function fetchStoresFromFirebase() {
-    try {
-        console.log("[PACE DEBUG] Fetching stores.");
-        const querySnapshot = await getDocs(collection(db, "stores"));
-        allStores = [];
-        querySnapshot.forEach((doc) => {
-            allStores.push({ id: doc.id, ...doc.data() });
-        });
-        filterAndRenderStores();
-        renderAdminTable();
-    } catch (error) {
-        console.error("讀取店家失敗：", error);
-        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
-    }
-}
-
 // index.html
 function filterAndRenderStores() {
     if (!storeContainer) return;
@@ -322,7 +325,6 @@ function filterAndRenderStores() {
         storeContainer.innerHTML = '<div class="loading-Spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
         return;
     }
-
     // 4. 清空畫面並開始渲染卡片
     storeContainer.innerHTML = "";
 
@@ -372,34 +374,18 @@ function filterAndRenderStores() {
         storeContainer.appendChild(card);
     });
 }
+
 // favorites.html
 function favoritesStores() {
     if (!favoriteContainer) return;
+    // 1. 篩選：只要 ID 在 myFavoriteIds 裡面的通通留下來
+    const favoriteStores = allStores.filter(store => myFavoriteIds.includes(store.id));
 
-    // 1. 抓取篩選條件
-    const citySelect = document.getElementById('citySelect');
-    const districtSelect = document.getElementById('districtSelect');
-    const globalSearchInput = document.getElementById('globalSearchInput');
-    const selectedCity = citySelect ? citySelect.value : '';
-    const selectedDist = districtSelect ? districtSelect.value : '';
-    const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
-
-    // 2. 進行篩選
-    const filtered = allStores.filter(store => {
-        const matchCity = !selectedCity || store.city === selectedCity;
-        const matchDist = !selectedDist || store.district === selectedDist;
-        const nameToSearch = store.shopName || store.name || '';
-        const matchKeyword = !searchKeyword || nameToSearch.toLowerCase().includes(searchKeyword);
-        return matchCity && matchDist && matchKeyword;
-    });
-
-    // 3. 如果找不到店家，顯示提示並結束
-    if (filtered.length === 0) {
-        favoriteContainer.innerHTML = '<div class="loading-Spinner">🤍 還未收藏店家！</div>';
+    // 2. 判斷有沒有收藏
+    if (favoriteStores.length === 0) {
+        favoriteContainer.innerHTML = '<p>目前沒有收藏的店家喔！</p>';
         return;
     }
-
-    // 4. 清空畫面並開始渲染卡片
     favoriteContainer.innerHTML = "";
 
     filtered.forEach(store => {
@@ -411,7 +397,6 @@ function favoritesStores() {
         const takeoutSupported = store.isCashPayEnabled !== false;
         const paySupported = store.isOnlinePayEnabled !== false;
         const seatingSupported = store.isSeatingAvailable !== false;
-        // 照片處理 (優先顯示 shopLogo)
         const logoData = store.shopLogo || store.emoji || '🏪';
         let finalLogoHtml = logoData;
         if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
@@ -447,12 +432,6 @@ function favoritesStores() {
         `;
         favoriteContainer.appendChild(card);
     });
-}
-async function getMyFavoriteIds() {
-    const user = auth.currentUser;
-    if (!user) return [];
-    const snapshot = await getDocs(collection(db, "users", user.uid, "favorites"));
-    return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
 }
 
 function getBrowserLocation() {

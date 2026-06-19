@@ -172,57 +172,48 @@ function initThemeSystem() {
 
 // 收藏按鈕監聽器
 const favBtn = document.getElementById('favorite-btn');
-const heartIcon = document.getElementById('heart-icon'); // 加入這一行
+const heartIcon = document.getElementById('heart-icon');
+
 if (favBtn) {
     favBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
-        // 1. 檢查登入
         if (!user) {
             alert("⚠️ 請先登入才能收藏店家喔！");
             return;
         }
-        // 2. 檢查是否有店舖資料 (這就是我們剛剛存進 window 的)
-        const {
-            id,
-            name,
-            sellerUid,
-            shopLogo,
-            shopName,
-            shopAddress,
-            shopLat,
-            shopLng,
-            isCashPayEnabled,
-            isOnlinePayEnabled,
-            hasSeating
-        } = window.currentStoreInfo;
+        const data = window.currentStoreInfo || {};
+        const { id } = data; // 確保有 id
+        
+        // 建立要存入的資料物件，並排除可能為 undefined 的欄位
+        // 利用 || null 或將其設定為預設空字串，防止 undefined 錯誤
+        const favoriteData = {
+            id: data.id || "",
+            name: data.name || "",
+            sellerUid: data.sellerUid || null, // 若為 undefined，存為 null
+            shopLogo: data.shopLogo || "",
+            shopName: data.shopName || "",
+            shopAddress: data.shopAddress || "",
+            shopLat: data.shopLat ?? 0, // 使用 Nullish coalescing operator
+            shopLng: data.shopLng ?? 0,
+            isCashPayEnabled: !!data.isCashPayEnabled, // 強制轉為布林值
+            isOnlinePayEnabled: !!data.isOnlinePayEnabled,
+            hasSeating: !!data.hasSeating
+        };
+
         const favRef = doc(db, "users", user.uid, "favorites", id);
 
         try {
-            // 2. 先抓取當前狀態
             const docSnap = await getDoc(favRef);
 
             if (docSnap.exists()) {
-                // --- 取消收藏邏輯 ---
                 await deleteDoc(favRef);
-                heartIcon.innerText = "🤍"; // 立即更新圖示
-                alert(`💔 已將「${name}」移除`);
+                heartIcon.innerText = "🤍";
+                alert(`💔 已將「${data.name}」移除`);
             } else {
-                // --- 加入收藏邏輯 ---
-                await setDoc(favRef, {
-                    id,
-                    name,
-                    sellerUid,
-                    shopLogo,
-                    shopName,
-                    shopAddress,
-                    shopLat,
-                    shopLng,
-                    isCashPayEnabled,
-                    isOnlinePayEnabled,
-                    hasSeating
-                });
-                heartIcon.innerText = "❤️"; // 立即更新圖示
-                alert(`❤️ 已將「${name}」加入最愛！`);
+                // 使用處理過的 favoriteData
+                await setDoc(favRef, favoriteData);
+                heartIcon.innerText = "❤️";
+                alert(`❤️ 已將「${data.name}」加入最愛！`);
             }
         } catch (error) {
             console.error("操作失敗:", error);

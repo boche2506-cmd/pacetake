@@ -207,22 +207,22 @@ if (favBtn) {
             } else {
                 // --- 加入收藏邏輯 ---
                 await setDoc(favRef, {
-                    sellerUid: store.sellerUid,
+                    sellerUid: stores.sellerUid,
                     createdAt: serverTimestamp(),
 
                     // 對應你從 Firebase 抓出來的正確欄位名稱
-                    shopName: store.shopName || '未命名店家',
-                    shopAddress: store.shopAddress || '',
-                    shopLogo: store.shopLogo || '🏪',
+                    shopName: stores.shopName || '未命名店家',
+                    shopAddress: stores.shopAddress || '',
+                    shopLogo: stores.shopLogo || '🏪',
 
                     // 直接對應你的布林值欄位
-                    isCashPayEnabled: store.isCashPayEnabled !== false,
-                    isOnlinePayEnabled: store.isOnlinePayEnabled !== false,
-                    hasSeating: store.hasSeating !== false, // 注意這裡改成你的 hasSeating
+                    isCashPayEnabled: stores.isCashPayEnabled !== false,
+                    isOnlinePayEnabled: stores.isOnlinePayEnabled !== false,
+                    hasSeating: stores.hasSeating !== false, // 注意這裡改成你的 hasSeating
 
                     // 座標欄位 (字串轉成數字，方便後續計算)
-                    lat: parseFloat(store.shopLat) || null,
-                    lng: parseFloat(store.shopLng) || null
+                    lat: parseFloat(stores.shopLat) || null,
+                    lng: parseFloat(stores.shopLng) || null
                 });
                 heartIcon.innerText = "❤️"; // 立即更新圖示
                 alert(`❤️ 已將「${name}」加入最愛！`);

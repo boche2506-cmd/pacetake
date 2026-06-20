@@ -26,6 +26,8 @@ export const provider = new GoogleAuthProvider();
 // 2. 全域核心變數與資料
 // ==========================================
 let allStores = [];
+let shopLat = null;
+let shopLng = null;
 let buyerLat = null;
 let buyerLng = null;
 let currentBuyerAddress = "正在獲取定位中...";
@@ -80,6 +82,7 @@ const modalAddressText = document.getElementById('modalAddressText');
 const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
 const globalSearchInput = document.getElementById('globalSearchInput');
 const menuUploadList = document.getElementById('menuUploadList');
+const favoriteContainer = document.getElementById('favoriteContainer');
 
 // 接著是下面那 6 行
 const toggleOnline = document.getElementById('toggleOnline');
@@ -89,6 +92,10 @@ const cashWarningModal = document.getElementById('cashWarningModal');
 const warningConfirmBtn = document.getElementById('warningConfirmBtn');
 const warningCancelBtn = document.getElementById('warningCancelBtn');
 
+window.currentStoreInfo = {
+    id: null,
+    name: null
+};
 // ==========================================
 // 3. 核心功能函式
 // ==========================================
@@ -165,6 +172,65 @@ function initThemeSystem() {
     }
 }
 
+// 收藏按鈕監聽器
+const favBtn = document.getElementById('favorite-btn');
+const heartIcon = document.getElementById('heart-icon');
+
+if (favBtn) {
+    favBtn.addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("⚠️ 請先登入才能收藏店家喔！");
+            return;
+        }
+        const data = window.currentStoreInfo || {};
+        const { id } = data; // 確保有 id
+
+        // 建立要存入的資料物件，並排除可能為 undefined 的欄位
+        // 利用 || null 或將其設定為預設空字串，防止 undefined 錯誤
+        const favoriteData = {
+            id: data.id || "",
+            name: data.name || "",
+            sellerUid: data.sellerUid || null, // 若為 undefined，存為 null
+            shopLogo: data.shopLogo || "",
+            shopName: data.shopName || "",
+            shopAddress: data.shopAddress || "",
+            shopLat: data.shopLat ?? 0, // 使用 Nullish coalescing operator
+            shopLng: data.shopLng ?? 0,
+            isCashPayEnabled: !!data.isCashPayEnabled, // 強制轉為布林值
+            isOnlinePayEnabled: !!data.isOnlinePayEnabled,
+            hasSeating: !!data.hasSeating
+        };
+
+        const favRef = doc(db, "users", user.uid, "favorites", id);
+
+        try {
+            const docSnap = await getDoc(favRef);
+
+            if (docSnap.exists()) {
+                await deleteDoc(favRef);
+                heartIcon.innerText = "🤍";
+                alert(`💔 已將「${data.name}」移除`);
+            } else {
+                // 使用處理過的 favoriteData
+                await setDoc(favRef, favoriteData);
+                heartIcon.innerText = "❤️";
+                alert(`❤️ 已將「${data.name}」加入最愛！`);
+            }
+        } catch (error) {
+            console.error("操作失敗:", error);
+            alert("系統錯誤，請稍後再試。");
+        }
+    });
+}
+
+async function getMyFavoriteIds() {
+    const user = auth.currentUser;
+    if (!user) return [];
+    const snapshot = await getDocs(collection(db, "users", user.uid, "favorites"));
+    return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
+}
+
 function updateUIForUser(user, currentRole) {
     // 這裡加上 const，確保這些變數只屬於這個函式
     const loginBtn = document.getElementById('loginBtn');
@@ -214,13 +280,14 @@ function renderDynamicMenu(role) {
     menuHTML += `
         <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
         <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
+        <a href="favorites.html" class="nav-fast">❤️ 我的收藏</a>
     `;
 
-    if (role === 'buyer' || role === 'admin') {
+    if (role === 'admin' || role === 'buyer') {
         menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
     }
 
-    if (role === 'seller' || role === 'admin') {
+    if (role === 'admin' || role === 'seller') {
         menuHTML += `
             <div class="menu-divider"></div>
             <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
@@ -258,6 +325,8 @@ function renderDynamicMenu(role) {
     }
 }
 
+// 從firebase抓資料
+
 async function fetchStoresFromFirebase() {
     try {
         console.log("[PACE DEBUG] Fetching stores.");
@@ -274,6 +343,40 @@ async function fetchStoresFromFirebase() {
     }
 }
 
+// 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
+window.createStoreCard = function (store, distanceHtml = null) {
+    const finalName = store.shopName || store.name || '未命名店家';
+    const finalAddress = store.shopAddress || store.address || '';
+    const takeoutSupported = store.isCashPayEnabled !== false;
+    const paySupported = store.isOnlinePayEnabled !== false;
+    const seatingSupported = store.hasSeating !== false;
+
+    const logoData = store.shopLogo || '🏪';
+    let finalLogoHtml = logoData;
+    if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
+        finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
+    }
+
+    const card = document.createElement('a');
+    card.href = `store.html?storeId=${store.id}`;
+    card.className = 'store-card';
+    card.innerHTML = `
+        <div class="store-img">${finalLogoHtml}</div>
+            <div class="store-info">
+                <div class="store-name">${finalName}</div>
+                <div class="store-meta">📍 ${finalAddress} <br> ${distanceText || ''}</div>
+                <div class="store-tags">
+                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金</span>
+                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 行動</span>
+                    <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用</span>
+                </div>
+            </div>
+        </div>
+    `;
+    return card;
+};
+
+// index.html
 function filterAndRenderStores() {
     if (!storeContainer) return;
 
@@ -306,7 +409,7 @@ function filterAndRenderStores() {
 
     filtered.forEach(store => {
         if (store.status === "offline") return;
-
+        const distanceText = getStoreDistanceText(store);
         // 基本資料準備
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
@@ -319,36 +422,69 @@ function filterAndRenderStores() {
         if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
             finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         }
-
-        // 距離計算處理
-        let distanceHtml = "<span>⚡ 距離未知</span>";
-        // 確保 buyerLat/Lng 已定義且店家有座標
-        if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
-            const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
-            distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
-        }
-
         // 生成卡片
-        const card = document.createElement('a');
-        card.href = `store.html?storeId=${store.id}`;
-        card.className = 'store-card';
-        card.innerHTML = `
-            <div class="store-img">${finalLogoHtml}</div>
-            <div class="store-info">
-                <div class="store">
-                    <div class="store-name">${finalName}</div>
-                    <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml}</div>
-                
-                <div class="store-tags">
-                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金支付</span>
-                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 支援行動支付</span>
-                    <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用座位</span>
-                </div>
-            </div>
-            </div>
-        `;
+        const card = window.createStoreCard(store, `<span>${distanceText}</span>`);
         storeContainer.appendChild(card);
     });
+}
+
+//favorites.html
+async function renderFavoriteStores() {
+    const favoriteContainer = document.getElementById('favoriteContainer');
+    // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
+    if (!favoriteContainer) return;
+
+    const user = auth.currentUser;
+    if (!user) {
+        favoriteContainer.innerHTML = '<p>請先登入以查看收藏清單。</p>';
+        return;
+    }
+
+    try {
+        // 抓取收藏集合
+        const favCol = collection(db, "users", user.uid, "favorites");
+        const snapshot = await getDocs(favCol);
+
+        if (snapshot.empty) {
+            favoriteContainer.innerHTML = '<div class="loading-Spinner">🤍 您目前還沒有收藏任何店家喔！</div>';
+            return;
+        }
+
+        favoriteContainer.innerHTML = ""; // 清空容器
+
+        snapshot.forEach((doc) => {
+            const store = doc.data();
+            // 直接呼叫我們剛才建立的共用函數
+            const card = window.createStoreCard(store);
+            favoriteContainer.appendChild(card);
+        });
+    } catch (error) {
+        console.error("讀取收藏失敗:", error);
+    }
+}
+
+// 確保登入狀態確認後才執行渲染
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        renderFavoriteStores();
+    }
+});
+
+// 距離計算處理 // 確保 buyerLat/Lng 已定義且店家有座標
+function getStoreDistanceText(store) {
+    const sLat = store.lat || store.Lat;
+    const sLng = store.lng || store.Lng;
+    // 檢查座標是否有效
+    if (typeof buyerLat !== 'undefined' && buyerLat !== null &&
+        typeof buyerLng !== 'undefined' && buyerLng !== null &&
+        sLat && sLng) {
+
+        // 記得也要轉成數字，避免字串相減導致錯誤
+        const dist = calculateDistance(buyerLat, buyerLng, parseFloat(sLat), parseFloat(sLng));
+        return `<span>⚡ ${dist.toFixed(1)} km</span>`;
+    }
+
+    return "<span>⚡ 距離未知</span>";
 }
 
 function getBrowserLocation() {
@@ -1255,11 +1391,47 @@ async function initStorePage() {
         }
 
         if (!storeData) throw new Error("無法從資料庫找到該店家資料");
+        window.currentStoreInfo = {
+            ...storeData, // 這行會自動把 storeData 的所有欄位全部放入，無需一行行寫
+            id: currentStoreId, // 確保 ID 被正確寫入
+            // 如果需要對特定欄位強制處理 (例如布林值轉型)，可以在下面單獨覆寫：
+            isCashPayEnabled: !!storeData.isCashPayEnabled,
+            isOnlinePayEnabled: !!storeData.isOnlinePayEnabled,
+            hasSeating: !!storeData.hasSeating
+        };
+        console.log("全域商店資訊已更新：", window.currentStoreInfo);
+        if (auth.currentUser) {
+            try {
+                await syncHeartIcon();
+            } catch (err) {
+                console.error("同步愛心狀態失敗:", err);
+            }
+        }
 
         // --- 渲染邏輯 ---
+        // 1. 先抓出 Firebase 的座標 (記得轉成數字)
+        // 1. 先抓出 Firebase 的座標 (記得轉成數字)
+        const sLat = parseFloat(storeData.shopLat || storeData.lat);
+        const sLng = parseFloat(storeData.shopLng || storeData.lng);
+
+        // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
+        let displayDistance = '距離未知'; // 預設值
+
+        if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
+            const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
+            displayDistance = dist.toFixed(1) + ' km';
+        }
+
+        // 3. 把算出來的結果填入 HTML
         document.getElementById('storeNameText').innerText = storeData.shopName || storeData.name || '未命名店家';
         document.getElementById('storeAddressText').innerText = '📍 ' + (storeData.shopAddress || storeData.address || '');
-        document.getElementById('storeDistanceText').innerText = '⚡ ' + (typeof dist !== 'undefined' ? dist + ' km' : '0.05 km');
+
+        // 這裡填入我們算好的 displayDistance
+        const distElement = document.getElementById('storeDistanceText');
+        if (distElement) {
+            distElement.innerText = '⚡ ' + displayDistance;
+        }
+
         const savedLogo = localStorage.getItem('selected_store_logo');
         const target = document.getElementById('logo-wrapper');
 
@@ -1291,21 +1463,21 @@ async function initStorePage() {
             // 2. 判斷並產生 HTML
             let priceHTML = '';
             let basePrice = 0;
-
+            const hasMedium = item.prices && item.prices.medium;
             if (item.priceType === 'multi') {
                 // 我們直接寫死三個規格，這樣最簡單好讀
                 priceHTML = `
         <div class="size-options">
         <div class="size-row">
-            <span class="size-label">大 $${item.prices.large}</span>
+            <span class="size-label" style="font-weight:bold;">大 $${item.prices.large}</span>
             <div class="quantity-control-panel">
                 <button class="minus-btn" data-id="${itemId}_large">-</button>
                 <span class="qty-number" id="qty_${itemId}_large">0</span>
                 <button class="plus-btn" data-id="${itemId}_large">+</button>
             </div>
         </div>
-        <div class="size-row">
-            <span class="size-label">中 $${item.prices.medium}</span>
+        <div class="size-row" style="${!hasMedium ? 'opacity: 0.5; pointer-events: none;' : ''}">
+            <span class="size-label" style="font-weight:bold;">中 $${item.prices.medium}</span>
             <div class="quantity-control-panel">
                 <button class="minus-btn" data-id="${itemId}_medium">-</button>
                 <span class="qty-number" id="qty_${itemId}_medium">0</span>
@@ -1313,7 +1485,7 @@ async function initStorePage() {
             </div>
         </div>
         <div class="size-row">
-            <span class="size-label">小 $${item.prices.small}</span>
+            <span class="size-label" style="font-weight:bold;">小 $${item.prices.small}</span>
             <div class="quantity-control-panel">
                 <button class="minus-btn" data-id="${itemId}_small">-</button>
                 <span class="qty-number" id="qty_${itemId}_small">0</span>
@@ -1326,7 +1498,7 @@ async function initStorePage() {
                 // 單一價格：這裡必須補上加減按鈕的 HTML，否則會消失
                 basePrice = parseInt(item.price) || 0;
                 priceHTML = `
-        <div class="size-row">
+        <div class="one-size-row">
             <span class="food-price" style="font-weight:bold;">$${basePrice}</span>
             <div class="quantity-control-panel">
                 <button class="minus-btn" data-id="${itemId}">-</button>
@@ -1418,6 +1590,25 @@ async function initStorePage() {
             if (typeof refreshTotalCartUI === 'function') refreshTotalCartUI();
             console.log("[PACE DEBUG] 購物車規格同步完成。");
         }, 200);
+
+        // 頁面初始化時，根據 Firebase 狀態更新愛心
+        async function syncHeartIcon() {
+            const heartIcon = document.getElementById('heart-icon');
+            if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
+            const user = auth.currentUser;
+            if (!user) {
+                heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
+                return;
+            }
+
+            try {
+                const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
+                const docSnap = await getDoc(favRef);
+                heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
+            } catch (e) {
+                console.error("同步收藏失敗:", e);
+            }
+        }
 
     } catch (error) {
         console.error("[PACE ERROR] 頁面渲染失敗：", error);

@@ -26,6 +26,8 @@ export const provider = new GoogleAuthProvider();
 // 2. 全域核心變數與資料
 // ==========================================
 let allStores = [];
+let shopLat = null;
+let shopLng = null;
 let buyerLat = null;
 let buyerLng = null;
 let currentBuyerAddress = "正在獲取定位中...";

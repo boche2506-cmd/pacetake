@@ -63,7 +63,6 @@ let activeDragItem = null;
 
 // --- 2. 初始化函式 (負責把那 17 行活化) ---
 // 全部直接宣告在全域，不用包進任何函式
-userNameDisplay = document.getElementById('userNameDisplay');
 const storeContainer = document.getElementById('store-Container');
 const googleLoginAction = document.getElementById('googleLoginAction');
 const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
@@ -342,7 +341,7 @@ async function fetchStoresFromFirebase() {
 }
 
 // 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
-window.createStoreCard = function (store, distanceHtml = null) {
+window.createStoreCard = function (store) {
     const finalName = store.shopName || store.name || '未命名店家';
     const finalAddress = store.shopAddress || store.address || '';
     const takeoutSupported = store.isCashPayEnabled !== false;
@@ -350,6 +349,16 @@ window.createStoreCard = function (store, distanceHtml = null) {
     const seatingSupported = store.hasSeating !== false;
 
     const logoData = store.shopLogo || '🏪';
+    const sLat = parseFloat(store.shopLat || store.lat);
+    const sLng = parseFloat(store.shopLng || store.lng);
+
+    // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
+    let distanceHtml = "<span>⚡ 距離未知</span>";
+    if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
+        const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
+        distanceHtml = dist.toFixed(1) + ' km';
+    }
+
     let finalLogoHtml = logoData;
     if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
         finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
@@ -361,9 +370,8 @@ window.createStoreCard = function (store, distanceHtml = null) {
     card.innerHTML = `
         <div class="store-img">${finalLogoHtml}</div>
         <div class="store-info">
-            <div class="store">
                 <div class="store-name">${finalName}</div>
-                <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml || ''}</div>
+                <div class="store-meta">📍 ${finalAddress} <br>⚡ 距離 ${distanceHtml}</div>
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金</span>
                     <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 行動</span>
@@ -374,48 +382,6 @@ window.createStoreCard = function (store, distanceHtml = null) {
     `;
     return card;
 };
-
-// 放在 app.js 中，負責渲染最愛清單的函數
-async function renderFavoriteStores() {
-    const favoriteContainer = document.getElementById('favoriteContainer');
-    // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
-    if (!favoriteContainer) return;
-
-    const user = auth.currentUser;
-    if (!user) {
-        favoriteContainer.innerHTML = '<p>請先登入以查看收藏清單。</p>';
-        return;
-    }
-
-    try {
-        // 抓取收藏集合
-        const favCol = collection(db, "users", user.uid, "favorites");
-        const snapshot = await getDocs(favCol);
-
-        if (snapshot.empty) {
-            favoriteContainer.innerHTML = '<div class="loading-Spinner">🍃 您目前還沒有收藏任何店家喔！</div>';
-            return;
-        }
-
-        favoriteContainer.innerHTML = ""; // 清空容器
-
-        snapshot.forEach((doc) => {
-            const store = doc.data();
-            // 直接呼叫我們剛才建立的共用函數
-            const card = window.createStoreCard(store, "❤️ 我的最愛");
-            favoriteContainer.appendChild(card);
-        });
-    } catch (error) {
-        console.error("讀取收藏失敗:", error);
-    }
-}
-
-// 確保登入狀態確認後才執行渲染
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        renderFavoriteStores();
-    }
-});
 
 // index.html
 function filterAndRenderStores() {
@@ -569,10 +535,7 @@ if (googleLoginAction) {
     });
 }
 
-// ==========================================
 // 4. 初始化與事件綁定
-// ==========================================
-
 // 初始化：設定上傳區塊的事件綁定
 // 直接在整個網頁範圍監聽點擊
 document.addEventListener('click', (e) => {
@@ -674,16 +637,6 @@ if (togglePasswordVisibility && loginPasswordInput) {
         this.textContent = type === 'password' ? '👁️' : '🙈';
     });
 }
-
-// 在共用 JS 中定義此函式
-export function getHasSeatingStatus() {
-    // 使用 querySelector 搭配你的原始 Class 名稱
-    const seatingToggle = document.querySelector('.seating-toggle');
-
-    // 如果該頁面有這個 toggle，就回傳它的 checked 狀態，沒有則預設 false
-    return seatingToggle ? seatingToggle.checked : false;
-}
-
 
 if (emailLoginAction) {
     emailLoginAction.addEventListener('click', async () => {
@@ -960,6 +913,7 @@ if (shopSubmitBtn) {
         // 修改這裡，對應你 HTML 裡的 ID: toggleCash 和 toggleOnline
         const isCashPayEnabled = document.getElementById('toggleCash') ? document.getElementById('toggleCash').checked : false;
         const isOnlinePayEnabled = document.getElementById('toggleOnline') ? document.getElementById('toggleOnline').checked : false;
+        const seatingtoggle = document.getElementById('seatingtoggle') ? document.getElementById('seatingtoggle').checked : false;
         // --- 3. 菜單打包 ---
         const menuRows = document.querySelectorAll('.menu-item-row');
         const menuItems = [];
@@ -1023,7 +977,7 @@ if (shopSubmitBtn) {
             isOnlinePayEnabled: isOnlinePayEnabled,
             isCashPayEnabled: isCashPayEnabled,
             newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
-            hasSeating: getHasSeatingStatus(),
+            hasSeating: seatingtoggle,
             menuList: menuItems,
             createdAt: new Date().toISOString()
         };
@@ -1732,7 +1686,6 @@ function startApp() {
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
     console.log("系統初始化完成");
 }
-
 // 2. 為了絕對安全，同時運用 DOMContentLoaded
 // 這不是多餘的，這是為了應對不同瀏覽器載入行為的「防禦性編程」
 document.addEventListener('DOMContentLoaded', startApp);

@@ -420,7 +420,7 @@ function filterAndRenderStores() {
             finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         }
         // 生成卡片
-        const distanceText = getStoreDistanceText(store);
+        const distanceText = getStoreDistanceText(storeLatLng);
         const card = window.createStoreCard(store, distanceText);
         storeContainer.appendChild(card);
     });
@@ -451,7 +451,7 @@ async function renderFavoriteStores() {
         favoriteContainer.innerHTML = ""; // 清空容器
 
         snapshot.forEach((doc) => {
-            const distanceText = getStoreDistanceText(store);
+            const distanceText = getStoreDistanceText(storeLatLng);
             const store = doc.data();
             // 直接呼叫我們剛才建立的共用函數
             const card = window.createStoreCard(store, distanceText);
@@ -469,7 +469,7 @@ auth.onAuthStateChanged((user) => {
 });
 
 // 距離計算處理 // 確保 buyerLat/Lng 已定義且店家有座標
-function getStoreDistanceText(store) {
+function getStoreDistanceText(storeLatLng) {
     const sLat = parseFloat(store.shopLat || store.lat);
     const sLng = parseFloat(store.shopLng || store.lng);
 

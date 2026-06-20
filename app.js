@@ -479,8 +479,8 @@ async function DelFavoriteStores() {
         setTimeout(() => {
             window.location.href = 'favorites.html';
         }, 2000);
-        
-        return; 
+
+        return;
     }
 
     // 若店家存在，則繼續渲染頁面內容
@@ -1353,6 +1353,25 @@ async function initStorePage() {
         window.location.href = "index.html";
         return;
     }
+    const storeDoc = await db.collection('stores').doc(currentStoreId).get();
+    if (!storeDoc.exists) {
+        const user = firebase.auth().currentUser;
+        if (user) {
+            // 自動從收藏中移除失效店家
+            await db.collection('users').doc(user.uid).update({
+                favorites: firebase.firestore.FieldValue.arrayRemove(currentStoreId)
+            });
+        }
+        alert("該店家已下架，已自動從您的收藏中移除。");
+        window.location.href = "favorites.html";
+        return;
+    }
+    // --- 【插入結束】 ---
+
+    // --- 【這是你原本的渲染邏輯開頭 (接在上面邏輯後面)】 ---
+    const storeData = storeDoc.data();
+    // 這裡繼續你原本渲染畫面、設定 shopLogo 的程式碼...
+
     document.body.setAttribute('data-store-id', currentStoreId);
 
     try {

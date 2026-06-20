@@ -63,6 +63,7 @@ let activeDragItem = null;
 
 // --- 2. 初始化函式 (負責把那 17 行活化) ---
 // 全部直接宣告在全域，不用包進任何函式
+userNameDisplay = document.getElementById('userNameDisplay');
 const storeContainer = document.getElementById('store-Container');
 const googleLoginAction = document.getElementById('googleLoginAction');
 const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
@@ -218,31 +219,6 @@ if (favBtn) {
             console.error("操作失敗:", error);
             alert("系統錯誤，請稍後再試。");
         }
-        // 頁面初始化時，根據 Firebase 狀態更新愛心
-        async function syncHeartIcon() {
-            const heartIcon = document.getElementById('heart-icon');
-            if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
-            const user = auth.currentUser;
-            if (!user) {
-                heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
-                return;
-            }
-
-            try {
-                const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
-                const docSnap = await getDoc(favRef);
-                heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
-            } catch (e) {
-                console.error("同步收藏失敗:", e);
-            }
-            if (auth.currentUser) {
-                try {
-                    await syncHeartIcon();
-                } catch (err) {
-                    console.error("同步愛心狀態失敗:", err);
-                }
-            }
-        }
     });
 }
 
@@ -366,23 +342,14 @@ async function fetchStoresFromFirebase() {
 }
 
 // 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
-window.createStoreCard = function (store) {
+window.createStoreCard = function (store, distanceHtml = null) {
     const finalName = store.shopName || store.name || '未命名店家';
     const finalAddress = store.shopAddress || store.address || '';
     const takeoutSupported = store.isCashPayEnabled !== false;
     const paySupported = store.isOnlinePayEnabled !== false;
     const seatingSupported = store.hasSeating !== false;
+
     const logoData = store.shopLogo || '🏪';
-    const sLat = parseFloat(store.shopLat || store.lat);
-    const sLng = parseFloat(store.shopLng || store.lng);
-
-    // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
-    let distanceHtml = "<span>⚡ 距離未知</span>";
-    if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
-        const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
-        distanceHtml = dist.toFixed(1) + ' km';
-    }
-
     let finalLogoHtml = logoData;
     if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
         finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
@@ -393,9 +360,10 @@ window.createStoreCard = function (store) {
     card.className = 'store-card';
     card.innerHTML = `
         <div class="store-img">${finalLogoHtml}</div>
-            <div class="store-info">
+        <div class="store-info">
+            <div class="store">
                 <div class="store-name">${finalName}</div>
-                <div class="store-meta">📍 ${finalAddress} <br>⚡ 距離 ${distanceHtml}</div>
+                <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml || ''}</div>
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金</span>
                     <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 行動</span>
@@ -406,6 +374,48 @@ window.createStoreCard = function (store) {
     `;
     return card;
 };
+
+// 放在 app.js 中，負責渲染最愛清單的函數
+async function renderFavoriteStores() {
+    const favoriteContainer = document.getElementById('favoriteContainer');
+    // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
+    if (!favoriteContainer) return;
+
+    const user = auth.currentUser;
+    if (!user) {
+        favoriteContainer.innerHTML = '<p>請先登入以查看收藏清單。</p>';
+        return;
+    }
+
+    try {
+        // 抓取收藏集合
+        const favCol = collection(db, "users", user.uid, "favorites");
+        const snapshot = await getDocs(favCol);
+
+        if (snapshot.empty) {
+            favoriteContainer.innerHTML = '<div class="loading-Spinner">🍃 您目前還沒有收藏任何店家喔！</div>';
+            return;
+        }
+
+        favoriteContainer.innerHTML = ""; // 清空容器
+
+        snapshot.forEach((doc) => {
+            const store = doc.data();
+            // 直接呼叫我們剛才建立的共用函數
+            const card = window.createStoreCard(store, "❤️ 我的最愛");
+            favoriteContainer.appendChild(card);
+        });
+    } catch (error) {
+        console.error("讀取收藏失敗:", error);
+    }
+}
+
+// 確保登入狀態確認後才執行渲染
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        renderFavoriteStores();
+    }
+});
 
 // index.html
 function filterAndRenderStores() {
@@ -441,52 +451,33 @@ function filterAndRenderStores() {
     filtered.forEach(store => {
         if (store.status === "offline") return;
 
+        // 基本資料準備
+        const finalName = store.shopName || store.name || '未命名店家';
+        const finalAddress = store.shopAddress || store.address || '';
+        const takeoutSupported = store.isCashPayEnabled !== false;
+        const paySupported = store.isOnlinePayEnabled !== false;
+        const seatingSupported = store.isSeatingAvailable !== false;
+        // 照片處理 (優先顯示 shopLogo)
+        const logoData = store.shopLogo || store.emoji || '🏪';
+        let finalLogoHtml = logoData;
+        if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
+            finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
+        }
+
+        // 距離計算處理
+        let distanceHtml = "<span>⚡ 距離未知</span>";
+        // 確保 buyerLat/Lng 已定義且店家有座標
+        if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
+            const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
+            distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
+        }
+
         // 生成卡片
-        const card = window.createStoreCard(store);
+        const dist = (typeof buyerLat !== 'undefined' && store.lat) ? `⚡ ${calculateDistance(buyerLat, buyerLng, store.lat, store.lng).toFixed(1)} km` : "⚡ 距離未知";
+        const card = window.createStoreCard(store, dist);
         storeContainer.appendChild(card);
     });
 }
-
-//favorites.html
-async function renderFavoriteStores() {
-    const favoriteContainer = document.getElementById('favoriteContainer');
-    // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
-    if (!favoriteContainer) return;
-
-    const user = auth.currentUser;
-    if (!user) {
-        favoriteContainer.innerHTML = '<p>請先登入以查看收藏清單。</p>';
-        return;
-    }
-
-    try {
-        // 抓取收藏集合
-        const favCol = collection(db, "users", user.uid, "favorites");
-        const snapshot = await getDocs(favCol);
-
-        if (snapshot.empty) {
-            favoriteContainer.innerHTML = '<div class="loading-Spinner">🤍 您目前還沒有收藏任何店家喔！</div>';
-            return;
-        }
-
-        favoriteContainer.innerHTML = ""; // 清空容器
-
-        snapshot.forEach((doc) => {
-            const store = doc.data();
-            // 直接呼叫我們剛才建立的共用函數
-            const card = window.createStoreCard(store);
-            favoriteContainer.appendChild(card);
-        });
-    } catch (error) {
-        console.error("讀取收藏失敗:", error);
-    }
-}
-// 確保登入狀態確認後才執行渲染
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        renderFavoriteStores();
-    }
-});
 
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');
@@ -562,7 +553,6 @@ if (citySelect) {
         filterAndRenderStores();
     });
 }
-
 if (districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
 if (globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
 // [使用者狀態與 UI 初始化]
@@ -579,7 +569,10 @@ if (googleLoginAction) {
     });
 }
 
+// ==========================================
 // 4. 初始化與事件綁定
+// ==========================================
+
 // 初始化：設定上傳區塊的事件綁定
 // 直接在整個網頁範圍監聽點擊
 document.addEventListener('click', (e) => {
@@ -627,7 +620,6 @@ document.addEventListener('change', (e) => {
         reader.readAsDataURL(file);
     }
 });
-
 // [頁面選單與燈箱操作]
 function bindHeaderEvents() {
     console.log("[PACE DEBUG] bindHeaderEvents() started.");
@@ -654,6 +646,10 @@ function bindHeaderEvents() {
             if (loginLightbox) loginLightbox.style.display = 'flex';
         });
     }
+
+    //if (auth.currentUser) {
+    //     updateUIForUser(auth.currentUser, 'buyer'); // 角色會由 handleUserSyncAndRoleRouting 修正
+    // }
 }
 
 // [登入與身分認證程序]
@@ -678,6 +674,16 @@ if (togglePasswordVisibility && loginPasswordInput) {
         this.textContent = type === 'password' ? '👁️' : '🙈';
     });
 }
+
+// 在共用 JS 中定義此函式
+export function getHasSeatingStatus() {
+    // 使用 querySelector 搭配你的原始 Class 名稱
+    const seatingToggle = document.querySelector('.seating-toggle');
+
+    // 如果該頁面有這個 toggle，就回傳它的 checked 狀態，沒有則預設 false
+    return seatingToggle ? seatingToggle.checked : false;
+}
+
 
 if (emailLoginAction) {
     emailLoginAction.addEventListener('click', async () => {
@@ -954,7 +960,6 @@ if (shopSubmitBtn) {
         // 修改這裡，對應你 HTML 裡的 ID: toggleCash 和 toggleOnline
         const isCashPayEnabled = document.getElementById('toggleCash') ? document.getElementById('toggleCash').checked : false;
         const isOnlinePayEnabled = document.getElementById('toggleOnline') ? document.getElementById('toggleOnline').checked : false;
-        const seatingtoggle = document.getElementById('seatingtoggle') ? document.getElementById('seatingtoggle').checked : false;
         // --- 3. 菜單打包 ---
         const menuRows = document.querySelectorAll('.menu-item-row');
         const menuItems = [];
@@ -1018,7 +1023,7 @@ if (shopSubmitBtn) {
             isOnlinePayEnabled: isOnlinePayEnabled,
             isCashPayEnabled: isCashPayEnabled,
             newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
-            hasSeating: seatingtoggle,
+            hasSeating: getHasSeatingStatus(),
             menuList: menuItems,
             createdAt: new Date().toISOString()
         };
@@ -1342,42 +1347,24 @@ function initPullToRefresh() {
 // 🎯 PACE 專屬：store.html 終極完美動態渲染模組 (含首頁卡片替換、加減鍵、備註欄)
 // ==========================================
 async function initStorePage() {
+    console.log("[PACE DEBUG] 啟動點餐頁面終極渲染程序...");
+    const menuContainer = document.getElementById('menuContainer');
+    if (!menuContainer) return;
+
     const urlParams = new URLSearchParams(window.location.search);
     const currentStoreId = urlParams.get('storeId');
-    if (!currentStoreId) return;
 
-    // 1. 讀取資料 (只讀一次就好！)
-    const storeRef = doc(db, "stores", currentStoreId);
-    const storeDoc = await getDoc(storeRef);
-
-    // 2. 檢查是否存在
-    if (!storeDoc.exists()) {
-        if (auth.currentUser) {
-            // 1. 定位到使用者收藏夾中，對應的那位店家的文件
-            // 路徑：users -> [使用者UID] -> favorites -> [該店家的sellerUid]
-            const favoriteDocRef = doc(db, "users", auth.currentUser.uid, "favorites", currentStoreId);
-            try {
-                // 2. 執行刪除，直接把這份文件移除
-                await deleteDoc(favoriteDocRef);
-                console.log("已從收藏夾中清除失效店家：", currentStoreId);
-            } catch (error) {
-                console.error("清理收藏時發生錯誤，但仍將導向：", error);
-            }
-            // 不管有沒有刪除成功，最後都導回，確保使用者不會卡在壞掉的頁面
-            window.location.href = "favorites.html";
-        }
-
-        alert("該店家已下架，已自動從您的收藏中移除。");
-        window.location.href = "favorites.html";
+    if (!currentStoreId) {
+        alert("❌ 找不到店家資訊");
+        window.location.href = "index.html";
         return;
     }
-    // --- 【這是你原本的渲染邏輯開頭 (接在上面邏輯後面)】 ---
-    const storeData = storeDoc.data();
-    // 這裡繼續你原本渲染畫面、設定 shopLogo 的程式碼...
     document.body.setAttribute('data-store-id', currentStoreId);
+
     try {
         // --- 這裡放回你原有的 Firebase 讀取邏輯 ---
         let storeData = null;
+        const firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
 
         // 嘗試用 v9 寫法讀取
         if (typeof db !== 'undefined' && typeof doc === 'function') {
@@ -1389,9 +1376,29 @@ async function initStorePage() {
             console.log("Logo 欄位的值：", storeData.shopLogo);
         }
 
-        if (!storeData) throw new Error("無法從資料庫找到該店家資料");
+        // 如果 v9 沒讀到，嘗試用 v8 寫法讀取
+        if (!storeData && firebaseFirestore) {
+            const docSnap = await firebaseFirestore.collection("stores").doc(currentStoreId).get();
+            if (docSnap.exists) storeData = docSnap.data();
+        }
 
+        if (!storeData) throw new Error("無法從資料庫找到該店家資料");
+        window.currentStoreInfo = {
+            ...storeData, // 這行會自動把 storeData 的所有欄位全部放入，無需一行行寫
+            id: currentStoreId, // 確保 ID 被正確寫入
+            // 如果需要對特定欄位強制處理 (例如布林值轉型)，可以在下面單獨覆寫：
+            isCashPayEnabled: !!storeData.isCashPayEnabled,
+            isOnlinePayEnabled: !!storeData.isOnlinePayEnabled,
+            hasSeating: !!storeData.hasSeating
+        };
         console.log("全域商店資訊已更新：", window.currentStoreInfo);
+        if (auth.currentUser) {
+            try {
+                await syncHeartIcon();
+            } catch (err) {
+                console.error("同步愛心狀態失敗:", err);
+            }
+        }
 
         // --- 渲染邏輯 ---
         // 1. 先抓出 Firebase 的座標 (記得轉成數字)
@@ -1432,7 +1439,6 @@ async function initStorePage() {
         } else {
             target.innerText = '🏪';
         }
-
         const menuList = storeData.menuList || storeData.menu || [];
         menuContainer.innerHTML = "";
 
@@ -1577,6 +1583,24 @@ async function initStorePage() {
             console.log("[PACE DEBUG] 購物車規格同步完成。");
         }, 200);
 
+        // 頁面初始化時，根據 Firebase 狀態更新愛心
+        async function syncHeartIcon() {
+            const heartIcon = document.getElementById('heart-icon');
+            if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
+            const user = auth.currentUser;
+            if (!user) {
+                heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
+                return;
+            }
+
+            try {
+                const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
+                const docSnap = await getDoc(favRef);
+                heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
+            } catch (e) {
+                console.error("同步收藏失敗:", e);
+            }
+        }
 
     } catch (error) {
         console.error("[PACE ERROR] 頁面渲染失敗：", error);
@@ -1708,6 +1732,7 @@ function startApp() {
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
     console.log("系統初始化完成");
 }
+
 // 2. 為了絕對安全，同時運用 DOMContentLoaded
 // 這不是多餘的，這是為了應對不同瀏覽器載入行為的「防禦性編程」
 document.addEventListener('DOMContentLoaded', startApp);

@@ -1341,25 +1341,21 @@ function initPullToRefresh() {
 // 🎯 PACE 專屬：store.html 終極完美動態渲染模組 (含首頁卡片替換、加減鍵、備註欄)
 // ==========================================
 async function initStorePage() {
-    console.log("[PACE DEBUG] 啟動點餐頁面終極渲染程序...");
-    const menuContainer = document.getElementById('menuContainer');
-    if (!menuContainer) return;
-
     const urlParams = new URLSearchParams(window.location.search);
     const currentStoreId = urlParams.get('storeId');
+    if (!currentStoreId) return;
 
-    if (!currentStoreId) {
-        alert("❌ 找不到店家資訊");
-        window.location.href = "index.html";
-        return;
-    }
-    const storeDoc = await db.collection('stores').doc(currentStoreId).get();
-    if (!storeDoc.exists) {
-        const user = firebase.auth().currentUser;
-        if (user) {
-            // 自動從收藏中移除失效店家
-            await db.collection('users').doc(user.uid).update({
-                favorites: firebase.firestore.FieldValue.arrayRemove(currentStoreId)
+    // 1. 使用 v9 的 doc 函式取得參照
+    const storeRef = doc(db, "stores", currentStoreId);
+    const storeDoc = await getDoc(storeRef);
+
+    // 2. 檢查是否存在
+    if (!storeDoc.exists()) {
+        // 店家不存在 -> 執行清理收藏
+        if (auth.currentUser) {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            await updateDoc(userRef, {
+                favorites: arrayRemove(currentStoreId)
             });
         }
         alert("該店家已下架，已自動從您的收藏中移除。");
@@ -1389,21 +1385,8 @@ async function initStorePage() {
             console.log("Logo 欄位的值：", storeData.shopLogo);
         }
 
-        // 如果 v9 沒讀到，嘗試用 v8 寫法讀取
-        if (!storeData && firebaseFirestore) {
-            const docSnap = await firebaseFirestore.collection("stores").doc(currentStoreId).get();
-            if (docSnap.exists) storeData = docSnap.data();
-        }
-
         if (!storeData) throw new Error("無法從資料庫找到該店家資料");
-        window.currentStoreInfo = {
-            ...storeData, // 這行會自動把 storeData 的所有欄位全部放入，無需一行行寫
-            id: currentStoreId, // 確保 ID 被正確寫入
-            // 如果需要對特定欄位強制處理 (例如布林值轉型)，可以在下面單獨覆寫：
-            isCashPayEnabled: !!storeData.isCashPayEnabled,
-            isOnlinePayEnabled: !!storeData.isOnlinePayEnabled,
-            hasSeating: !!storeData.hasSeating
-        };
+
         console.log("全域商店資訊已更新：", window.currentStoreInfo);
         if (auth.currentUser) {
             try {

@@ -362,8 +362,7 @@ window.createStoreCard = function (store, distanceHtml = null) {
     card.className = 'store-card';
     card.innerHTML = `
         <div class="store-img">${finalLogoHtml}</div>
-        <div class="store-info">
-            <div class="store">
+            <div class="store-info">
                 <div class="store-name">${finalName}</div>
                 <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml || ''}</div>
                 <div class="store-tags">
@@ -424,13 +423,12 @@ function filterAndRenderStores() {
             finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         }
         // 生成卡片
-        const dist = (typeof buyerLat !== 'undefined' && store.lat) ? `⚡ ${calculateDistance(buyerLat, buyerLng, shopLat, shopLng).toFixed(1)} km` : "⚡ 距離未知";
-        const card = window.createStoreCard(store, dist, `<span>${distanceText}</span>`);
+        const card = window.createStoreCard(store, `<span>${distanceText}</span>`);
         storeContainer.appendChild(card);
     });
 }
 
-// 放在 app.js 中，負責渲染最愛清單的函數
+//favorites.html
 async function renderFavoriteStores() {
     const favoriteContainer = document.getElementById('favoriteContainer');
     // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
@@ -457,7 +455,7 @@ async function renderFavoriteStores() {
         snapshot.forEach((doc) => {
             const store = doc.data();
             // 直接呼叫我們剛才建立的共用函數
-            const card = window.createStoreCard(store);
+            const card = window.createStoreCard(store, distanceHtml = null);
             favoriteContainer.appendChild(card);
         });
     } catch (error) {
@@ -474,10 +472,19 @@ auth.onAuthStateChanged((user) => {
 
 // 距離計算處理 // 確保 buyerLat/Lng 已定義且店家有座標
 function getStoreDistanceText(store) {
-    if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && shopLat && shopLng) {
-        const dist = calculateDistance(buyerLat, buyerLng, shopLat, shopLng);
-        distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
-    } return "⚡ 距離未知";
+    const sLat = store.lat || store.Lat;
+    const sLng = store.lng || store.Lng;
+    // 檢查座標是否有效
+    if (typeof buyerLat !== 'undefined' && buyerLat !== null &&
+        typeof buyerLng !== 'undefined' && buyerLng !== null &&
+        sLat && sLng) {
+
+        // 記得也要轉成數字，避免字串相減導致錯誤
+        const dist = calculateDistance(buyerLat, buyerLng, parseFloat(sLat), parseFloat(sLng));
+        return `<span>⚡ ${dist.toFixed(1)} km</span>`;
+    }
+
+    return "<span>⚡ 距離未知</span>";
 }
 
 function getBrowserLocation() {

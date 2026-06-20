@@ -32,7 +32,7 @@
         }
 
         .favoriteContainer {
-            height: 82%;
+            height: 63%;
             max-width: 100%;
             overflow-y: auto;
             display: flex;
@@ -109,20 +109,6 @@
             gap: 1cqw;
         }
 
-        .store {
-            height: 100%;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-grow: 1;
-            /* 💡 關鍵：讓文字區塊拿走剩下的所有寬度，點點點才會精準生效 */
-            overflow: hidden;
-            /* 💡 關鍵：防止內部文字把外殼撐開 */
-            gap: 1.5cqw;
-        }
-
         /* 店家名稱 */
         .store-name {
             font-size: 6cqw;
@@ -142,7 +128,7 @@
             height: 45%;
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: flex-start;
             font-size: 3.5cqw;
             /* 字體改用 cqw */
@@ -150,7 +136,7 @@
             white-space: nowrap;
             max-width: 100%;
             /* 💡 關鍵：限制最大寬度為父層的 100% */
-            line-height: 1.1;
+            line-height: 1.5;
         }
 
         /* 標籤容器 (現金支付 / 支援行動支付) */

@@ -450,9 +450,8 @@ async function renderFavoriteStores() {
 
         snapshot.forEach((doc) => {
             const store = doc.data();
-            storeData.id = doc.id;
-            if (!isValidStore(storeData)) {
-                console.warn("偵測到幽靈資料，準備自動刪除:", doc.id);
+            if (!isValidStore(store)) {
+                console.warn("偵測到幽靈資料，準備自動刪除:");
                 deleteDoc(doc.ref); // 直接從資料庫殺掉
                 return; // 不執行渲染，這張卡片就不會出現在畫面上
             }

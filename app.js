@@ -452,16 +452,33 @@ async function renderFavoriteStores() {
             const card = window.createStoreCard(store);
             favoriteContainer.appendChild(card);
         });
+        const storeId = new URLSearchParams(window.location.search).get('sellerUid');
+        const storeDoc = await db.collection('stores').doc(storeId).get();
+
+        if (!storeDoc.exists) {
+            // 1. 顯示全螢幕提示訊息
+            document.body.innerHTML = `
+            <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; text-align:center; font-family: sans-serif;">
+                <h2>⚠️ 該店家已不存在</h2>
+                <p>這家店可能已被移除。系統將在 3 秒後自動導回您的收藏清單...</p>
+            </div>
+        `;
+
+            // 2. 設定 2 秒後自動導回
+            setTimeout(() => {
+                window.location.href = 'favorites.html';
+            }, 2000);
+
+            return;
+        }
+
+        // 若店家存在，則繼續渲染頁面內容
+        renderStoreDetails(storeDoc.data());
+
     } catch (error) {
         console.error("讀取收藏失敗:", error);
     }
 }
-// 確保登入狀態確認後才執行渲染
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        renderFavoriteStores();
-    }
-});
 
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');
@@ -537,6 +554,7 @@ if (citySelect) {
         filterAndRenderStores();
     });
 }
+
 if (districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
 if (globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
 // [使用者狀態與 UI 初始化]
@@ -552,6 +570,7 @@ if (googleLoginAction) {
         }
     });
 }
+
 // 4. 初始化與事件綁定
 // 初始化：設定上傳區塊的事件綁定
 // 直接在整個網頁範圍監聽點擊
@@ -600,6 +619,7 @@ document.addEventListener('change', (e) => {
         reader.readAsDataURL(file);
     }
 });
+
 // [頁面選單與燈箱操作]
 function bindHeaderEvents() {
     console.log("[PACE DEBUG] bindHeaderEvents() started.");
@@ -1568,28 +1588,6 @@ async function initStorePage() {
                 console.error("同步收藏失敗:", e);
             }
         }
-
-        const storeId = new URLSearchParams(window.location.search).get('storeId');
-        const storeDoc = await db.collection('stores').doc(storeId).get();
-
-        if (!storeDoc.exists) {
-            // 1. 顯示全螢幕提示訊息
-            document.body.innerHTML = `
-            <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; text-align:center; font-family: sans-serif;">
-                <h2>⚠️ 該店家已不存在</h2>
-                <p>店家已被移除。系統將在 2 秒後自動導回您的收藏清單...</p>
-            </div>
-        `;
-
-            // 2. 設定 3 秒後自動導回
-            setTimeout(() => {
-                window.location.href = 'favorites.html';
-            }, 2000);
-            return;
-            // 若店家存在，則繼續渲染頁面內容
-            renderStoreDetails(storeDoc.data());
-        }
-
     } catch (error) {
         console.error("[PACE ERROR] 頁面渲染失敗：", error);
         menuContainer.innerHTML = "<p>無法載入店家菜單，請檢查網路連線。</p>";

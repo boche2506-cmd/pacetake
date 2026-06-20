@@ -342,14 +342,24 @@ async function fetchStoresFromFirebase() {
 }
 
 // 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
-window.createStoreCard = function (store, distanceHtml) {
+window.createStoreCard = function (store) {
     const finalName = store.shopName || store.name || '未命名店家';
     const finalAddress = store.shopAddress || store.address || '';
     const takeoutSupported = store.isCashPayEnabled !== false;
     const paySupported = store.isOnlinePayEnabled !== false;
     const seatingSupported = store.hasSeating !== false;
-
     const logoData = store.shopLogo || '🏪';
+    const sLat = parseFloat(store.shopLat || store.lat);
+    const sLng = parseFloat(store.shopLng || store.lng);
+
+    // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
+    let distanceHtml = "<span>⚡ 距離未知</span>";
+
+    if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
+        const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
+        distanceHtml = dist.toFixed(1) + ' km';
+    }
+
     let finalLogoHtml = logoData;
     if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
         finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
@@ -362,7 +372,7 @@ window.createStoreCard = function (store, distanceHtml) {
         <div class="store-img">${finalLogoHtml}</div>
             <div class="store-info">
                 <div class="store-name">${finalName}</div>
-                <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml}</div>
+                <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml || ''}</div>
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金</span>
                     <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 行動</span>
@@ -407,21 +417,9 @@ function filterAndRenderStores() {
 
     filtered.forEach(store => {
         if (store.status === "offline") return;
-        // 基本資料準備
-        const finalName = store.shopName || store.name || '未命名店家';
-        const finalAddress = store.shopAddress || store.address || '';
-        const takeoutSupported = store.isCashPayEnabled !== false;
-        const paySupported = store.isOnlinePayEnabled !== false;
-        const seatingSupported = store.isSeatingAvailable !== false;
-        // 照片處理 (優先顯示 shopLogo)
-        const logoData = store.shopLogo || store.emoji || '🏪';
-        let finalLogoHtml = logoData;
-        if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
-            finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
-        }
+
         // 生成卡片
-        const distanceText = getStoreDistanceText(storeLatLng);
-        const card = window.createStoreCard(store, distanceText);
+        const card = window.createStoreCard(store);
         storeContainer.appendChild(card);
     });
 }
@@ -451,10 +449,9 @@ async function renderFavoriteStores() {
         favoriteContainer.innerHTML = ""; // 清空容器
 
         snapshot.forEach((doc) => {
-            const distanceText = getStoreDistanceText(storeLatLng);
             const store = doc.data();
             // 直接呼叫我們剛才建立的共用函數
-            const card = window.createStoreCard(store, distanceText);
+            const card = window.createStoreCard(store);
             favoriteContainer.appendChild(card);
         });
     } catch (error) {
@@ -467,22 +464,6 @@ auth.onAuthStateChanged((user) => {
         renderFavoriteStores();
     }
 });
-
-// 距離計算處理 // 確保 buyerLat/Lng 已定義且店家有座標
-function getStoreDistanceText(storeLatLng) {
-    const sLat = parseFloat(store.shopLat || store.lat);
-    const sLng = parseFloat(store.shopLng || store.lng);
-
-    // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
-    let displayDistance = '距離未知'; // 預設值
-
-    if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
-        const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
-        displayDistance = dist.toFixed(1) + ' km';
-    }
-    // 檢查座標是否有效
-    return "<span>⚡ 距離未知</span>";
-}
 
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');

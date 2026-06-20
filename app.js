@@ -63,7 +63,6 @@ let activeDragItem = null;
 
 // --- 2. 初始化函式 (負責把那 17 行活化) ---
 // 全部直接宣告在全域，不用包進任何函式
-userNameDisplay = document.getElementById('userNameDisplay');
 const storeContainer = document.getElementById('store-Container');
 const googleLoginAction = document.getElementById('googleLoginAction');
 const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
@@ -85,7 +84,6 @@ const favoriteContainer = document.getElementById('favoriteContainer');
 // 接著是下面那 6 行
 const toggleOnline = document.getElementById('toggleOnline');
 const toggleCash = document.getElementById('toggleCash');
-const seatingtoggle = document.getElementById('seatingtoggle');
 const newebpayContainer = document.getElementById('newebpayContainer');
 const cashWarningModal = document.getElementById('cashWarningModal');
 const warningConfirmBtn = document.getElementById('warningConfirmBtn');
@@ -554,11 +552,7 @@ if (googleLoginAction) {
         }
     });
 }
-
-// ==========================================
 // 4. 初始化與事件綁定
-// ==========================================
-
 // 初始化：設定上傳區塊的事件綁定
 // 直接在整個網頁範圍監聽點擊
 document.addEventListener('click', (e) => {
@@ -632,10 +626,6 @@ function bindHeaderEvents() {
             if (loginLightbox) loginLightbox.style.display = 'flex';
         });
     }
-
-    //if (auth.currentUser) {
-    //     updateUIForUser(auth.currentUser, 'buyer'); // 角色會由 handleUserSyncAndRoleRouting 修正
-    // }
 }
 
 // [登入與身分認證程序]
@@ -660,16 +650,6 @@ if (togglePasswordVisibility && loginPasswordInput) {
         this.textContent = type === 'password' ? '👁️' : '🙈';
     });
 }
-
-// 在共用 JS 中定義此函式
-export function getHasSeatingStatus() {
-    // 使用 querySelector 搭配你的原始 Class 名稱
-    const seatingToggle = document.querySelector('.seating-toggle');
-
-    // 如果該頁面有這個 toggle，就回傳它的 checked 狀態，沒有則預設 false
-    return seatingToggle ? seatingToggle.checked : false;
-}
-
 
 if (emailLoginAction) {
     emailLoginAction.addEventListener('click', async () => {
@@ -946,6 +926,7 @@ if (shopSubmitBtn) {
         // 修改這裡，對應你 HTML 裡的 ID: toggleCash 和 toggleOnline
         const isCashPayEnabled = document.getElementById('toggleCash') ? document.getElementById('toggleCash').checked : false;
         const isOnlinePayEnabled = document.getElementById('toggleOnline') ? document.getElementById('toggleOnline').checked : false;
+        const seatingtoggle = document.getElementById('seatingtoggle') ? document.getElementById('seatingtoggle').checked : false;
         // --- 3. 菜單打包 ---
         const menuRows = document.querySelectorAll('.menu-item-row');
         const menuItems = [];
@@ -1009,7 +990,7 @@ if (shopSubmitBtn) {
             isOnlinePayEnabled: isOnlinePayEnabled,
             isCashPayEnabled: isCashPayEnabled,
             newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
-            hasSeating: getHasSeatingStatus(),
+            hasSeating: seatingtoggle,
             menuList: menuItems,
             createdAt: new Date().toISOString()
         };

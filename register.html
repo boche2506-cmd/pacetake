@@ -282,7 +282,7 @@
             font-size: 4cqw;
         }
 
-        .seating-toggle-switch,
+        .seatingtoggle-switch,
         .menu-soldout-switch {
             position: relative;
             display: inline-block;
@@ -290,12 +290,12 @@
             height: 7cqw;
         }
 
-        .seating-toggle-switch input,
+        .seatingtoggle-switch input,
         .menu-soldout-switch input {
             display: none;
         }
 
-        .seating-toggle-switch .toggle-slider,
+        .seatingtoggle-switch .toggle-slider,
         .menu-soldout-switch .toggle-slider {
             position: absolute;
             cursor: pointer;
@@ -328,7 +328,7 @@
             transition: 0.4s;
         }
 
-        .seating-toggle-switch .toggle-slider::before {
+        .seatingtoggle-switch .toggle-slider::before {
             position: absolute;
             content: "";
             height: 5cqw;
@@ -347,37 +347,37 @@
             /* 把字往右擠，閃開左邊的白圈圈 */
         }
 
-        .seating-toggle-switch .on-text {
+        .seatingtoggle-switch .on-text {
             display: block;
             margin-left: 5cqw;
             /* 把字往右擠，閃開左邊的白圈圈 */
         }
 
-        .seating-toggle-switch .off-text,
+        .seatingtoggle-switch .off-text,
         .menu-soldout-switch .off-text {
             display: none;
         }
 
         /* 6. 勾選狀態 (變紅色、圓圈右移、文字替換) */
-        .seating-toggle:checked+.toggle-slider,
+        .seatingtoggle:checked+.toggle-slider,
         .menu-soldout-toggle:checked+.toggle-slider {
             background-color: #ff4d4f;
             /* 變成紅色 */
         }
 
-        .seating-toggle:checked+.toggle-slider::before,
+        .seatingtoggle:checked+.toggle-slider::before,
         .menu-soldout-toggle:checked+.toggle-slider::before {
             transform: translateX(10cqw);
             /* 把白圈圈推到最右邊 (75 - 22 - 8 = 45) */
         }
 
-        .seating-toggle:checked+.toggle-slider .on-text,
+        .seatingtoggle:checked+.toggle-slider .on-text,
         .menu-soldout-toggle:checked+.toggle-slider .on-text {
             display: none;
             /* 隱藏販售中 */
         }
 
-        .seating-toggle:checked+.toggle-slider .off-text,
+        .seatingtoggle:checked+.toggle-slider .off-text,
         .menu-soldout-toggle:checked+.toggle-slider .off-text {
             display: block;
             /* 顯示暫停 */
@@ -721,7 +721,7 @@
                             class="slider"></span></label>
                 </div>
                 <div class="seating">
-                    <label class="seating-toggle-switch"><input type="checkbox" class="seating-toggle" checked>
+                    <label class="seatingtoggle-switch"><input type="checkbox" class="seatingtoggle" checked>
                         <span class="toggle-slider">
                             <span class="on-text">開放中</span>
                             <span class="off-text">無提供</span>

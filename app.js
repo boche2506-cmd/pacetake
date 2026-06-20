@@ -170,65 +170,6 @@ function initThemeSystem() {
     }
 }
 
-// 收藏按鈕監聽器
-const favBtn = document.getElementById('favorite-btn');
-const heartIcon = document.getElementById('heart-icon');
-
-if (favBtn) {
-    favBtn.addEventListener('click', async () => {
-        const user = auth.currentUser;
-        if (!user) {
-            alert("⚠️ 請先登入才能收藏店家喔！");
-            return;
-        }
-        const data = window.currentStoreInfo || {};
-        const { id } = data; // 確保有 id
-
-        // 建立要存入的資料物件，並排除可能為 undefined 的欄位
-        // 利用 || null 或將其設定為預設空字串，防止 undefined 錯誤
-        const favoriteData = {
-            id: data.id || "",
-            name: data.name || "",
-            sellerUid: data.sellerUid || null, // 若為 undefined，存為 null
-            shopLogo: data.shopLogo || "",
-            shopName: data.shopName || "",
-            shopAddress: data.shopAddress || "",
-            shopLat: data.shopLat ?? 0, // 使用 Nullish coalescing operator
-            shopLng: data.shopLng ?? 0,
-            isCashPayEnabled: !!data.isCashPayEnabled, // 強制轉為布林值
-            isOnlinePayEnabled: !!data.isOnlinePayEnabled,
-            hasSeating: !!data.hasSeating
-        };
-
-        const favRef = doc(db, "users", user.uid, "favorites", id);
-
-        try {
-            const docSnap = await getDoc(favRef);
-
-            if (docSnap.exists()) {
-                await deleteDoc(favRef);
-                heartIcon.innerText = "🤍";
-                alert(`💔 已將「${data.name}」移除`);
-            } else {
-                // 使用處理過的 favoriteData
-                await setDoc(favRef, favoriteData);
-                heartIcon.innerText = "❤️";
-                alert(`❤️ 已將「${data.name}」加入最愛！`);
-            }
-        } catch (error) {
-            console.error("操作失敗:", error);
-            alert("系統錯誤，請稍後再試。");
-        }
-    });
-}
-
-async function getMyFavoriteIds() {
-    const user = auth.currentUser;
-    if (!user) return [];
-    const snapshot = await getDocs(collection(db, "users", user.uid, "favorites"));
-    return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
-}
-
 function updateUIForUser(user, currentRole) {
     // 這裡加上 const，確保這些變數只屬於這個函式
     const loginBtn = document.getElementById('loginBtn');
@@ -341,6 +282,65 @@ async function fetchStoresFromFirebase() {
     }
 }
 
+// 收藏按鈕監聽器
+const favBtn = document.getElementById('favorite-btn');
+const heartIcon = document.getElementById('heart-icon');
+
+if (favBtn) {
+    favBtn.addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("⚠️ 請先登入才能收藏店家喔！");
+            return;
+        }
+        const data = window.currentStoreInfo || {};
+        const { id } = data; // 確保有 id
+
+        // 建立要存入的資料物件，並排除可能為 undefined 的欄位
+        // 利用 || null 或將其設定為預設空字串，防止 undefined 錯誤
+        const favoriteData = {
+            id: data.id || "",
+            name: data.name || "",
+            sellerUid: data.sellerUid || null, // 若為 undefined，存為 null
+            shopLogo: data.shopLogo || "",
+            shopName: data.shopName || "",
+            shopAddress: data.shopAddress || "",
+            shopLat: data.shopLat ?? 0, // 使用 Nullish coalescing operator
+            shopLng: data.shopLng ?? 0,
+            isCashPayEnabled: !!data.isCashPayEnabled, // 強制轉為布林值
+            isOnlinePayEnabled: !!data.isOnlinePayEnabled,
+            hasSeating: !!data.hasSeating
+        };
+
+        const favRef = doc(db, "users", user.uid, "favorites", id);
+
+        try {
+            const docSnap = await getDoc(favRef);
+
+            if (docSnap.exists()) {
+                await deleteDoc(favRef);
+                heartIcon.innerText = "🤍";
+                alert(`💔 已將「${data.name}」移除`);
+            } else {
+                // 使用處理過的 favoriteData
+                await setDoc(favRef, favoriteData);
+                heartIcon.innerText = "❤️";
+                alert(`❤️ 已將「${data.name}」加入最愛！`);
+            }
+        } catch (error) {
+            console.error("操作失敗:", error);
+            alert("系統錯誤，請稍後再試。");
+        }
+    });
+}
+
+async function getMyFavoriteIds() {
+    const user = auth.currentUser;
+    if (!user) return [];
+    const snapshot = await getDocs(collection(db, "users", user.uid, "favorites"));
+    return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
+}
+
 // 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
 window.createStoreCard = function (store) {
     const finalName = store.shopName || store.name || '未命名店家';
@@ -450,7 +450,12 @@ async function renderFavoriteStores() {
 
         snapshot.forEach((doc) => {
             const store = doc.data();
-            // 直接呼叫我們剛才建立的共用函數
+            storeData.id = doc.id;
+            if (!isValidStore(storeData)) {
+                console.warn("偵測到幽靈資料，準備自動刪除:", doc.id);
+                deleteDoc(doc.ref); // 直接從資料庫殺掉
+                return; // 不執行渲染，這張卡片就不會出現在畫面上
+            }
             const card = window.createStoreCard(store);
             favoriteContainer.appendChild(card);
         });
@@ -458,12 +463,24 @@ async function renderFavoriteStores() {
         console.error("讀取收藏失敗:", error);
     }
 }
+
 // 確保登入狀態確認後才執行渲染
 auth.onAuthStateChanged((user) => {
     if (user) {
         renderFavoriteStores();
     }
 });
+
+function isValidStore(store) {
+    // 1. 如果資料本身是 null 或 undefined，直接無效
+    if (!store) return false;
+    // 2. 檢查關鍵欄位：如果沒有店名，或者店名是空的，視為無效
+    const hasName = store.shopName && store.shopName.trim() !== "";
+    // 3. 檢查是否有店家的唯一 ID
+    const hasId = store.id && store.id.trim() !== "";
+    // 4. 只有當這些條件都滿足時，才回傳 true
+    return hasName && hasId;
+}
 
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');
@@ -1339,31 +1356,17 @@ async function initStorePage() {
         // 嘗試用 v9 寫法讀取
         if (typeof db !== 'undefined' && typeof doc === 'function') {
             const docSnap = await getDoc(doc(db, "stores", currentStoreId));
-            if (!docSnap.exists()) {
-                if (auth.currentUser) {
-                    // 1. 定位到使用者收藏夾中，對應的那位店家的文件
-                    // 路徑：users -> [使用者UID] -> favorites -> [該店家的sellerUid]
-                    const favoriteDocRef = doc(db, "users", auth.currentUser.uid, "favorites", currentStoreId);
-                    try {
-                        // 2. 執行刪除，直接把這份文件移除
-                        await deleteDoc(favoriteDocRef);
-                        console.log("已從收藏夾中清除失效店家：", currentStoreId);
-                    } catch (error) {
-                        console.error("清理收藏時發生錯誤，但仍將導向：", error);
-                    }
-                    // 不管有沒有刪除成功，最後都導回，確保使用者不會卡在壞掉的頁面
-                    window.location.href = "favorites.html";
-                }
-
-                alert("該店家已下架，已自動從您的收藏中移除。");
-                window.location.href = "favorites.html";
-                return;
-            }
             if (docSnap.exists()) storeData = docSnap.data();
             console.log("Firebase 拿到的資料：", storeData); // <-- 加上這行！
 
             // 順便檢查一下這裡有沒有值
             console.log("Logo 欄位的值：", storeData.shopLogo);
+        }
+
+        // 如果 v9 沒讀到，嘗試用 v8 寫法讀取
+        if (!storeData && firebaseFirestore) {
+            const docSnap = await firebaseFirestore.collection("stores").doc(currentStoreId).get();
+            if (docSnap.exists) storeData = docSnap.data();
         }
 
         if (!storeData) throw new Error("無法從資料庫找到該店家資料");

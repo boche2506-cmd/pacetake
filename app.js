@@ -299,12 +299,10 @@ if (favBtn) {
         // 建立要存入的資料物件，並排除可能為 undefined 的欄位
         // 利用 || null 或將其設定為預設空字串，防止 undefined 錯誤
         const favoriteData = {
-            id: data.id || "",
-            name: data.name || "",
-            sellerUid: data.sellerUid || null, // 若為 undefined，存為 null
+            sellerUid: data.sellerUid,
             shopLogo: data.shopLogo || "",
-            shopName: data.shopName || "",
-            shopAddress: data.shopAddress || "",
+            shopName: data.shopName,
+            shopAddress: data.shopAddress,
             shopLat: data.shopLat ?? 0, // 使用 Nullish coalescing operator
             shopLng: data.shopLng ?? 0,
             isCashPayEnabled: !!data.isCashPayEnabled, // 強制轉為布林值
@@ -320,12 +318,12 @@ if (favBtn) {
             if (docSnap.exists()) {
                 await deleteDoc(favRef);
                 heartIcon.innerText = "🤍";
-                alert(`💔 已將「${data.name}」移除`);
+                alert(`💔 已將「${shopName}」移除`);
             } else {
                 // 使用處理過的 favoriteData
                 await setDoc(favRef, favoriteData);
                 heartIcon.innerText = "❤️";
-                alert(`❤️ 已將「${data.name}」加入最愛！`);
+                alert(`❤️ 已將「${shopName}」加入最愛！`);
             }
         } catch (error) {
             console.error("操作失敗:", error);

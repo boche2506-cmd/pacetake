@@ -1568,27 +1568,24 @@ async function initStorePage() {
                 console.error("同步收藏失敗:", e);
             }
         }
-        async function initStorePage() {
-            const storeId = new URLSearchParams(window.location.search).get('storeId');
-            const storeDoc = await db.collection('stores').doc(storeId).get();
 
-            if (!storeDoc.exists) {
-                // 1. 顯示全螢幕提示訊息
-                document.body.innerHTML = `
+        const storeId = new URLSearchParams(window.location.search).get('storeId');
+        const storeDoc = await db.collection('stores').doc(storeId).get();
+
+        if (!storeDoc.exists) {
+            // 1. 顯示全螢幕提示訊息
+            document.body.innerHTML = `
             <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; text-align:center; font-family: sans-serif;">
                 <h2>⚠️ 該店家已不存在</h2>
                 <p>店家已被移除。系統將在 2 秒後自動導回您的收藏清單...</p>
             </div>
         `;
 
-                // 2. 設定 3 秒後自動導回
-                setTimeout(() => {
-                    window.location.href = 'favorites.html';
-                }, 2000);
-
-                return;
-            }
-
+            // 2. 設定 3 秒後自動導回
+            setTimeout(() => {
+                window.location.href = 'favorites.html';
+            }, 2000);
+            return;
             // 若店家存在，則繼續渲染頁面內容
             renderStoreDetails(storeDoc.data());
         }

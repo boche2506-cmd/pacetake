@@ -461,6 +461,12 @@ async function renderFavoriteStores() {
         console.error("讀取收藏失敗:", error);
     }
 }
+// 確保登入狀態確認後才執行渲染
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        renderFavoriteStores();
+    }
+});
 
 // 距離計算處理 // 確保 buyerLat/Lng 已定義且店家有座標
 function getStoreDistanceText(store) {

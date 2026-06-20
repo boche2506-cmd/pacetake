@@ -1320,7 +1320,6 @@ async function initStorePage() {
         let storeData = null;
         const firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
 
-        // 嘗試用 v9 寫法讀取
         if (typeof db !== 'undefined' && typeof doc === 'function') {
             const docSnap = await getDoc(doc(db, "stores", currentStoreId));
             if (docSnap.exists()) storeData = docSnap.data();
@@ -1330,30 +1329,40 @@ async function initStorePage() {
             console.log("Logo 欄位的值：", storeData.shopLogo);
         }
 
-        // 如果 v9 沒讀到，嘗試用 v8 寫法讀取
-        if (!storeData && firebaseFirestore) {
-            const docSnap = await firebaseFirestore.collection("stores").doc(currentStoreId).get();
-            if (docSnap.exists) storeData = docSnap.data();
-        }
-
         if (!storeData) throw new Error("無法從資料庫找到該店家資料");
-        window.currentStoreInfo = {
-            ...storeData, // 這行會自動把 storeData 的所有欄位全部放入，無需一行行寫
-            id: currentStoreId, // 確保 ID 被正確寫入
-            // 如果需要對特定欄位強制處理 (例如布林值轉型)，可以在下面單獨覆寫：
-            isCashPayEnabled: !!storeData.isCashPayEnabled,
-            isOnlinePayEnabled: !!storeData.isOnlinePayEnabled,
-            hasSeating: !!storeData.hasSeating
-        };
-        console.log("全域商店資訊已更新：", window.currentStoreInfo);
         if (auth.currentUser) {
+            // 1. 定位到使用者收藏夾中，對應的那位店家的文件
+            // 路徑：users -> [使用者UID] -> favorites -> [該店家的sellerUid]
+            const favoriteDocRef = doc(db, "users", auth.currentUser.uid, "favorites", currentStoreId);
             try {
-                await syncHeartIcon();
-            } catch (err) {
-                console.error("同步愛心狀態失敗:", err);
+                // 2. 執行刪除，直接把這份文件移除
+                await deleteDoc(favoriteDocRef);
+                console.log("已從收藏夾中清除失效店家：", currentStoreId);
+            } catch (error) {
+                console.error("清理收藏時發生錯誤，但仍將導向：", error);
+            }
+            // 不管有沒有刪除成功，最後都導回，確保使用者不會卡在壞掉的頁面
+            window.location.href = "favorites.html";
+            alert("該店家已下架，已自動從您的收藏中移除。");
+            window.location.href = "favorites.html";
+
+            window.currentStoreInfo = {
+                ...storeData, // 這行會自動把 storeData 的所有欄位全部放入，無需一行行寫
+                id: currentStoreId, // 確保 ID 被正確寫入
+                // 如果需要對特定欄位強制處理 (例如布林值轉型)，可以在下面單獨覆寫：
+                isCashPayEnabled: !!storeData.isCashPayEnabled,
+                isOnlinePayEnabled: !!storeData.isOnlinePayEnabled,
+                hasSeating: !!storeData.hasSeating
+            };
+            console.log("全域商店資訊已更新：", window.currentStoreInfo);
+            if (auth.currentUser) {
+                try {
+                    await syncHeartIcon();
+                } catch (err) {
+                    console.error("同步愛心狀態失敗:", err);
+                }
             }
         }
-
         // --- 渲染邏輯 ---
         // 1. 先抓出 Firebase 的座標 (記得轉成數字)
         // 1. 先抓出 Firebase 的座標 (記得轉成數字)

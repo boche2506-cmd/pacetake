@@ -455,7 +455,7 @@ async function renderFavoriteStores() {
         snapshot.forEach((doc) => {
             const store = doc.data();
             // 直接呼叫我們剛才建立的共用函數
-            const card = window.createStoreCard(store, distanceHtml = null);
+            const card = window.createStoreCard(store);
             favoriteContainer.appendChild(card);
         });
     } catch (error) {

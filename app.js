@@ -421,22 +421,11 @@ function filterAndRenderStores() {
         if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
             finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         }
-
-
-
         // 生成卡片
         const dist = (typeof buyerLat !== 'undefined' && store.lat) ? `⚡ ${calculateDistance(buyerLat, buyerLng, store.lat, store.lng).toFixed(1)} km` : "⚡ 距離未知";
         const card = window.createStoreCard(store, dist, `<span>${distanceText}</span>`);
         storeContainer.appendChild(card);
     });
-}
-
-// 距離計算處理 // 確保 buyerLat/Lng 已定義且店家有座標
-function getStoreDistanceText(store) {
-    if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
-        const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
-        distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
-    } return "⚡ 距離未知";
 }
 
 // 放在 app.js 中，負責渲染最愛清單的函數
@@ -466,7 +455,7 @@ async function renderFavoriteStores() {
         snapshot.forEach((doc) => {
             const store = doc.data();
             // 直接呼叫我們剛才建立的共用函數
-            const card = window.createStoreCard(store, "❤️ 我的最愛");
+            const card = window.createStoreCard(store);
             favoriteContainer.appendChild(card);
         });
     } catch (error) {
@@ -480,6 +469,14 @@ auth.onAuthStateChanged((user) => {
         renderFavoriteStores();
     }
 });
+
+// 距離計算處理 // 確保 buyerLat/Lng 已定義且店家有座標
+function getStoreDistanceText(store) {
+    if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
+        const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
+        distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
+    } return "⚡ 距離未知";
+}
 
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');

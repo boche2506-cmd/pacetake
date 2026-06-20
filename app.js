@@ -372,7 +372,7 @@ window.createStoreCard = function (store) {
         <div class="store-img">${finalLogoHtml}</div>
             <div class="store-info">
                 <div class="store-name">${finalName}</div>
-                <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml || ''}</div>
+                <div class="store-meta">📍 ${finalAddress} <br>⚡ ${distanceHtml || ''}</div>
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金</span>
                     <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 行動</span>
@@ -1402,7 +1402,12 @@ async function initStorePage() {
 
         // 3. 把算出來的結果填入 HTML
         document.getElementById('storeNameText').innerText = storeData.shopName || storeData.name || '未命名店家';
-        document.getElementById('storeAddressText').innerText = '📍 ' + (storeData.shopAddress || storeData.address || '');
+        document.getElementById('storeAddressText').innerHTML =
+            `<a href="${mapLink}" target="_blank" style="text-decoration: none; color: inherit;">📍 ${address}</a>`;
+        const address = storeData.shopAddress || storeData.address || '';
+        const encodedAddress = encodeURIComponent(address);
+        // 如果有經緯度，可以用這個網址格式
+        const mapLink = `https://www.google.com/maps/search/?api=1&query=${storeData.shopLat},${storeData.shopLng}`;
 
         // 這裡填入我們算好的 displayDistance
         const distElement = document.getElementById('storeDistanceText');

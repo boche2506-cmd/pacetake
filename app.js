@@ -218,6 +218,31 @@ if (favBtn) {
             console.error("操作失敗:", error);
             alert("系統錯誤，請稍後再試。");
         }
+        // 頁面初始化時，根據 Firebase 狀態更新愛心
+        async function syncHeartIcon() {
+            const heartIcon = document.getElementById('heart-icon');
+            if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
+            const user = auth.currentUser;
+            if (!user) {
+                heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
+                return;
+            }
+
+            try {
+                const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
+                const docSnap = await getDoc(favRef);
+                heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
+            } catch (e) {
+                console.error("同步收藏失敗:", e);
+            }
+            if (auth.currentUser) {
+                try {
+                    await syncHeartIcon();
+                } catch (err) {
+                    console.error("同步愛心狀態失敗:", err);
+                }
+            }
+        }
     });
 }
 
@@ -1321,7 +1346,7 @@ async function initStorePage() {
     const currentStoreId = urlParams.get('storeId');
     if (!currentStoreId) return;
 
-    // 1. 使用 v9 的 doc 函式取得參照
+    // 1. 讀取資料 (只讀一次就好！)
     const storeRef = doc(db, "stores", currentStoreId);
     const storeDoc = await getDoc(storeRef);
 
@@ -1331,28 +1356,28 @@ async function initStorePage() {
             // 1. 定位到使用者收藏夾中，對應的那位店家的文件
             // 路徑：users -> [使用者UID] -> favorites -> [該店家的sellerUid]
             const favoriteDocRef = doc(db, "users", auth.currentUser.uid, "favorites", currentStoreId);
-
-            // 2. 執行刪除，直接把這份文件移除
-            await deleteDoc(favoriteDocRef);
-            console.log("已從收藏夾中清除失效店家：", currentStoreId);
+            try {
+                // 2. 執行刪除，直接把這份文件移除
+                await deleteDoc(favoriteDocRef);
+                console.log("已從收藏夾中清除失效店家：", currentStoreId);
+            } catch (error) {
+                console.error("清理收藏時發生錯誤，但仍將導向：", error);
+            }
+            // 不管有沒有刪除成功，最後都導回，確保使用者不會卡在壞掉的頁面
+            window.location.href = "favorites.html";
         }
 
         alert("該店家已下架，已自動從您的收藏中移除。");
         window.location.href = "favorites.html";
         return;
     }
-    // --- 【插入結束】 ---
-
     // --- 【這是你原本的渲染邏輯開頭 (接在上面邏輯後面)】 ---
     const storeData = storeDoc.data();
     // 這裡繼續你原本渲染畫面、設定 shopLogo 的程式碼...
-
     document.body.setAttribute('data-store-id', currentStoreId);
-
     try {
         // --- 這裡放回你原有的 Firebase 讀取邏輯 ---
         let storeData = null;
-        const firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
 
         // 嘗試用 v9 寫法讀取
         if (typeof db !== 'undefined' && typeof doc === 'function') {
@@ -1367,13 +1392,6 @@ async function initStorePage() {
         if (!storeData) throw new Error("無法從資料庫找到該店家資料");
 
         console.log("全域商店資訊已更新：", window.currentStoreInfo);
-        if (auth.currentUser) {
-            try {
-                await syncHeartIcon();
-            } catch (err) {
-                console.error("同步愛心狀態失敗:", err);
-            }
-        }
 
         // --- 渲染邏輯 ---
         // 1. 先抓出 Firebase 的座標 (記得轉成數字)
@@ -1414,6 +1432,7 @@ async function initStorePage() {
         } else {
             target.innerText = '🏪';
         }
+
         const menuList = storeData.menuList || storeData.menu || [];
         menuContainer.innerHTML = "";
 
@@ -1558,24 +1577,7 @@ async function initStorePage() {
             console.log("[PACE DEBUG] 購物車規格同步完成。");
         }, 200);
 
-        // 頁面初始化時，根據 Firebase 狀態更新愛心
-        async function syncHeartIcon() {
-            const heartIcon = document.getElementById('heart-icon');
-            if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
-            const user = auth.currentUser;
-            if (!user) {
-                heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
-                return;
-            }
 
-            try {
-                const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
-                const docSnap = await getDoc(favRef);
-                heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
-            } catch (e) {
-                console.error("同步收藏失敗:", e);
-            }
-        }
     } catch (error) {
         console.error("[PACE ERROR] 頁面渲染失敗：", error);
         menuContainer.innerHTML = "<p>無法載入店家菜單，請檢查網路連線。</p>";
@@ -1706,7 +1708,6 @@ function startApp() {
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
     console.log("系統初始化完成");
 }
-
 // 2. 為了絕對安全，同時運用 DOMContentLoaded
 // 這不是多餘的，這是為了應對不同瀏覽器載入行為的「防禦性編程」
 document.addEventListener('DOMContentLoaded', startApp);

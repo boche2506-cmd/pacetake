@@ -422,7 +422,7 @@ function filterAndRenderStores() {
             finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         }
         // 生成卡片
-        const dist = (typeof buyerLat !== 'undefined' && store.lat) ? `⚡ ${calculateDistance(buyerLat, buyerLng, store.lat, store.lng).toFixed(1)} km` : "⚡ 距離未知";
+        const dist = (typeof buyerLat !== 'undefined' && store.lat) ? `⚡ ${calculateDistance(buyerLat, buyerLng, shopLat, shopLng).toFixed(1)} km` : "⚡ 距離未知";
         const card = window.createStoreCard(store, dist, `<span>${distanceText}</span>`);
         storeContainer.appendChild(card);
     });
@@ -472,8 +472,8 @@ auth.onAuthStateChanged((user) => {
 
 // 距離計算處理 // 確保 buyerLat/Lng 已定義且店家有座標
 function getStoreDistanceText(store) {
-    if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && store.lat && store.lng) {
-        const dist = calculateDistance(buyerLat, buyerLng, store.lat, store.lng);
+    if (typeof buyerLat !== 'undefined' && typeof buyerLng !== 'undefined' && buyerLat !== null && buyerLng !== null && shopLat && shopLng) {
+        const dist = calculateDistance(buyerLat, buyerLng, shopLat, shopLng);
         distanceHtml = `<span>⚡ ${dist.toFixed(1)} km</span>`;
     } return "⚡ 距離未知";
 }

@@ -26,8 +26,6 @@ export const provider = new GoogleAuthProvider();
 // 2. 全域核心變數與資料
 // ==========================================
 let allStores = [];
-let shopLat = null;
-let shopLng = null;
 let buyerLat = null;
 let buyerLng = null;
 let currentBuyerAddress = "正在獲取定位中...";
@@ -344,7 +342,7 @@ async function fetchStoresFromFirebase() {
 }
 
 // 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
-window.createStoreCard = function (store, distanceHtml = null) {
+window.createStoreCard = function (store, distanceHtml) {
     const finalName = store.shopName || store.name || '未命名店家';
     const finalAddress = store.shopAddress || store.address || '';
     const takeoutSupported = store.isCashPayEnabled !== false;
@@ -364,7 +362,7 @@ window.createStoreCard = function (store, distanceHtml = null) {
         <div class="store-img">${finalLogoHtml}</div>
             <div class="store-info">
                 <div class="store-name">${finalName}</div>
-                <div class="store-meta">📍 ${finalAddress} <br> ${distanceText || ''}</div>
+                <div class="store-meta">📍 ${finalAddress} <br> ${distanceHtml}</div>
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金</span>
                     <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 行動</span>
@@ -409,7 +407,6 @@ function filterAndRenderStores() {
 
     filtered.forEach(store => {
         if (store.status === "offline") return;
-        const distanceText = getStoreDistanceText(store);
         // 基本資料準備
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
@@ -423,7 +420,8 @@ function filterAndRenderStores() {
             finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
         }
         // 生成卡片
-        const card = window.createStoreCard(store, `<span>${distanceText}</span>`);
+        const distanceText = getStoreDistanceText(store);
+        const card = window.createStoreCard(store, distanceText);
         storeContainer.appendChild(card);
     });
 }
@@ -453,9 +451,10 @@ async function renderFavoriteStores() {
         favoriteContainer.innerHTML = ""; // 清空容器
 
         snapshot.forEach((doc) => {
+            const distanceText = getStoreDistanceText(store);
             const store = doc.data();
             // 直接呼叫我們剛才建立的共用函數
-            const card = window.createStoreCard(store);
+            const card = window.createStoreCard(store, distanceText);
             favoriteContainer.appendChild(card);
         });
     } catch (error) {
@@ -463,27 +462,19 @@ async function renderFavoriteStores() {
     }
 }
 
-// 確保登入狀態確認後才執行渲染
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        renderFavoriteStores();
-    }
-});
-
 // 距離計算處理 // 確保 buyerLat/Lng 已定義且店家有座標
 function getStoreDistanceText(store) {
-    const sLat = store.lat || store.Lat;
-    const sLng = store.lng || store.Lng;
-    // 檢查座標是否有效
-    if (typeof buyerLat !== 'undefined' && buyerLat !== null &&
-        typeof buyerLng !== 'undefined' && buyerLng !== null &&
-        sLat && sLng) {
+    const sLat = parseFloat(store.shopLat || store.lat);
+    const sLng = parseFloat(store.shopLng || store.lng);
 
-        // 記得也要轉成數字，避免字串相減導致錯誤
-        const dist = calculateDistance(buyerLat, buyerLng, parseFloat(sLat), parseFloat(sLng));
-        return `<span>⚡ ${dist.toFixed(1)} km</span>`;
+    // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
+    let displayDistance = '距離未知'; // 預設值
+
+    if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
+        const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
+        displayDistance = dist.toFixed(1) + ' km';
     }
-
+    // 檢查座標是否有效
     return "<span>⚡ 距離未知</span>";
 }
 

@@ -85,6 +85,7 @@ const favoriteContainer = document.getElementById('favoriteContainer');
 // 接著是下面那 6 行
 const toggleOnline = document.getElementById('toggleOnline');
 const toggleCash = document.getElementById('toggleCash');
+const seatingtoggle = document.getElementById('seatingtoggle');
 const newebpayContainer = document.getElementById('newebpayContainer');
 const cashWarningModal = document.getElementById('cashWarningModal');
 const warningConfirmBtn = document.getElementById('warningConfirmBtn');
@@ -354,7 +355,6 @@ window.createStoreCard = function (store) {
 
     // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
     let distanceHtml = "<span>⚡ 距離未知</span>";
-
     if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
         const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
         distanceHtml = dist.toFixed(1) + ' km';
@@ -372,7 +372,7 @@ window.createStoreCard = function (store) {
         <div class="store-img">${finalLogoHtml}</div>
             <div class="store-info">
                 <div class="store-name">${finalName}</div>
-                <div class="store-meta">📍 ${finalAddress} <br>⚡ ${distanceHtml || ''}</div>
+                <div class="store-meta">📍 ${finalAddress} <br>⚡ ${distanceHtml ? '' : 'inactive'}</div>
                 <div class="store-tags">
                     <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金</span>
                     <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 行動</span>
@@ -1402,12 +1402,7 @@ async function initStorePage() {
 
         // 3. 把算出來的結果填入 HTML
         document.getElementById('storeNameText').innerText = storeData.shopName || storeData.name || '未命名店家';
-        document.getElementById('storeAddressText').innerHTML =
-            `<a href="${mapLink}" target="_blank" style="text-decoration: none; color: inherit;">📍 ${address}</a>`;
-        const address = storeData.shopAddress || storeData.address || '';
-        const encodedAddress = encodeURIComponent(address);
-        // 如果有經緯度，可以用這個網址格式
-        const mapLink = `https://www.google.com/maps/search/?api=1&query=${storeData.shopLat},${storeData.shopLng}`;
+        document.getElementById('storeAddressText').innerText = '📍 ' + (storeData.shopAddress || storeData.address || '');
 
         // 這裡填入我們算好的 displayDistance
         const distElement = document.getElementById('storeDistanceText');

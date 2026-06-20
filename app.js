@@ -447,17 +447,21 @@ async function renderFavoriteStores() {
         }
 
         favoriteContainer.innerHTML = ""; // 清空容器
-
+        let hasDeleted = false;
         snapshot.forEach((doc) => {
             const store = doc.data();
             if (!isValidStore(store)) {
                 console.warn("偵測到幽靈資料，準備自動刪除:");
                 deleteDoc(doc.ref); // 直接從資料庫殺掉
+                hasDeleted = true; // 2. 有刪除就把開關打開
                 return; // 不執行渲染，這張卡片就不會出現在畫面上
             }
             const card = window.createStoreCard(store);
             favoriteContainer.appendChild(card);
         });
+        if (hasDeleted) {
+            alert("已自動清理失效的店家收藏。");
+        }
     } catch (error) {
         console.error("讀取收藏失敗:", error);
     }

@@ -463,7 +463,7 @@ auth.onAuthStateChanged((user) => {
     }
 });
 async function DelFavoriteStores() {
-    const storeId = new URLSearchParams(window.location.search).get('storeId');
+    const storeId = new URLSearchParams(window.location.search).get('sellerUid');
     const storeDoc = await db.collection('stores').doc(storeId).get();
 
     if (!storeDoc.exists) {

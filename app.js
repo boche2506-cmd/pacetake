@@ -462,30 +462,6 @@ auth.onAuthStateChanged((user) => {
         renderFavoriteStores();
     }
 });
-async function DelFavoriteStores() {
-    const storeId = new URLSearchParams(window.location.search).get('sellerUid');
-    const storeDoc = await db.collection('stores').doc(storeId).get();
-
-    if (!storeDoc.exists) {
-        // 1. 顯示全螢幕提示訊息
-        document.body.innerHTML = `
-            <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; text-align:center; font-family: sans-serif;">
-                <h2>⚠️ 該店家已不存在</h2>
-                <p>這家店可能已被移除。系統將在 3 秒後自動導回您的收藏清單...</p>
-            </div>
-        `;
-
-        // 2. 設定 2 秒後自動導回
-        setTimeout(() => {
-            window.location.href = 'favorites.html';
-        }, 2000);
-
-        return;
-    }
-
-    // 若店家存在，則繼續渲染頁面內容
-    renderStoreDetails(storeDoc.data());
-}
 
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');
@@ -1351,13 +1327,16 @@ async function initStorePage() {
 
     // 2. 檢查是否存在
     if (!storeDoc.exists()) {
-        // 店家不存在 -> 執行清理收藏
         if (auth.currentUser) {
-            const userRef = doc(db, "users", auth.currentUser.uid);
-            await updateDoc(userRef, {
-                favorites: arrayRemove(currentStoreId)
-            });
+            // 1. 定位到使用者收藏夾中，對應的那位店家的文件
+            // 路徑：users -> [使用者UID] -> favorites -> [該店家的sellerUid]
+            const favoriteDocRef = doc(db, "users", auth.currentUser.uid, "favorites", currentStoreId);
+
+            // 2. 執行刪除，直接把這份文件移除
+            await deleteDoc(favoriteDocRef);
+            console.log("已從收藏夾中清除失效店家：", currentStoreId);
         }
+
         alert("該店家已下架，已自動從您的收藏中移除。");
         window.location.href = "favorites.html";
         return;

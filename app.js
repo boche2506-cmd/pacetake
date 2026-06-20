@@ -452,32 +452,39 @@ async function renderFavoriteStores() {
             const card = window.createStoreCard(store);
             favoriteContainer.appendChild(card);
         });
-        const storeId = new URLSearchParams(window.location.search).get('sellerUid');
-        const storeDoc = await db.collection('stores').doc(storeId).get();
+    } catch (error) {
+        console.error("讀取收藏失敗:", error);
+    }
+}
+// 確保登入狀態確認後才執行渲染
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        renderFavoriteStores();
+    }
+});
+async function initStorePage() {
+    const storeId = new URLSearchParams(window.location.search).get('storeId');
+    const storeDoc = await db.collection('stores').doc(storeId).get();
 
-        if (!storeDoc.exists) {
-            // 1. 顯示全螢幕提示訊息
-            document.body.innerHTML = `
+    if (!storeDoc.exists) {
+        // 1. 顯示全螢幕提示訊息
+        document.body.innerHTML = `
             <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; text-align:center; font-family: sans-serif;">
                 <h2>⚠️ 該店家已不存在</h2>
                 <p>這家店可能已被移除。系統將在 3 秒後自動導回您的收藏清單...</p>
             </div>
         `;
 
-            // 2. 設定 2 秒後自動導回
-            setTimeout(() => {
-                window.location.href = 'favorites.html';
-            }, 2000);
-
-            return;
-        }
-
-        // 若店家存在，則繼續渲染頁面內容
-        renderStoreDetails(storeDoc.data());
-
-    } catch (error) {
-        console.error("讀取收藏失敗:", error);
+        // 2. 設定 2 秒後自動導回
+        setTimeout(() => {
+            window.location.href = 'favorites.html';
+        }, 2000);
+        
+        return; 
     }
+
+    // 若店家存在，則繼續渲染頁面內容
+    renderStoreDetails(storeDoc.data());
 }
 
 function getBrowserLocation() {

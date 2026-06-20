@@ -462,7 +462,7 @@ auth.onAuthStateChanged((user) => {
         renderFavoriteStores();
     }
 });
-async function initStorePage() {
+async function DelFavoriteStores() {
     const storeId = new URLSearchParams(window.location.search).get('storeId');
     const storeDoc = await db.collection('stores').doc(storeId).get();
 

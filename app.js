@@ -208,12 +208,12 @@ if (favBtn) {
             if (docSnap.exists()) {
                 await deleteDoc(favRef);
                 heartIcon.innerText = "🤍";
-                alert(`💔 已將「${data.name}」移除`);
+                alert(`💔 已將「${shopName}」移除`);
             } else {
                 // 使用處理過的 favoriteData
                 await setDoc(favRef, favoriteData);
                 heartIcon.innerText = "❤️";
-                alert(`❤️ 已將「${data.name}」加入最愛！`);
+                alert(`❤️ 已將「${shopName}」加入最愛！`);
             }
         } catch (error) {
             console.error("操作失敗:", error);

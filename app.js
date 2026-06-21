@@ -30,7 +30,9 @@ let buyerLat = null;
 let buyerLng = null;
 let currentBuyerAddress = "正在獲取定位中...";
 let currentUserId = null;
-
+let loginBtn, avatarBtn, dropdownMenu;
+let loginLightbox, userNameDisplay;
+let activeDragItem = null;
 const areaData = {
     "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
     "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -56,10 +58,7 @@ const areaData = {
     "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
 };
 
-// UI 變數宣告
-let loginBtn, avatarBtn, dropdownMenu;
-let loginLightbox, userNameDisplay;
-let activeDragItem = null;
+
 
 // --- 2. 初始化函式 (負責把那 17 行活化) ---
 // 全部直接宣告在全域，不用包進任何函式
@@ -425,7 +424,6 @@ function filterAndRenderStores() {
 //favorites.html
 async function renderFavoriteStores() {
     const favoriteContainer = document.getElementById('favoriteContainer');
-    // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
     if (!favoriteContainer) return;
 
     const user = auth.currentUser;
@@ -435,31 +433,59 @@ async function renderFavoriteStores() {
     }
 
     try {
-        // 抓取收藏集合
+        // 1. 抓取收藏列表的所有文件
         const favCol = collection(db, "users", user.uid, "favorites");
-        const snapshot = await getDocs(favCol);
+        const favSnapshot = await getDocs(favCol);
 
-        if (snapshot.empty) {
+        if (favSnapshot.empty) {
             favoriteContainer.innerHTML = '<div class="loading-Spinner">🤍 您目前還沒有收藏任何店家喔！</div>';
             return;
         }
 
-        favoriteContainer.innerHTML = ""; // 清空容器
-        let hasDeleted = false;
-        snapshot.forEach((doc) => {
+        // 整理出所有收藏的 sellerUid (即文件 ID)
+        const favIds = favSnapshot.docs.map(doc => doc.id);
+
+        // 1. 將 favIds 切分成每 30 個一組的二維陣列
+        const chunkArray = (arr, size) => {
+            return Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+                arr.slice(i * size, i * size + size)
+            );
+        };
+
+        const chunks = chunkArray(favIds, 30);
+        const allActiveStores = []; // 用來存放所有撈到的有效店家資料
+
+        // 2. 對每一組 chunk 進行批次查詢
+        for (const chunk of chunks) {
+            const q = query(collection(db, "stores"), where(documentId(), 'in', chunk));
+            const snapshot = await getDocs(q);
+            allActiveStores.push(...snapshot.docs);
+        }
+
+        // 取得所有存在的店家 ID
+        const activeIds = allActiveStores.map(doc => doc.id);
+
+        // 3. 找出幽靈資料 (剩下的邏輯保持不變)
+        const ghostIds = favIds.filter(id => !activeIds.includes(id));
+
+        // 4. 清理幽靈資料
+        if (ghostIds.length > 0) {
+            const batch = writeBatch(db);
+            ghostIds.forEach(id => {
+                const docRef = doc(db, "users", user.uid, "favorites", id);
+                batch.delete(docRef);
+            });
+            await batch.commit();
+        }
+
+        // 5. 渲染最後結果
+        favoriteContainer.innerHTML = "";
+        allActiveStores.forEach((doc) => {
             const store = doc.data();
-            if (!isValidStore(store)) {
-                console.warn("偵測到幽靈資料，準備自動刪除:");
-                deleteDoc(doc.ref); // 直接從資料庫殺掉
-                hasDeleted = true; // 2. 有刪除就把開關打開
-                return; // 不執行渲染，這張卡片就不會出現在畫面上
-            }
             const card = window.createStoreCard(store);
             favoriteContainer.appendChild(card);
         });
-        if (hasDeleted) {
-            alert("已自動清理失效的店家收藏。");
-        }
+
     } catch (error) {
         console.error("讀取收藏失敗:", error);
     }

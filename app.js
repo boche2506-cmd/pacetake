@@ -748,7 +748,12 @@ async function handleFavorite(action = 'toggle') {
     const heartIcon = document.getElementById('heart-icon');
     const store = window.currentStoreInfo;
     // 基礎防呆：沒有心型圖示或店家資訊就不用跑了
-    if (!heartIcon || !store?.id) return;
+    if (!heartIcon || !store?.sellerUid) {
+        console.warn("無法取得店家 UID，無法操作最愛");
+        return;
+    }
+    const storeId = store.sellerUid; // 將 sellerUid 當作 ID 使用
+    const favRef = doc(db, "users", user.uid, "favorites", storeId);
     // 1. 同步狀態邏輯 (Sync)
     if (action === 'sync') {
         if (!user) {
@@ -756,8 +761,7 @@ async function handleFavorite(action = 'toggle') {
             return;
         }
         try {
-            console.log("現在要同步的 ID:", store.id);
-            const favSnap = await getDoc(doc(db, "users", user.uid, "favorites", store.id));
+            const favSnap = await getDoc(favRef);
             heartIcon.innerText = favSnap.exists() ? "❤️" : "🤍";
         } catch (e) {
             console.error("同步失敗:", e);
@@ -767,14 +771,13 @@ async function handleFavorite(action = 'toggle') {
     // 2. 切換狀態邏輯 (Toggle)
     if (action === 'toggle') {
         if (!user) return alert("⚠️ 請先登入才能收藏店家喔！");
-        const favRef = doc(db, "users", user.uid, "favorites", store.id);
         const favSnap = await getDoc(favRef);
         if (favSnap.exists()) {
             await deleteDoc(favRef);
             heartIcon.innerText = "🤍";
-            alert(`💔 已將「${store.shopName}」移除`);
+            alert(`💔 已將「${store.shopName}」從最愛移除`);
         } else {
-            const favoriteData = {
+            await setDoc(favRef, {
                 sellerUid: store.sellerUid || null,
                 shopLogo: store.shopLogo || "",
                 shopName: store.shopName || "",
@@ -783,9 +786,9 @@ async function handleFavorite(action = 'toggle') {
                 shopLng: store.shopLng ?? 0,
                 isCashPayEnabled: !!store.isCashPayEnabled,
                 isOnlinePayEnabled: !!store.isOnlinePayEnabled,
-                hasSeating: !!store.hasSeating
-            };
-            await setDoc(favRef, favoriteData);
+                hasSeating: !!store.hasSeating,
+                savedAt: new Date().toISOString()
+            });
             heartIcon.innerText = "❤️";
             alert(`❤️ 已將「${store.shopName}」加入最愛！`);
         }
@@ -896,7 +899,7 @@ if (shopSubmitBtn) {
             newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
             hasSeating: seatingtoggle,
             menuList: menuItems,
-            createdAt: new Date().toISOString()
+            savedAt: new Date().toISOString()
         };
         shopSubmitBtn.disabled = true;
         try {

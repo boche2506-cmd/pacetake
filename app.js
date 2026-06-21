@@ -1044,7 +1044,7 @@ window.issuePromoCode = async function () {
 document.addEventListener('click', (e) => {
     const action = e.target.getAttribute('data-action');
     if (action === 'issuePromo') {
-        issuePromo = async function () {
+        window.issuePromo = async function () {
             const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
             if (!code || code.trim() === "") return;
             try {

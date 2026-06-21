@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp,documentId } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 // 在你的網頁 script 或其他 JS 檔案中：
 // 接下來就可以直接呼叫這些函式了
 // 例如：
@@ -497,17 +497,6 @@ auth.onAuthStateChanged((user) => {
         renderFavoriteStores();
     }
 });
-
-function isValidStore(store) {
-    // 1. 如果資料本身是 null 或 undefined，直接無效
-    if (!store) return false;
-    // 2. 檢查關鍵欄位：如果沒有店名，或者店名是空的，視為無效
-    const hasName = store.shopName && store.shopName.trim() !== "";
-    // 3. 檢查是否有店家的唯一 ID
-    const hasId = store.id && store.id.trim() !== "";
-    // 4. 只有當這些條件都滿足時，才回傳 true
-    return hasName && hasId;
-}
 
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');

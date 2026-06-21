@@ -1024,43 +1024,29 @@ document.addEventListener('click', (e) => {
         e.target.closest('.menu-item-row').remove();
     }
 });
-
 // 發行邀請碼
-window.issuePromoCode = async function () {
-    const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
-    if (!code || code.trim() === "") return;
-    try {
-        await setDoc(doc(db, "promo_codes", code.trim()), {
-            code: code.trim(), createdBy: currentUserId, createdAt: new Date().toISOString(),
-            isActive: true, usedBy: null
-        });
-        alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！`);
-    } catch (error) {
-        console.error("邀請碼發行失敗:", error);
-        alert("發行失敗，請檢查您的系統權限配置！");
-    }
-};
-
-document.addEventListener('click', (e) => {
+document.addEventListener('click', async (e) => {
     const action = e.target.getAttribute('data-action');
-    if (action === 'issuePromo') {
-        window.issuePromo = async function () {
-            const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
-            if (!code || code.trim() === "") return;
-            try {
-                await setDoc(doc(db, "promo_codes", code.trim()), {
-                    code: code.trim(), createdBy: currentUserId, createdAt: new Date().toISOString(),
-                    isActive: true, usedBy: null
-                });
-                alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！`);
-            } catch (error) {
-                console.error("邀請碼發行失敗:", error);
-                alert("發行失敗，請檢查您的系統權限配置！");
-            }
-        };
-    } seatingtoggle
-});
 
+    if (e.target.getAttribute('data-action') === 'issuePromo') {
+        // 把原本放在 window 裡面的那段邏輯，直接搬進來！
+        const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
+        if (!code || code.trim() === "") return;
+        try {
+            await setDoc(doc(db, "promo_codes", code.trim()), {
+                code: code.trim(),
+                createdBy: currentUserId,
+                createdAt: new Date().toISOString(),
+                isActive: true,
+                usedBy: null
+            });
+            alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！`);
+        } catch (error) {
+            console.error("邀請碼發行失敗:", error);
+            alert("發行失敗，請檢查您的系統權限配置！");
+        }
+    }
+});
 // 封裝成一個獨立的初始化函式
 function initPullToRefresh() {
     const topGroup = document.querySelector('.sticky-top-group');

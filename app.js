@@ -127,6 +127,7 @@ async function handleUserSyncAndRoleRouting(user) {
                 uid: user.uid,
                 email: user.email,
                 role: "buyer",
+                displayName: user.displayName,
                 createdAt: new Date().toISOString()
             });
         }
@@ -178,7 +179,8 @@ if (favBtn) {
             shopLng: data.shopLng ?? 0,
             isCashPayEnabled: !!data.isCashPayEnabled, // 強制轉為布林值
             isOnlinePayEnabled: !!data.isOnlinePayEnabled,
-            hasSeating: !!data.hasSeating
+            hasSeating: !!data.hasSeating,
+            createdAt: new Date().toISOString()
         };
         const favRef = doc(db, "users", user.uid, "favorites", id);
         try {

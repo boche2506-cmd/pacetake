@@ -116,6 +116,7 @@ async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
     currentUserId = user.uid;
     console.log("[PACE DEBUG] User synced:", user.uid);
+
     let currentRole = "buyer";
     try {
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -125,7 +126,6 @@ async function handleUserSyncAndRoleRouting(user) {
             await setDoc(doc(db, "users", user.uid), {
                 uid: user.uid,
                 email: user.email,
-                displayName: user.displayName || "匿名用戶",
                 role: "buyer",
                 createdAt: new Date().toISOString()
             });
@@ -155,6 +155,58 @@ function initThemeSystem() {
     }
 }
 // 收藏按鈕監聽器
+const favBtn = document.getElementById('favorite-btn');
+const heartIcon = document.getElementById('heart-icon');
+if (favBtn) {
+    favBtn.addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("⚠️ 請先登入才能收藏店家喔！");
+            return;
+        }
+        const data = window.currentStoreInfo || {};
+        const { id } = data; // 確保有 id
+
+        // 建立要存入的資料物件，並排除可能為 undefined 的欄位
+        // 利用 || null 或將其設定為預設空字串，防止 undefined 錯誤
+        const favoriteData = {
+            sellerUid: data.sellerUid || null, // 若為 undefined，存為 null
+            shopLogo: data.shopLogo || "",
+            shopName: data.shopName || "",
+            shopAddress: data.shopAddress || "",
+            shopLat: data.shopLat ?? 0, // 使用 Nullish coalescing operator
+            shopLng: data.shopLng ?? 0,
+            isCashPayEnabled: !!data.isCashPayEnabled, // 強制轉為布林值
+            isOnlinePayEnabled: !!data.isOnlinePayEnabled,
+            hasSeating: !!data.hasSeating
+        };
+        const favRef = doc(db, "users", user.uid, "favorites", id);
+        try {
+            const docSnap = await getDoc(favRef);
+            if (docSnap.exists()) {
+                await deleteDoc(favRef);
+                heartIcon.innerText = "🤍";
+                alert(`💔 已將「${data.shopName}」移除`);
+            } else {
+                // 使用處理過的 favoriteData
+                await setDoc(favRef, favoriteData);
+                heartIcon.innerText = "❤️";
+                alert(`❤️ 已將「${data.shopName}」加入最愛！`);
+            }
+        } catch (error) {
+            console.error("操作失敗:", error);
+            alert("系統錯誤，請稍後再試。");
+        }
+    });
+}
+
+async function getMyFavoriteIds() {
+    const user = auth.currentUser;
+    if (!user) return [];
+    const snapshot = await getDocs(collection(db, "users", user.uid, "favorites"));
+    return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
+}
+
 function updateUIForUser(user, currentRole) {
     // 這裡加上 const，確保這些變數只屬於這個函式
     const loginBtn = document.getElementById('loginBtn');
@@ -288,6 +340,7 @@ window.createStoreCard = function (store) {
     `;
     return card;
 };
+
 // index.html
 function filterAndRenderStores() {
     if (!storeContainer) return;
@@ -320,6 +373,7 @@ function filterAndRenderStores() {
         storeContainer.appendChild(card);
     });
 }
+
 //favorites.html
 async function renderFavoriteStores() {
     const favoriteContainer = document.getElementById('favoriteContainer');
@@ -348,12 +402,14 @@ async function renderFavoriteStores() {
         console.error("讀取收藏失敗:", error);
     }
 }
+
+// 確保登入狀態確認後才執行渲染
 auth.onAuthStateChanged((user) => {
     if (user) {
         renderFavoriteStores();
     }
 });
-// 確保登入狀態確認後才執行渲染
+
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');
     const modalAddressText = document.getElementById('modalAddressText');
@@ -735,65 +791,7 @@ if (window.location.pathname.includes('register.html')) {
         });
     }
 }
-// 1. 按鈕點擊時
-
-// 2. 網頁讀取時 (同步愛心狀態)
-
-/**
- * 處理「最愛」功能的總管理員
- * @param {string} action - 'toggle' (切換狀態) 或 'sync' (同步圖示)
- */
-async function handleFavorite(action = 'toggle') {
-    const user = auth.currentUser;
-    const heartIcon = document.getElementById('heart-icon');
-    const store = window.currentStoreInfo;
-    // 基礎防呆：沒有心型圖示或店家資訊就不用跑了
-    if (!heartIcon || !store?.sellerUid) {
-        console.warn("無法取得店家 UID，無法操作最愛");
-        return;
-    }
-    const storeId = store.sellerUid; // 將 sellerUid 當作 ID 使用
-    const favRef = doc(db, "users", user.uid, "favorites", storeId);
-    // 1. 同步狀態邏輯 (Sync)
-    if (action === 'sync') {
-        if (!user) {
-            heartIcon.innerText = "🤍";
-            return;
-        }
-        try {
-            const favSnap = await getDoc(favRef);
-            heartIcon.innerText = favSnap.exists() ? "❤️" : "🤍";
-        } catch (e) {
-            console.error("同步失敗:", e);
-        }
-        return;
-    }
-    // 2. 切換狀態邏輯 (Toggle)
-    if (action === 'toggle') {
-        if (!user) return alert("⚠️ 請先登入才能收藏店家喔！");
-        const favSnap = await getDoc(favRef);
-        if (favSnap.exists()) {
-            await deleteDoc(favRef);
-            heartIcon.innerText = "🤍";
-            alert(`💔 已將「${store.shopName}」從最愛移除`);
-        } else {
-            await setDoc(favRef, {
-                sellerUid: store.sellerUid || null,
-                shopLogo: store.shopLogo || "",
-                shopName: store.shopName || "",
-                shopAddress: store.shopAddress || "",
-                shopLat: store.shopLat ?? 0,
-                shopLng: store.shopLng ?? 0,
-                isCashPayEnabled: !!store.isCashPayEnabled,
-                isOnlinePayEnabled: !!store.isOnlinePayEnabled,
-                hasSeating: !!store.hasSeating,
-                savedAt: new Date().toISOString()
-            });
-            heartIcon.innerText = "❤️";
-            alert(`❤️ 已將「${store.shopName}」加入最愛！`);
-        }
-    }
-}
+// ... 下方原本的資料組合與儲存邏輯 ...
 // shopSubmitBtn 監聽與手動提交邏輯
 const shopSubmitBtn = document.getElementById('shopSubmitBtn');
 if (shopSubmitBtn) {
@@ -899,7 +897,7 @@ if (shopSubmitBtn) {
             newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
             hasSeating: seatingtoggle,
             menuList: menuItems,
-            savedAt: new Date().toISOString()
+            createdAt: new Date().toISOString()
         };
         shopSubmitBtn.disabled = true;
         try {
@@ -1048,24 +1046,26 @@ document.addEventListener('click', async (e) => {
             alert("發行失敗，請檢查您的系統權限配置！");
         }
     }
-    if (e.target.getAttribute('data-action') === 'favorite-btn') {
-        handleFavorite();
-    }
 });
+
 // 封裝成一個獨立的初始化函式
 function initPullToRefresh() {
     const topGroup = document.querySelector('.sticky-top-group');
     let startY = 0;
     let isReloading = false; // 加入鎖定開關，防止連點
+
     if (topGroup) {
         topGroup.addEventListener('touchstart', (e) => {
             startY = e.touches[0].pageY;
             isReloading = false;
         }, { passive: true });
+
         topGroup.addEventListener('touchmove', (e) => {
             if (isReloading) return;
+
             const currentY = e.touches[0].pageY;
             const pullDistance = currentY - startY;
+
             if (pullDistance > 80) {
                 isReloading = true;
                 console.log("[PACE] 偵測到上層下拉，觸發重新整理！");
@@ -1074,7 +1074,10 @@ function initPullToRefresh() {
         }, { passive: true });
     }
 }
+
+// ==========================================
 // 🎯 PACE 專屬：store.html 終極完美動態渲染模組 (含首頁卡片替換、加減鍵、備註欄)
+// ==========================================
 async function initStorePage() {
     console.log("[PACE DEBUG] 啟動點餐頁面終極渲染程序...");
     const menuContainer = document.getElementById('menuContainer');
@@ -1128,6 +1131,13 @@ async function initStorePage() {
             hasSeating: !!storeData.hasSeating
         };
         console.log("全域商店資訊已更新：", window.currentStoreInfo);
+        if (auth.currentUser) {
+            try {
+                await syncHeartIcon();
+            } catch (err) {
+                console.error("同步愛心狀態失敗:", err);
+            }
+        }
         // 1. 先抓出 Firebase 的座標 (記得轉成數字)
         const sLat = parseFloat(storeData.shopLat || storeData.lat);
         const sLng = parseFloat(storeData.shopLng || storeData.lng);
@@ -1295,6 +1305,22 @@ async function initStorePage() {
             console.log("[PACE DEBUG] 購物車規格同步完成。");
         }, 200);
         // 頁面初始化時，根據 Firebase 狀態更新愛心
+        async function syncHeartIcon() {
+            const heartIcon = document.getElementById('heart-icon');
+            if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
+            const user = auth.currentUser;
+            if (!user) {
+                heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
+                return;
+            }
+            try {
+                const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
+                const docSnap = await getDoc(favRef);
+                heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
+            } catch (e) {
+                console.error("同步收藏失敗:", e);
+            }
+        }
     } catch (error) {
         console.error("[PACE ERROR] 頁面渲染失敗：", error);
         menuContainer.innerHTML = "<p>無法載入店家菜單，請檢查網路連線。</p>";
@@ -1406,7 +1432,6 @@ function startApp() {
     initCartDOMState();
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
-    handleFavorite();
     console.log("系統初始化完成");
 }
 // 2. 為了絕對安全，同時運用 DOMContentLoaded

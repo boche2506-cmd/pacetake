@@ -756,6 +756,7 @@ async function handleFavorite(action = 'toggle') {
             return;
         }
         try {
+            console.log("現在要同步的 ID:", store.id);
             const favSnap = await getDoc(doc(db, "users", user.uid, "favorites", store.id));
             heartIcon.innerText = favSnap.exists() ? "❤️" : "🤍";
         } catch (e) {
@@ -1402,7 +1403,7 @@ function startApp() {
     initCartDOMState();
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
-    handleFavorite('sync');
+    handleFavorite();
     console.log("系統初始化完成");
 }
 // 2. 為了絕對安全，同時運用 DOMContentLoaded

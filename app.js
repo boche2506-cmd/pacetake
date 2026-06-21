@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, documentId, writeBatch} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 // 在你的網頁 script 或其他 JS 檔案中：
 // 接下來就可以直接呼叫這些函式了
 // 例如：
@@ -16,12 +16,10 @@ const firebaseConfig = {
     appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
     measurementId: "G-888XL8JTHW",
 };
-
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const provider = new GoogleAuthProvider();
-
 // ==========================================
 // 2. 全域核心變數與資料
 // ==========================================
@@ -57,10 +55,6 @@ const areaData = {
     "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
     "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
 };
-
-
-
-// --- 2. 初始化函式 (負責把那 17 行活化) ---
 // 全部直接宣告在全域，不用包進任何函式
 const storeContainer = document.getElementById('store-Container');
 const googleLoginAction = document.getElementById('googleLoginAction');
@@ -79,7 +73,6 @@ const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
 const globalSearchInput = document.getElementById('globalSearchInput');
 const menuUploadList = document.getElementById('menuUploadList');
 const favoriteContainer = document.getElementById('favoriteContainer');
-
 // 接著是下面那 6 行
 const toggleOnline = document.getElementById('toggleOnline');
 const toggleCash = document.getElementById('toggleCash');
@@ -92,9 +85,7 @@ window.currentStoreInfo = {
     id: null,
     name: null
 };
-// ==========================================
 // 3. 核心功能函式
-// ==========================================
 // 監聽 Firebase 登入狀態
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -142,21 +133,18 @@ async function handleUserSyncAndRoleRouting(user) {
     } catch (e) {
         console.error("Role routing error:", e);
     }
-
     updateUIForUser(user, currentRole);
     fetchStoresFromFirebase();
 }
 
 function initThemeSystem() {
     const toggleBtn = document.getElementById('themeToggleBtn');
-
     // 1. 初始化：網頁載入時套用顏色
     const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
     if (toggleBtn) {
         toggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-
         // 2. 綁定事件：只有當按鈕存在時，才註冊點擊事件
         toggleBtn.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -168,123 +156,9 @@ function initThemeSystem() {
         });
     }
 }
-
-function updateUIForUser(user, currentRole) {
-    // 這裡加上 const，確保這些變數只屬於這個函式
-    const loginBtn = document.getElementById('loginBtn');
-    const avatarBtn = document.getElementById('avatarBtn');
-    const loginLightbox = document.getElementById('loginLightbox');
-    const userNameDisplay = document.getElementById('userNameDisplay');
-
-    if (loginBtn) loginBtn.style.display = 'none';
-    if (avatarBtn) avatarBtn.style.display = 'flex';
-    if (loginLightbox) loginLightbox.style.display = 'none';
-
-    if (userNameDisplay) {
-        if (currentRole === "admin") {
-            userNameDisplay.innerHTML = `👑 總管`;
-        } else if (currentRole === "seller") {
-            userNameDisplay.innerHTML = `🏪 老闆`;
-        } else {
-            userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
-        }
-    }
-
-    const userAvatarImg = document.getElementById('userAvatarImg');
-    const defaultIcon = document.getElementById('defaultIcon');
-    if (user.photoURL && userAvatarImg && defaultIcon) {
-        userAvatarImg.src = user.photoURL;
-        userAvatarImg.style.display = 'block';
-        defaultIcon.style.display = 'none';
-    } else if (defaultIcon) {
-        if (userAvatarImg) userAvatarImg.style.display = 'none';
-        defaultIcon.style.display = 'block';
-    }
-
-    const statusText = document.getElementById('statusText');
-    const statusDot = document.getElementById('statusDot');
-    if (statusDot) statusDot.classList.add('active');
-    if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
-
-    renderDynamicMenu(currentRole);
-}
-
-function renderDynamicMenu(role) {
-    const menuContainer = document.getElementById('dropdownMenu');
-    if (!menuContainer) return;
-
-    let menuHTML = '';
-
-    menuHTML += `
-        <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
-        <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
-        <a href="favorites.html" class="nav-fast">❤️ 我的收藏</a>
-    `;
-
-    if (role === 'admin' || role === 'buyer') {
-        menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
-    }
-
-    if (role === 'admin' || role === 'seller') {
-        menuHTML += `
-            <div class="menu-divider"></div>
-            <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
-            <a href="manage.html" class="nav-fast">⚙️ 店舖管理</a>
-            <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
-        `;
-    }
-
-    if (role === 'admin') {
-        menuHTML += `
-        <div class="menu-divider"></div>
-        <a href="javascript:void(0)" data-action="toggleAdmin" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
-        <a href="javascript:void(0)" data-action="issuePromo" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
-    `;
-    }
-
-    menuHTML += `
-        <div class="menu-divider"></div>
-        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
-    `;
-
-    menuContainer.innerHTML = menuHTML;
-
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            console.log("[PACE DEBUG] Logout clicked.");
-            try {
-                await signOut(auth);
-                location.reload();
-            } catch (error) {
-                console.error("Logout error:", error);
-            }
-        });
-    }
-}
-
-// 從firebase抓資料
-
-async function fetchStoresFromFirebase() {
-    try {
-        console.log("[PACE DEBUG] Fetching stores.");
-        const querySnapshot = await getDocs(collection(db, "stores"));
-        allStores = [];
-        querySnapshot.forEach((doc) => {
-            allStores.push({ id: doc.id, ...doc.data() });
-        });
-        filterAndRenderStores();
-        renderAdminTable();
-    } catch (error) {
-        console.error("讀取店家失敗：", error);
-        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
-    }
-}
-
 // 收藏按鈕監聽器
 const favBtn = document.getElementById('favorite-btn');
 const heartIcon = document.getElementById('heart-icon');
-
 if (favBtn) {
     favBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
@@ -298,22 +172,19 @@ if (favBtn) {
         // 建立要存入的資料物件，並排除可能為 undefined 的欄位
         // 利用 || null 或將其設定為預設空字串，防止 undefined 錯誤
         const favoriteData = {
-            sellerUid: data.sellerUid,
+            sellerUid: data.sellerUid || null, // 若為 undefined，存為 null
             shopLogo: data.shopLogo || "",
-            shopName: data.shopName,
-            shopAddress: data.shopAddress,
+            shopName: data.shopName || "",
+            shopAddress: data.shopAddress || "",
             shopLat: data.shopLat ?? 0, // 使用 Nullish coalescing operator
             shopLng: data.shopLng ?? 0,
             isCashPayEnabled: !!data.isCashPayEnabled, // 強制轉為布林值
             isOnlinePayEnabled: !!data.isOnlinePayEnabled,
             hasSeating: !!data.hasSeating
         };
-
         const favRef = doc(db, "users", user.uid, "favorites", id);
-
         try {
             const docSnap = await getDoc(favRef);
-
             if (docSnap.exists()) {
                 await deleteDoc(favRef);
                 heartIcon.innerText = "🤍";
@@ -338,6 +209,102 @@ async function getMyFavoriteIds() {
     return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
 }
 
+function updateUIForUser(user, currentRole) {
+    // 這裡加上 const，確保這些變數只屬於這個函式
+    const loginBtn = document.getElementById('loginBtn');
+    const avatarBtn = document.getElementById('avatarBtn');
+    const loginLightbox = document.getElementById('loginLightbox');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (avatarBtn) avatarBtn.style.display = 'flex';
+    if (loginLightbox) loginLightbox.style.display = 'none';
+    if (userNameDisplay) {
+        if (currentRole === "admin") {
+            userNameDisplay.innerHTML = `👑 總管`;
+        } else if (currentRole === "seller") {
+            userNameDisplay.innerHTML = `🏪 老闆`;
+        } else {
+            userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
+        }
+    }
+    const userAvatarImg = document.getElementById('userAvatarImg');
+    const defaultIcon = document.getElementById('defaultIcon');
+    if (user.photoURL && userAvatarImg && defaultIcon) {
+        userAvatarImg.src = user.photoURL;
+        userAvatarImg.style.display = 'block';
+        defaultIcon.style.display = 'none';
+    } else if (defaultIcon) {
+        if (userAvatarImg) userAvatarImg.style.display = 'none';
+        defaultIcon.style.display = 'block';
+    }
+    const statusText = document.getElementById('statusText');
+    const statusDot = document.getElementById('statusDot');
+    if (statusDot) statusDot.classList.add('active');
+    if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
+    renderDynamicMenu(currentRole);
+}
+
+function renderDynamicMenu(role) {
+    const menuContainer = document.getElementById('dropdownMenu');
+    if (!menuContainer) return;
+    let menuHTML = '';
+    menuHTML += `
+        <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
+        <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
+        <a href="favorites.html" class="nav-fast">❤️ 我的收藏</a>
+    `;
+    if (role === 'admin' || role === 'buyer') {
+        menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
+    }
+    if (role === 'admin' || role === 'seller') {
+        menuHTML += `
+            <div class="menu-divider"></div>
+            <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
+            <a href="manage.html" class="nav-fast">⚙️ 店舖管理</a>
+            <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
+        `;
+    }
+    if (role === 'admin') {
+        menuHTML += `
+        <div class="menu-divider"></div>
+        <a href="javascript:void(0)" data-action="toggleAdmin" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
+        <a href="javascript:void(0)" data-action="issuePromo" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
+    `;
+    }
+    menuHTML += `
+        <div class="menu-divider"></div>
+        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
+    `;
+    menuContainer.innerHTML = menuHTML;
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            console.log("[PACE DEBUG] Logout clicked.");
+            try {
+                await signOut(auth);
+                location.reload();
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+        });
+    }
+}
+// 從firebase抓資料
+async function fetchStoresFromFirebase() {
+    try {
+        console.log("[PACE DEBUG] Fetching stores.");
+        const querySnapshot = await getDocs(collection(db, "stores"));
+        allStores = [];
+        querySnapshot.forEach((doc) => {
+            allStores.push({ id: doc.id, ...doc.data() });
+        });
+        filterAndRenderStores();
+        renderAdminTable();
+    } catch (error) {
+        console.error("讀取店家失敗：", error);
+        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
+    }
+}
 // 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
 window.createStoreCard = function (store) {
     const finalName = store.shopName || store.name || '未命名店家';
@@ -345,25 +312,21 @@ window.createStoreCard = function (store) {
     const takeoutSupported = store.isCashPayEnabled !== false;
     const paySupported = store.isOnlinePayEnabled !== false;
     const seatingSupported = store.hasSeating !== false;
-
     const logoData = store.shopLogo || '🏪';
     const sLat = parseFloat(store.shopLat || store.lat);
     const sLng = parseFloat(store.shopLng || store.lng);
-
     // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
     let distanceHtml = "<span>⚡ 距離未知</span>";
     if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
         const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
         distanceHtml = dist.toFixed(1) + ' km';
     }
-
     let finalLogoHtml = logoData;
     if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
         finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
     }
-
     const card = document.createElement('a');
-    card.href = `store.html?storeId=${store.id}`;
+    card.href = `store.html?storeId=${store.sellerUid}`;
     card.className = 'store-card';
     card.innerHTML = `
         <div class="store-img">${finalLogoHtml}</div>
@@ -384,16 +347,13 @@ window.createStoreCard = function (store) {
 // index.html
 function filterAndRenderStores() {
     if (!storeContainer) return;
-
     // 1. 抓取篩選條件
     const citySelect = document.getElementById('citySelect');
     const districtSelect = document.getElementById('districtSelect');
     const globalSearchInput = document.getElementById('globalSearchInput');
-
     const selectedCity = citySelect ? citySelect.value : '';
     const selectedDist = districtSelect ? districtSelect.value : '';
     const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
-
     // 2. 進行篩選
     const filtered = allStores.filter(store => {
         const matchCity = !selectedCity || store.city === selectedCity;
@@ -402,19 +362,15 @@ function filterAndRenderStores() {
         const matchKeyword = !searchKeyword || nameToSearch.toLowerCase().includes(searchKeyword);
         return matchCity && matchDist && matchKeyword;
     });
-
     // 3. 如果找不到店家，顯示提示並結束
     if (filtered.length === 0) {
         storeContainer.innerHTML = '<div class="loading-Spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
         return;
     }
-
     // 4. 清空畫面並開始渲染卡片
     storeContainer.innerHTML = "";
-
     filtered.forEach(store => {
         if (store.status === "offline") return;
-
         // 生成卡片
         const card = window.createStoreCard(store);
         storeContainer.appendChild(card);
@@ -424,68 +380,27 @@ function filterAndRenderStores() {
 //favorites.html
 async function renderFavoriteStores() {
     const favoriteContainer = document.getElementById('favoriteContainer');
+    // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
     if (!favoriteContainer) return;
-
     const user = auth.currentUser;
     if (!user) {
         favoriteContainer.innerHTML = '<p>請先登入以查看收藏清單。</p>';
         return;
     }
-
     try {
         // 1. 抓取收藏列表的所有文件
         const favCol = collection(db, "users", user.uid, "favorites");
-        const favSnapshot = await getDocs(favCol);
-
-        if (favSnapshot.empty) {
+        const snapshot = await getDocs(favCol);
+        if (snapshot.empty) {
             favoriteContainer.innerHTML = '<div class="loading-Spinner">🤍 您目前還沒有收藏任何店家喔！</div>';
             return;
         }
-
-        // 整理出所有收藏的 sellerUid (即文件 ID)
-        const favIds = favSnapshot.docs.map(doc => doc.id);
-
-        // 1. 將 favIds 切分成每 30 個一組的二維陣列
-        const chunkArray = (arr, size) => {
-            return Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
-                arr.slice(i * size, i * size + size)
-            );
-        };
-
-        const chunks = chunkArray(favIds, 30);
-        const allActiveStores = []; // 用來存放所有撈到的有效店家資料
-
-        // 2. 對每一組 chunk 進行批次查詢
-        for (const chunk of chunks) {
-            const q = query(collection(db, "stores"), where(documentId(), 'in', chunk));
-            const snapshot = await getDocs(q);
-            allActiveStores.push(...snapshot.docs);
-        }
-
-        // 取得所有存在的店家 ID
-        const activeIds = allActiveStores.map(doc => doc.id);
-
-        // 3. 找出幽靈資料 (剩下的邏輯保持不變)
-        const ghostIds = favIds.filter(id => !activeIds.includes(id));
-
-        // 4. 清理幽靈資料
-        if (ghostIds.length > 0) {
-            const batch = writeBatch(db);
-            ghostIds.forEach(id => {
-                const docRef = doc(db, "users", user.uid, "favorites", id);
-                batch.delete(docRef);
-            });
-            await batch.commit();
-        }
-
-        // 5. 渲染最後結果
-        favoriteContainer.innerHTML = "";
-        allActiveStores.forEach((doc) => {
+        favoriteContainer.innerHTML = ""; // 清空容器
+        snapshot.forEach((doc) => {
             const store = doc.data();
             const card = window.createStoreCard(store);
             favoriteContainer.appendChild(card);
         });
-
     } catch (error) {
         console.error("讀取收藏失敗:", error);
     }
@@ -501,17 +416,14 @@ auth.onAuthStateChanged((user) => {
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');
     const modalAddressText = document.getElementById('modalAddressText');
-
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 buyerLat = position.coords.latitude;
                 buyerLng = position.coords.longitude;
                 const currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
-
                 if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
                 if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
-
                 // 確認函數存在再呼叫
                 if (typeof filterAndRenderStores === 'function') {
                     filterAndRenderStores();
@@ -527,10 +439,7 @@ function getBrowserLocation() {
         if (modalAddressText) modalAddressText.innerText = "您的裝置不支援 GPS 定位裝置。";
     }
 }
-
-// ==========================================
 // 📍 計算兩點經緯度距離 (回傳公里數)
-// ==========================================
 function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // 地球半徑(公里)
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -541,9 +450,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
-
 // 店家清單篩選與顯示邏輯
-
 if (gpsPinBtn) {
     gpsPinBtn.addEventListener('click', () => {
         console.log("[PACE DEBUG] GPS Pin clicked.");
@@ -552,7 +459,6 @@ if (gpsPinBtn) {
     });
 }
 if (closeAddressModalBtn) closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
-
 if (citySelect) {
     Object.keys(areaData).forEach(city => {
         const opt = document.createElement('option');
@@ -587,7 +493,6 @@ if (googleLoginAction) {
         }
     });
 }
-
 // 4. 初始化與事件綁定
 // 初始化：設定上傳區塊的事件綁定
 // 直接在整個網頁範圍監聽點擊
@@ -599,7 +504,6 @@ document.addEventListener('click', (e) => {
         if (input) input.click();
     }
 });
-
 // 直接在整個網頁範圍監聽 change
 document.addEventListener('change', (e) => {
     // 如果觸發的是 .image-input
@@ -607,13 +511,10 @@ document.addEventListener('change', (e) => {
         const input = e.target;
         const box = input.closest('.img-upload-box, .shop-logo-box');
         if (!box) return;
-
         const file = input.files[0];
         if (!file) return;
-
         const img = box.querySelector('.preview-img');
         const reader = new FileReader();
-
         reader.onload = (event) => {
             const tempImg = new Image();
             tempImg.src = event.target.result;
@@ -623,10 +524,8 @@ document.addEventListener('change', (e) => {
                 const scaleSize = MAX_WIDTH / tempImg.width;
                 canvas.width = tempImg.width > MAX_WIDTH ? MAX_WIDTH : tempImg.width;
                 canvas.height = tempImg.width > MAX_WIDTH ? tempImg.height * scaleSize : tempImg.height;
-
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
-
                 if (img) {
                     img.src = canvas.toDataURL('image/jpeg', 0.7);
                     img.style.display = 'block';
@@ -643,7 +542,6 @@ function bindHeaderEvents() {
     avatarBtn = document.getElementById('avatarBtn');
     dropdownMenu = document.getElementById('dropdownMenu');
     loginLightbox = document.getElementById('loginLightbox');
-
     if (avatarBtn && dropdownMenu) {
         avatarBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -655,7 +553,6 @@ function bindHeaderEvents() {
             }
         });
     }
-
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
             console.log("[PACE DEBUG] Login button clicked.");
@@ -663,7 +560,6 @@ function bindHeaderEvents() {
         });
     }
 }
-
 // [登入與身分認證程序]
 if (customReturnBtn) customReturnBtn.addEventListener('click', () => {
     console.log("[PACE DEBUG] Custom return clicked.");
@@ -741,15 +637,11 @@ document.getElementById('shopAddress')?.addEventListener('blur', () => {
     const city = document.getElementById('shopCity').value;
     const district = document.getElementById('shopDistrict').value;
     const detail = document.getElementById('shopAddress').value.trim();
-
     if (!city || !district || !detail) return;
-
     const fullAddress = `${city}${district}${detail}`;
     console.log("[PACE] 使用 Google API 查詢：", fullAddress);
-
     // 初始化 Google Geocoder
     const geocoder = new google.maps.Geocoder();
-
     geocoder.geocode({ 'address': fullAddress }, (results, status) => {
         if (status === 'OK') {
             const location = results[0].geometry.location;
@@ -779,7 +671,6 @@ if (toggleOnline) {
         if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
     });
 }
-
 // toggleCash 開啟警告邏輯
 if (toggleCash) {
     toggleCash.checked = false;
@@ -800,6 +691,7 @@ if (warningConfirmBtn) {
         if (cashWarningModal) cashWarningModal.style.display = 'none';
     });
 }
+
 if (warningCancelBtn) {
     warningCancelBtn.addEventListener('click', () => {
         console.log("[PACE DEBUG] Cash warning cancelled.");
@@ -811,6 +703,7 @@ if (warningCancelBtn) {
 if (menuUploadList) {
     document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
 }
+
 const addItemRowBtn = document.getElementById('addItemRowBtn');
 if (addItemRowBtn && menuUploadList) {
     addItemRowBtn.addEventListener('click', () => {
@@ -883,17 +776,14 @@ if (addItemRowBtn && menuUploadList) {
         makeItemDraggable(newRow);
     });
 }
-
 // 確保只有在 register.html 才執行這段檢查
 if (window.location.pathname.includes('register.html')) {
-
     // 你的原本的檢查邏輯
     const shopSubmitBtn = document.getElementById('shopSubmitBtn');
     if (shopSubmitBtn) {
         shopSubmitBtn.addEventListener('click', (e) => {
             const lat = document.getElementById('shopLat')?.value.trim();
             const lng = document.getElementById('shopLng')?.value.trim();
-
             if (!lat || !lng) {
                 e.preventDefault(); // 阻止送出
                 alert("⚠️ 請先確認店鋪經緯度！若無法自動取得，請點擊「查詢座標」按鈕手動輸入，確保定位正確喔！");
@@ -904,27 +794,22 @@ if (window.location.pathname.includes('register.html')) {
         });
     }
 }
-
 // ... 下方原本的資料組合與儲存邏輯 ...
-
 // shopSubmitBtn 監聽與手動提交邏輯
 const shopSubmitBtn = document.getElementById('shopSubmitBtn');
 if (shopSubmitBtn) {
     shopSubmitBtn.addEventListener('click', async (e) => {
         e.preventDefault();
-
         // --- 1. 嚴謹的身分確認與權限檢查 ---
         const user = auth.currentUser;
         if (!user) {
             alert("⚠️ 請先登入帳號！");
             return;
         }
-
         // 先檢查該用戶是否已經是賣家，防止重複開鋪
         try {
             const userDocRef = doc(db, "users", user.uid);
             const userDoc = await getDoc(userDocRef);
-
             if (userDoc.exists() && userDoc.data().role === "seller") {
                 alert("您已經擁有店舖了，將為您前往賣家後台。");
                 window.location.href = "seller.html";
@@ -934,43 +819,35 @@ if (shopSubmitBtn) {
             console.error("權限檢查失敗:", err);
             return;
         }
-
         // --- 2. 基本資訊與防呆 ---
         const name = document.getElementById('shopName')?.value.trim();
         const phone = document.getElementById('shopPhone')?.value.trim();
         const city = document.getElementById('shopCity')?.value;
         const district = document.getElementById('shopDistrict')?.value;
         const detailAddress = document.getElementById('shopAddress')?.value.trim();
-
         if (!name || !phone || !city || !district || !detailAddress) {
             alert("⚠️ 請填寫完整的店舖資訊！");
             return;
         }
-
         const lat = document.getElementById('shopLat')?.value.trim() || '';
         const lng = document.getElementById('shopLng')?.value.trim() || '';
         const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
         const status = document.getElementById('shopStatus')?.value || 'online';
         const prepareTime = parseInt(document.getElementById('prepareTimeInput')?.value) || 15;
-
         const logoEl = document.getElementById('shopLogoPreview');
         const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
-
         const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
         const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
         const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
-        // 修改這裡，對應你 HTML 裡的 ID: toggleCash 和 toggleOnline
         const isCashPayEnabled = document.getElementById('toggleCash') ? document.getElementById('toggleCash').checked : false;
         const isOnlinePayEnabled = document.getElementById('toggleOnline') ? document.getElementById('toggleOnline').checked : false;
         const seatingtoggle = document.getElementById('seatingtoggle') ? document.getElementById('seatingtoggle').checked : false;
         // --- 3. 菜單打包 ---
         const menuRows = document.querySelectorAll('.menu-item-row');
         const menuItems = [];
-
         menuRows.forEach((row, index) => {
             const nameVal = row.querySelector('.item-name-input').value.trim();
             if (!nameVal) return;
-
             const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';
             let itemObj = {
                 id: `item_${index}`,
@@ -978,7 +855,6 @@ if (shopSubmitBtn) {
                 note: row.querySelector('.item-note-input').value.trim(),
                 image: row.querySelector('.preview-img').src
             };
-
             if (isSizeMode) {
                 itemObj.priceType = 'multi';
                 itemObj.prices = {
@@ -992,21 +868,17 @@ if (shopSubmitBtn) {
             }
             menuItems.push(itemObj);
         });
-
         // --- 4. 邀請碼驗證 ---
         if (inviteCode) {
             const promoQuery = query(collection(db, "promo_codes"), where("code", "==", inviteCode), where("isActive", "==", true));
             const querySnapshot = await getDocs(promoQuery);
-
             if (querySnapshot.empty) {
                 alert("❌ 無效的邀請碼或已被使用！");
                 return;
             }
-
             const promoDoc = querySnapshot.docs[0];
             await updateDoc(promoDoc.ref, { isActive: false, usedBy: user.uid });
         }
-
         // --- 5. 資料組裝與送出 ---
         const shopData = {
             sellerUid: user.uid,
@@ -1030,24 +902,28 @@ if (shopSubmitBtn) {
             menuList: menuItems,
             createdAt: new Date().toISOString()
         };
-
         shopSubmitBtn.disabled = true;
         try {
+            // 1. 處理店家資料
             await setDoc(doc(db, "stores", user.uid), shopData);
-            await updateDoc(doc(db, "users", user.uid), { role: "seller" });
-
+            // 2. 處理角色身分（只在非 admin 時更新）
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            const userData = userSnap.data();
+            // 只要不是 admin，就一律更新為 seller
+            if (userData?.role !== 'admin') {
+                await updateDoc(userRef, { role: "seller" });
+            }
             alert("🎉 開張成功！");
             window.location.href = "seller.html";
         } catch (dbError) {
+            console.error("提交錯誤:", dbError); // 在 console 留下紀錄方便查錯
             alert("系統錯誤：" + dbError.message);
             shopSubmitBtn.disabled = false;
         }
     });
 }
-
-// ==========================================
-// 拖曳菜單專屬函式區 (賣家)
-// ==========================================
+// 拖曳菜單專屬函式區 新增菜單(賣家)
 function makeItemDraggable(row) {
     const handle = row.querySelector('.drag-handle');
     if (!handle) return;
@@ -1072,9 +948,7 @@ function startDrag(e, row) {
 function onDragMove(e) {
     if (!activeDragItem || !menuUploadList) return;
     if (e.cancelable) e.preventDefault();
-
     const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-
     // 使用 requestAnimationFrame 優化效能
     requestAnimationFrame(() => {
         const siblings = [...menuUploadList.querySelectorAll('.menu-item-row')].filter(el => el !== activeDragItem);
@@ -1082,7 +956,6 @@ function onDragMove(e) {
             const box = sibling.getBoundingClientRect();
             return clientY <= box.top + box.height / 2;
         });
-
         if (nextSibling && activeDragItem !== nextSibling) {
             menuUploadList.insertBefore(activeDragItem, nextSibling);
         } else if (!nextSibling && activeDragItem !== menuUploadList.lastElementChild) {
@@ -1102,16 +975,12 @@ function onDragEnd() {
     window.removeEventListener('touchend', onDragEnd);
 }
 // 拖曳菜單專屬函式區 (賣家)結束
-// ==========================================
-
-// === 將這段整段替換掉原本的 menuManagementList.addEventListener ===
 // 💡 加上 if 判斷安全守護，確保只有在有該元素的頁面才執行，避免 store.html 崩潰
 if (menuUploadList) {
     menuUploadList.addEventListener('change', (e) => {
         if (e.target.classList.contains('menu-soldout-toggle') || e.target.classList.contains('soldout-toggle')) {
             const isChecked = e.target.checked;
             const card = e.target.closest('.menu-item-row');
-
             if (card) {
                 if (isChecked) {
                     card.classList.add('sold-out');
@@ -1128,19 +997,13 @@ document.addEventListener('click', (e) => {
     if (e.target.classList.contains('new-size')) {
         const btn = e.target;
         const menuItem = btn.closest('.menu-item-row');
-
         if (!menuItem) return;
-
         const mainPriceInput = menuItem.querySelector('.price-input');
         const sizePriceContainer = menuItem.querySelector('.new-size-price');
-
         if (!mainPriceInput || !sizePriceContainer) return;
-
         // 切換顯示狀態
         const isHidden = sizePriceContainer.style.display === 'none' || sizePriceContainer.style.display === '';
-
         sizePriceContainer.style.display = isHidden ? 'flex' : 'none';
-
         // 切換原始金額欄位的狀態
         mainPriceInput.disabled = isHidden;
         mainPriceInput.style.textDecoration = isHidden ? 'line-through' : 'none';
@@ -1148,31 +1011,24 @@ document.addEventListener('click', (e) => {
         mainPriceInput.required = !isHidden;
     }
 });
-
-// ==========================================
 // 7. Window 全域綁定區 (給 HTML onclick 呼叫)
-// ==========================================
-
 document.addEventListener('click', (e) => {
     // 檢查是否點擊到了刪除按鈕
     if (e.target.classList.contains('del-row-btn')) {
         const menuUploadList = document.getElementById('menuUploadList');
         if (!menuUploadList) return;
-
         const rows = menuUploadList.querySelectorAll('.menu-item-row');
-
         // 檢查是否只剩最後一行
         if (rows.length <= 1) {
             alert("報告老闆，店裡至少要留一項商品才能開張喔！");
             return;
         }
-
         // 刪除該行
         e.target.closest('.menu-item-row').remove();
     }
 });
 
-// 1. 新增店家邏輯
+// 1. admin新增店家邏輯
 const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
 if (adminSubmitStoreBtn) {
     adminSubmitStoreBtn.addEventListener('click', async () => {
@@ -1183,12 +1039,10 @@ if (adminSubmitStoreBtn) {
         const address = document.getElementById('adminNewStoreAddress')?.value.trim() || '';
         const inviteCode = document.getElementById('adminNewStoreInviteCode')?.value.trim() || '';
         const status = document.getElementById('adminNewStoreStatus')?.value || 'online';
-
         if (!name || !district || !address) {
             alert("⚠️ 店名、區域、詳細地址為必填項目！");
             return;
         }
-
         adminSubmitStoreBtn.innerText = "⏳ 正在同步至雲端...";
         try {
             await addDoc(collection(db, "stores"), {
@@ -1207,7 +1061,6 @@ if (adminSubmitStoreBtn) {
         }
     });
 }
-
 // 2. 刪除店家邏輯 (模組化版本)
 async function deleteStore(storeId) {
     if (confirm("⚠️ 確定要從 Firebase 徹底刪除這個店家嗎？(刪除後無法恢復)")) {
@@ -1221,7 +1074,6 @@ async function deleteStore(storeId) {
         }
     }
 }
-
 // 3. 渲染表格邏輯
 function renderAdminTable() {
     const tbody = document.getElementById('adminStoreTableBody');
@@ -1231,7 +1083,6 @@ function renderAdminTable() {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1cqw; color:#aaa;">目前雲端尚無店家資料</td></tr>';
         return;
     }
-
     allStores.forEach(store => {
         const finalName = store.shopName || store.name || '未命名店家';
         const finalAddress = store.shopAddress || store.address || '';
@@ -1279,7 +1130,6 @@ window.toggleView = function (view) {
         window.scrollTo(0, 0); // 建議加上滾動回頂部，讓體驗一致
     }
 };
-
 // 綁定「返回一般買家視圖」按鈕
 const toggleBuyerBtn = document.getElementById('toggleBuyerViewBtn');
 if (toggleBuyerBtn) {
@@ -1287,7 +1137,6 @@ if (toggleBuyerBtn) {
         window.toggleView('buyer');
     });
 }
-
 // 6. 發行邀請碼
 window.issuePromoCode = async function () {
     const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
@@ -1307,12 +1156,10 @@ window.issuePromoCode = async function () {
 document.addEventListener('click', (e) => {
     // 檢查點擊的元素有沒有 data-action 屬性
     const action = e.target.getAttribute('data-action');
-
     // 如果標籤是 toggleAdmin，就切換後台
     if (action === 'toggleAdmin') {
         window.toggleView('admin');
     }
-
     // 如果標籤是 issuePromo，就執行邀請碼功能
     if (action === 'issuePromo') {
         window.issuePromoCode();
@@ -1372,17 +1219,31 @@ async function initStorePage() {
         // 嘗試用 v9 寫法讀取
         if (typeof db !== 'undefined' && typeof doc === 'function') {
             const docSnap = await getDoc(doc(db, "stores", currentStoreId));
+            if (!docSnap.exists()) {
+                if (auth.currentUser) {
+                    // 1. 定位到使用者收藏夾中，對應的那位店家的文件
+                    // 路徑：users -> [使用者UID] -> favorites -> [該店家的sellerUid]
+                    const favoriteDocRef = doc(db, "users", auth.currentUser.uid, "favorites", currentStoreId);
+                    try {
+                        // 2. 執行刪除，直接把這份文件移除
+                        await deleteDoc(favoriteDocRef);
+                        console.log("已從收藏夾中清除失效店家：", currentStoreId);
+                    } catch (error) {
+                        console.error("清理收藏時發生錯誤，但仍將導向：", error);
+                    }
+                    // 不管有沒有刪除成功，最後都導回，確保使用者不會卡在壞掉的頁面
+                    window.location.href = "favorites.html";
+                }
+
+                alert("該店家已下架，已自動從您的收藏中移除。");
+                window.location.href = "favorites.html";
+                return;
+            }
             if (docSnap.exists()) storeData = docSnap.data();
             console.log("Firebase 拿到的資料：", storeData); // <-- 加上這行！
 
             // 順便檢查一下這裡有沒有值
             console.log("Logo 欄位的值：", storeData.shopLogo);
-        }
-
-        // 如果 v9 沒讀到，嘗試用 v8 寫法讀取
-        if (!storeData && firebaseFirestore) {
-            const docSnap = await firebaseFirestore.collection("stores").doc(currentStoreId).get();
-            if (docSnap.exists) storeData = docSnap.data();
         }
 
         if (!storeData) throw new Error("無法從資料庫找到該店家資料");

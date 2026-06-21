@@ -1045,7 +1045,7 @@ document.addEventListener('click', async (e) => {
         }
     }
     if (e.target.getAttribute('data-action') === 'favorite-btn') {
-        handleFavorite(action = 'toggle');
+        handleFavorite();
     }
 });
 // 封裝成一個獨立的初始化函式

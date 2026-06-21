@@ -747,11 +747,6 @@ async function handleFavorite(action = 'toggle') {
     const user = auth.currentUser;
     const heartIcon = document.getElementById('heart-icon');
     const store = window.currentStoreInfo;
-    // 基礎防呆：沒有心型圖示或店家資訊就不用跑了
-    if (!heartIcon) {
-        console.warn("無法取得店家 UID，無法操作最愛");
-        return;
-    }
     const storeId = store.sellerUid; // 將 sellerUid 當作 ID 使用
     const favRef = doc(db, "users", user.uid, "favorites", storeId);
     // 1. 同步狀態邏輯 (Sync)

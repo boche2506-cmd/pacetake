@@ -1043,10 +1043,22 @@ window.issuePromoCode = async function () {
 
 document.addEventListener('click', (e) => {
     const action = e.target.getAttribute('data-action');
-    // 「守門員」：只有當這個屬性確實存在，且等於 issuePromo 時才執行
     if (action === 'issuePromo') {
-        window.issuePromoCode();
-    }
+        issuePromo = async function () {
+            const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
+            if (!code || code.trim() === "") return;
+            try {
+                await setDoc(doc(db, "promo_codes", code.trim()), {
+                    code: code.trim(), createdBy: currentUserId, createdAt: new Date().toISOString(),
+                    isActive: true, usedBy: null
+                });
+                alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！`);
+            } catch (error) {
+                console.error("邀請碼發行失敗:", error);
+                alert("發行失敗，請檢查您的系統權限配置！");
+            }
+        };
+    } seatingtoggle
 });
 
 // 封裝成一個獨立的初始化函式

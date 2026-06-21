@@ -748,7 +748,7 @@ async function handleFavorite(action = 'toggle') {
     const heartIcon = document.getElementById('heart-icon');
     const store = window.currentStoreInfo;
     // 基礎防呆：沒有心型圖示或店家資訊就不用跑了
-    if (!heartIcon || !store?.sellerUid) {
+    if (!heartIcon) {
         console.warn("無法取得店家 UID，無法操作最愛");
         return;
     }

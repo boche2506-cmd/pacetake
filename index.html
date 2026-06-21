@@ -441,7 +441,6 @@
                 </div>
             </header>
             <div class="sticky-top-group">
-
                 <div class="location-bar">
                     <button class="gps-trigger-btn" id="gpsPinBtn">📍 (目前位置)</button>
                     <div class="location-select-group">
@@ -494,63 +493,6 @@
                 </a>
             </footer>
         </div>
-        <!-- ========================================== -->
-        <!-- 🔮 派思核心控制台 (Admin 視圖) -->
-        <!-- ========================================== -->
-        <div id="adminView"
-            style="display: none; padding: 0.25cqw; background: #121212; color: #e0e0e0; min-height: 100vh; overflow: auto; font-family: sans-serif;">
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.125cqw solid #333; padding-bottom: 0.5cqw;">
-                <h1 style="color: #4dadff; margin: 0; font-size: 0.75cqw;">🔮 派思最高意志控制台</h1>
-                <button id="toggleBuyerViewBtn"
-                    style="padding: 0.5cqw 1cqw; background: #ff4d4d; color: white; border: none; border-radius: 0.375cqw; cursor: pointer; font-weight: bold; font-size: 0.75cqw; transition: 0.2s;">
-                    🧑‍💼 返回一般買家視圖
-                </button>
-            </div>
-            <div
-                style="background: #1e1e1e; padding: 0.25cqw; border-radius: 0.5cqw; margin-bottom: 0.25cqw; border: 0.2cqw solid #2d2d2d;overflow-y: auto;">
-                <h3 style="color: #ffca28; margin-top: 0;">➕ 新增全新店家</h3>
-                <p style="color: #aaa; font-size: 0.75cqw; margin-bottom: 0.25cqw;">請輸入店家資訊，新增後將立即同步至 Firebase 雲端資料庫。
-                </p>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25cqw; margin-bottom: 0.25cqw;">
-                    <input type="text" id="adminNewStoreName" placeholder="店家名稱 (*必填)"
-                        style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
-                    <input type="text" id="adminNewStorePhone" placeholder="聯絡電話 (*必填)"
-                        style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
-                    <input type="text" id="adminNewStoreCity" placeholder="縣市 (如: 基隆市) (*必填)"
-                        style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
-                    <input type="text" id="adminNewStoreDistrict" placeholder="區域 (如: 七堵區) (*必填)"
-                        style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw;">
-                    <input type="text" id="adminNewStoreAddress" placeholder="詳細地址 (*必填)"
-                        style="padding: 0.25cqw; background: #2a2a2a; border: 0.2cqw solid #444; color: white; border-radius: 0.25cqw; grid-column: span 2;">
-
-                </div>
-                <button id="adminSubmitStoreBtn"
-                    style="width: 10cqw; padding: 0.25cqw; background: #059669; color: white; border: none; border-radius: 0.25cqw; font-weight: bold; cursor: pointer; transition: 0.2s;">✅
-                    確認新增店家至雲端</button>
-            </div>
-            <div
-                style="background: #1e1e1e; padding: 0.25cqw; border-radius: 0.5cqw; border: 0.2cqw solid #2d2d2d; overflow-x: auto;">
-                <h3 style="color: #4da5ff; margin-top: 0;"> 📋 目前雲端店家總覽</h3>
-                <table
-                    style="width: 10cqw; border-collapse: collapse; margin-top: 0.5cqw; text-align: left; font-size: 0.75cqw;">
-                    <tr style="background: #2d2d2d; color: #fff;">
-                        <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a;">店家名稱</th>
-                        <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a;">詳細地址</th>
-                        <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a;">聯絡電話</th>
-                        <th style="padding: 0.75cqw; border: 0.2cqw solid #3a3a3a; text-align: center;">核心操作
-                        </th>
-                    </tr>
-                    <tbody id="adminStoreTableBody">
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 0.25cqw; color: #888;">正在載入雲端資料...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
             <div class="modal-card">
                 <div class="modal-title" style=" font-weight: 600; color: var(--text-main);">加入PACE 派思</div>
@@ -568,7 +510,6 @@
                     </svg>
                     Google 登入
                 </button>
-
                 <button id="toggleEmailFormBtn"
                     style="display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 5cqw; background-color: white; border: 0.2cqw solid #e5e7eb; border-radius: 2cqw; padding: 3cqw 0; font-size: 5cqw; font-weight: 600; color: #374151; cursor: pointer; box-shadow: 0 0.5cqw 2cqw rgba(0,0,0,0.05);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2"

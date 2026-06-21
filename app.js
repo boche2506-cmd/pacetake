@@ -142,14 +142,12 @@ function initThemeSystem() {
     // 1. 初始化：網頁載入時套用顏色
     const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
-
     if (toggleBtn) {
         toggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
         // 2. 綁定事件：只有當按鈕存在時，才註冊點擊事件
         toggleBtn.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('pacetake-theme', newTheme);
             toggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
@@ -299,7 +297,6 @@ async function fetchStoresFromFirebase() {
             allStores.push({ id: doc.id, ...doc.data() });
         });
         filterAndRenderStores();
-        renderAdminTable();
     } catch (error) {
         console.error("讀取店家失敗：", error);
         if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
@@ -1028,116 +1025,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// 1. admin新增店家邏輯
-const adminSubmitStoreBtn = document.getElementById('adminSubmitStoreBtn');
-if (adminSubmitStoreBtn) {
-    adminSubmitStoreBtn.addEventListener('click', async () => {
-        const name = document.getElementById('adminNewStoreName')?.value.trim() || '';
-        const phone = document.getElementById('adminNewStorePhone')?.value.trim() || '';
-        const city = document.getElementById('adminNewStoreCity')?.value || '';
-        const district = document.getElementById('adminNewStoreDistrict')?.value.trim() || '';
-        const address = document.getElementById('adminNewStoreAddress')?.value.trim() || '';
-        const inviteCode = document.getElementById('adminNewStoreInviteCode')?.value.trim() || '';
-        const status = document.getElementById('adminNewStoreStatus')?.value || 'online';
-        if (!name || !district || !address) {
-            alert("⚠️ 店名、區域、詳細地址為必填項目！");
-            return;
-        }
-        adminSubmitStoreBtn.innerText = "⏳ 正在同步至雲端...";
-        try {
-            await addDoc(collection(db, "stores"), {
-                name: name, shopName: name, phone: phone, city: city, district: district,
-                address: address, shopAddress: address, isCashPayEnabled: isCashPayEnabled,
-                isOnlinePayEnabled: isOnlinePayEnabled, status: status, inviteCode: inviteCode,
-                menu: [], createdAt: new Date().toISOString()
-            });
-            alert("✅ 店家已成功新增至雲端！");
-            fetchStoresFromFirebase();
-        } catch (error) {
-            console.error("新增店家失敗:", error);
-            alert("新增失敗，請檢查網路或資料庫權限！");
-        } finally {
-            adminSubmitStoreBtn.innerText = "✅ 確認新增店家至雲端";
-        }
-    });
-}
-// 2. 刪除店家邏輯 (模組化版本)
-async function deleteStore(storeId) {
-    if (confirm("⚠️ 確定要從 Firebase 徹底刪除這個店家嗎？(刪除後無法恢復)")) {
-        try {
-            await deleteDoc(doc(db, "stores", storeId));
-            alert("🗑️ 店家已從雲端刪除！");
-            fetchStoresFromFirebase();
-        } catch (error) {
-            console.error("刪除店家失敗:", error);
-            alert("刪除失敗，請檢查網路或資料庫權限！");
-        }
-    }
-}
-// 3. 渲染表格邏輯
-function renderAdminTable() {
-    const tbody = document.getElementById('adminStoreTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    if (allStores.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1cqw; color:#aaa;">目前雲端尚無店家資料</td></tr>';
-        return;
-    }
-    allStores.forEach(store => {
-        const finalName = store.shopName || store.name || '未命名店家';
-        const finalAddress = store.shopAddress || store.address || '';
-        const phone = store.phone || '無資料';
-        const statusText = store.status === 'offline' ? '🔴 下線' : '🟢 上線';
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #ffca28; font-weight: bold;">${finalName}</td>
-            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #bbb;">${store.city || ''}${store.district || ''} ${finalAddress}</td>
-            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; color: #bbb;">${phone}</td>
-            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; text-align: center; color: ${store.status === 'offline' ? '#ef4444' : '#10b981'}; font-weight: bold;">${statusText}</td>
-            <td style="padding: 1cqw; border: 0.2cqw solid #3a3a3a; text-align: center;">
-                <button class="delete-btn" data-id="${store.id}" style="padding: 1cqw 2cqw; background: #ef4444; color: white; border: none; border-radius: 1cqw; cursor: pointer; font-weight: bold;">刪除</button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-// 4. 事件委派：統一處理表格內的所有「刪除」按鈕點擊 (取代原本的 onclick)
-const tbody = document.getElementById('adminStoreTableBody');
-if (tbody) {
-    tbody.addEventListener('click', (e) => {
-        if (e.target.classList.contains('delete-btn')) {
-            const storeId = e.target.getAttribute('data-id');
-            deleteStore(storeId);
-        }
-    });
-}
-
-// 5. 視圖切換
-// 統一處理所有的視圖切換邏輯
-window.toggleView = function (view) {
-    const adminEl = document.getElementById('adminView');
-    const buyerEl = document.getElementById('buyerView');
-
-    if (view === 'admin') {
-        if (adminEl) adminEl.style.display = 'block';
-        if (buyerEl) buyerEl.style.display = 'none';
-        window.scrollTo(0, 0);
-    } else {
-        if (adminEl) adminEl.style.display = 'none';
-        if (buyerEl) buyerEl.style.display = 'block';
-        window.scrollTo(0, 0); // 建議加上滾動回頂部，讓體驗一致
-    }
-};
-// 綁定「返回一般買家視圖」按鈕
-const toggleBuyerBtn = document.getElementById('toggleBuyerViewBtn');
-if (toggleBuyerBtn) {
-    toggleBuyerBtn.addEventListener('click', () => {
-        window.toggleView('buyer');
-    });
-}
-// 6. 發行邀請碼
+// 發行邀請碼
 window.issuePromoCode = async function () {
     const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
     if (!code || code.trim() === "") return;
@@ -1154,13 +1042,8 @@ window.issuePromoCode = async function () {
 };
 
 document.addEventListener('click', (e) => {
-    // 檢查點擊的元素有沒有 data-action 屬性
     const action = e.target.getAttribute('data-action');
-    // 如果標籤是 toggleAdmin，就切換後台
-    if (action === 'toggleAdmin') {
-        window.toggleView('admin');
-    }
-    // 如果標籤是 issuePromo，就執行邀請碼功能
+    // 「守門員」：只有當這個屬性確實存在，且等於 issuePromo 時才執行
     if (action === 'issuePromo') {
         window.issuePromoCode();
     }
@@ -1200,22 +1083,18 @@ async function initStorePage() {
     console.log("[PACE DEBUG] 啟動點餐頁面終極渲染程序...");
     const menuContainer = document.getElementById('menuContainer');
     if (!menuContainer) return;
-
     const urlParams = new URLSearchParams(window.location.search);
     const currentStoreId = urlParams.get('storeId');
-
     if (!currentStoreId) {
         alert("❌ 找不到店家資訊");
         window.location.href = "index.html";
         return;
     }
     document.body.setAttribute('data-store-id', currentStoreId);
-
     try {
         // --- 這裡放回你原有的 Firebase 讀取邏輯 ---
         let storeData = null;
         const firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
-
         // 嘗試用 v9 寫法讀取
         if (typeof db !== 'undefined' && typeof doc === 'function') {
             const docSnap = await getDoc(doc(db, "stores", currentStoreId));
@@ -1234,18 +1113,15 @@ async function initStorePage() {
                     // 不管有沒有刪除成功，最後都導回，確保使用者不會卡在壞掉的頁面
                     window.location.href = "favorites.html";
                 }
-
                 alert("該店家已下架，已自動從您的收藏中移除。");
                 window.location.href = "favorites.html";
                 return;
             }
             if (docSnap.exists()) storeData = docSnap.data();
             console.log("Firebase 拿到的資料：", storeData); // <-- 加上這行！
-
             // 順便檢查一下這裡有沒有值
             console.log("Logo 欄位的值：", storeData.shopLogo);
         }
-
         if (!storeData) throw new Error("無法從資料庫找到該店家資料");
         window.currentStoreInfo = {
             ...storeData, // 這行會自動把 storeData 的所有欄位全部放入，無需一行行寫
@@ -1263,16 +1139,11 @@ async function initStorePage() {
                 console.error("同步愛心狀態失敗:", err);
             }
         }
-
-        // --- 渲染邏輯 ---
-        // 1. 先抓出 Firebase 的座標 (記得轉成數字)
         // 1. 先抓出 Firebase 的座標 (記得轉成數字)
         const sLat = parseFloat(storeData.shopLat || storeData.lat);
         const sLng = parseFloat(storeData.shopLng || storeData.lng);
-
         // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
         let displayDistance = '距離未知'; // 預設值
-
         if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
             const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
             displayDistance = dist.toFixed(1) + ' km';
@@ -1285,16 +1156,13 @@ async function initStorePage() {
         document.getElementById('storeAddressText').innerHTML = `
         <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
         📍 ${address}</a>`;
-
         // 這裡填入我們算好的 displayDistance
         const distElement = document.getElementById('storeDistanceText');
         if (distElement) {
             distElement.innerText = '⚡ ' + displayDistance;
         }
-
         const savedLogo = localStorage.getItem('selected_store_logo');
         const target = document.getElementById('logo-wrapper');
-
         if (!target) return; // 如果找不到盒子就跳出，防止報錯
         const imageSource = storeData.shopLogo;
         if (imageSource) {
@@ -1309,7 +1177,6 @@ async function initStorePage() {
         }
         const menuList = storeData.menuList || storeData.menu || [];
         menuContainer.innerHTML = "";
-
         menuList.forEach((item, index) => {
             // 確保 ID 格式與你的 cart-manager 一致
             const itemId = `${currentStoreId}|||item_${index}`;
@@ -1319,7 +1186,6 @@ async function initStorePage() {
             const savedItem = cartData.find(c => c.id === itemId);
             const qty = savedItem ? savedItem.qty : 0;
             const buyerNote = savedItem ? savedItem.note : "";
-
             // 2. 判斷並產生 HTML
             let priceHTML = '';
             let basePrice = 0;
@@ -1327,53 +1193,51 @@ async function initStorePage() {
             if (item.priceType === 'multi') {
                 // 我們直接寫死三個規格，這樣最簡單好讀
                 priceHTML = `
-        <div class="size-options">
-        <div class="size-row">
-            <span class="size-label" style="font-weight:bold;">大 $${item.prices.large}</span>
-            <div class="quantity-control-panel">
-                <button class="minus-btn" data-id="${itemId}_large">-</button>
-                <span class="qty-number" id="qty_${itemId}_large">0</span>
-                <button class="plus-btn" data-id="${itemId}_large">+</button>
-            </div>
-        </div>
-        <div class="size-row" style="${!hasMedium ? 'opacity: 0.5; pointer-events: none;' : ''}">
-            <span class="size-label" style="font-weight:bold;">中 $${item.prices.medium}</span>
-            <div class="quantity-control-panel">
-                <button class="minus-btn" data-id="${itemId}_medium">-</button>
-                <span class="qty-number" id="qty_${itemId}_medium">0</span>
-                <button class="plus-btn" data-id="${itemId}_medium">+</button>
-            </div>
-        </div>
-        <div class="size-row">
-            <span class="size-label" style="font-weight:bold;">小 $${item.prices.small}</span>
-            <div class="quantity-control-panel">
-                <button class="minus-btn" data-id="${itemId}_small">-</button>
-                <span class="qty-number" id="qty_${itemId}_small">0</span>
-                <button class="plus-btn" data-id="${itemId}_small">+</button>
-            </div>
-        </div>
-        </div>
-    `;
+                <div class="size-options">
+                    <div class="size-row">
+                        <span class="size-label" style="font-weight:bold;">大 $${item.prices.large}</span>
+                        <div class="quantity-control-panel">
+                            <button class="minus-btn" data-id="${itemId}_large">-</button>
+                            <span class="qty-number" id="qty_${itemId}_large">0</span>
+                            <button class="plus-btn" data-id="${itemId}_large">+</button>
+                        </div>
+                    </div>
+                    <div class="size-row" style="${!hasMedium ? 'opacity: 0.5; pointer-events: none;' : ''}">
+                        <span class="size-label" style="font-weight:bold;">中 $${item.prices.medium}</span>
+                        <div class="quantity-control-panel">
+                            <button class="minus-btn" data-id="${itemId}_medium">-</button>
+                            <span class="qty-number" id="qty_${itemId}_medium">0</span>
+                            <button class="plus-btn" data-id="${itemId}_medium">+</button>
+                        </div>
+                    </div>
+                    <div class="size-row">
+                        <span class="size-label" style="font-weight:bold;">小 $${item.prices.small}</span>
+                        <div class="quantity-control-panel">
+                            <button class="minus-btn" data-id="${itemId}_small">-</button>
+                            <span class="qty-number" id="qty_${itemId}_small">0</span>
+                            <button class="plus-btn" data-id="${itemId}_small">+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
             } else {
                 // 單一價格：這裡必須補上加減按鈕的 HTML，否則會消失
                 basePrice = parseInt(item.price) || 0;
                 priceHTML = `
-        <div class="one-size-row">
-            <span class="food-price" style="font-weight:bold;">$${basePrice}</span>
-            <div class="quantity-control-panel">
-                <button class="minus-btn" data-id="${itemId}">-</button>
-                <span class="qty-number" id="qty_${itemId}">0</span>
-                <button class="plus-btn" data-id="${itemId}">+</button>
-            </div>
-        </div>
-    `;
+                <div class="one-size-row">
+                    <span class="food-price" style="font-weight:bold;">$${basePrice}</span>
+                    <div class="quantity-control-panel">
+                        <button class="minus-btn" data-id="${itemId}">-</button>
+                        <span class="qty-number" id="qty_${itemId}">0</span>
+                        <button class="plus-btn" data-id="${itemId}">+</button>
+                    </div>
+                </div>
+            `;
             }
-
             // 3. 建立並填入卡片
             const foodCard = document.createElement('div');
             foodCard.className = 'food-card';
             foodCard.dataset.id = itemId;
-
             // --- 🎯 在這裡加入這些屬性 ---
             foodCard.dataset.price = basePrice; // 存入單一價格 (給非多規格商品用)
             foodCard.dataset.largePrice = item.prices?.large || 0;
@@ -1381,36 +1245,32 @@ async function initStorePage() {
             foodCard.dataset.smallPrice = item.prices?.small || 0;
             // ----------------------------
             foodCard.innerHTML = `
-            <div class="card-note-display">${merchantNote}</div>
-            <div class="food-img-info">
-                <div class="food-img">${item.image ? `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; position: absolute;">` : '🍱'}</div>
-                <div class="food-info">
-                <div class="food-name">${item.name || '未命名'}</div>${priceHTML}
+                <div class="card-note-display">${merchantNote}</div>
+                <div class="food-img-info">
+                    <div class="food-img">${item.image ? `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; order-radius:inherit; position: absolute;">` : '🍱'}</div>
+                    <div class="food-info">
+                    <div class="food-name">${item.name || '未命名'}</div>${priceHTML}
+                    </div>
+                </div>    
+                <div class="note-wrapper">
+                    <input type="text" class="input-style" placeholder="✍️ 填寫客製化備註..." value="${buyerNote}">
                 </div>
-            </div>    
-            <div class="note-wrapper">
-            <input type="text" class="input-style" placeholder="✍️ 填寫客製化備註..." value="${buyerNote}">
-        </div>
-    `;
+            `;
             menuContainer.appendChild(foodCard);
         });
-
         // --- 事件綁定 ---
         menuContainer.addEventListener('click', (e) => {
             if (!e.target.matches('.plus-btn, .minus-btn')) return;
-
             const clickedBtn = e.target;
             const itemId = clickedBtn.dataset.id; // 這現在是類似 'storeId|||item_0_large' 的格式
             const card = clickedBtn.closest('.food-card');
             const qtyDisplay = clickedBtn.parentElement.querySelector('.qty-number');
             const noteInput = card.querySelector('.input-style');
-
             // 計算數量
             let count = parseInt(qtyDisplay.innerText);
             if (e.target.matches('.plus-btn')) count++;
             else if (count > 0) count--;
             qtyDisplay.innerText = count;
-
             // --- 動態獲取價格 ---
             // 邏輯：從 itemId 的後綴判斷價格
             let currentPrice = 0;
@@ -1420,7 +1280,6 @@ async function initStorePage() {
             else if (itemId.includes('_medium')) currentPrice = parseInt(card.dataset.mediumPrice || 0);
             else if (itemId.includes('_small')) currentPrice = parseInt(card.dataset.smallPrice || 0);
             else currentPrice = parseInt(card.dataset.price || 0); // 單一價格
-
             updateLocalStorageData(
                 itemId, // 傳入精確的規格 ID
                 card.querySelector('.food-name').innerText,
@@ -1431,26 +1290,21 @@ async function initStorePage() {
                 card
             );
         });
-
         // --- 在 initStorePage 的最後面 ---
         setTimeout(() => {
             const currentStoreId = document.body.getAttribute('data-store-id');
             const cartData = JSON.parse(localStorage.getItem('pacetake_cart')) || [];
-
             cartData.forEach(cartItem => {
                 // cartItem.id 現在可能是 'storeId|||item_0_large'
                 // 我們要找的是頁面上對應那個按鈕的 span
                 const qtyDisplay = document.getElementById(`qty_${cartItem.id}`);
-
                 if (qtyDisplay) {
                     qtyDisplay.innerText = cartItem.qty;
                 }
             });
-
             if (typeof refreshTotalCartUI === 'function') refreshTotalCartUI();
             console.log("[PACE DEBUG] 購物車規格同步完成。");
         }, 200);
-
         // 頁面初始化時，根據 Firebase 狀態更新愛心
         async function syncHeartIcon() {
             const heartIcon = document.getElementById('heart-icon');
@@ -1460,7 +1314,6 @@ async function initStorePage() {
                 heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
                 return;
             }
-
             try {
                 const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
                 const docSnap = await getDoc(favRef);
@@ -1469,13 +1322,11 @@ async function initStorePage() {
                 console.error("同步收藏失敗:", e);
             }
         }
-
     } catch (error) {
         console.error("[PACE ERROR] 頁面渲染失敗：", error);
         menuContainer.innerHTML = "<p>無法載入店家菜單，請檢查網路連線。</p>";
     }
 }
-
 /** * 🛒 購物車管理核心 */
 // --- 1. 資料處理區 ---
 export function getCartData() {
@@ -1488,7 +1339,6 @@ export function getCartData() {
         return [];
     }
 }
-
 // --- 2. UI 渲染區 ---
 export function refreshTotalCartUI() {
     const localCartData = getCartData();
@@ -1499,23 +1349,18 @@ export function refreshTotalCartUI() {
         totalQty += item.qty;
         totalPrice += (item.price * item.qty);
     });
-
     const badge = document.querySelector('.order-badge-count');
     if (badge) badge.innerText = `($${totalPrice})`;
-
     const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
     if (cartSummaryText) {
         cartSummaryText.innerHTML = `🛒 已加入 ${totalQty} 項 · 總計 $${totalPrice}`;
     }
 }
-
 // --- 3. 業務邏輯區 ---
 export async function checkoutToFirebase(buyerPhone, sellerUid) {
     const localCartData = getCartData();
     if (localCartData.length === 0) return alert("購物車是空的");
-
     const totalAmount = localCartData.reduce((sum, item) => sum + (item.price * item.qty), 0);
-
     try {
         await addDoc(collection(db, "orders"), {
             items: localCartData,
@@ -1532,13 +1377,11 @@ export async function checkoutToFirebase(buyerPhone, sellerUid) {
         console.error("訂單送出失敗: ", e);
     }
 }
-
 // 這是你現在使用的唯一更新函式
 export function updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput, card) {
     let localCartData = getCartData();
     const currentQty = parseInt(qtyDisplay.innerText, 10);
     const currentNote = noteInput ? noteInput.value.trim() : "";
-
     // 1. 店家檢查邏輯
     if (localCartData.length > 0 && String(localCartData[0].storeId).trim() !== String(currentStoreId).trim()) {
         if (confirm("⚠️ 購物車內已有其他店家的商品，加入此商品將會清空前店清單，確定繼續嗎？")) {
@@ -1549,7 +1392,6 @@ export function updateLocalStorageData(itemId, itemName, itemPrice, currentStore
             return;
         }
     }
-
     // 2. 其餘邏輯保持不變...
     localCartData = localCartData.filter(i => i.id !== itemId);
     if (currentQty > 0) {
@@ -1562,7 +1404,6 @@ export function updateLocalStorageData(itemId, itemName, itemPrice, currentStore
             storeId: currentStoreId
         });
     }
-
     localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
     refreshTotalCartUI();
 }
@@ -1571,11 +1412,9 @@ export function initCartDOMState() {
     const cartItems = getCartData();
     const currentStoreId = document.body.getAttribute('data-store-id');
     if (!cartItems || cartItems.length === 0) return;
-
     cartItems.forEach(item => {
         // 確保只回填當前店家的資料
         if (String(item.storeId || "").trim() !== String(currentStoreId || "").trim()) return;
-
         // 直接透過 ID 找到對應的 span，例如 qty_storeId|||item_0_large
         const qtyDisplay = document.getElementById(`qty_${item.id}`);
         if (qtyDisplay) {
@@ -1583,10 +1422,7 @@ export function initCartDOMState() {
         }
     });
 }
-// ==========================================
 // 🚀 初始化區塊
-// ==========================================
-
 // 1. 將所有邏輯封裝在一個啟動函式裡
 function startApp() {
     initThemeSystem();
@@ -1594,7 +1430,6 @@ function startApp() {
     initStorePage();
     getBrowserLocation();
     fetchStoresFromFirebase();
-    renderAdminTable();
     initCartDOMState();
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡

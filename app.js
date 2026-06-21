@@ -1401,10 +1401,14 @@ async function initStorePage() {
             const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
             displayDistance = dist.toFixed(1) + ' km';
         }
-
+        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${sLat},${sLng}`;
+        // 2. 獲取地址文字 (確保 fallback 機制)
+        const address = storeData.shopAddress || storeData.address || '地址未提供';
         // 3. 把算出來的結果填入 HTML
         document.getElementById('storeNameText').innerText = storeData.shopName || storeData.name || '未命名店家';
-        document.getElementById('storeAddressText').innerText = '📍 ' + (storeData.shopAddress || storeData.address || '');
+        document.getElementById('storeAddressText').innerHTML = `
+        <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+        📍 ${address}</a>`;
 
         // 這裡填入我們算好的 displayDistance
         const distElement = document.getElementById('storeDistanceText');

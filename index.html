@@ -172,27 +172,19 @@
 
         /* 店家單一卡片 */
         .store-card {
-            /* height: 35%; */
-            /* ❌ 建議移除百分比高度，因為內容物（圖片、文字、標籤）*/
-            /* 改用 cqw 後，讓卡片高度被內容自然撐開（或改用 min-height） */
             min-height: 24cqw;
-            /* 💡 新增：設定最小高度，確保卡片視覺比例穩固 */
             width: 100%;
-            /* 撐滿 store-list 的寬度（扣除 padding） */
             display: flex;
             align-items: center;
-            gap: 1cqw;
-            /* 圖片與文字區塊的間距 */
-            background-color: var(--card-bg);
-            border: 0.3cqw solid var(--border-color);
-            border-radius: 4cqw;
-            /* 圓角改用 cqw */
-            text-decoration: none;
             color: inherit;
             box-shadow: var(--shadow-sm);
+            background-color: var(--card-bg);
+            border: 0.3cqw solid var(--border-color);
+            border-radius: 3cqw;
+            gap: 0.5cqw;
+            padding: 0.25cqw;
+            text-decoration: none;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            padding: 0.5cqw;
-            /* 卡片內部內襯改用 cqw */
             box-sizing: border-box;
         }
 
@@ -203,24 +195,21 @@
 
         /* 左側店家圖示外殼 */
         .store-img {
-            width: 15cqw;
-            /* 依比例放大/縮小 */
-            height: 15cqw;
+            width: 20cqw;
+            height: 20cqw;
+            display: block;            
+            justify-content: center;
+            align-items: center;
             background-color: var(--bg-global);
             border-radius: 3cqw;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-size: 5cqw;
             /* 裡面的 Emoji 大小 */
             flex-shrink: 0;
             object-fit: contain;
-            /* 關鍵：確保完整顯示，不裁切，短邊留空 */
-            display: block;
             box-sizing: border-box;
+            position: relative;
         }
 
-        /* 右側文字資訊大外殼 */
         .store-info {
             height: 100%;
             max-width: 100%;
@@ -229,10 +218,8 @@
             justify-content: space-between;
             align-items: flex-start;
             flex-grow: 1;
-            /* 💡 關鍵：讓文字區塊拿走剩下的所有寬度，點點點才會精準生效 */
             overflow: hidden;
-            /* 💡 關鍵：防止內部文字把外殼撐開 */
-            gap: 1cqw;
+            gap: 0.25cqw;
         }
 
         /* 店家名稱 */
@@ -262,7 +249,7 @@
             white-space: nowrap;
             max-width: 100%;
             /* 💡 關鍵：限制最大寬度為父層的 100% */
-            line-height: 1.5;
+            line-height: 1.1;
         }
 
         /* 標籤容器 (現金支付 / 支援行動支付) */

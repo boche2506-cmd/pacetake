@@ -26,9 +26,8 @@ let buyerLat = null;
 let buyerLng = null;
 let currentBuyerAddress = "正在獲取定位中...";
 let currentUserId = null;
-let loginBtn, avatarBtn, dropdownMenu;
-let loginLightbox, userNameDisplay;
 let activeDragItem = null;
+
 const areaData = {
     "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
     "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -53,7 +52,7 @@ const areaData = {
     "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
     "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
 };
-// 全部直接宣告在全域，不用包進任何函式
+// 統一管理頁面上的所有元件
 const storeContainer = document.getElementById('store-Container');
 const googleLoginAction = document.getElementById('googleLoginAction');
 const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
@@ -71,40 +70,81 @@ const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
 const globalSearchInput = document.getElementById('globalSearchInput');
 const menuUploadList = document.getElementById('menuUploadList');
 const favoriteContainer = document.getElementById('favoriteContainer');
-// 接著是下面那 6 行
 const toggleOnline = document.getElementById('toggleOnline');
 const toggleCash = document.getElementById('toggleCash');
 const newebpayContainer = document.getElementById('newebpayContainer');
 const cashWarningModal = document.getElementById('cashWarningModal');
 const warningConfirmBtn = document.getElementById('warningConfirmBtn');
 const warningCancelBtn = document.getElementById('warningCancelBtn');
+const statusDot = document.getElementById('statusDot');
+const statusText = document.getElementById('statusText');
+const toggleBtn = document.getElementById('themeToggleBtn');
+const loginBtn = document.getElementById('loginBtn');
+const avatarBtn = document.getElementById('avatarBtn');
+const loginLightbox = document.getElementById('loginLightbox');
+const userNameDisplay = document.getElementById('userNameDisplay');
+const userAvatarImg = document.getElementById('userAvatarImg');
+const defaultIcon = document.getElementById('defaultIcon');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const logoutBtn = document.getElementById('logoutBtn');
+const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
+const shopCity = document.getElementById('shopCity');
+const shopDistrict = document.getElementById('shopDistrict');
+const addItemRowBtn = document.getElementById('addItemRowBtn');
+const shopSubmitBtn = document.getElementById('shopSubmitBtn');
+const heartIcon = document.getElementById('heart-icon');
+const menuContainer = document.getElementById('menuContainer');
+const storeDistanceText = document.getElementById('storeDistanceText');
+const logoWrapper = document.getElementById('logo-wrapper');
+const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
 
 window.currentStoreInfo = {
     id: null,
     name: null
 };
-// 3. 核心功能函式
+
+function getShopFormData() {
+    // 每次被呼叫時，都抓取當下最新的一手資料
+    return {
+        name: document.getElementById('shopName')?.value.trim(),
+        phone: document.getElementById('shopPhone')?.value.trim(),
+        city: document.getElementById('shopCity')?.value,
+        district: document.getElementById('shopDistrict')?.value,
+        detailAddress: document.getElementById('shopAddress')?.value.trim(),
+        lat: document.getElementById('shopLat')?.value.trim() || '',
+        lng: document.getElementById('shopLng')?.value.trim() || '',
+        inviteCode: document.getElementById('shopInviteCode')?.value.trim() || '',
+        status: document.getElementById('shopStatus')?.value || 'online',
+        prepareTime: parseInt(document.getElementById('prepareTimeInput')?.value) || 15,
+        shopLogoData: (document.getElementById('shopLogoPreview')?.style.display !== 'none') ? document.getElementById('shopLogoPreview')?.src : "",
+        merchantIdValue: document.getElementById('merchantIdInput')?.value.trim() || '',
+        hashKeyValue: document.getElementById('hashKeyInput')?.value.trim() || '',
+        hashIvValue: document.getElementById('hashIvInput')?.value.trim() || '',
+        isCashPayEnabled: document.getElementById('toggleCash')?.checked || false,
+        isOnlinePayEnabled: document.getElementById('toggleOnline')?.checked || false,
+        hasSeating: document.getElementById('seatingtoggle')?.checked || false
+    };
+}
 // 監聽 Firebase 登入狀態
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
         handleUserSyncAndRoleRouting(user);
-    } else {
+        renderFavoriteStores();
+    }
+    else {
         console.log("[PACE DEBUG] Auth state: Logged out");
-        loginBtn = document.getElementById('loginBtn');
-        avatarBtn = document.getElementById('avatarBtn');
-        dropdownMenu = document.getElementById('dropdownMenu');
+        // 處理 UI 狀態恢復成訪客模式
         if (loginBtn) loginBtn.style.display = 'block';
         if (avatarBtn) {
             avatarBtn.style.display = 'none';
             dropdownMenu.style.display = 'none';
             dropdownMenu.innerHTML = '';
         }
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
         if (statusDot) statusDot.classList.remove('active');
         if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
         if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
+        // 執行訪客狀態的渲染
         renderDynamicMenu('guest');
         fetchStoresFromFirebase();
     }
@@ -114,7 +154,6 @@ async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
     currentUserId = user.uid;
     console.log("[PACE DEBUG] User synced:", user.uid);
-
     let currentRole = "buyer";
     try {
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -135,9 +174,13 @@ async function handleUserSyncAndRoleRouting(user) {
     updateUIForUser(user, currentRole);
     fetchStoresFromFirebase();
 }
-
+async function getMyFavoriteIds() {
+    const user = auth.currentUser;
+    if (!user) return [];
+    const snapshot = await getDocs(collection(db, "users", user.uid, "favorites"));
+    return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
+}
 function initThemeSystem() {
-    const toggleBtn = document.getElementById('themeToggleBtn');
     // 1. 初始化：網頁載入時套用顏色
     const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
@@ -154,19 +197,8 @@ function initThemeSystem() {
     }
 }
 
-async function getMyFavoriteIds() {
-    const user = auth.currentUser;
-    if (!user) return [];
-    const snapshot = await getDocs(collection(db, "users", user.uid, "favorites"));
-    return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
-}
-
 function updateUIForUser(user, currentRole) {
     // 這裡加上 const，確保這些變數只屬於這個函式
-    const loginBtn = document.getElementById('loginBtn');
-    const avatarBtn = document.getElementById('avatarBtn');
-    const loginLightbox = document.getElementById('loginLightbox');
-    const userNameDisplay = document.getElementById('userNameDisplay');
     if (loginBtn) loginBtn.style.display = 'none';
     if (avatarBtn) avatarBtn.style.display = 'flex';
     if (loginLightbox) loginLightbox.style.display = 'none';
@@ -179,8 +211,6 @@ function updateUIForUser(user, currentRole) {
             userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
         }
     }
-    const userAvatarImg = document.getElementById('userAvatarImg');
-    const defaultIcon = document.getElementById('defaultIcon');
     if (user.photoURL && userAvatarImg && defaultIcon) {
         userAvatarImg.src = user.photoURL;
         userAvatarImg.style.display = 'block';
@@ -189,8 +219,6 @@ function updateUIForUser(user, currentRole) {
         if (userAvatarImg) userAvatarImg.style.display = 'none';
         defaultIcon.style.display = 'block';
     }
-    const statusText = document.getElementById('statusText');
-    const statusDot = document.getElementById('statusDot');
     if (statusDot) statusDot.classList.add('active');
     if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
     renderDynamicMenu(currentRole);
@@ -228,7 +256,6 @@ function renderDynamicMenu(role) {
         <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
     `;
     menuContainer.innerHTML = menuHTML;
-    const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
             console.log("[PACE DEBUG] Logout clicked.");
@@ -357,13 +384,6 @@ async function renderFavoriteStores() {
     }
 }
 
-// 確保登入狀態確認後才執行渲染
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        renderFavoriteStores();
-    }
-});
-
 function getBrowserLocation() {
     const gpsPinBtn = document.getElementById('gpsPinBtn');
     const modalAddressText = document.getElementById('modalAddressText');
@@ -489,10 +509,6 @@ document.addEventListener('change', (e) => {
 // [頁面選單與燈箱操作]
 function bindHeaderEvents() {
     console.log("[PACE DEBUG] bindHeaderEvents() started.");
-    loginBtn = document.getElementById('loginBtn');
-    avatarBtn = document.getElementById('avatarBtn');
-    dropdownMenu = document.getElementById('dropdownMenu');
-    loginLightbox = document.getElementById('loginLightbox');
     if (avatarBtn && dropdownMenu) {
         avatarBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -514,7 +530,6 @@ function bindHeaderEvents() {
 // [登入與身分認證程序]
 if (customReturnBtn) customReturnBtn.addEventListener('click', () => {
     console.log("[PACE DEBUG] Custom return clicked.");
-    loginLightbox = document.getElementById('loginLightbox');
     if (loginLightbox) loginLightbox.style.display = 'none';
 });
 
@@ -525,7 +540,6 @@ if (toggleEmailFormBtn) {
     });
 }
 
-const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
 if (togglePasswordVisibility && loginPasswordInput) {
     togglePasswordVisibility.addEventListener('click', function () {
         const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -562,8 +576,6 @@ if (emailLoginAction) {
 }
 
 // 賣家註冊專區初始化
-const shopCity = document.getElementById('shopCity');
-const shopDistrict = document.getElementById('shopDistrict');
 if (shopCity) {
     Object.keys(areaData).forEach(city => {
         const opt = document.createElement('option');
@@ -655,7 +667,6 @@ if (menuUploadList) {
     document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
 }
 
-const addItemRowBtn = document.getElementById('addItemRowBtn');
 if (addItemRowBtn && menuUploadList) {
     addItemRowBtn.addEventListener('click', () => {
         console.log("[PACE DEBUG] Add item row clicked.");
@@ -730,7 +741,6 @@ if (addItemRowBtn && menuUploadList) {
 // 確保只有在 register.html 才執行這段檢查
 if (window.location.pathname.includes('register.html')) {
     // 你的原本的檢查邏輯
-    const shopSubmitBtn = document.getElementById('shopSubmitBtn');
     if (shopSubmitBtn) {
         shopSubmitBtn.addEventListener('click', (e) => {
             const lat = document.getElementById('shopLat')?.value.trim();
@@ -747,7 +757,6 @@ if (window.location.pathname.includes('register.html')) {
 }
 // ... 下方原本的資料組合與儲存邏輯 ...
 // shopSubmitBtn 監聽與手動提交邏輯
-const shopSubmitBtn = document.getElementById('shopSubmitBtn');
 if (shopSubmitBtn) {
     shopSubmitBtn.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -797,6 +806,7 @@ if (shopSubmitBtn) {
         const menuRows = document.querySelectorAll('.menu-item-row');
         const menuItems = [];
         menuRows.forEach((row, index) => {
+            const supply = document.getElementById('menu-soldout-switch') ? document.getElementById('menu-soldout-switch').checked : false;
             const nameVal = row.querySelector('.item-name-input').value.trim();
             if (!nameVal) return;
             const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';
@@ -1025,7 +1035,6 @@ document.addEventListener('click', async (e) => {
             hasSeating: !!data.hasSeating,
             createdAt: new Date().toISOString()
         };
-        const heartIcon = document.getElementById('heart-icon');
         const favRef = doc(db, "users", user.uid, "favorites", id);
         try {
             const docSnap = await getDoc(favRef);
@@ -1078,7 +1087,6 @@ function initPullToRefresh() {
 // ==========================================
 async function initStorePage() {
     console.log("[PACE DEBUG] 啟動點餐頁面終極渲染程序...");
-    const menuContainer = document.getElementById('menuContainer');
     if (!menuContainer) return;
     const urlParams = new URLSearchParams(window.location.search);
     const currentStoreId = urlParams.get('storeId');
@@ -1242,11 +1250,14 @@ async function initStorePage() {
             foodCard.dataset.smallPrice = item.prices?.small || 0;
             // ----------------------------
             foodCard.innerHTML = `
-                <div class="card-note-display">${merchantNote}</div>
+                
                 <div class="food-img-info">
-                    <div class="food-img">${item.image ? `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; order-radius:inherit; position: absolute;">` : '🍱'}</div>
+                    <div class="food-img">${item.image ? `<img src="${item.image}" style="width:100%; height:100%; border-radius:inherit; position: absolute;">` : '🍱'}</div>
                     <div class="food-info">
-                    <div class="food-name">${item.name || '未命名'}</div>${priceHTML}
+                    <div class="food-name-note-display">
+                    <div class="food-name">${item.name || '未命名'}</div>
+                    <div class="card-note-display">${merchantNote}</div>
+                    </div>${priceHTML}
                     </div>
                 </div>    
                 <div class="note-wrapper">
@@ -1304,7 +1315,6 @@ async function initStorePage() {
         }, 200);
         // 頁面初始化時，根據 Firebase 狀態更新愛心
         async function syncHeartIcon() {
-            const heartIcon = document.getElementById('heart-icon');
             if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
             const user = auth.currentUser;
             if (!user) {
@@ -1348,7 +1358,6 @@ export function refreshTotalCartUI() {
     });
     const badge = document.querySelector('.order-badge-count');
     if (badge) badge.innerText = `($${totalPrice})`;
-    const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
     if (cartSummaryText) {
         cartSummaryText.innerHTML = `🛒 已加入 ${totalQty} 項 · 總計 $${totalPrice}`;
     }

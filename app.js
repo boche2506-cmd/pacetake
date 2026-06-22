@@ -1025,6 +1025,7 @@ document.addEventListener('click', async (e) => {
             hasSeating: !!data.hasSeating,
             createdAt: new Date().toISOString()
         };
+        const heartIcon = document.getElementById('heart-icon');
         const favRef = doc(db, "users", user.uid, "favorites", id);
         try {
             const docSnap = await getDoc(favRef);

@@ -95,7 +95,6 @@ const shopSubmitBtn = document.getElementById('shopSubmitBtn');
 const heartIcon = document.getElementById('heart-icon');
 const menuContainer = document.getElementById('menuContainer');
 const storeDistanceText = document.getElementById('storeDistanceText');
-const logoWrapper = document.getElementById('logo-wrapper');
 const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
 
 window.currentStoreInfo = {
@@ -113,10 +112,8 @@ function getShopFormData() {
         detailAddress: document.getElementById('shopAddress')?.value.trim(),
         lat: document.getElementById('shopLat')?.value.trim() || '',
         lng: document.getElementById('shopLng')?.value.trim() || '',
-        inviteCode: document.getElementById('shopInviteCode')?.value.trim() || '',
         status: document.getElementById('shopStatus')?.value || 'online',
         prepareTime: parseInt(document.getElementById('prepareTimeInput')?.value) || 15,
-        shopLogoData: (document.getElementById('shopLogoPreview')?.style.display !== 'none') ? document.getElementById('shopLogoPreview')?.src : "",
         merchantIdValue: document.getElementById('merchantIdInput')?.value.trim() || '',
         hashKeyValue: document.getElementById('hashKeyInput')?.value.trim() || '',
         hashIvValue: document.getElementById('hashIvInput')?.value.trim() || '',
@@ -174,6 +171,7 @@ async function handleUserSyncAndRoleRouting(user) {
     updateUIForUser(user, currentRole);
     fetchStoresFromFirebase();
 }
+
 async function getMyFavoriteIds() {
     const user = auth.currentUser;
     if (!user) return [];
@@ -225,8 +223,7 @@ function updateUIForUser(user, currentRole) {
 }
 
 function renderDynamicMenu(role) {
-    const menuContainer = document.getElementById('dropdownMenu');
-    if (!menuContainer) return;
+    if (!dropdownMenu) return;
     let menuHTML = '';
     menuHTML += `
         <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
@@ -255,7 +252,7 @@ function renderDynamicMenu(role) {
         <div class="menu-divider"></div>
         <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
     `;
-    menuContainer.innerHTML = menuHTML;
+    dropdownMenu.innerHTML = menuHTML;
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
             console.log("[PACE DEBUG] Logout clicked.");
@@ -321,14 +318,10 @@ window.createStoreCard = function (store) {
     `;
     return card;
 };
-
 // index.html
 function filterAndRenderStores() {
     if (!storeContainer) return;
     // 1. 抓取篩選條件
-    const citySelect = document.getElementById('citySelect');
-    const districtSelect = document.getElementById('districtSelect');
-    const globalSearchInput = document.getElementById('globalSearchInput');
     const selectedCity = citySelect ? citySelect.value : '';
     const selectedDist = districtSelect ? districtSelect.value : '';
     const searchKeyword = globalSearchInput ? globalSearchInput.value.toLowerCase().trim() : '';
@@ -357,7 +350,6 @@ function filterAndRenderStores() {
 
 //favorites.html
 async function renderFavoriteStores() {
-    const favoriteContainer = document.getElementById('favoriteContainer');
     // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
     if (!favoriteContainer) return;
     const user = auth.currentUser;
@@ -385,8 +377,6 @@ async function renderFavoriteStores() {
 }
 
 function getBrowserLocation() {
-    const gpsPinBtn = document.getElementById('gpsPinBtn');
-    const modalAddressText = document.getElementById('modalAddressText');
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -755,135 +745,6 @@ if (window.location.pathname.includes('register.html')) {
         });
     }
 }
-// ... 下方原本的資料組合與儲存邏輯 ...
-// shopSubmitBtn 監聽與手動提交邏輯
-if (shopSubmitBtn) {
-    shopSubmitBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        // --- 1. 嚴謹的身分確認與權限檢查 ---
-        const user = auth.currentUser;
-        if (!user) {
-            alert("⚠️ 請先登入帳號！");
-            return;
-        }
-        // 先檢查該用戶是否已經是賣家，防止重複開鋪
-        try {
-            const userDocRef = doc(db, "users", user.uid);
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists() && userDoc.data().role === "seller") {
-                alert("您已經擁有店舖了，將為您前往賣家後台。");
-                window.location.href = "seller.html";
-                return;
-            }
-        } catch (err) {
-            console.error("權限檢查失敗:", err);
-            return;
-        }
-        // --- 2. 基本資訊與防呆 ---
-        const name = document.getElementById('shopName')?.value.trim();
-        const phone = document.getElementById('shopPhone')?.value.trim();
-        const city = document.getElementById('shopCity')?.value;
-        const district = document.getElementById('shopDistrict')?.value;
-        const detailAddress = document.getElementById('shopAddress')?.value.trim();
-        if (!name || !phone || !city || !district || !detailAddress) {
-            alert("⚠️ 請填寫完整的店舖資訊！");
-            return;
-        }
-        const lat = document.getElementById('shopLat')?.value.trim() || '';
-        const lng = document.getElementById('shopLng')?.value.trim() || '';
-        const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
-        const status = document.getElementById('shopStatus')?.value || 'online';
-        const prepareTime = parseInt(document.getElementById('prepareTimeInput')?.value) || 15;
-        const logoEl = document.getElementById('shopLogoPreview');
-        const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
-        const merchantIdValue = document.getElementById('merchantIdInput')?.value.trim() || '';
-        const hashKeyValue = document.getElementById('hashKeyInput')?.value.trim() || '';
-        const hashIvValue = document.getElementById('hashIvInput')?.value.trim() || '';
-        const isCashPayEnabled = document.getElementById('toggleCash') ? document.getElementById('toggleCash').checked : false;
-        const isOnlinePayEnabled = document.getElementById('toggleOnline') ? document.getElementById('toggleOnline').checked : false;
-        const seatingtoggle = document.getElementById('seatingtoggle') ? document.getElementById('seatingtoggle').checked : false;
-        // --- 3. 菜單打包 ---
-        const menuRows = document.querySelectorAll('.menu-item-row');
-        const menuItems = [];
-        menuRows.forEach((row, index) => {
-            const supply = document.getElementById('menu-soldout-switch') ? document.getElementById('menu-soldout-switch').checked : false;
-            const nameVal = row.querySelector('.item-name-input').value.trim();
-            if (!nameVal) return;
-            const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';
-            let itemObj = {
-                id: `item_${index}`,
-                name: nameVal,
-                note: row.querySelector('.item-note-input').value.trim(),
-                image: row.querySelector('.preview-img').src
-            };
-            if (isSizeMode) {
-                itemObj.priceType = 'multi';
-                itemObj.prices = {
-                    large: row.querySelector('.price-input-large').value,
-                    medium: row.querySelector('.price-input-medium').value,
-                    small: row.querySelector('.price-input-small').value
-                };
-            } else {
-                itemObj.priceType = 'single';
-                itemObj.price = parseInt(row.querySelector('.price-input').value) || 0;
-            }
-            menuItems.push(itemObj);
-        });
-        // --- 4. 邀請碼驗證 ---
-        if (inviteCode) {
-            const promoQuery = query(collection(db, "promo_codes"), where("code", "==", inviteCode), where("isActive", "==", true));
-            const querySnapshot = await getDocs(promoQuery);
-            if (querySnapshot.empty) {
-                alert("❌ 無效的邀請碼或已被使用！");
-                return;
-            }
-            const promoDoc = querySnapshot.docs[0];
-            await updateDoc(promoDoc.ref, { isActive: false, usedBy: user.uid });
-        }
-        // --- 5. 資料組裝與送出 ---
-        const shopData = {
-            sellerUid: user.uid,
-            shopName: name,
-            shopPhone: phone,
-            city: city,
-            district: district,
-            detailAddress: detailAddress,
-            // 雖然你有獨立欄位，但保留 shopAddress 也很方便前端直接顯示
-            shopAddress: `${city}${district}${detailAddress}`,
-            shopLat: lat,
-            shopLng: lng,
-            inviteCode: inviteCode,
-            status: status,
-            shopLogo: shopLogoData,
-            prepareTime: prepareTime,
-            isOnlinePayEnabled: isOnlinePayEnabled,
-            isCashPayEnabled: isCashPayEnabled,
-            newebpayConfig: { MerchantID: merchantIdValue, HashKey: hashKeyValue, HashIV: hashIvValue },
-            hasSeating: seatingtoggle,
-            menuList: menuItems,
-            createdAt: new Date().toISOString()
-        };
-        shopSubmitBtn.disabled = true;
-        try {
-            // 1. 處理店家資料
-            await setDoc(doc(db, "stores", user.uid), shopData);
-            // 2. 處理角色身分（只在非 admin 時更新）
-            const userRef = doc(db, "users", user.uid);
-            const userSnap = await getDoc(userRef);
-            const userData = userSnap.data();
-            // 只要不是 admin，就一律更新為 seller
-            if (userData?.role !== 'admin') {
-                await updateDoc(userRef, { role: "seller" });
-            }
-            alert("🎉 開張成功！");
-            window.location.href = "seller.html";
-        } catch (dbError) {
-            console.error("提交錯誤:", dbError); // 在 console 留下紀錄方便查錯
-            alert("系統錯誤：" + dbError.message);
-            shopSubmitBtn.disabled = false;
-        }
-    });
-}
 // 拖曳菜單專屬函式區 新增菜單(賣家)
 function makeItemDraggable(row) {
     const handle = row.querySelector('.drag-handle');
@@ -976,7 +837,6 @@ document.addEventListener('click', (e) => {
 document.addEventListener('click', (e) => {
     // 檢查是否點擊到了刪除按鈕
     if (e.target.classList.contains('del-row-btn')) {
-        const menuUploadList = document.getElementById('menuUploadList');
         if (!menuUploadList) return;
         const rows = menuUploadList.querySelectorAll('.menu-item-row');
         // 檢查是否只剩最後一行
@@ -1020,7 +880,6 @@ document.addEventListener('click', async (e) => {
         }
         const data = window.currentStoreInfo || {};
         const { id } = data; // 確保有 id
-
         // 建立要存入的資料物件，並排除可能為 undefined 的欄位
         // 利用 || null 或將其設定為預設空字串，防止 undefined 錯誤
         const favoriteData = {
@@ -1053,8 +912,121 @@ document.addEventListener('click', async (e) => {
             alert("系統錯誤，請稍後再試。");
         }
     }
-});
+    // shopSubmitBtn 監聽與手動提交邏輯
+    if (action === 'shopSubmitBtn') {
+        // --- 1. 嚴謹的身分確認與權限檢查 ---
+        const ShopFormData = getShopFormData();
+        const user = auth.currentUser;
+        if (!user) {
+            alert("⚠️ 請先登入帳號！");
+            return;
+        }
+        // 先檢查該用戶是否已經是賣家，防止重複開鋪
+        try {
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists() && userDoc.data().role === "seller") {
+                alert("您已經擁有店舖了，將為您前往賣家後台。");
+                window.location.href = "seller.html";
+                return;
+            }
+        } catch (err) {
+            console.error("權限檢查失敗:", err);
+            return;
+        }
+        // --- 2. 基本資訊與防呆 ---
+        if (!name || !phone || !city || !district || !detailAddress) {
+            alert("⚠️ 請填寫完整的店舖資訊！");
+            return;
+        }
+        const logoEl = document.getElementById('shopLogoPreview');
+        const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
+        // --- 3. 菜單打包 ---
+        const menuRows = document.querySelectorAll('.menu-item-row');
+        const menuItems = [];
+        menuRows.forEach((row, index) => {
+            const supply = document.getElementById('menu-soldout-switch') ? document.getElementById('menu-soldout-switch').checked : false;
+            const nameVal = row.querySelector('.item-name-input').value.trim();
+            if (!nameVal) return;
+            const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';
+            let itemObj = {
+                id: `item_${index}`,
+                name: nameVal,
+                note: row.querySelector('.item-note-input').value.trim(),
+                image: row.querySelector('.preview-img').src
+            };
+            if (isSizeMode) {
+                itemObj.priceType = 'multi';
+                itemObj.prices = {
+                    large: row.querySelector('.price-input-large').value,
+                    medium: row.querySelector('.price-input-medium').value,
+                    small: row.querySelector('.price-input-small').value
+                };
+            } else {
+                itemObj.priceType = 'single';
+                itemObj.price = parseInt(row.querySelector('.price-input').value) || 0;
+            }
+            menuItems.push(itemObj);
+        });
+        // --- 4. 邀請碼驗證 ---
+        const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
+        if (inviteCode) {
+            const promoQuery = query(collection(db, "promo_codes"), where("code", "==", inviteCode), where("isActive", "==", true));
+            const querySnapshot = await getDocs(promoQuery);
+            if (querySnapshot.empty) {
+                alert("❌ 無效的邀請碼或已被使用！");
+                return;
+            }
+            const promoDoc = querySnapshot.docs[0];
+            await updateDoc(promoDoc.ref, { isActive: false, usedBy: user.uid });
+        }
+        // --- 5. 資料組裝與送出 ---
+        const shopData = {
+            sellerUid: user.uid,
+            shopName: ShopFormData.name,
+            shopPhone: ShopFormData.phone,
+            city: ShopFormData.city,
+            district: ShopFormData.district,
+            detailAddress: ShopFormData.detailAddress,
+            // 雖然你有獨立欄位，但保留 shopAddress 也很方便前端直接顯示
+            shopAddress: `${city}${district}${detailAddress}`,
+            shopLat: ShopFormData.lat,
+            shopLng: ShopFormData.lng,
+            inviteCode: inviteCode,
+            status: ShopFormData.status,
+            shopLogo: shopLogoData,
+            prepareTime: ShopFormData.prepareTime,
+            isOnlinePayEnabled: ShopFormData.isOnlinePayEnabled,
+            isCashPayEnabled: ShopFormData.isCashPayEnabled,
+            HashIV: ShopFormData.hashIvValue,
+            HashKey: ShopFormData.hashKeyValue,
+            MerchantID: ShopFormData.merchantIdValue,
+            hasSeating: ShopFormData.hasSeating,
+            menuList: menuItems,
+            createdAt: new Date().toISOString()
+        };
+        shopSubmitBtn.disabled = true;
+        try {
+            // 1. 處理店家資料
+            await setDoc(doc(db, "stores", user.uid), shopData);
+            // 2. 處理角色身分（只在非 admin 時更新）
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            const userData = userSnap.data();
+            // 只要不是 admin，就一律更新為 seller
+            if (userData?.role !== 'admin') {
+                await updateDoc(userRef, { role: "seller" });
+            }
+            alert("🎉 開張成功！");
+            window.location.href = "seller.html";
+        } catch (dbError) {
+            console.error("提交錯誤:", dbError); // 在 console 留下紀錄方便查錯
+            alert("系統錯誤：" + dbError.message);
+            shopSubmitBtn.disabled = false;
+        }
+    }
 
+});
 // 封裝成一個獨立的初始化函式
 function initPullToRefresh() {
     const topGroup = document.querySelector('.sticky-top-group');
@@ -1081,7 +1053,6 @@ function initPullToRefresh() {
         }, { passive: true });
     }
 }
-
 // ==========================================
 // 🎯 PACE 專屬：store.html 終極完美動態渲染模組 (含首頁卡片替換、加減鍵、備註欄)
 // ==========================================
@@ -1094,6 +1065,22 @@ async function initStorePage() {
         alert("❌ 找不到店家資訊");
         window.location.href = "index.html";
         return;
+    }
+    // 頁面初始化時，根據 Firebase 狀態更新愛心
+    async function syncHeartIcon() {
+        if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
+        const user = auth.currentUser;
+        if (!user) {
+            heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
+            return;
+        }
+        try {
+            const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
+            const docSnap = await getDoc(favRef);
+            heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
+        } catch (e) {
+            console.error("同步收藏失敗:", e);
+        }
     }
     document.body.setAttribute('data-store-id', currentStoreId);
     try {
@@ -1313,22 +1300,6 @@ async function initStorePage() {
             if (typeof refreshTotalCartUI === 'function') refreshTotalCartUI();
             console.log("[PACE DEBUG] 購物車規格同步完成。");
         }, 200);
-        // 頁面初始化時，根據 Firebase 狀態更新愛心
-        async function syncHeartIcon() {
-            if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
-            const user = auth.currentUser;
-            if (!user) {
-                heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
-                return;
-            }
-            try {
-                const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
-                const docSnap = await getDoc(favRef);
-                heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
-            } catch (e) {
-                console.error("同步收藏失敗:", e);
-            }
-        }
     } catch (error) {
         console.error("[PACE ERROR] 頁面渲染失敗：", error);
         menuContainer.innerHTML = "<p>無法載入店家菜單，請檢查網路連線。</p>";

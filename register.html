@@ -295,7 +295,6 @@
             display: none;
         }
 
-        .seatingtoggle-switch .toggle-slider,
         .menu-soldout-switch .toggle-slider {
             position: absolute;
             cursor: pointer;
@@ -326,6 +325,25 @@
             background-color: white;
             border-radius: 50%;
             transition: 0.4s;
+        }
+
+        .seatingtoggle-switch .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #52c41a;
+            /* 綠色 */
+            border-radius: 7cqw;
+            transition: 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3.25cqw;
+            font-weight: bold;
         }
 
         .seatingtoggle-switch .toggle-slider::before {
@@ -721,7 +739,8 @@
                             class="slider"></span></label>
                 </div>
                 <div class="seating">
-                    <label class="seatingtoggle-switch" data-action="seating"><input type="checkbox" class="seatingtoggle" id="seatingtoggle">
+                    <label class="seatingtoggle-switch" data-action="seating"><input type="checkbox"
+                            class="seatingtoggle" id="seatingtoggle">
                         <span class="toggle-slider">
                             <span class="on-text">開放中</span>
                             <span class="off-text">無提供</span>
@@ -789,7 +808,7 @@
                         <div class="remark" style="width: 100%; gap: 1cqw">
                             <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 80%;"
                                 placeholder="備註">
-                            <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle">
+                            <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle" id="menu-soldout-toggle">
                                 <span class="toggle-slider">
                                     <span class="on-text">販售中</span>
                                     <span class="off-text">暫停</span>

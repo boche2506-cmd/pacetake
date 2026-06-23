@@ -96,6 +96,16 @@ const heartIcon = document.getElementById('heart-icon');
 const menuContainer = document.getElementById('menuContainer');
 const storeDistanceText = document.getElementById('storeDistanceText');
 const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
+// 1. 初始化函式：負責把資料灌入指定的 Select
+function initCitySelect(selectElement) {
+    if (!selectElement) return;
+    Object.keys(areaData).forEach(city => {
+        const opt = document.createElement('option');
+        opt.value = city;
+        opt.innerText = city;
+        selectElement.appendChild(opt);
+    });
+}
 
 window.currentStoreInfo = {
     id: null,
@@ -178,6 +188,7 @@ async function getMyFavoriteIds() {
     const snapshot = await getDocs(collection(db, "users", user.uid, "favorites"));
     return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
 }
+
 function initThemeSystem() {
     // 1. 初始化：網頁載入時套用顏色
     const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
@@ -347,7 +358,6 @@ function filterAndRenderStores() {
         storeContainer.appendChild(card);
     });
 }
-
 //favorites.html
 async function renderFavoriteStores() {
     // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
@@ -410,49 +420,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
-}
-// 店家清單篩選與顯示邏輯
-if (gpsPinBtn) {
-    gpsPinBtn.addEventListener('click', () => {
-        console.log("[PACE DEBUG] GPS Pin clicked.");
-        getBrowserLocation();
-        if (addressDetailLightbox) addressDetailLightbox.style.display = 'flex';
-    });
-}
-if (closeAddressModalBtn) closeAddressModalBtn.addEventListener('click', () => { addressDetailLightbox.style.display = 'none'; });
-if (citySelect) {
-    Object.keys(areaData).forEach(city => {
-        const opt = document.createElement('option');
-        opt.value = city; opt.innerText = city; citySelect.appendChild(opt);
-    });
-    citySelect.addEventListener('change', () => {
-        const selectedCity = citySelect.value;
-        if (districtSelect) {
-            districtSelect.innerHTML = '<option value="">選擇區域</option>';
-            if (areaData[selectedCity]) {
-                areaData[selectedCity].forEach(dist => {
-                    const opt = document.createElement('option');
-                    opt.value = dist; opt.innerText = dist; districtSelect.appendChild(opt);
-                });
-            }
-        }
-        filterAndRenderStores();
-    });
-}
-if (districtSelect) districtSelect.addEventListener('change', filterAndRenderStores);
-if (globalSearchInput) globalSearchInput.addEventListener('input', filterAndRenderStores);
-// [使用者狀態與 UI 初始化]
-if (googleLoginAction) {
-    googleLoginAction.addEventListener('click', async () => {
-        console.log("[PACE DEBUG] Google login action.");
-        try {
-            const result = await signInWithPopup(auth, provider);
-            await handleUserSyncAndRoleRouting(result.user);
-        } catch (error) {
-            console.error("Google 登入失敗：", error);
-            alert("連線失敗，請檢查網路服務！");
-        }
-    });
 }
 // 4. 初始化與事件綁定
 // 初始化：設定上傳區塊的事件綁定
@@ -564,27 +531,6 @@ if (emailLoginAction) {
         }
     });
 }
-
-// 賣家註冊專區初始化
-if (shopCity) {
-    Object.keys(areaData).forEach(city => {
-        const opt = document.createElement('option');
-        opt.value = city; opt.innerText = city; shopCity.appendChild(opt);
-    });
-    shopCity.addEventListener('change', () => {
-        const selectedCity = shopCity.value;
-        if (shopDistrict) {
-            shopDistrict.innerHTML = '<option value="">選擇區域</option>';
-            if (areaData[selectedCity]) {
-                areaData[selectedCity].forEach(dist => {
-                    const opt = document.createElement('option');
-                    opt.value = dist; opt.innerText = dist; shopDistrict.appendChild(opt);
-                });
-            }
-        }
-    });
-}
-
 // 監聽詳細地址輸入框，當離開欄位時自動查詢
 document.getElementById('shopAddress')?.addEventListener('blur', () => {
     const city = document.getElementById('shopCity').value;
@@ -663,7 +609,7 @@ if (addItemRowBtn && menuUploadList) {
         const newRow = document.createElement('div');
         newRow.className = 'menu-item-row';
         newRow.innerHTML = `
-                <div class="menu-item">
+                        <div class="menu-item">
                             <div class="img-upload-box" id="uploadBox">
                                 <input type="file" id="imageInput" class="image-input" accept="image/*"
                                     style="display: none;">
@@ -716,14 +662,14 @@ if (addItemRowBtn && menuUploadList) {
                         <div class="remark" style="width: 100%; gap: 1cqw">
                             <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 80%;"
                                 placeholder="備註">
-                            <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle">
+                            <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle"
+                                    id="menu-soldout-toggle" checked>
                                 <span class="toggle-slider">
                                     <span class="on-text">販售中</span>
                                     <span class="off-text">暫停</span>
                                 </span>
                             </label>
-                        </div>
-            `;
+                        </div>`;
         menuUploadList.appendChild(newRow);
         makeItemDraggable(newRow);
     });
@@ -848,7 +794,55 @@ document.addEventListener('click', (e) => {
         e.target.closest('.menu-item-row').remove();
     }
 });
-// Listener
+// Listener'input'
+document.addEventListener('input', (e) => {
+    const target = e.target.closest('[data-action]');
+    if (!target) return;
+    const action = target.getAttribute('data-action');
+
+    if (action === 'globalSearch') {
+        filterAndRenderStores();
+    }
+    else {
+        // 如果有需要處理預設情況或錯誤紀錄，可以寫在這裡
+        console.log('未知的 action:', action);
+    }
+});
+// Listener'change'
+document.addEventListener('change', async (e) => {
+    const target = e.target.closest('[data-action]');
+    if (!target) return;
+    const action = target.getAttribute('data-action');
+    // 1. 處理「城市選擇」相關的邏輯 (citySelect 或 shopCity)
+    if (action === 'citySelect' || action === 'shopCity') {
+        // 決定要更新哪一個區域選單
+        const selectedValue = target.value;
+        const targetDistrictId = action === 'citySelect' ? '#districtSelect' : '#shopDistrict';
+        const districtSelect = document.querySelector(targetDistrictId);
+        if (districtSelect) {
+            districtSelect.innerHTML = '<option value="">選擇區域</option>';
+            if (areaData[selectedValue]) {
+                areaData[selectedValue].forEach(dist => {
+                    const opt = document.createElement('option');
+                    opt.value = dist;
+                    opt.innerText = dist;
+                    districtSelect.appendChild(opt);
+                });
+            }
+        }
+        // 如果是 citySelect，還要記得觸發篩選
+        if (action === 'citySelect') filterAndRenderStores();
+    }
+    // 2. 處理「區域選擇」的邏輯
+    else if (action === 'districtSelect') {
+        filterAndRenderStores();
+    }
+    // 3. 其他處理
+    else {
+        console.log('未知的 action:', action);
+    }
+});
+// Listener'click'
 document.addEventListener('click', async (e) => {
     const target = e.target.closest('[data-action]');
     if (!target) return;
@@ -872,7 +866,7 @@ document.addEventListener('click', async (e) => {
         }
     }
     // 收藏按鈕監聽器
-    if (action === 'favorite-btn') {
+    else if (action === 'favorite-btn') {
         const user = auth.currentUser;
         if (!user) {
             alert("⚠️ 請先登入才能收藏店家喔！");
@@ -913,7 +907,7 @@ document.addEventListener('click', async (e) => {
         }
     }
     // shopSubmitBtn 監聽與手動提交邏輯
-    if (action === 'shopSubmitBtn') {
+    else if (action === 'shopSubmitBtn') {
         // --- 1. 嚴謹的身分確認與權限檢查 ---
         const ShopFormData = getShopFormData();
         const user = auth.currentUser;
@@ -1025,26 +1019,42 @@ document.addEventListener('click', async (e) => {
             shopSubmitBtn.disabled = false;
         }
     }
-
+    else if (action === 'gpsPinBtn') {
+        console.log("[PACE DEBUG] GPS Pin clicked.");
+        getBrowserLocation();
+        if (addressDetailLightbox) addressDetailLightbox.style.display = 'flex';
+    }
+    else if (action === 'closeAddressModalBtn') {
+        addressDetailLightbox.style.display = 'none';
+    }
+    else if (action === 'googleLoginAction') {
+        try {
+            const result = await signInWithPopup(auth, provider);
+            await handleUserSyncAndRoleRouting(result.user);
+        } catch (error) {
+            console.error("Google 登入失敗：", error);
+            alert("連線失敗，請檢查網路服務！");
+        }
+    }
+    else {
+        // 如果有需要處理預設情況或錯誤紀錄，可以寫在這裡
+        console.log('未知的 action:', action);
+    }
 });
 // 封裝成一個獨立的初始化函式
 function initPullToRefresh() {
     const topGroup = document.querySelector('.sticky-top-group');
     let startY = 0;
     let isReloading = false; // 加入鎖定開關，防止連點
-
     if (topGroup) {
         topGroup.addEventListener('touchstart', (e) => {
             startY = e.touches[0].pageY;
             isReloading = false;
         }, { passive: true });
-
         topGroup.addEventListener('touchmove', (e) => {
             if (isReloading) return;
-
             const currentY = e.touches[0].pageY;
             const pullDistance = currentY - startY;
-
             if (pullDistance > 80) {
                 isReloading = true;
                 console.log("[PACE] 偵測到上層下拉，觸發重新整理！");
@@ -1237,7 +1247,6 @@ async function initStorePage() {
             foodCard.dataset.smallPrice = item.prices?.small || 0;
             // ----------------------------
             foodCard.innerHTML = `
-                
                 <div class="food-img-info">
                     <div class="food-img">${item.image ? `<img src="${item.image}" style="width:100%; height:100%; border-radius:inherit; position: absolute;">` : '🍱'}</div>
                     <div class="food-info">
@@ -1400,7 +1409,6 @@ export function initCartDOMState() {
     });
 }
 // 🚀 初始化區塊
-// 1. 將所有邏輯封裝在一個啟動函式裡
 function startApp() {
     initThemeSystem();
     bindHeaderEvents();
@@ -1410,8 +1418,9 @@ function startApp() {
     initCartDOMState();
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
+    initCitySelect(citySelect);
+    initCitySelect(shopCity);
     console.log("系統初始化完成");
 }
-// 2. 為了絕對安全，同時運用 DOMContentLoaded
 // 這不是多餘的，這是為了應對不同瀏覽器載入行為的「防禦性編程」
 document.addEventListener('DOMContentLoaded', startApp);

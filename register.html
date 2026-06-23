@@ -302,7 +302,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #52c41a;
+            background-color: #ff4d4f;
             /* 綠色 */
             border-radius: 7cqw;
             transition: 0.4s;
@@ -319,7 +319,7 @@
             content: "";
             height: 5cqw;
             width: 5cqw;
-            left: 1.375cqw;
+            right: 1.375cqw;
             /* 圓圈初始在左邊 */
             bottom: 1cqw;
             background-color: white;
@@ -334,7 +334,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #52c41a;
+            background-color: #ff4d4f;
             /* 綠色 */
             border-radius: 7cqw;
             transition: 0.4s;
@@ -351,7 +351,7 @@
             content: "";
             height: 5cqw;
             width: 5cqw;
-            left: 1.5cqw;
+            right: 1.5cqw;
             /* 圓圈初始在左邊 */
             bottom: 1cqw;
             background-color: white;
@@ -359,47 +359,47 @@
             transition: 0.4s;
         }
 
-        .menu-soldout-switch .on-text {
-            display: block;
-            margin-left: 5cqw;
-            /* 把字往右擠，閃開左邊的白圈圈 */
-        }
-
-        .seatingtoggle-switch .on-text {
-            display: block;
-            margin-left: 5cqw;
-            /* 把字往右擠，閃開左邊的白圈圈 */
-        }
-
-        .seatingtoggle-switch .off-text,
         .menu-soldout-switch .off-text {
+            display: block;
+            margin-right: 6cqw;
+            /* 把字往右擠，閃開左邊的白圈圈 */
+        }
+
+        .seatingtoggle-switch .off-text {
+            display: block;
+            margin-right: 6cqw;
+            /* 把字往右擠，閃開左邊的白圈圈 */
+        }
+
+        .seatingtoggle-switch .on-text,
+        .menu-soldout-switch .on-text {
             display: none;
         }
 
-        /* 6. 勾選狀態 (變紅色、圓圈右移、文字替換) */
+        /* 6. 勾選狀態 (變綠色、圓圈右移、文字替換) */
         .seatingtoggle:checked+.toggle-slider,
         .menu-soldout-toggle:checked+.toggle-slider {
-            background-color: #ff4d4f;
-            /* 變成紅色 */
+            background-color: #52c41a;
+            /* 變成綠色 */
         }
 
         .seatingtoggle:checked+.toggle-slider::before,
         .menu-soldout-toggle:checked+.toggle-slider::before {
-            transform: translateX(10cqw);
+            transform: translateX(-10cqw);
             /* 把白圈圈推到最右邊 (75 - 22 - 8 = 45) */
-        }
-
-        .seatingtoggle:checked+.toggle-slider .on-text,
-        .menu-soldout-toggle:checked+.toggle-slider .on-text {
-            display: none;
-            /* 隱藏販售中 */
         }
 
         .seatingtoggle:checked+.toggle-slider .off-text,
         .menu-soldout-toggle:checked+.toggle-slider .off-text {
+            display: none;
+            /* 隱藏販售中 */
+        }
+
+        .seatingtoggle:checked+.toggle-slider .on-text,
+        .menu-soldout-toggle:checked+.toggle-slider .on-text {
             display: block;
             /* 顯示暫停 */
-            margin-right: 6cqw;
+            margin-left: 6cqw;
             /* 把字往左擠，閃開右邊的白圈圈 */
         }
 
@@ -808,7 +808,8 @@
                         <div class="remark" style="width: 100%; gap: 1cqw">
                             <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 80%;"
                                 placeholder="備註">
-                            <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle" id="menu-soldout-toggle">
+                            <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle"
+                                    id="menu-soldout-toggle" checked>
                                 <span class="toggle-slider">
                                     <span class="on-text">販售中</span>
                                     <span class="off-text">暫停</span>

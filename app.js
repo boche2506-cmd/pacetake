@@ -191,50 +191,40 @@ function getShopFormData() {
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
-        handleUserSyncAndRoleRouting(user);
+        // 1. 同步角色資料
+        const role = await handleUserSyncAndRoleRouting(user);
+        // 2. 統一更新 UI
+        updateUIForUser(user, role);
+        // 3. 渲染
         renderFavoriteStores();
-    }
-    else {
-        console.log("[PACE DEBUG] Auth state: Logged out");
-        // 處理 UI 狀態恢復成訪客模式
-        if (loginBtn) loginBtn.style.display = 'block';
-        if (avatarBtn) {
-            avatarBtn.style.display = 'none';
-            dropdownMenu.style.display = 'none';
-            dropdownMenu.innerHTML = '';
-        }
-        if (statusDot) statusDot.classList.remove('active');
-        if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
-        if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
-        // 執行訪客狀態的渲染
+        fetchStoresFromFirebase();
+    } else {
+        console.log("[PACE DEBUG] Auth: Logged out");
+        // 統一在這裡處理「訪客模式」的 UI 清理
+        updateUIForUser(null, 'guest');
         renderDynamicMenu('guest');
         fetchStoresFromFirebase();
     }
 });
 
 async function handleUserSyncAndRoleRouting(user) {
-    if (!user) return;
-    currentUserId = user.uid;
-    console.log("[PACE DEBUG] User synced:", user.uid);
-    let currentRole = "buyer";
-    try {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-            currentRole = userDoc.data().role || "buyer";
-        } else {
-            await setDoc(doc(db, "users", user.uid), {
-                uid: user.uid,
-                email: user.email,
-                role: "buyer",
-                displayName: user.displayName,
-                createdAt: new Date().toISOString()
-            });
-        }
-    } catch (e) {
-        console.error("Role routing error:", e);
+    const userDocRef = doc(db, "users", user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+        return userDoc.data().role || "buyer";
+    } else {
+        const newUser = {
+            uid: user.uid,
+            email: user.email || "",
+            displayName: user.displayName || "新會員",
+            role: "buyer",
+            createdAt: new Date().toISOString(),
+            lastLogin: new Date().toISOString() // 順便記錄第一次登入時間
+        };
+        await setDoc(userDocRef, newUser);
+        return "buyer";
     }
-    updateUIForUser(user, currentRole);
-    fetchStoresFromFirebase();
 }
 // 從firebase抓資料
 async function fetchStoresFromFirebase() {
@@ -911,26 +901,16 @@ document.addEventListener('click', async (e) => {
             return;
         }
         // 先檢查該用戶是否已經是賣家，防止重複開鋪
-        console.log("偵測到的 DB 物件:", db);
-        console.log("偵測到的 user 物件:", user);
-        console.log("正在查詢的路徑:", "users/" + user.uid);
-
         try {
             const userDocRef = doc(db, "users", user.uid);
-            console.log("Ref 建立成功，準備讀取..."); // 確認是否走到這一步
-
             const userDoc = await getDoc(userDocRef);
-            console.log("讀取結果:", userDoc.exists()); // 確認是否有讀取到資料
-
             if (userDoc.exists() && userDoc.data().role === "seller") {
                 alert("您已經擁有店舖了，將為您前往賣家後台。");
                 window.location.href = "seller.html";
                 return;
             }
         } catch (err) {
-            // 這裡我們印出詳細錯誤，告訴我這裡顯示什麼
-            console.error("【詳細錯誤發生處】:");
-            console.dir(err);
+            console.error("權限檢查失敗:", err);
             return;
         }
         // --- 2. 基本資訊與防呆 ---
@@ -1034,21 +1014,16 @@ document.addEventListener('click', async (e) => {
     }
     else if (action === 'googleLoginAction') {
         try {
-            const result = await signInWithPopup(auth, provider);
-            await handleUserSyncAndRoleRouting(result.user);
+            await signInWithPopup(auth, provider);
+            // 不要在這裡呼叫 handleUserSyncAndRoleRouting！
+            // 登入後，onAuthStateChanged 會自動被觸發
         } catch (error) {
             console.error("Google 登入失敗：", error);
-            alert("連線失敗，請檢查網路服務！");
         }
     }
     else if (action === 'logoutBtn') {
-        console.log("[PACE DEBUG] Logout clicked.");
-        try {
-            await signOut(auth);
-            location.reload();
-        } catch (error) {
-            console.error("Logout error:", error);
-        }
+        await signOut(auth);
+        // 不用寫 location.reload()，onAuthStateChanged 偵測到登出後會自動切換 UI
     }
     else {
         // 如果有需要處理預設情況或錯誤紀錄，可以寫在這裡

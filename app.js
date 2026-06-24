@@ -434,6 +434,8 @@ function initCitySelect(selectElement) {
 }
 
 function getBrowserLocation() {
+    // 🛡️ 守護：如果不是首頁，直接離開
+    if (!window.location.pathname.includes('index.html')) return;
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -473,7 +475,7 @@ function setupAddressGeocoder() {
     // 1. 頁面路徑安全檢查
     if (!window.location.pathname.includes('register.html')) return;
     console.log("[PACE] Initializing Register Page Logic...");
-    
+
     const addressInput = document.getElementById('shopAddress');
     addressInput?.addEventListener('blur', async () => {
         const city = document.getElementById('citySelect').value;
@@ -1409,6 +1411,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initThemeSystem();
     initCitySelect();
     getBrowserLocation();
+    setupAddressGeocoder();
     initRegisterPage();
     setupMenuManager();
     initAppListeners();

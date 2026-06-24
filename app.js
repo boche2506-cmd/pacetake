@@ -325,20 +325,9 @@ function renderDynamicMenu(role) {
     }
     menuHTML += `
         <div class="menu-divider"></div>
-        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
+        <button id="logoutBtn" data-action="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
     `;
     dropdownMenu.innerHTML = menuHTML;
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            console.log("[PACE DEBUG] Logout clicked.");
-            try {
-                await signOut(auth);
-                location.reload();
-            } catch (error) {
-                console.error("Logout error:", error);
-            }
-        });
-    }
 }
 // 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
 function createStoreCard(store) {
@@ -1053,6 +1042,15 @@ document.addEventListener('click', async (e) => {
         } catch (error) {
             console.error("Google 登入失敗：", error);
             alert("連線失敗，請檢查網路服務！");
+        }
+    }
+    else if (action === 'logoutBtn') {
+        console.log("[PACE DEBUG] Logout clicked.");
+        try {
+            await signOut(auth);
+            location.reload();
+        } catch (error) {
+            console.error("Logout error:", error);
         }
     }
     else {

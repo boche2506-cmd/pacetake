@@ -195,18 +195,18 @@
         }
 
         .food-name {
-            height: 100%;
+            height: auto;
             width: 50%;
             font-size: 6cqw;
             /* 字體改用 cqw */
             font-weight: 700;
             color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
+            white-space: normal;
+            overflow: visible;
             /* 💡 新增：隱藏超出部分 */
-            text-overflow: ellipsis;
+            text-overflow: clip;
             /* 超出顯示 ... */
-            line-height: 1.1;
+            line-height: 1.2;
             display: flex;
             flex-direction: row;
             justify-content: flex-start;
@@ -214,19 +214,21 @@
         }
 
         .card-note-display {
-            height: 100%;
+            height: auto;
             width: 50%;
             font-size: 3cqw;
             font-weight: 500;
             color: var(--text-muted);
-            line-height: 1.1;
+            line-height: 1.2;
             /* 讓行距跟著字體一起自動調整 */
             display: flex;
             flex-direction: row;
             justify-content: flex-start;
             align-items: center;
             box-sizing: border-box;
-            white-space: nowrap;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
             padding: 0 2cqw;
         }
 

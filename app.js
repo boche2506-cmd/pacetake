@@ -930,7 +930,7 @@ document.addEventListener('click', async (e) => {
             return;
         }
         // --- 2. 基本資訊與防呆 ---
-        if (!name || !phone || !city || !district || !detailAddress) {
+        if (!ShopFormData.name || !ShopFormData.phone || !ShopFormData.city || !ShopFormData.district || !ShopFormData.detailAddress) {
             alert("⚠️ 請填寫完整的店舖資訊！");
             return;
         }

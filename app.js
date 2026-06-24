@@ -236,13 +236,6 @@ async function handleUserSyncAndRoleRouting(user) {
     updateUIForUser(user, currentRole);
     fetchStoresFromFirebase();
 }
-
-async function getMyFavoriteIds() {
-    const user = auth.currentUser;
-    if (!user) return [];
-    const snapshot = await getDocs(collection(db, "users", user.uid, "favorites"));
-    return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
-}
 // 從firebase抓資料
 async function fetchStoresFromFirebase() {
     try {
@@ -1409,15 +1402,16 @@ export function initCartDOMState() {
 // 🚀 初始化區塊
 document.addEventListener('DOMContentLoaded', () => {
     initAuthSystem();
-    initThemeSystem();
-    getBrowserLocation();
-    initStorePage();
     fetchStoresFromFirebase();
-    initCartDOMState();
-    initRegisterPage();
-    refreshTotalCartUI();
-    initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
+    initThemeSystem();
     initCitySelect();
+    getBrowserLocation();
+    initRegisterPage();
+    setupMenuManager();
     initAppListeners();
+    initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
+    initStorePage();
+    refreshTotalCartUI();
+    initCartDOMState();
     console.log("系統初始化完成");
 });

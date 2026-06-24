@@ -476,46 +476,49 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 // 監聽詳細地址輸入框，當離開欄位時自動查詢
-document.getElementById('shopAddress')?.addEventListener('blur', () => {
-    const city = document.getElementById('citySelect').value;
-    const district = document.getElementById('districtSelect').value;
-    const detail = document.getElementById('shopAddress').value.trim();
-    if (!city || !district || !detail) return;
-    const fullAddress = `${city}${district}${detail}`;
-    console.log("[PACE] 使用 Google API 查詢：", fullAddress);
-    // 初始化 Google Geocoder
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ 'address': fullAddress }, (results, status) => {
-        if (status === 'OK') {
-            const location = results[0].geometry.location;
-            // 填入經緯度欄位
-            document.getElementById('shopLat').value = location.lat();
-            document.getElementById('shopLng').value = location.lng();
-            console.log("[PACE] Google 定位成功！");
-        } else {
-            console.warn("[PACE] Google 定位失敗，狀態：" + status);
+function setupAddressGeocoder() {
+    const addressInput = document.getElementById('shopAddress');
+    addressInput?.addEventListener('blur', async () => {
+        const city = document.getElementById('citySelect').value;
+        const district = document.getElementById('districtSelect').value;
+        const detail = document.getElementById('shopAddress').value.trim();
+        if (!city || !district || !detail) return;
+        const fullAddress = `${city}${district}${detail}`;
+        console.log("[PACE] 使用 Google API 查詢：", fullAddress);
+        // 初始化 Google Geocoder
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ 'address': fullAddress }, (results, status) => {
+            if (status === 'OK') {
+                const location = results[0].geometry.location;
+                // 填入經緯度欄位
+                document.getElementById('shopLat').value = location.lat();
+                document.getElementById('shopLng').value = location.lng();
+                console.log("[PACE] Google 定位成功！");
+            } else {
+                console.warn("[PACE] Google 定位失敗，狀態：" + status);
+            }
+        });
+    });
+}
+// 確保只有在 register.html 才執行這段檢查
+function initRegisterPage() {
+    // 1. 頁面路徑安全檢查
+    if (!window.location.pathname.includes('register.html')) return;
+    console.log("[PACE] Initializing Register Page Logic...");
+
+    // 2. 位址與經緯度檢查 (包含提交驗證)
+    shopSubmitBtn?.addEventListener('click', (e) => {
+        const lat = document.getElementById('shopLat')?.value.trim();
+        const lng = document.getElementById('shopLng')?.value.trim();
+        if (!lat || !lng) {
+            e.preventDefault();
+            alert("⚠️ 請先確認店鋪經緯度！若無法自動取得，請點擊「查詢座標」按鈕手動輸入，確保定位正確喔！");
+            document.getElementById('shopLat')?.focus();
+            return;
         }
     });
-});
-// 確保只有在 register.html 才執行這段檢查
-if (window.location.pathname.includes('register.html')) {
-    // 你的原本的檢查邏輯
-    if (shopSubmitBtn) {
-        shopSubmitBtn.addEventListener('click', (e) => {
-            const lat = document.getElementById('shopLat')?.value.trim();
-            const lng = document.getElementById('shopLng')?.value.trim();
-            if (!lat || !lng) {
-                e.preventDefault(); // 阻止送出
-                alert("⚠️ 請先確認店鋪經緯度！若無法自動取得，請點擊「查詢座標」按鈕手動輸入，確保定位正確喔！");
-                document.getElementById('shopLat')?.focus();
-                return;
-            }
-            // ... 後續的送出邏輯
-        });
-    }
-}
-if (newebpayContainer) {
-    newebpayContainer.innerHTML = `
+    if (newebpayContainer) {
+        newebpayContainer.innerHTML = `
             <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
             <div style="display:flex; flex-direction:column; gap:0.5cqw;">
                 <input type="text" id="merchantIdInput" class="input-style" style="height:8cqw;" placeholder="請輸入 商店代號 (MerchantID)">
@@ -523,49 +526,37 @@ if (newebpayContainer) {
                 <input type="text" id="hashIvInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashIV">
             </div>
         `;
-}
-
-if (toggleOnline) {
-    toggleOnline.addEventListener('change', function () {
+    }
+    toggleOnline?.addEventListener('change', function () {
         if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
     });
-}
-// toggleCash 開啟警告邏輯
-if (toggleCash) {
-    toggleCash.checked = false;
-    toggleCash.addEventListener('click', function (e) {
-        console.log("[PACE DEBUG] toggleCash clicked.");
-        if (this.checked) {
-            this.checked = false;
-            e.preventDefault();
-            if (cashWarningModal) cashWarningModal.style.display = 'flex';
+    // 4. 現金警告邏輯 (事件委派)
+    if (toggleCash) {
+        toggleCash.checked = false;
+        toggleCash.addEventListener('click', (e) => {
+            if (toggleCash.checked) {
+                toggleCash.checked = false;
+                e.preventDefault();
+                if (cashWarningModal) cashWarningModal.style.display = 'flex';
+            }
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (e.target.id === 'warningConfirmBtn') {
+            if (toggleCash) toggleCash.checked = true;
+            if (cashWarningModal) cashWarningModal.style.display = 'none';
+        } else if (e.target.id === 'warningCancelBtn') {
+            if (toggleCash) toggleCash.checked = false;
+            if (cashWarningModal) cashWarningModal.style.display = 'none';
         }
     });
-}
 
-if (warningConfirmBtn) {
-    warningConfirmBtn.addEventListener('click', () => {
-        console.log("[PACE DEBUG] Cash warning confirmed.");
-        if (toggleCash) toggleCash.checked = true;
-        if (cashWarningModal) cashWarningModal.style.display = 'none';
-    });
-}
+    if (menuUploadList) {
+        document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
+    }
 
-if (warningCancelBtn) {
-    warningCancelBtn.addEventListener('click', () => {
-        console.log("[PACE DEBUG] Cash warning cancelled.");
-        if (toggleCash) toggleCash.checked = false;
-        if (cashWarningModal) cashWarningModal.style.display = 'none';
-    });
-}
-
-if (menuUploadList) {
-    document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
-}
-
-if (addItemRowBtn && menuUploadList) {
-    addItemRowBtn.addEventListener('click', () => {
-        console.log("[PACE DEBUG] Add item row clicked.");
+    addItemRowBtn?.addEventListener('click', () => {
         const newRow = document.createElement('div');
         newRow.className = 'menu-item-row';
         newRow.innerHTML = `
@@ -1436,6 +1427,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initStorePage();
     fetchStoresFromFirebase();
     initCartDOMState();
+    initRegisterPage();
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
     initCitySelect();

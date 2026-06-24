@@ -188,7 +188,7 @@ function getShopFormData() {
     };
 }
 // 監聽 Firebase 登入狀態
-onAuthStateChanged(auth, async(user) => {
+onAuthStateChanged(auth, async (user) => {
     if (user) {
         console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
         // 1. 同步角色資料
@@ -260,10 +260,21 @@ function initThemeSystem() {
 }
 
 function updateUIForUser(user, currentRole) {
-    // 這裡加上 const，確保這些變數只屬於這個函式
+    // 1. 如果 user 為 null，代表是訪客模式，在這裡處理清空邏輯
+    if (!user) {
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (avatarBtn) avatarBtn.style.display = 'none';
+        if (userNameDisplay) userNameDisplay.innerText = "訪客";
+        // 這裡可以呼叫 renderDynamicMenu('guest') 之類的邏輯
+        return; // 直接中斷，不往下執行
+    }
+
+    // 2. 如果程式執行到這裡，表示 user 一定存在，可以安心讀取資料
     if (loginBtn) loginBtn.style.display = 'none';
     if (avatarBtn) avatarBtn.style.display = 'flex';
     if (loginLightbox) loginLightbox.style.display = 'none';
+
+    // 角色顯示邏輯
     if (userNameDisplay) {
         if (currentRole === "admin") {
             userNameDisplay.innerHTML = `👑 總管`;
@@ -273,6 +284,8 @@ function updateUIForUser(user, currentRole) {
             userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
         }
     }
+
+    // 頭像處理邏輯 (結合你的建議)
     if (user.photoURL && userAvatarImg && defaultIcon) {
         userAvatarImg.src = user.photoURL;
         userAvatarImg.style.display = 'block';
@@ -281,8 +294,11 @@ function updateUIForUser(user, currentRole) {
         if (userAvatarImg) userAvatarImg.style.display = 'none';
         defaultIcon.style.display = 'block';
     }
+
+    // 狀態處理
     if (statusDot) statusDot.classList.add('active');
     if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
+
     renderDynamicMenu(currentRole);
 }
 

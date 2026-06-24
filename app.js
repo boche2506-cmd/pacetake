@@ -127,14 +127,17 @@ function initAuthSystem() {
         });
     }
     if (togglePasswordVisibility && loginPasswordInput) {
-        togglePasswordVisibility.addEventListener('click', function () {
-            const isPass = loginPasswordInput.getAttribute('type') === 'password';
-            loginPasswordInput.setAttribute('type', isPass ? 'text' : 'password');
-            this.textContent = isPass ? '🙈' : '👁️';
+        togglePasswordVisibility.addEventListener('click', () => {
+            const isPass = loginPasswordInput.type === 'password';
+            loginPasswordInput.type = isPass ? 'text' : 'password';
+            togglePasswordVisibility.textContent = isPass ? '🙈' : '👁️';
         });
     }
     if (emailLoginAction) {
         emailLoginAction.addEventListener('click', async () => {
+            const originalText = emailLoginAction.textContent; // 記住原本的字
+            emailLoginAction.disabled = true; // 鎖住按鈕
+            emailLoginAction.textContent = "處理中..."; // 給使用者提示
             console.log("[PACE DEBUG] Email login action.");
             const email = loginEmailInput.value.trim();
             const password = loginPasswordInput.value;
@@ -156,6 +159,9 @@ function initAuthSystem() {
                 } else {
                     alert("登入密碼有誤，請再確認一次！");
                 }
+            } finally {
+                emailLoginAction.disabled = false; // 處理完後解鎖
+                emailLoginAction.textContent = originalText; // 恢復文字
             }
         });
     }
@@ -469,9 +475,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
-// 4. 初始化與事件綁定
-// 初始化：設定上傳區塊的事件綁定
-// [頁面選單與燈箱操作]
 // 監聽詳細地址輸入框，當離開欄位時自動查詢
 document.getElementById('shopAddress')?.addEventListener('blur', () => {
     const city = document.getElementById('citySelect').value;
@@ -1426,7 +1429,7 @@ export function initCartDOMState() {
     });
 }
 // 🚀 初始化區塊
-function startApp() {
+document.addEventListener('DOMContentLoaded', () => {
     initAuthSystem();
     initThemeSystem();
     getBrowserLocation();
@@ -1436,10 +1439,6 @@ function startApp() {
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
     initCitySelect();
-    console.log("系統初始化完成");
-}
-// 2. 監聽 DOMContentLoaded，確保 HTML 都長出來了再執行
-document.addEventListener('DOMContentLoaded', () => {
     initAppListeners();
-    startApp();
+    console.log("系統初始化完成");
 });

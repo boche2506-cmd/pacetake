@@ -939,7 +939,7 @@ document.addEventListener('click', async (e) => {
         const menuRows = document.querySelectorAll('.menu-item-row');
         const menuItems = [];
         menuRows.forEach((row, index) => {
-            const supply = document.getElementById('menu-soldout-switch') ? document.getElementById('menu-soldout-switch').checked : false;
+            const supply = document.getElementById('menu-soldout-toggle') ? document.getElementById('menu-soldout-toggle').checked : false;
             const nameVal = row.querySelector('.item-name-input').value.trim();
             if (!nameVal) return;
             const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';

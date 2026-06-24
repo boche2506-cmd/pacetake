@@ -435,7 +435,10 @@ function initCitySelect(selectElement) {
 
 function getBrowserLocation() {
     // 🛡️ 守護：如果不是首頁，直接離開
-    if (!window.location.pathname.includes('index.html')) return;
+    const path = window.location.pathname;
+    if (path === '/' || path.includes('index.html')) {
+        // 這裡是你的首頁邏輯
+    }
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {

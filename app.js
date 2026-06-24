@@ -805,9 +805,9 @@ document.addEventListener('change', async (e) => {
     if (!target) return;
     const action = target.getAttribute('data-action-change');
     const selectedValue = target.value;
+    const path = window.location.pathname;
     // 1. 處理「城市選擇」邏輯
     if (action === 'citySelect') {
-        // 直接指定目標，修正拼字錯誤並移除冗餘的三元運算子
         const districtSelect = document.querySelector('#districtSelect');
         if (districtSelect) {
             districtSelect.innerHTML = '<option value="">選擇區域</option>';
@@ -820,12 +820,17 @@ document.addEventListener('change', async (e) => {
                 });
             }
         }
-        // 如果是 citySelect，還要記得觸發篩選
-        if (action === 'citySelect') filterAndRenderStores();
+        // 分流執行：只有在 index.html 才篩選商店
+        if (path.includes('index.html') || path === '/') {
+            filterAndRenderStores();
+        }
     }
-    // 2. 處理「區域選擇」的邏輯
+    // 處理「區域選擇」的邏輯
     else if (action === 'districtSelect') {
-        filterAndRenderStores();
+        // 分流執行：只有在 index.html 才篩選商店
+        if (path.includes('index.html') || path === '/') {
+            filterAndRenderStores();
+        }
     }
     // 3. 其他處理
     else {

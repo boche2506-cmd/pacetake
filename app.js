@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 // 在你的網頁 script 或其他 JS 檔案中：
 // 接下來就可以直接呼叫這些函式了
 // 例如：
@@ -18,6 +18,10 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const provider = new GoogleAuthProvider();
+export const currentStoreInfo = {
+    id: null,
+    name: null
+};
 // ==========================================
 // 2. 全域核心變數與資料
 // ==========================================
@@ -55,12 +59,6 @@ const areaData = {
 // 統一管理頁面上的所有元件
 const storeContainer = document.getElementById('store-Container');
 const googleLoginAction = document.getElementById('googleLoginAction');
-const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
-const emailFormSection = document.getElementById('emailFormSection');
-const customReturnBtn = document.getElementById('customReturnBtn');
-const loginEmailInput = document.getElementById('loginEmail');
-const loginPasswordInput = document.getElementById('loginPassword');
-const emailLoginAction = document.getElementById('emailLoginAction');
 const citySelect = document.getElementById('citySelect');
 const districtSelect = document.getElementById('districtSelect');
 const gpsPinBtn = document.getElementById('gpsPinBtn');
@@ -79,15 +77,10 @@ const warningCancelBtn = document.getElementById('warningCancelBtn');
 const statusDot = document.getElementById('statusDot');
 const statusText = document.getElementById('statusText');
 const toggleBtn = document.getElementById('themeToggleBtn');
-const loginBtn = document.getElementById('loginBtn');
-const avatarBtn = document.getElementById('avatarBtn');
-const loginLightbox = document.getElementById('loginLightbox');
 const userNameDisplay = document.getElementById('userNameDisplay');
 const userAvatarImg = document.getElementById('userAvatarImg');
 const defaultIcon = document.getElementById('defaultIcon');
-const dropdownMenu = document.getElementById('dropdownMenu');
 const logoutBtn = document.getElementById('logoutBtn');
-const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
 const shopCity = document.getElementById('shopCity');
 const shopDistrict = document.getElementById('shopDistrict');
 const addItemRowBtn = document.getElementById('addItemRowBtn');
@@ -96,21 +89,79 @@ const heartIcon = document.getElementById('heart-icon');
 const menuContainer = document.getElementById('menuContainer');
 const storeDistanceText = document.getElementById('storeDistanceText');
 const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
-// 1. 初始化函式：負責把資料灌入指定的 Select
-function initCitySelect(selectElement) {
-    if (!selectElement) return;
-    Object.keys(areaData).forEach(city => {
-        const opt = document.createElement('option');
-        opt.value = city;
-        opt.innerText = city;
-        selectElement.appendChild(opt);
-    });
-}
 
-window.currentStoreInfo = {
-    id: null,
-    name: null
-};
+function initAuthSystem() {
+    console.log("[PACE DEBUG] Initializing Auth UI...");
+    const avatarBtn = document.getElementById('avatarBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginLightbox = document.getElementById('loginLightbox');
+    const customReturnBtn = document.getElementById('customReturnBtn');
+    const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
+    const emailFormSection = document.getElementById('emailFormSection');
+    const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
+    const loginPasswordInput = document.getElementById('loginPassword');
+    const emailLoginAction = document.getElementById('emailLoginAction');
+    const loginEmailInput = document.getElementById('loginEmail');
+    // 2. 下拉選單邏輯
+    if (avatarBtn && dropdownMenu) {
+        avatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', (e) => {
+            if (!avatarBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+    }
+    // 3. 登入視窗切換邏輯
+    if (loginBtn && loginLightbox) {
+        loginBtn.addEventListener('click', () => loginLightbox.style.display = 'flex');
+    }
+    if (customReturnBtn && loginLightbox) {
+        customReturnBtn.addEventListener('click', () => loginLightbox.style.display = 'none');
+    }
+    // 4. 表單隱藏/密碼顯現邏輯
+    if (toggleEmailFormBtn && emailFormSection) {
+        toggleEmailFormBtn.addEventListener('click', () => {
+            emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+    if (togglePasswordVisibility && loginPasswordInput) {
+        togglePasswordVisibility.addEventListener('click', function () {
+            const isPass = loginPasswordInput.getAttribute('type') === 'password';
+            loginPasswordInput.setAttribute('type', isPass ? 'text' : 'password');
+            this.textContent = isPass ? '🙈' : '👁️';
+        });
+    }
+    if (emailLoginAction) {
+        emailLoginAction.addEventListener('click', async () => {
+            console.log("[PACE DEBUG] Email login action.");
+            const email = loginEmailInput.value.trim();
+            const password = loginPasswordInput.value;
+            if (!email || !password) {
+                alert("密碼或 Email 欄位不可為空！");
+                return;
+            }
+            try {
+                const result = await signInWithEmailAndPassword(auth, email, password);
+                await handleUserSyncAndRoleRouting(result.user);
+            } catch (loginError) {
+                if (loginError.code === "auth/user-not-found" || loginError.code === "auth/invalid-credential") {
+                    try {
+                        const result = await createUserWithEmailAndPassword(auth, email, password);
+                        await handleUserSyncAndRoleRouting(result.user);
+                    } catch (regError) {
+                        alert("註冊密碼強度不足，或帳號已被佔用！");
+                    }
+                } else {
+                    alert("登入密碼有誤，請再確認一次！");
+                }
+            }
+        });
+    }
+}
 
 function getShopFormData() {
     // 每次被呼叫時，都抓取當下最新的一手資料
@@ -187,6 +238,21 @@ async function getMyFavoriteIds() {
     if (!user) return [];
     const snapshot = await getDocs(collection(db, "users", user.uid, "favorites"));
     return snapshot.docs.map(doc => doc.id); // 回傳 ["store01", "store02"]
+}
+// 從firebase抓資料
+async function fetchStoresFromFirebase() {
+    try {
+        console.log("[PACE DEBUG] Fetching stores.");
+        const querySnapshot = await getDocs(collection(db, "stores"));
+        allStores = [];
+        querySnapshot.forEach((doc) => {
+            allStores.push({ id: doc.id, ...doc.data() });
+        });
+        filterAndRenderStores();
+    } catch (error) {
+        console.error("讀取店家失敗：", error);
+        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
+    }
 }
 
 function initThemeSystem() {
@@ -276,23 +342,8 @@ function renderDynamicMenu(role) {
         });
     }
 }
-// 從firebase抓資料
-async function fetchStoresFromFirebase() {
-    try {
-        console.log("[PACE DEBUG] Fetching stores.");
-        const querySnapshot = await getDocs(collection(db, "stores"));
-        allStores = [];
-        querySnapshot.forEach((doc) => {
-            allStores.push({ id: doc.id, ...doc.data() });
-        });
-        filterAndRenderStores();
-    } catch (error) {
-        console.error("讀取店家失敗：", error);
-        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
-    }
-}
 // 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
-window.createStoreCard = function (store) {
+function createStoreCard(store) {
     const finalName = store.shopName || store.name || '未命名店家';
     const finalAddress = store.shopAddress || store.address || '';
     const takeoutSupported = store.isCashPayEnabled !== false;
@@ -354,7 +405,7 @@ function filterAndRenderStores() {
     filtered.forEach(store => {
         if (store.status === "offline") return;
         // 生成卡片
-        const card = window.createStoreCard(store);
+        const card = createStoreCard(store);
         storeContainer.appendChild(card);
     });
 }
@@ -378,12 +429,22 @@ async function renderFavoriteStores() {
         favoriteContainer.innerHTML = ""; // 清空容器
         snapshot.forEach((doc) => {
             const store = doc.data();
-            const card = window.createStoreCard(store);
+            const card = createStoreCard(store);
             favoriteContainer.appendChild(card);
         });
     } catch (error) {
         console.error("讀取收藏失敗:", error);
     }
+}
+// 1. 初始化函式：負責把資料灌入指定的 Select
+function initCitySelect(selectElement) {
+    if (!selectElement) return;
+    Object.keys(areaData).forEach(city => {
+        const opt = document.createElement('option');
+        opt.value = city;
+        opt.innerText = city;
+        selectElement.appendChild(opt);
+    });
 }
 
 function getBrowserLocation() {
@@ -423,114 +484,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 // 4. 初始化與事件綁定
 // 初始化：設定上傳區塊的事件綁定
-// 直接在整個網頁範圍監聽點擊
-document.addEventListener('click', (e) => {
-    // 如果點到的是上傳盒子 (img-upload-box 或 shop-logo-box)
-    const box = e.target.closest('.img-upload-box, .shop-logo-box');
-    if (box) {
-        const input = box.querySelector('.image-input');
-        if (input) input.click();
-    }
-});
-// 直接在整個網頁範圍監聽 change
-document.addEventListener('change', (e) => {
-    // 如果觸發的是 .image-input
-    if (e.target.classList.contains('image-input')) {
-        const input = e.target;
-        const box = input.closest('.img-upload-box, .shop-logo-box');
-        if (!box) return;
-        const file = input.files[0];
-        if (!file) return;
-        const img = box.querySelector('.preview-img');
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const tempImg = new Image();
-            tempImg.src = event.target.result;
-            tempImg.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800;
-                const scaleSize = MAX_WIDTH / tempImg.width;
-                canvas.width = tempImg.width > MAX_WIDTH ? MAX_WIDTH : tempImg.width;
-                canvas.height = tempImg.width > MAX_WIDTH ? tempImg.height * scaleSize : tempImg.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
-                if (img) {
-                    img.src = canvas.toDataURL('image/jpeg', 0.7);
-                    img.style.display = 'block';
-                }
-            };
-        };
-        reader.readAsDataURL(file);
-    }
-});
 // [頁面選單與燈箱操作]
-function bindHeaderEvents() {
-    console.log("[PACE DEBUG] bindHeaderEvents() started.");
-    if (avatarBtn && dropdownMenu) {
-        avatarBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-        });
-        document.addEventListener('click', (e) => {
-            if (!avatarBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.style.display = 'none';
-            }
-        });
-    }
-    if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
-            console.log("[PACE DEBUG] Login button clicked.");
-            if (loginLightbox) loginLightbox.style.display = 'flex';
-        });
-    }
-}
-// [登入與身分認證程序]
-if (customReturnBtn) customReturnBtn.addEventListener('click', () => {
-    console.log("[PACE DEBUG] Custom return clicked.");
-    if (loginLightbox) loginLightbox.style.display = 'none';
-});
-
-if (toggleEmailFormBtn) {
-    toggleEmailFormBtn.addEventListener('click', () => {
-        console.log("[PACE DEBUG] Toggle email form.");
-        if (emailFormSection) emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
-    });
-}
-
-if (togglePasswordVisibility && loginPasswordInput) {
-    togglePasswordVisibility.addEventListener('click', function () {
-        const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        loginPasswordInput.setAttribute('type', type);
-        this.textContent = type === 'password' ? '👁️' : '🙈';
-    });
-}
-
-if (emailLoginAction) {
-    emailLoginAction.addEventListener('click', async () => {
-        console.log("[PACE DEBUG] Email login action.");
-        const email = loginEmailInput.value.trim();
-        const password = loginPasswordInput.value;
-        if (!email || !password) {
-            alert("密碼或 Email 欄位不可為空！");
-            return;
-        }
-        try {
-            const result = await signInWithEmailAndPassword(auth, email, password);
-            await handleUserSyncAndRoleRouting(result.user);
-        } catch (loginError) {
-            if (loginError.code === "auth/user-not-found" || loginError.code === "auth/invalid-credential") {
-                try {
-                    const result = await createUserWithEmailAndPassword(auth, email, password);
-                    await handleUserSyncAndRoleRouting(result.user);
-                } catch (regError) {
-                    alert("註冊密碼強度不足，或帳號已被佔用！");
-                }
-            } else {
-                alert("登入密碼有誤，請再確認一次！");
-            }
-        }
-    });
-}
 // 監聽詳細地址輸入框，當離開欄位時自動查詢
 document.getElementById('shopAddress')?.addEventListener('blur', () => {
     const city = document.getElementById('shopCity').value;
@@ -553,7 +507,23 @@ document.getElementById('shopAddress')?.addEventListener('blur', () => {
         }
     });
 });
-
+// 確保只有在 register.html 才執行這段檢查
+if (window.location.pathname.includes('register.html')) {
+    // 你的原本的檢查邏輯
+    if (shopSubmitBtn) {
+        shopSubmitBtn.addEventListener('click', (e) => {
+            const lat = document.getElementById('shopLat')?.value.trim();
+            const lng = document.getElementById('shopLng')?.value.trim();
+            if (!lat || !lng) {
+                e.preventDefault(); // 阻止送出
+                alert("⚠️ 請先確認店鋪經緯度！若無法自動取得，請點擊「查詢座標」按鈕手動輸入，確保定位正確喔！");
+                document.getElementById('shopLat')?.focus();
+                return;
+            }
+            // ... 後續的送出邏輯
+        });
+    }
+}
 if (newebpayContainer) {
     newebpayContainer.innerHTML = `
             <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
@@ -674,23 +644,6 @@ if (addItemRowBtn && menuUploadList) {
         makeItemDraggable(newRow);
     });
 }
-// 確保只有在 register.html 才執行這段檢查
-if (window.location.pathname.includes('register.html')) {
-    // 你的原本的檢查邏輯
-    if (shopSubmitBtn) {
-        shopSubmitBtn.addEventListener('click', (e) => {
-            const lat = document.getElementById('shopLat')?.value.trim();
-            const lng = document.getElementById('shopLng')?.value.trim();
-            if (!lat || !lng) {
-                e.preventDefault(); // 阻止送出
-                alert("⚠️ 請先確認店鋪經緯度！若無法自動取得，請點擊「查詢座標」按鈕手動輸入，確保定位正確喔！");
-                document.getElementById('shopLat')?.focus();
-                return;
-            }
-            // ... 後續的送出邏輯
-        });
-    }
-}
 // 拖曳菜單專屬函式區 新增菜單(賣家)
 function makeItemDraggable(row) {
     const handle = row.querySelector('.drag-handle');
@@ -792,6 +745,75 @@ document.addEventListener('click', (e) => {
         }
         // 刪除該行
         e.target.closest('.menu-item-row').remove();
+    }
+});
+/**
+ * 監聽特定欄位的變化並更新 UI的工具
+ * @param {string} collectionName - 資料庫集合名稱
+ * @param {string} docId - 文件 ID
+ * @param {string} fieldName - 要監聽的欄位名稱
+ * @param {HTMLElement} element - 要更新的 UI 元件
+ */
+export function setupRealtimeListener(collectionName, docId, fieldName, element) {
+    const docRef = doc(db, collectionName, docId);
+    // 建立監聽器
+    return onSnapshot(docRef, (snapshot) => {
+        if (!snapshot.exists()) return;
+        const data = snapshot.data();
+        const value = data[fieldName];
+        // 根據欄位類型更新 UI
+        if (element.type === 'checkbox') {
+            element.checked = value; // 更新開關狀態
+        } else {
+            element.innerText = value; // 更新文字顯示
+        }
+        console.log(`${fieldName} 已自動更新為:`, value);
+    });
+    // 將 unsubscribe 回傳出去，讓你在 app.js 可以控制
+    return unsubscribe;
+}
+//Firebase 即時監聽
+function initAppListeners() {
+    // 確保元素真的存在才進行綁定，避免報錯
+}
+// 直接在整個網頁範圍監聽點擊對應class="img-upload-box"class="shop-logo-box"
+document.addEventListener('click', (e) => {
+    // 如果點到的是上傳盒子 (img-upload-box 或 shop-logo-box)
+    const box = e.target.closest('.img-upload-box, .shop-logo-box');
+    if (box) {
+        const input = box.querySelector('.image-input');
+        if (input) input.click();
+    }
+});
+// 直接在整個網頁範圍監聽 change
+document.addEventListener('change', (e) => {
+    // 如果觸發的是 .image-input
+    if (e.target.classList.contains('image-input')) {
+        const input = e.target;
+        const box = input.closest('.img-upload-box, .shop-logo-box');
+        if (!box) return;
+        const file = input.files[0];
+        if (!file) return;
+        const img = box.querySelector('.preview-img');
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const tempImg = new Image();
+            tempImg.src = event.target.result;
+            tempImg.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const scaleSize = MAX_WIDTH / tempImg.width;
+                canvas.width = tempImg.width > MAX_WIDTH ? MAX_WIDTH : tempImg.width;
+                canvas.height = tempImg.width > MAX_WIDTH ? tempImg.height * scaleSize : tempImg.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+                if (img) {
+                    img.src = canvas.toDataURL('image/jpeg', 0.7);
+                    img.style.display = 'block';
+                }
+            };
+        };
+        reader.readAsDataURL(file);
     }
 });
 // Listener'input'
@@ -1410,10 +1432,10 @@ export function initCartDOMState() {
 }
 // 🚀 初始化區塊
 function startApp() {
+    initAuthSystem();
     initThemeSystem();
-    bindHeaderEvents();
-    initStorePage();
     getBrowserLocation();
+    initStorePage();
     fetchStoresFromFirebase();
     initCartDOMState();
     refreshTotalCartUI();
@@ -1422,5 +1444,8 @@ function startApp() {
     initCitySelect(shopCity);
     console.log("系統初始化完成");
 }
-// 這不是多餘的，這是為了應對不同瀏覽器載入行為的「防禦性編程」
-document.addEventListener('DOMContentLoaded', startApp);
+// 2. 監聽 DOMContentLoaded，確保 HTML 都長出來了再執行
+document.addEventListener('DOMContentLoaded', () => {
+    initAppListeners();
+    startApp();
+});

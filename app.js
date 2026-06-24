@@ -551,11 +551,101 @@ function initRegisterPage() {
             if (cashWarningModal) cashWarningModal.style.display = 'none';
         }
     });
+}
+// 拖曳菜單專屬函式區 新增菜單(賣家)
+function setupMenuManager() {
+    // 如果頁面沒有菜單容器，就直接跳出，不執行任何邏輯
+    if (!menuUploadList) return;
+    // --- 1. 拖曳功能模組 ---
+    let activeDragItem = null;
 
-    if (menuUploadList) {
-        document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
+    function makeItemDraggable(row) {
+        const handle = row.querySelector('.drag-handle');
+        if (!handle) return;
+        handle.addEventListener('mousedown', (e) => startDrag(e, row));
+        handle.addEventListener('touchstart', (e) => startDrag(e, row), { passive: false });
     }
 
+    function startDrag(e, row) {
+        if (e.cancelable) e.preventDefault();
+        activeDragItem = row;
+        row.style.opacity = '0.5';
+        row.style.border = '0.2cqw dashed var(--brand-blue)';
+        if (e.type.startsWith('touch')) {
+            window.addEventListener('touchmove', onDragMove, { passive: false });
+            window.addEventListener('touchend', onDragEnd);
+        } else {
+            window.addEventListener('mousemove', onDragMove);
+            window.addEventListener('mouseup', onDragEnd);
+        }
+    }
+
+    function onDragMove(e) {
+        if (!activeDragItem || !menuUploadList) return;
+        if (e.cancelable) e.preventDefault();
+        const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+        requestAnimationFrame(() => {
+            const siblings = [...menuUploadList.querySelectorAll('.menu-item-row')].filter(el => el !== activeDragItem);
+            const nextSibling = siblings.find(sibling => {
+                const box = sibling.getBoundingClientRect();
+                return clientY <= box.top + box.height / 2;
+            });
+            if (nextSibling && activeDragItem !== nextSibling) {
+                menuUploadList.insertBefore(activeDragItem, nextSibling);
+            } else if (!nextSibling && activeDragItem !== menuUploadList.lastElementChild) {
+                menuUploadList.appendChild(activeDragItem);
+            }
+        });
+    }
+
+    function onDragEnd() {
+        if (!activeDragItem) return;
+        activeDragItem.style.opacity = '1';
+        activeDragItem.style.border = '0.2cqw solid var(--border-color)';
+        activeDragItem = null;
+        window.removeEventListener('mousemove', onDragMove);
+        window.removeEventListener('mouseup', onDragEnd);
+        window.removeEventListener('touchmove', onDragMove);
+        window.removeEventListener('touchend', onDragEnd);
+    }
+    // --- 2. 初始化已存在的項目 ---
+    document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
+    // --- 3. 統一的事件委派 (點擊與變更) ---
+    // 我們只綁定在 menuUploadList 上，這樣新增的項目也會自動擁有這些功能
+    menuUploadList.addEventListener('click', (e) => {
+        const target = e.target;
+        const row = target.closest('.menu-item-row');
+        if (!row) return;
+        // 刪除按鈕邏輯
+        if (target.classList.contains('del-row-btn')) {
+            if (menuUploadList.querySelectorAll('.menu-item-row').length <= 1) {
+                alert("報告老闆，店裡至少要留一項商品才能開張喔！");
+                return;
+            }
+            row.remove();
+        }
+        // 規格切換邏輯
+        if (target.classList.contains('new-size')) {
+            const mainPriceInput = row.querySelector('.price-input');
+            const sizePriceContainer = row.querySelector('.new-size-price');
+            if (!mainPriceInput || !sizePriceContainer) return;
+
+            const isHidden = sizePriceContainer.style.display === 'none' || sizePriceContainer.style.display === '';
+            sizePriceContainer.style.display = isHidden ? 'flex' : 'none';
+            mainPriceInput.disabled = isHidden;
+            mainPriceInput.style.textDecoration = isHidden ? 'line-through' : 'none';
+            mainPriceInput.style.backgroundColor = isHidden ? 'var(--bg-Container)' : '';
+            mainPriceInput.required = !isHidden;
+        }
+    });
+
+    menuUploadList.addEventListener('change', (e) => {
+        if (e.target.classList.contains('menu-soldout-toggle')) {
+            const row = e.target.closest('.menu-item-row');
+            if (row) row.classList.toggle('sold-out', !e.target.checked);
+        }
+    });
+    // --- 4. 新增行按鈕邏輯 ---
     addItemRowBtn?.addEventListener('click', () => {
         const newRow = document.createElement('div');
         newRow.className = 'menu-item-row';
@@ -625,109 +715,6 @@ function initRegisterPage() {
         makeItemDraggable(newRow);
     });
 }
-// 拖曳菜單專屬函式區 新增菜單(賣家)
-function makeItemDraggable(row) {
-    const handle = row.querySelector('.drag-handle');
-    if (!handle) return;
-    handle.addEventListener('mousedown', (e) => startDrag(e, row));
-    handle.addEventListener('touchstart', (e) => startDrag(e, row), { passive: false });
-}
-
-function startDrag(e, row) {
-    if (e.cancelable) e.preventDefault();
-    activeDragItem = row;
-    row.style.opacity = '0.5';
-    row.style.border = '0.2cqw dashed var(--brand-blue)';
-    if (e.type.startsWith('touch')) {
-        window.addEventListener('touchmove', onDragMove, { passive: false });
-        window.addEventListener('touchend', onDragEnd);
-    } else {
-        window.addEventListener('mousemove', onDragMove);
-        window.addEventListener('mouseup', onDragEnd);
-    }
-}
-
-function onDragMove(e) {
-    if (!activeDragItem || !menuUploadList) return;
-    if (e.cancelable) e.preventDefault();
-    const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-    // 使用 requestAnimationFrame 優化效能
-    requestAnimationFrame(() => {
-        const siblings = [...menuUploadList.querySelectorAll('.menu-item-row')].filter(el => el !== activeDragItem);
-        const nextSibling = siblings.find(sibling => {
-            const box = sibling.getBoundingClientRect();
-            return clientY <= box.top + box.height / 2;
-        });
-        if (nextSibling && activeDragItem !== nextSibling) {
-            menuUploadList.insertBefore(activeDragItem, nextSibling);
-        } else if (!nextSibling && activeDragItem !== menuUploadList.lastElementChild) {
-            menuUploadList.appendChild(activeDragItem);
-        }
-    });
-}
-
-function onDragEnd() {
-    if (!activeDragItem) return;
-    activeDragItem.style.opacity = '1';
-    activeDragItem.style.border = '0.2cqw solid var(--border-color)';
-    activeDragItem = null;
-    window.removeEventListener('mousemove', onDragMove);
-    window.removeEventListener('mouseup', onDragEnd);
-    window.removeEventListener('touchmove', onDragMove);
-    window.removeEventListener('touchend', onDragEnd);
-}
-// 拖曳菜單專屬函式區 (賣家)結束
-// 💡 加上 if 判斷安全守護，確保只有在有該元素的頁面才執行，避免 store.html 崩潰
-if (menuUploadList) {
-    menuUploadList.addEventListener('change', (e) => {
-        if (e.target.classList.contains('menu-soldout-toggle') || e.target.classList.contains('soldout-toggle')) {
-            const isChecked = e.target.checked;
-            const card = e.target.closest('.menu-item-row');
-            if (card) {
-                if (isChecked) {
-                    card.classList.add('sold-out');
-                } else {
-                    card.classList.remove('sold-out');
-                }
-            }
-        }
-    });
-}
-
-document.addEventListener('click', (e) => {
-    // 判斷點擊的是否為「如需規格」按鈕
-    if (e.target.classList.contains('new-size')) {
-        const btn = e.target;
-        const menuItem = btn.closest('.menu-item-row');
-        if (!menuItem) return;
-        const mainPriceInput = menuItem.querySelector('.price-input');
-        const sizePriceContainer = menuItem.querySelector('.new-size-price');
-        if (!mainPriceInput || !sizePriceContainer) return;
-        // 切換顯示狀態
-        const isHidden = sizePriceContainer.style.display === 'none' || sizePriceContainer.style.display === '';
-        sizePriceContainer.style.display = isHidden ? 'flex' : 'none';
-        // 切換原始金額欄位的狀態
-        mainPriceInput.disabled = isHidden;
-        mainPriceInput.style.textDecoration = isHidden ? 'line-through' : 'none';
-        mainPriceInput.style.backgroundColor = isHidden ? 'var(--bg-Container)' : '';
-        mainPriceInput.required = !isHidden;
-    }
-});
-// 7. Window 全域綁定區 (給 HTML onclick 呼叫)
-document.addEventListener('click', (e) => {
-    // 檢查是否點擊到了刪除按鈕
-    if (e.target.classList.contains('del-row-btn')) {
-        if (!menuUploadList) return;
-        const rows = menuUploadList.querySelectorAll('.menu-item-row');
-        // 檢查是否只剩最後一行
-        if (rows.length <= 1) {
-            alert("報告老闆，店裡至少要留一項商品才能開張喔！");
-            return;
-        }
-        // 刪除該行
-        e.target.closest('.menu-item-row').remove();
-    }
-});
 /**
  * 監聽特定欄位的變化並更新 UI的工具
  * @param {string} collectionName - 資料庫集合名稱

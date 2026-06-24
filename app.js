@@ -470,6 +470,10 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 // 監聽詳細地址輸入框，當離開欄位時自動查詢
 function setupAddressGeocoder() {
+    // 1. 頁面路徑安全檢查
+    if (!window.location.pathname.includes('register.html')) return;
+    console.log("[PACE] Initializing Register Page Logic...");
+    
     const addressInput = document.getElementById('shopAddress');
     addressInput?.addEventListener('blur', async () => {
         const city = document.getElementById('citySelect').value;
@@ -498,7 +502,6 @@ function initRegisterPage() {
     // 1. 頁面路徑安全檢查
     if (!window.location.pathname.includes('register.html')) return;
     console.log("[PACE] Initializing Register Page Logic...");
-
     // 2. 位址與經緯度檢查 (包含提交驗證)
     shopSubmitBtn?.addEventListener('click', (e) => {
         const lat = document.getElementById('shopLat')?.value.trim();

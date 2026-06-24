@@ -188,7 +188,7 @@ function getShopFormData() {
     };
 }
 // 監聽 Firebase 登入狀態
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async(user) => {
     if (user) {
         console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
         // 1. 同步角色資料

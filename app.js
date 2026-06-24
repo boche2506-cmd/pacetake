@@ -81,8 +81,6 @@ const userNameDisplay = document.getElementById('userNameDisplay');
 const userAvatarImg = document.getElementById('userAvatarImg');
 const defaultIcon = document.getElementById('defaultIcon');
 const logoutBtn = document.getElementById('logoutBtn');
-const shopCity = document.getElementById('shopCity');
-const shopDistrict = document.getElementById('shopDistrict');
 const addItemRowBtn = document.getElementById('addItemRowBtn');
 const shopSubmitBtn = document.getElementById('shopSubmitBtn');
 const heartIcon = document.getElementById('heart-icon');
@@ -168,8 +166,8 @@ function getShopFormData() {
     return {
         name: document.getElementById('shopName')?.value.trim(),
         phone: document.getElementById('shopPhone')?.value.trim(),
-        city: document.getElementById('shopCity')?.value,
-        district: document.getElementById('shopDistrict')?.value,
+        city: document.getElementById('citySelect')?.value,
+        district: document.getElementById('districtSelect')?.value,
         detailAddress: document.getElementById('shopAddress')?.value.trim(),
         lat: document.getElementById('shopLat')?.value.trim() || '',
         lng: document.getElementById('shopLng')?.value.trim() || '',
@@ -487,8 +485,8 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 // [頁面選單與燈箱操作]
 // 監聽詳細地址輸入框，當離開欄位時自動查詢
 document.getElementById('shopAddress')?.addEventListener('blur', () => {
-    const city = document.getElementById('shopCity').value;
-    const district = document.getElementById('shopDistrict').value;
+    const city = document.getElementById('citySelect').value;
+    const district = document.getElementById('districtSelect').value;
     const detail = document.getElementById('shopAddress').value.trim();
     if (!city || !district || !detail) return;
     const fullAddress = `${city}${district}${detail}`;
@@ -818,9 +816,9 @@ document.addEventListener('change', (e) => {
 });
 // Listener'input'
 document.addEventListener('input', (e) => {
-    const target = e.target.closest('[data-action]');
+    const target = e.target.closest('[data-action-input]');
     if (!target) return;
-    const action = target.getAttribute('data-action');
+    const action = target.getAttribute('data-action-input');
 
     if (action === 'globalSearch') {
         filterAndRenderStores();
@@ -832,15 +830,14 @@ document.addEventListener('input', (e) => {
 });
 // Listener'change'
 document.addEventListener('change', async (e) => {
-    const target = e.target.closest('[data-action]');
+    const target = e.target.closest('[data-action-change]');
     if (!target) return;
-    const action = target.getAttribute('data-action');
-    // 1. 處理「城市選擇」相關的邏輯 (citySelect 或 shopCity)
-    if (action === 'citySelect' || action === 'shopCity') {
-        // 決定要更新哪一個區域選單
-        const selectedValue = target.value;
-        const targetDistrictId = action === 'citySelect' ? '#districtSelect' : '#shopDistrict';
-        const districtSelect = document.querySelector(targetDistrictId);
+    const action = target.getAttribute('data-action-change');
+    const selectedValue = target.value;
+    // 1. 處理「城市選擇」邏輯
+    if (action === 'citySelect') {
+        // 直接指定目標，修正拼字錯誤並移除冗餘的三元運算子
+        const districtSelect = document.querySelector('#districtSelect');
         if (districtSelect) {
             districtSelect.innerHTML = '<option value="">選擇區域</option>';
             if (areaData[selectedValue]) {
@@ -1440,8 +1437,7 @@ function startApp() {
     initCartDOMState();
     refreshTotalCartUI();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
-    initCitySelect(citySelect);
-    initCitySelect(shopCity);
+    initCitySelect();
     console.log("系統初始化完成");
 }
 // 2. 監聽 DOMContentLoaded，確保 HTML 都長出來了再執行

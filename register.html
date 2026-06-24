@@ -679,7 +679,7 @@
                 <div class="shop-name-block" style="display: flex; gap: 1cqw; align-items: center;">
                     <div class="shop-logo-box" id="shopLogoBox"
                         style="width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                        <input type="file" id="shopLogoInput" class="image-input" data-action="image-input" accept="image/*"
+                        <input type="file" id="shopLogoInput" class="image-input" accept="image/*"
                             style="display: none;">
                         <img id="shopLogoPreview" class="preview-img" src=""
                             style="display: none; width: 100%; height: 100%; object-fit: contain; border-radius: 2cqw; position: absolute;">
@@ -688,10 +688,32 @@
                     <div style="display: flex; flex-direction: column; gap: 1cqw; flex-grow: 1;">
                         <input type="text" id="shopName" class="input-style" placeholder="請輸入店鋪招牌名稱(必填)" required>
                         <div style="display: flex; gap: 1cqw;">
-                            <select id="shopCity" class="input-style">
+                            <select id="citySelect" class="input-style" data-action-change="citySelect">
                                 <option value="">選擇縣市</option>
+                                <option value="臺北市">臺北市</option>
+                                <option value="新北市">新北市</option>
+                                <option value="基隆市">基隆市</option>
+                                <option value="桃園市">桃園市</option>
+                                <option value="新竹市">新竹市</option>
+                                <option value="新竹縣">新竹縣</option>
+                                <option value="苗栗縣">苗栗縣</option>
+                                <option value="台中市">台中市</option>
+                                <option value="彰化縣">彰化縣</option>
+                                <option value="南投縣">南投縣</option>
+                                <option value="雲林縣">雲林縣</option>
+                                <option value="嘉義市">嘉義市</option>
+                                <option value="嘉義縣">嘉義縣</option>
+                                <option value="台南市">台南市</option>
+                                <option value="高雄市">高雄市</option>
+                                <option value="屏東縣">屏東縣</option>
+                                <option value="宜蘭縣">宜蘭縣</option>
+                                <option value="花蓮縣">花蓮縣</option>
+                                <option value="臺東縣">臺東縣</option>
+                                <option value="澎湖縣">澎湖縣</option>
+                                <option value="金門縣">金門縣</option>
+                                <option value="連江縣">連江縣</option>
                             </select>
-                            <select id="shopDistrict" class="input-style">
+                            <select id="districtSelect" class="input-style" data-action-change="districtSelect">
                                 <option value="">選擇區域</option>
                             </select>
                         </div>
@@ -739,8 +761,7 @@
                             class="slider"></span></label>
                 </div>
                 <div class="seating">
-                    <label class="seatingtoggle-switch" ><input type="checkbox"
-                            class="seatingtoggle" id="seatingtoggle">
+                    <label class="seatingtoggle-switch"><input type="checkbox" class="seatingtoggle" id="seatingtoggle">
                         <span class="toggle-slider">
                             <span class="on-text">開放中</span>
                             <span class="off-text">無提供</span>
@@ -757,7 +778,7 @@
                     <div class="menu-item-row">
                         <div class="menu-item">
                             <div class="img-upload-box" id="uploadBox">
-                                <input type="file" id="imageInput" class="image-input" data-action="image-input" accept="image/*"
+                                <input type="file" id="imageInput" class="image-input" accept="image/*"
                                     style="display: none;">
                                 <img class="preview-img" src=""
                                     style="display: none; position: absolute; width: 100%; height: 100%; object-fit: contain; border-radius: 2cqw;">

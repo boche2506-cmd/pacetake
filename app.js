@@ -911,16 +911,26 @@ document.addEventListener('click', async (e) => {
             return;
         }
         // 先檢查該用戶是否已經是賣家，防止重複開鋪
+        console.log("偵測到的 DB 物件:", db);
+        console.log("偵測到的 user 物件:", user);
+        console.log("正在查詢的路徑:", "users/" + user.uid);
+
         try {
             const userDocRef = doc(db, "users", user.uid);
+            console.log("Ref 建立成功，準備讀取..."); // 確認是否走到這一步
+
             const userDoc = await getDoc(userDocRef);
+            console.log("讀取結果:", userDoc.exists()); // 確認是否有讀取到資料
+
             if (userDoc.exists() && userDoc.data().role === "seller") {
                 alert("您已經擁有店舖了，將為您前往賣家後台。");
                 window.location.href = "seller.html";
                 return;
             }
         } catch (err) {
-            console.error("權限檢查失敗:", err);
+            // 這裡我們印出詳細錯誤，告訴我這裡顯示什麼
+            console.error("【詳細錯誤發生處】:");
+            console.dir(err);
             return;
         }
         // --- 2. 基本資訊與防呆 ---

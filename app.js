@@ -89,13 +89,13 @@ const heartIcon = document.getElementById('heart-icon');
 const menuContainer = document.getElementById('menuContainer');
 const storeDistanceText = document.getElementById('storeDistanceText');
 const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
+const loginLightbox = document.getElementById('loginLightbox');
+const avatarBtn = document.getElementById('avatarBtn');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const loginBtn = document.getElementById('loginBtn');
 
 function initAuthSystem() {
     console.log("[PACE DEBUG] Initializing Auth UI...");
-    const avatarBtn = document.getElementById('avatarBtn');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const loginBtn = document.getElementById('loginBtn');
-    const loginLightbox = document.getElementById('loginLightbox');
     const customReturnBtn = document.getElementById('customReturnBtn');
     const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
     const emailFormSection = document.getElementById('emailFormSection');

@@ -973,7 +973,7 @@ document.addEventListener('click', async (e) => {
             district: ShopFormData.district,
             detailAddress: ShopFormData.detailAddress,
             // 雖然你有獨立欄位，但保留 shopAddress 也很方便前端直接顯示
-            shopAddress: `${city}${district}${detailAddress}`,
+            shopAddress: `${ShopFormData.city}${ShopFormData.district}${ShopFormData.detailAddress}`,
             shopLat: ShopFormData.lat,
             shopLng: ShopFormData.lng,
             inviteCode: inviteCode,

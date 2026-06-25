@@ -66,7 +66,6 @@ const modalAddressText = document.getElementById('modalAddressText');
 const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
 const globalSearchInput = document.getElementById('globalSearchInput');
 const menuUploadList = document.getElementById('menuUploadList');
-const favoriteContainer = document.getElementById('favoriteContainer');
 const toggleOnline = document.getElementById('toggleOnline');
 const toggleCash = document.getElementById('toggleCash');
 const newebpayContainer = document.getElementById('newebpayContainer');
@@ -396,11 +395,12 @@ function filterAndRenderStores() {
 }
 //favorites.html
 async function renderFavoriteStores() {
+    const favoriteContainer = document.getElementById('favoriteContainer');
     // 如果頁面上沒有這個容器，代表現在不是收藏頁，直接結束函數
     if (!favoriteContainer) return;
     const user = auth.currentUser;
     if (!user) {
-        favoriteContainer.innerHTML = '<p>請先登入以查看收藏清單。</p>';
+        favoriteContainer.innerHTML = '<p style="color: var(--text-main);">請先登入以查看收藏清單。</p>';
         return;
     }
     try {
@@ -1411,6 +1411,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAuthSystem();
     fetchStoresFromFirebase();
     initThemeSystem();
+    renderFavoriteStores();
     initCitySelect(document.getElementById('citySelect'));
     getBrowserLocation();
     setupAddressGeocoder();

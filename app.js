@@ -421,7 +421,7 @@ async function renderFavoriteStores() {
         console.error("讀取收藏失敗:", error);
     }
 }
-// 確保登入狀態確認後才執行渲染
+// 這是 Firebase 的 觀察者 (Observer)。確保登入狀態確認後才執行渲染
 auth.onAuthStateChanged((user) => {
     if (user) {
         renderFavoriteStores();
@@ -945,6 +945,7 @@ document.addEventListener('click', async (e) => {
             let itemObj = {
                 id: `item_${index}`,
                 name: nameVal,
+                supply:supply,
                 note: row.querySelector('.item-note-input').value.trim(),
                 image: row.querySelector('.preview-img').src
             };

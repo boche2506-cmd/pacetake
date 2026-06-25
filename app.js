@@ -700,7 +700,7 @@ function setupMenuManager() {
                             <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 80%;"
                                 placeholder="備註">
                             <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle"
-                                    id="menu-soldout-toggle" checked>
+                                    checked>
                                 <span class="toggle-slider">
                                     <span class="on-text">販售中</span>
                                     <span class="off-text">暫停</span>
@@ -938,14 +938,15 @@ document.addEventListener('click', async (e) => {
         const menuRows = document.querySelectorAll('.menu-item-row');
         const menuItems = [];
         menuRows.forEach((row, index) => {
-            const supply = document.getElementById('menu-soldout-toggle') ? document.getElementById('menu-soldout-toggle').checked : false;
+            const toggle = row.querySelector('.menu-soldout-toggle');
+            const supply = toggle ? toggle.checked : true; // 預設為 true (有貨)
             const nameVal = row.querySelector('.item-name-input').value.trim();
             if (!nameVal) return;
             const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';
             let itemObj = {
                 id: `item_${index}`,
                 name: nameVal,
-                supply:supply,
+                supply: supply,
                 note: row.querySelector('.item-note-input').value.trim(),
                 image: row.querySelector('.preview-img').src
             };

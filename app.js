@@ -382,7 +382,7 @@ function filterAndRenderStores() {
     });
     // 3. 如果找不到店家，顯示提示並結束
     if (filtered.length === 0) {
-        storeContainer.innerHTML = '<div class="loading-Spinner">🍃 此商圈目前尚無合作店家進駐喔！</div>';
+        storeContainer.innerHTML = '<div class="loading-Spinner" style="color: var(--text-main);">🍃 此商圈目前尚無合作店家進駐喔！</div>';
         return;
     }
     // 4. 清空畫面並開始渲染卡片
@@ -408,7 +408,7 @@ async function renderFavoriteStores() {
         const favCol = collection(db, "users", user.uid, "favorites");
         const snapshot = await getDocs(favCol);
         if (snapshot.empty) {
-            favoriteContainer.innerHTML = '<div class="loading-Spinner">🤍 您目前還沒有收藏任何店家喔！</div>';
+            favoriteContainer.innerHTML = '<div class="loading-Spinner" style="color: var(--text-main);">🤍 您目前還沒有收藏任何店家喔！</div>';
             return;
         }
         favoriteContainer.innerHTML = ""; // 清空容器

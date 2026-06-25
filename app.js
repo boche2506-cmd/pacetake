@@ -58,7 +58,6 @@ const areaData = {
 };
 // 統一管理頁面上的所有元件
 const storeContainer = document.getElementById('store-Container');
-const googleLoginAction = document.getElementById('googleLoginAction');
 const citySelect = document.getElementById('citySelect');
 const districtSelect = document.getElementById('districtSelect');
 const gpsPinBtn = document.getElementById('gpsPinBtn');
@@ -77,10 +76,6 @@ const warningCancelBtn = document.getElementById('warningCancelBtn');
 const statusDot = document.getElementById('statusDot');
 const statusText = document.getElementById('statusText');
 const toggleBtn = document.getElementById('themeToggleBtn');
-const userNameDisplay = document.getElementById('userNameDisplay');
-const userAvatarImg = document.getElementById('userAvatarImg');
-const defaultIcon = document.getElementById('defaultIcon');
-const logoutBtn = document.getElementById('logoutBtn');
 const addItemRowBtn = document.getElementById('addItemRowBtn');
 const shopSubmitBtn = document.getElementById('shopSubmitBtn');
 const heartIcon = document.getElementById('heart-icon');
@@ -91,6 +86,7 @@ const loginLightbox = document.getElementById('loginLightbox');
 const avatarBtn = document.getElementById('avatarBtn');
 const dropdownMenu = document.getElementById('dropdownMenu');
 const loginBtn = document.getElementById('loginBtn');
+const userNameDisplay = document.getElementById('userNameDisplay');
 
 function initAuthSystem() {
     console.log("[PACE DEBUG] Initializing Auth UI...");
@@ -188,43 +184,51 @@ function getShopFormData() {
     };
 }
 // 監聽 Firebase 登入狀態
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
-        // 1. 同步角色資料
-        const role = await handleUserSyncAndRoleRouting(user);
-        // 2. 統一更新 UI
-        updateUIForUser(user, role);
-        // 3. 渲染
-        renderFavoriteStores();
-        fetchStoresFromFirebase();
+        handleUserSyncAndRoleRouting(user);
     } else {
-        console.log("[PACE DEBUG] Auth: Logged out");
-        // 統一在這裡處理「訪客模式」的 UI 清理
-        updateUIForUser(null, 'guest');
+        console.log("[PACE DEBUG] Auth state: Logged out");
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (avatarBtn) {
+            avatarBtn.style.display = 'none';
+            dropdownMenu.style.display = 'none';
+            dropdownMenu.innerHTML = '';
+        }
+        if (statusDot) statusDot.classList.remove('active');
+        if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
+        if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
         renderDynamicMenu('guest');
         fetchStoresFromFirebase();
     }
 });
 
 async function handleUserSyncAndRoleRouting(user) {
-    const userDocRef = doc(db, "users", user.uid);
-    const userDoc = await getDoc(userDocRef);
+    if (!user) return;
+    currentUserId = user.uid;
+    console.log("[PACE DEBUG] User synced:", user.uid);
 
-    if (userDoc.exists()) {
-        return userDoc.data().role || "buyer";
-    } else {
-        const newUser = {
-            uid: user.uid,
-            email: user.email || "",
-            displayName: user.displayName || "新會員",
-            role: "buyer",
-            createdAt: new Date().toISOString(),
-            lastLogin: new Date().toISOString() // 順便記錄第一次登入時間
-        };
-        await setDoc(userDocRef, newUser);
-        return "buyer";
+    let currentRole = "buyer";
+    try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+            currentRole = userDoc.data().role || "buyer";
+        } else {
+            await setDoc(doc(db, "users", user.uid), {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName || "新會員",
+                role: "buyer",
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString() // 順便記錄第一次登入時間
+            });
+        }
+    } catch (e) {
+        console.error("Role routing error:", e);
     }
+    updateUIForUser(user, currentRole);
+    fetchStoresFromFirebase();
 }
 // 從firebase抓資料
 async function fetchStoresFromFirebase() {
@@ -242,38 +246,11 @@ async function fetchStoresFromFirebase() {
     }
 }
 
-function initThemeSystem() {
-    // 1. 初始化：網頁載入時套用顏色
-    const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    if (toggleBtn) {
-        toggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-        // 2. 綁定事件：只有當按鈕存在時，才註冊點擊事件
-        toggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('pacetake-theme', newTheme);
-            toggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-        });
-    }
-}
-
 function updateUIForUser(user, currentRole) {
-    // 1. 如果 user 為 null，代表是訪客模式，在這裡處理清空邏輯
-    if (!user) {
-        if (loginBtn) loginBtn.style.display = 'block';
-        if (avatarBtn) avatarBtn.style.display = 'none';
-        if (userNameDisplay) userNameDisplay.innerText = "訪客";
-        // 這裡可以呼叫 renderDynamicMenu('guest') 之類的邏輯
-        return; // 直接中斷，不往下執行
-    }
-
-    // 2. 如果程式執行到這裡，表示 user 一定存在，可以安心讀取資料
+    // 如果程式執行到這裡，表示 user 一定存在，可以安心讀取資料
     if (loginBtn) loginBtn.style.display = 'none';
     if (avatarBtn) avatarBtn.style.display = 'flex';
     if (loginLightbox) loginLightbox.style.display = 'none';
-
     // 角色顯示邏輯
     if (userNameDisplay) {
         if (currentRole === "admin") {
@@ -284,7 +261,8 @@ function updateUIForUser(user, currentRole) {
             userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
         }
     }
-
+    const userAvatarImg = document.getElementById('userAvatarImg');
+    const defaultIcon = document.getElementById('defaultIcon');
     // 頭像處理邏輯 (結合你的建議)
     if (user.photoURL && userAvatarImg && defaultIcon) {
         userAvatarImg.src = user.photoURL;
@@ -294,11 +272,9 @@ function updateUIForUser(user, currentRole) {
         if (userAvatarImg) userAvatarImg.style.display = 'none';
         defaultIcon.style.display = 'block';
     }
-
     // 狀態處理
     if (statusDot) statusDot.classList.add('active');
     if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
-
     renderDynamicMenu(currentRole);
 }
 
@@ -330,9 +306,26 @@ function renderDynamicMenu(role) {
     }
     menuHTML += `
         <div class="menu-divider"></div>
-        <button id="logoutBtn" data-action="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
+        <button data-action="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
     `;
     dropdownMenu.innerHTML = menuHTML;
+}
+
+function initThemeSystem() {
+    // 1. 初始化：網頁載入時套用顏色
+    const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (toggleBtn) {
+        toggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        // 2. 綁定事件：只有當按鈕存在時，才註冊點擊事件
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('pacetake-theme', newTheme);
+            toggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        });
+    }
 }
 // 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
 function createStoreCard(store) {
@@ -1038,6 +1031,7 @@ document.addEventListener('click', async (e) => {
     }
     else if (action === 'logoutBtn') {
         await signOut(auth);
+        location.reload();
         // 不用寫 location.reload()，onAuthStateChanged 偵測到登出後會自動切換 UI
     }
     else {

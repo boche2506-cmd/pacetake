@@ -421,6 +421,12 @@ async function renderFavoriteStores() {
         console.error("讀取收藏失敗:", error);
     }
 }
+// 確保登入狀態確認後才執行渲染
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        renderFavoriteStores();
+    }
+});
 // 1. 初始化函式：負責把資料灌入指定的 Select
 function initCitySelect(selectElement) {
     if (!selectElement) return;

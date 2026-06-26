@@ -93,7 +93,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
         handleUserSyncAndRoleRouting(user);
-        renderDynamicMenu(role, uid);
+        renderDynamicMenu();
     } else {
         console.log("[PACE DEBUG] Auth state: Logged out");
         if (loginBtn) loginBtn.style.display = 'block';

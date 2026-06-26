@@ -107,7 +107,7 @@ function showGuestUI() {
     if (statusDot) statusDot.classList.remove('active');
     if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
     if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
-    renderDynamicMenu(role);
+    renderDynamicMenu('guest');
     fetchStoresFromFirebase();
 }
 
@@ -281,7 +281,7 @@ function updateUIForUser(user, currentRole) {
     // 狀態處理
     if (statusDot) statusDot.classList.add('active');
     if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
-    renderDynamicMenu(role);
+    renderDynamicMenu(currentRole);
 }
 
 function renderDynamicMenu(role) {

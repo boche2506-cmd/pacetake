@@ -14,6 +14,8 @@ const firebaseConfig = {
     appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
     measurementId: "G-888XL8JTHW",
 };
+// 在 app.js 的最後一行
+export { signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp };
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
@@ -161,94 +163,6 @@ function initAuthSystem() {
         });
     }
 }
-// 這個函式負責把表單資料變成要存入資料庫的格式
-function getShopDataForDatabase(ShopFormData, userUid, inviteCode, shopLogoData, isEditMode = false) {
-    const data = {
-        shopName: ShopFormData.name,
-        shopPhone: ShopFormData.phone,
-        city: ShopFormData.city,
-        district: ShopFormData.district,
-        detailAddress: ShopFormData.detailAddress,
-        shopAddress: `${ShopFormData.city}${ShopFormData.district}${ShopFormData.detailAddress}`,
-        shopLat: ShopFormData.lat,
-        shopLng: ShopFormData.lng,
-        inviteCode: inviteCode,
-        status: ShopFormData.status,
-        shopLogo: shopLogoData,
-        prepareTime: ShopFormData.prepareTime,
-        isOnlinePayEnabled: ShopFormData.isOnlinePayEnabled,
-        isCashPayEnabled: ShopFormData.isCashPayEnabled,
-        HashIV: ShopFormData.hashIvValue,
-        HashKey: ShopFormData.hashKeyValue,
-        MerchantID: ShopFormData.merchantIdValue,
-        hasSeating: ShopFormData.hasSeating
-    };
-    // 只有在「新增」時才需要寫入這些欄位
-    if (!isEditMode) {
-        data.sellerUid = userUid;
-        data.createdAt = new Date().toISOString();
-    }
-    return data;
-}
-// 負責把資料填回表單
-function fillShopFormData(data) {
-    document.getElementById('shopName').value = data.shopName || '';
-    document.getElementById('shopPhone').value = data.shopPhone || '';
-    document.getElementById('citySelect').value = data.city || '';
-    document.getElementById('districtSelect').value = data.district || '';
-    document.getElementById('shopAddress').value = data.detailAddress || '';
-    document.getElementById('shopLat').value = data.shopLat || '';
-    document.getElementById('shopLng').value = data.shopLng || '';
-    document.getElementById('shopStatus').value = data.status || 'online';
-    document.getElementById('prepareTimeInput').value = data.prepareTime || 15;
-    document.getElementById('merchantIdInput').value = data.MerchantID || '';
-    document.getElementById('hashKeyInput').value = data.HashKey || '';
-    document.getElementById('hashIvInput').value = data.HashIV || '';
-    document.getElementById('toggleCash').checked = !!data.isCashPayEnabled;
-    document.getElementById('toggleOnline').checked = !!data.isOnlinePayEnabled;
-    document.getElementById('seatingtoggle').checked = !!data.hasSeating;
-}
-// 每次被呼叫時，都抓取當下最新的一手資料
-function getShopFormData() {
-    return {
-        name: document.getElementById('shopName')?.value.trim(),
-        phone: document.getElementById('shopPhone')?.value.trim(),
-        city: document.getElementById('citySelect')?.value,
-        district: document.getElementById('districtSelect')?.value,
-        detailAddress: document.getElementById('shopAddress')?.value.trim(),
-        lat: document.getElementById('shopLat')?.value.trim() || '',
-        lng: document.getElementById('shopLng')?.value.trim() || '',
-        status: document.getElementById('shopStatus')?.value || 'online',
-        prepareTime: parseInt(document.getElementById('prepareTimeInput')?.value) || 15,
-        merchantIdValue: document.getElementById('merchantIdInput')?.value.trim() || '',
-        hashKeyValue: document.getElementById('hashKeyInput')?.value.trim() || '',
-        hashIvValue: document.getElementById('hashIvInput')?.value.trim() || '',
-        isCashPayEnabled: document.getElementById('toggleCash')?.checked || false,
-        isOnlinePayEnabled: document.getElementById('toggleOnline')?.checked || false,
-        hasSeating: document.getElementById('seatingtoggle')?.checked || false
-    };
-}
-// 監聽 Firebase 登入狀態
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
-        handleUserSyncAndRoleRouting(user);
-        renderFavoriteStores();
-    } else {
-        console.log("[PACE DEBUG] Auth state: Logged out");
-        if (loginBtn) loginBtn.style.display = 'block';
-        if (avatarBtn) {
-            avatarBtn.style.display = 'none';
-            dropdownMenu.style.display = 'none';
-            dropdownMenu.innerHTML = '';
-        }
-        if (statusDot) statusDot.classList.remove('active');
-        if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
-        if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
-        renderDynamicMenu('guest');
-        fetchStoresFromFirebase();
-    }
-});
 
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
@@ -323,14 +237,34 @@ function updateUIForUser(user, currentRole) {
     if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
     renderDynamicMenu(currentRole);
 }
-
-function renderDynamicMenu(role,user) {
+// 監聽 Firebase 登入狀態
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
+        handleUserSyncAndRoleRouting(user);
+        renderFavoriteStores();
+    } else {
+        console.log("[PACE DEBUG] Auth state: Logged out");
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (avatarBtn) {
+            avatarBtn.style.display = 'none';
+            dropdownMenu.style.display = 'none';
+            dropdownMenu.innerHTML = '';
+        }
+        if (statusDot) statusDot.classList.remove('active');
+        if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
+        if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
+        renderDynamicMenu('userRole, user.uid');
+        fetchStoresFromFirebase();
+    }
+});
+function renderDynamicMenu(role, uid) {
     if (!dropdownMenu) return;
     let menuHTML = '';
     menuHTML += `
-        <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
-        <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
-        <a href="favorites.html" class="nav-fast">❤️ 我的收藏</a>
+        <a href="orders.htmluserId=${uid}" class="nav-fast">🛒 我的訂單</a>
+        <a href="history.htmluserId=${uid}" class="nav-fast">⏳ 歷史訂單</a>
+        <a href="favorites.htmluserId=${uid}" class="nav-fast">❤️ 我的收藏</a>
     `;
     if (role === 'admin' || role === 'buyer') {
         menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
@@ -338,10 +272,10 @@ function renderDynamicMenu(role,user) {
     if (role === 'admin' || role === 'seller') {
         menuHTML += `
             <div class="menu-divider"></div>
-            <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
-            <a href="manage.html?manageId=${user.uid}" class="nav-fast">⚙️ 店舖管理</a>
+            <a href="seller.htmlstoreId=${uid}" class="nav-fast">🧑‍🍳 接單管理</a>
+            <a href="manage.htmlstoreId=${uid}" class="nav-fast">⚙️ 店舖管理</a>
             <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
-        `;
+    `;
     }
     if (role === 'admin') {
         menuHTML += `

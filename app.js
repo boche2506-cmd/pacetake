@@ -339,7 +339,7 @@ function renderDynamicMenu(role) {
         menuHTML += `
             <div class="menu-divider"></div>
             <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
-            <a href="manage.html?manageId=${userUid}" class="nav-fast">⚙️ 店舖管理</a>
+            <a href="manage.html?manageId=${user.uid}" class="nav-fast">⚙️ 店舖管理</a>
             <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
         `;
     }

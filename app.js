@@ -120,6 +120,7 @@ function initAuthSystem() {
     const loginPasswordInput = document.getElementById('loginPassword');
     const emailLoginAction = document.getElementById('emailLoginAction');
     const loginEmailInput = document.getElementById('loginEmail');
+    const googleLoginAction = document.getElementById('googleLoginAction');
     // 2. 下拉選單邏輯
     if (avatarBtn && dropdownMenu) {
         avatarBtn.addEventListener('click', (e) => {
@@ -181,6 +182,18 @@ function initAuthSystem() {
             } finally {
                 emailLoginAction.disabled = false; // 處理完後解鎖
                 emailLoginAction.textContent = originalText; // 恢復文字
+            }
+        });
+    }
+    if (googleLoginAction) {
+        googleLoginAction.addEventListener('click', async () => {
+            console.log("[PACE DEBUG] Google login action.");
+            try {
+                const result = await signInWithPopup(auth, provider);
+                await handleUserSyncAndRoleRouting(result.user);
+            } catch (error) {
+                console.error("Google 登入失敗：", error);
+                alert("連線失敗，請檢查網路服務！");
             }
         });
     }
@@ -272,8 +285,8 @@ function updateUIForUser(user, currentRole) {
 }
 
 function renderDynamicMenu(role) {
-    const menuContainer = document.getElementById('dropdownMenu');
-    if (!menuContainer) return;
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    if (!dropdownMenu) return;
     let menuHTML = '';
     menuHTML += `
         <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
@@ -302,7 +315,7 @@ function renderDynamicMenu(role) {
         <div class="menu-divider"></div>
         <button data-action="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
     `;
-    menuContainer.innerHTML = menuHTML;
+    dropdownMenu.innerHTML = menuHTML;
 }
 
 function initThemeSystem() {
@@ -617,22 +630,6 @@ document.addEventListener('click', async (e) => {
     }
     else if (action === 'closeAddressModalBtn') {
         addressDetailLightbox.style.display = 'none';
-    }
-    else if (action === 'googleLoginAction') {
-        try {
-            await signInWithPopup(auth, provider);
-            // 不要在這裡呼叫 handleUserSyncAndRoleRouting！
-            // 登入後，onAuthStateChanged 會自動被觸發
-        } catch (error) {
-            console.error("Google 登入失敗：", error);
-        }
-        try {
-            const result = await signInWithPopup(auth, provider);
-            await handleUserSyncAndRoleRouting(result.user);
-        } catch (error) {
-            console.error("Google 登入失敗：", error);
-            alert("連線失敗，請檢查網路服務！");
-        }
     }
     else if (action === 'logoutBtn') {
         await signOut(auth);

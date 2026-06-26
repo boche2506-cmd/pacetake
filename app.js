@@ -313,9 +313,21 @@ function renderDynamicMenu(role) {
     }
     menuHTML += `
         <div class="menu-divider"></div>
-        <button class="logoutBtn" data-action="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
+        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
     `;
     dropdownMenu.innerHTML = menuHTML;
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            console.log("[PACE DEBUG] Logout clicked.");
+            try {
+                await signOut(auth);
+                location.reload();
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+        });
+    }
 }
 
 function initThemeSystem() {
@@ -630,10 +642,6 @@ document.addEventListener('click', async (e) => {
     }
     else if (action === 'closeAddressModalBtn') {
         addressDetailLightbox.style.display = 'none';
-    }
-    else if (action === 'logoutBtn') {
-        await signOut(auth);
-        // 不用寫 location.reload()，onAuthStateChanged 偵測到登出後會自動切換 UI
     }
     else {
         // 如果有需要處理預設情況或錯誤紀錄，可以寫在這裡

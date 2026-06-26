@@ -88,6 +88,27 @@ const avatarBtn = document.getElementById('avatarBtn');
 const dropdownMenu = document.getElementById('dropdownMenu');
 const loginBtn = document.getElementById('loginBtn');
 const userNameDisplay = document.getElementById('userNameDisplay');
+// 監聽 Firebase 登入狀態
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
+        handleUserSyncAndRoleRouting(user);
+        renderFavoriteStores();
+    } else {
+        console.log("[PACE DEBUG] Auth state: Logged out");
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (avatarBtn) {
+            avatarBtn.style.display = 'none';
+            dropdownMenu.style.display = 'none';
+            dropdownMenu.innerHTML = '';
+        }
+        if (statusDot) statusDot.classList.remove('active');
+        if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
+        if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
+        renderDynamicMenu('userRole, user.uid');
+        fetchStoresFromFirebase();
+    }
+});
 
 function initAuthSystem() {
     console.log("[PACE DEBUG] Initializing Auth UI...");
@@ -237,27 +258,7 @@ function updateUIForUser(user, currentRole) {
     if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
     renderDynamicMenu(currentRole);
 }
-// 監聽 Firebase 登入狀態
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
-        handleUserSyncAndRoleRouting(user);
-        renderFavoriteStores();
-    } else {
-        console.log("[PACE DEBUG] Auth state: Logged out");
-        if (loginBtn) loginBtn.style.display = 'block';
-        if (avatarBtn) {
-            avatarBtn.style.display = 'none';
-            dropdownMenu.style.display = 'none';
-            dropdownMenu.innerHTML = '';
-        }
-        if (statusDot) statusDot.classList.remove('active');
-        if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
-        if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
-        renderDynamicMenu('userRole, user.uid');
-        fetchStoresFromFirebase();
-    }
-});
+
 function renderDynamicMenu(role, uid) {
     if (!dropdownMenu) return;
     let menuHTML = '';
@@ -452,274 +453,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
-}
-// 監聽詳細地址輸入框，當離開欄位時自動查詢
-function setupAddressGeocoder() {
-    // 1. 頁面路徑安全檢查
-    if (!window.location.pathname.includes('register.html')) return;
-    console.log("[PACE] Initializing Register Page Logic...");
-
-    const addressInput = document.getElementById('shopAddress');
-    addressInput?.addEventListener('blur', async () => {
-        const city = document.getElementById('citySelect').value;
-        const district = document.getElementById('districtSelect').value;
-        const detail = document.getElementById('shopAddress').value.trim();
-        if (!city || !district || !detail) return;
-        const fullAddress = `${city}${district}${detail}`;
-        console.log("[PACE] 使用 Google API 查詢：", fullAddress);
-        // 初始化 Google Geocoder
-        const geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ 'address': fullAddress }, (results, status) => {
-            if (status === 'OK') {
-                const location = results[0].geometry.location;
-                // 填入經緯度欄位
-                document.getElementById('shopLat').value = location.lat();
-                document.getElementById('shopLng').value = location.lng();
-                console.log("[PACE] Google 定位成功！");
-            } else {
-                console.warn("[PACE] Google 定位失敗，狀態：" + status);
-            }
-        });
-    });
-}
-// 確保只有在 register.html 才執行這段檢查
-async function initRegisterPage() {
-    // 1. 從網址取得 storeId (例如: register.html?storeId=123)
-    const urlParams = new URLSearchParams(window.location.search);
-    const storeId = urlParams.get('storeId');
-    const submitBtn = document.getElementById('submitBtn');
-    // . 頁面路徑安全檢查
-    if (!window.location.pathname.includes('register.html')) return;
-    console.log("[PACE] Initializing Register Page Logic...");
-    if (storeId) {
-        console.log("偵測到 storeId，進入編輯模式:", storeId);
-        // 2. 從 Firebase 讀取該店家的資料
-        const storeDoc = await getDoc(doc(db, "stores", storeId));
-        if (storeDoc.exists()) {
-            const data = storeDoc.data();
-            // 3. 把資料填進表單
-            fillShopFormData(data);
-            // 4. 【重要】給按鈕貼上標籤，告訴它待會要執行「更新」
-            submitBtn.dataset.mode = 'edit';
-            submitBtn.dataset.storeId = storeId;
-            submitBtn.innerText = "儲存修改"; // 修改按鈕文字，讓商家知道現在是修改模式
-        }
-    }
-    // . 位址與經緯度檢查 (包含提交驗證)
-    if (newebpayContainer) {
-        newebpayContainer.innerHTML = `
-            <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
-            <div style="display:flex; flex-direction:column; gap:0.5cqw;">
-                <input type="text" id="merchantIdInput" class="input-style" style="height:8cqw;" placeholder="請輸入 商店代號 (MerchantID)">
-                <input type="text" id="hashKeyInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashKey">
-                <input type="text" id="hashIvInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashIV">
-            </div>
-        `;
-    }
-    toggleOnline?.addEventListener('change', function () {
-        if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
-    });
-    // . 現金警告邏輯 (事件委派)
-    if (toggleCash) {
-        toggleCash.checked = false;
-        toggleCash.addEventListener('click', (e) => {
-            if (toggleCash.checked) {
-                toggleCash.checked = false;
-                e.preventDefault();
-                if (cashWarningModal) cashWarningModal.style.display = 'flex';
-            }
-        });
-    }
-
-    document.addEventListener('click', (e) => {
-        if (e.target.id === 'warningConfirmBtn') {
-            if (toggleCash) toggleCash.checked = true;
-            if (cashWarningModal) cashWarningModal.style.display = 'none';
-        } else if (e.target.id === 'warningCancelBtn') {
-            if (toggleCash) toggleCash.checked = false;
-            if (cashWarningModal) cashWarningModal.style.display = 'none';
-        }
-    });
-}
-// 拖曳菜單專屬函式區 新增菜單(賣家)
-function setupMenuManager() {
-    // 如果頁面沒有菜單容器，就直接跳出，不執行任何邏輯
-    if (!menuUploadList) return;
-    // --- 1. 拖曳功能模組 ---
-    let activeDragItem = null;
-
-    function makeItemDraggable(row) {
-        const handle = row.querySelector('.drag-handle');
-        if (!handle) return;
-        handle.addEventListener('mousedown', (e) => startDrag(e, row));
-        handle.addEventListener('touchstart', (e) => startDrag(e, row), { passive: false });
-    }
-
-    function startDrag(e, row) {
-        if (e.cancelable) e.preventDefault();
-        activeDragItem = row;
-        row.style.opacity = '0.5';
-        row.style.border = '0.2cqw dashed var(--brand-blue)';
-        if (e.type.startsWith('touch')) {
-            window.addEventListener('touchmove', onDragMove, { passive: false });
-            window.addEventListener('touchend', onDragEnd);
-        } else {
-            window.addEventListener('mousemove', onDragMove);
-            window.addEventListener('mouseup', onDragEnd);
-        }
-    }
-
-    function onDragMove(e) {
-        if (!activeDragItem || !menuUploadList) return;
-        if (e.cancelable) e.preventDefault();
-        const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-        requestAnimationFrame(() => {
-            const siblings = [...menuUploadList.querySelectorAll('.menu-item-row')].filter(el => el !== activeDragItem);
-            const nextSibling = siblings.find(sibling => {
-                const box = sibling.getBoundingClientRect();
-                return clientY <= box.top + box.height / 2;
-            });
-            if (nextSibling && activeDragItem !== nextSibling) {
-                menuUploadList.insertBefore(activeDragItem, nextSibling);
-            } else if (!nextSibling && activeDragItem !== menuUploadList.lastElementChild) {
-                menuUploadList.appendChild(activeDragItem);
-            }
-        });
-    }
-
-    function onDragEnd() {
-        if (!activeDragItem) return;
-        activeDragItem.style.opacity = '1';
-        activeDragItem.style.border = '0.2cqw solid var(--border-color)';
-        activeDragItem = null;
-        window.removeEventListener('mousemove', onDragMove);
-        window.removeEventListener('mouseup', onDragEnd);
-        window.removeEventListener('touchmove', onDragMove);
-        window.removeEventListener('touchend', onDragEnd);
-    }
-    // --- 2. 初始化已存在的項目 ---
-    document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
-    // --- 3. 統一的事件委派 (點擊與變更) ---
-    // 我們只綁定在 menuUploadList 上，這樣新增的項目也會自動擁有這些功能
-    menuUploadList.addEventListener('click', (e) => {
-        const target = e.target;
-        const row = target.closest('.menu-item-row');
-        if (!row) return;
-        // 刪除按鈕邏輯
-        if (target.classList.contains('del-row-btn')) {
-            if (menuUploadList.querySelectorAll('.menu-item-row').length <= 1) {
-                alert("報告老闆，店裡至少要留一項商品才能開張喔！");
-                return;
-            }
-            row.remove();
-        }
-        // 規格切換邏輯
-        if (target.classList.contains('new-size')) {
-            const mainPriceInput = row.querySelector('.price-input');
-            const sizePriceContainer = row.querySelector('.new-size-price');
-            if (!mainPriceInput || !sizePriceContainer) return;
-
-            const isHidden = sizePriceContainer.style.display === 'none' || sizePriceContainer.style.display === '';
-            sizePriceContainer.style.display = isHidden ? 'flex' : 'none';
-            mainPriceInput.disabled = isHidden;
-            mainPriceInput.style.textDecoration = isHidden ? 'line-through' : 'none';
-            mainPriceInput.style.backgroundColor = isHidden ? 'var(--bg-Container)' : '';
-            mainPriceInput.required = !isHidden;
-        }
-    });
-
-    menuUploadList.addEventListener('change', (e) => {
-        if (e.target.classList.contains('menu-soldout-toggle')) {
-            const row = e.target.closest('.menu-item-row');
-            if (row) row.classList.toggle('sold-out', !e.target.checked);
-        }
-    });
-    // --- 4. 新增行按鈕邏輯 ---
-    addItemRowBtn?.addEventListener('click', () => {
-        const newRow = document.createElement('div');
-        newRow.className = 'menu-item-row';
-        newRow.innerHTML = `
-                        <div class="menu-item">
-                            <div class="img-upload-box" id="uploadBox">
-                                <input type="file" id="imageInput" class="image-input" accept="image/*"
-                                    style="display: none;">
-                                <img class="preview-img" src=""
-                                    style="display: none; position: absolute; width: 100%; height: 100%; object-fit: contain; border-radius: 2cqw;">
-                                <div class="upload-placeholder"
-                                    style="font-size: 8cqw;  width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                    📷<span>上傳照片</span></div>
-                            </div>
-                            <div class="item-fields" style="width: 100%; gap: 0.5cqw;">
-                                <input type="text" class="input-style item-name-input"
-                                    style="height:8cqw; width: 100%; padding: 0 2cqw;" placeholder="品項名稱(必填)" required>
-                                <div class="price-input-wrapper">
-                                    <span class="price-symbol">$</span>
-                                    <input type="number" class="input-style price-input"
-                                        style="height:8cqw; width: 100%;padding-left:5cqw;" placeholder="金額(必填)" min="0"
-                                        required>
-                                </div>
-                            </div>
-                            <button type="button" class="new-size">如需規格</button>
-                            <div class="item-right-ctrls"
-                                style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
-                                <div class="drag-handle"
-                                    style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
-                                    ☰</div>
-                                <button type="button" class="del-row-btn"
-                                    style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
-                            </div>
-                        </div>
-                        <div class="new-size-price"
-                            style="display: none; height: 8cqw; width: 100%; flex-direction: row; justify-content: space-around; gap: 1cqw;">
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">大$</span>
-                                <input type="number" class="input-style price-input-large"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
-                                    required>
-                            </div>
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">中$</span>
-                                <input type="number" class="input-style price-input-medium"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額" min="0">
-                            </div>
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">小$</span>
-                                <input type="number" class="input-style price-input-small"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="remark" style="width: 100%; gap: 1cqw">
-                            <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 80%;"
-                                placeholder="備註">
-                            <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle"
-                                    checked>
-                                <span class="toggle-slider">
-                                    <span class="on-text">販售中</span>
-                                    <span class="off-text">暫停</span>
-                                </span>
-                            </label>
-                        </div>`;
-        menuUploadList.appendChild(newRow);
-        makeItemDraggable(newRow);
-    });
-}
-// 菜單文件
-async function refreshMenu(storeId, menuItems) {
-    const menuCollectionRef = collection(db, "stores", storeId, "menu");
-
-    // 1. 取得該店目前的舊菜單文件
-    const querySnapshot = await getDocs(menuCollectionRef);
-
-    // 2. 建立刪除任務 (同時執行，速度很快)
-    const deletePromises = querySnapshot.docs.map(docSnapshot => deleteDoc(docSnapshot.ref));
-    await Promise.all(deletePromises);
-    console.log("舊菜單已清空");
-
-    // 3. 建立寫入任務 (將最新的 menuItems 寫入)
-    const addPromises = menuItems.map(item => addDoc(menuCollectionRef, item));
-    await Promise.all(addPromises);
-    console.log("新菜單已同步");
 }
 /**
  * 監聽特定欄位的變化並更新 UI的工具

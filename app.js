@@ -93,7 +93,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
         handleUserSyncAndRoleRouting(user);
-        renderDynamicMenu();
+        renderDynamicMenu(userRole, user.uid);
     } else {
         console.log("[PACE DEBUG] Auth state: Logged out");
         if (loginBtn) loginBtn.style.display = 'block';
@@ -273,7 +273,7 @@ function renderDynamicMenu(role, uid) {
         menuHTML += `
             <div class="menu-divider"></div>
             <a href="seller.html?storeId=${user.uid}" class="nav-fast">🧑‍🍳 接單管理</a>
-            <a href="manage.html?storeId=${user.uid}" class="nav-fast">⚙️ 店舖管理</a>
+            <a href="manage.html?storeId=${uid}" class="nav-fast">⚙️ 店舖管理</a>
             <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
     `;
     }

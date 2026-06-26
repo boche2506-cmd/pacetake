@@ -287,23 +287,31 @@ function updateUIForUser(user, currentRole) {
 function renderDynamicMenu(role) {
     const dropdownMenu = document.getElementById('dropdownMenu');
     if (!dropdownMenu) return;
-    let menuHTML = '';
-    menuHTML += `
+    // 確保有 userId，沒有的話用 'guest' 佔位
+    const userId = currentUserId || 'guest';
+    // 1. 個人連結區塊 (誰都能看，或依照登入狀態調整)
+    let personalLinks = `
         <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
         <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
         <a href="favorites.html" class="nav-fast">❤️ 我的收藏</a>
     `;
-    if (role === 'admin' || role === 'buyer') {
-        menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
-    }
+    // 2. 店舖與管理連結區塊
+    let shopLinks = '';
     if (role === 'admin' || role === 'seller') {
-        menuHTML += `
+        shopLinks = `
             <div class="menu-divider"></div>
-            <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
-            <a href="manage.html" class="nav-fast">⚙️ 店舖管理</a>
+            <div class="menu-header">店舖管理</div> <a href="seller.html?storeId=${userId}" class="nav-fast">🧑‍🍳 接單管理</a>
+            <a href="manage.html?storeId=${userId}" class="nav-fast">⚙️ 店舖管理</a>
             <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
-    `;
+        `;
     }
+    // 3. 開店連結區塊
+    let registerLink = '';
+    if (role === 'admin' || role === 'buyer') {
+        registerLink = `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店</a>`;
+    }
+    // 最終組合
+    dropdownMenu.innerHTML = personalLinks + registerLink + shopLinks;
     if (role === 'admin') {
         menuHTML += `
         <div class="menu-divider"></div>
@@ -441,7 +449,7 @@ async function renderFavoriteStores() {
         console.error("讀取收藏失敗:", error);
     }
 }
-// 確保登入狀態確認後才執行渲染
+// 確保登入狀態確認後才執行渲染,不用會有時間差
 auth.onAuthStateChanged((user) => {
     if (user) {
         renderFavoriteStores();

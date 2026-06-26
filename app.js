@@ -67,18 +67,9 @@ const addressDetailLightbox = document.getElementById('addressDetailLightbox');
 const modalAddressText = document.getElementById('modalAddressText');
 const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
 const globalSearchInput = document.getElementById('globalSearchInput');
-const menuUploadList = document.getElementById('menuUploadList');
-const toggleOnline = document.getElementById('toggleOnline');
-const toggleCash = document.getElementById('toggleCash');
-const newebpayContainer = document.getElementById('newebpayContainer');
-const cashWarningModal = document.getElementById('cashWarningModal');
-const warningConfirmBtn = document.getElementById('warningConfirmBtn');
-const warningCancelBtn = document.getElementById('warningCancelBtn');
 const statusDot = document.getElementById('statusDot');
 const statusText = document.getElementById('statusText');
 const toggleBtn = document.getElementById('themeToggleBtn');
-const addItemRowBtn = document.getElementById('addItemRowBtn');
-const shopSubmitBtn = document.getElementById('shopSubmitBtn');
 const heartIcon = document.getElementById('heart-icon');
 const menuContainer = document.getElementById('menuContainer');
 const storeDistanceText = document.getElementById('storeDistanceText');
@@ -258,9 +249,8 @@ function updateUIForUser(user, currentRole) {
     renderDynamicMenu(currentRole);
 }
 
-function renderDynamicMenu(role, user) {
+function renderDynamicMenu(role) {
     if (!dropdownMenu) return;
-    currentUserId = user.uid;
     let menuHTML = '';
     menuHTML += `
         <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
@@ -273,7 +263,7 @@ function renderDynamicMenu(role, user) {
     if (role === 'admin' || role === 'seller') {
         menuHTML += `
             <div class="menu-divider"></div>
-            <a href="seller.html?storeId=${user.uid}" class="nav-fast">🧑‍🍳 接單管理</a>
+            <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
             <a href="manage.html" class="nav-fast">⚙️ 店舖管理</a>
             <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
     `;
@@ -483,46 +473,6 @@ export function setupRealtimeListener(collectionName, docId, fieldName, element)
 function initAppListeners() {
     // 確保元素真的存在才進行綁定，避免報錯
 }
-// 直接在整個網頁範圍監聽點擊對應class="img-upload-box"class="shop-logo-box"
-document.addEventListener('click', (e) => {
-    // 如果點到的是上傳盒子 (img-upload-box 或 shop-logo-box)
-    const box = e.target.closest('.img-upload-box, .shop-logo-box');
-    if (box) {
-        const input = box.querySelector('.image-input');
-        if (input) input.click();
-    }
-});
-// 直接在整個網頁範圍監聽 change
-document.addEventListener('change', (e) => {
-    // 如果觸發的是 .image-input
-    if (e.target.classList.contains('image-input')) {
-        const input = e.target;
-        const box = input.closest('.img-upload-box, .shop-logo-box');
-        if (!box) return;
-        const file = input.files[0];
-        if (!file) return;
-        const img = box.querySelector('.preview-img');
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const tempImg = new Image();
-            tempImg.src = event.target.result;
-            tempImg.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800;
-                const scaleSize = MAX_WIDTH / tempImg.width;
-                canvas.width = tempImg.width > MAX_WIDTH ? MAX_WIDTH : tempImg.width;
-                canvas.height = tempImg.width > MAX_WIDTH ? tempImg.height * scaleSize : tempImg.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
-                if (img) {
-                    img.src = canvas.toDataURL('image/jpeg', 0.7);
-                    img.style.display = 'block';
-                }
-            };
-        };
-        reader.readAsDataURL(file);
-    }
-});
 // Listener'input'
 document.addEventListener('input', (e) => {
     const target = e.target.closest('[data-action-input]');
@@ -637,116 +587,6 @@ document.addEventListener('click', async (e) => {
         } catch (error) {
             console.error("操作失敗:", error);
             alert("系統錯誤，請稍後再試。");
-        }
-    }
-    // shopSubmitBtn 監聽與手動提交邏輯
-    else if (action === 'shopSubmitBtn') {
-        // 取得按鈕上的標籤來判斷要做什麼
-        const btn = document.getElementById('submitBtn');
-        const mode = btn.dataset.mode;// 'edit' 或 undefined
-        const storeId = btn.dataset.storeId || auth.currentUser?.uid; // 編輯模式用參數，新增用當前 UID
-        const ShopFormData = getShopFormData();
-        // --- 菜單打包 ---
-        const menuRows = document.querySelectorAll('.menu-item-row');
-        const menuItems = [];
-        menuRows.forEach((row) => {
-            const toggle = row.querySelector('.menu-soldout-toggle');
-            const supply = toggle ? toggle.checked : true; // 預設為 true (有貨)
-            const nameVal = row.querySelector('.item-name-input').value.trim();
-            if (!nameVal) return;
-            const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';
-            let itemObj = {
-                name: nameVal,
-                supply: supply,
-                note: row.querySelector('.item-note-input').value.trim(),
-                image: row.querySelector('.preview-img').src
-            };
-            if (isSizeMode) {
-                itemObj.priceType = 'multi';
-                itemObj.prices = {
-                    large: row.querySelector('.price-input-large').value,
-                    medium: row.querySelector('.price-input-medium').value,
-                    small: row.querySelector('.price-input-small').value
-                };
-            } else {
-                itemObj.priceType = 'single';
-                itemObj.price = parseInt(row.querySelector('.price-input').value) || 0;
-            }
-            menuItems.push(itemObj);
-        });
-        const lat = document.getElementById('shopLat')?.value.trim();
-        const lng = document.getElementById('shopLng')?.value.trim();
-        if (!lat || !lng) {
-            alert("⚠️ 請先確認店鋪經緯度！若無法自動取得，請點擊「查詢座標」按鈕手動輸入，確保定位正確喔！");
-            document.getElementById('shopLat')?.focus();
-            return; // 直接中斷，不往下執行
-        }
-        const user = auth.currentUser;
-        if (!user) {
-            alert("⚠️ 請先登入帳號！");
-            return;
-        }
-        // 先檢查該用戶是否已經是賣家，防止重複開鋪
-        try {
-            const userDocRef = doc(db, "users", user.uid);
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists() && userDoc.data().role === "seller") {
-                alert("您已經擁有店舖了，將為您前往賣家後台。");
-                window.location.href = "seller.html";
-                return;
-            }
-        } catch (err) {
-            console.error("權限檢查失敗:", err);
-            return;
-        }
-        // --- 2. 基本資訊與防呆 ---
-        if (!ShopFormData.name || !ShopFormData.phone || !ShopFormData.city || !ShopFormData.district || !ShopFormData.detailAddress) {
-            alert("⚠️ 請填寫完整的店舖資訊！");
-            return;
-        }
-        const logoEl = document.getElementById('shopLogoPreview');
-        const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
-        // --- 3. 邀請碼驗證 ---
-        const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
-        if (inviteCode) {
-            const promoQuery = query(collection(db, "promo_codes"), where("code", "==", inviteCode), where("isActive", "==", true));
-            const querySnapshot = await getDocs(promoQuery);
-            if (querySnapshot.empty) {
-                alert("❌ 無效的邀請碼或已被使用！");
-                return;
-            }
-            const promoDoc = querySnapshot.docs[0];
-            await updateDoc(promoDoc.ref, { isActive: false, usedBy: user.uid });
-        }
-        btn.disabled = true; // 這裡鎖定按鈕，防止使用者連按
-        try {
-            if (mode === 'edit') {
-                // 模式 A：更新既有資料
-                const shopData = getShopDataForDatabase(ShopFormData, user.uid, inviteCode, shopLogoData, true);
-                await updateDoc(doc(db, "stores", storeId), shopData);
-            } else {
-                // 模式 B：新增
-                const shopData = getShopDataForDatabase(ShopFormData, user.uid, inviteCode, shopLogoData, false);
-                await setDoc(doc(db, "stores", user.uid), shopData);
-            }
-            // 1. 處理菜單資料
-            const targetStoreId = (mode === 'edit') ? storeId : user.uid;
-            await refreshMenu(targetStoreId, menuItems);
-            console.log("店家與菜單已成功儲存至子集合！");
-            // 2. 處理角色身分（只在非 admin 時更新）
-            const userRef = doc(db, "users", user.uid);
-            const userSnap = await getDoc(userRef);
-            const userData = userSnap.data();
-            // 只要不是 admin，就一律更新為 seller
-
-            if (userData?.role !== 'admin')
-                await updateDoc(userRef, { role: "seller" });
-            alert("🎉 開張成功！");
-            window.location.href = "seller.html";
-        } catch (dbError) {
-            console.error("提交錯誤:", dbError);
-            alert("系統錯誤：" + dbError.message);
-            btn.disabled = false; // 失敗時恢復按鈕
         }
     }
     else if (action === 'gpsPinBtn') {

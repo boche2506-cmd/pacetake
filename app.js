@@ -324,7 +324,7 @@ function updateUIForUser(user, currentRole) {
     renderDynamicMenu(currentRole);
 }
 
-function renderDynamicMenu(role) {
+function renderDynamicMenu(role,user) {
     if (!dropdownMenu) return;
     let menuHTML = '';
     menuHTML += `

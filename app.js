@@ -557,8 +557,6 @@ document.addEventListener('click', async (e) => {
         }
         const data = window.currentStoreInfo || {};
         const { id } = data; // 確保有 id
-        // 建立要存入的資料物件，並排除可能為 undefined 的欄位
-        // 利用 || null 或將其設定為預設空字串，防止 undefined 錯誤
         const favoriteData = {
             sellerUid: data.sellerUid || null, // 若為 undefined，存為 null
             shopLogo: data.shopLogo || "",
@@ -672,7 +670,6 @@ async function initStorePage() {
         // --- 這裡放回你原有的 Firebase 讀取邏輯 ---
         let storeData = null;
         const firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
-        // 嘗試用 v9 寫法讀取
         if (typeof db !== 'undefined' && typeof doc === 'function') {
             const docSnap = await getDoc(doc(db, "stores", currentStoreId));
             if (!docSnap.exists()) {

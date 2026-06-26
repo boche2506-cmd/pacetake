@@ -258,13 +258,13 @@ function updateUIForUser(user, currentRole) {
     renderDynamicMenu(currentRole);
 }
 
-function renderDynamicMenu(role, uid) {
+function renderDynamicMenu(role, user) {
     if (!dropdownMenu) return;
     let menuHTML = '';
     menuHTML += `
-        <a href="orders.html?userId=${uid}" class="nav-fast">🛒 我的訂單</a>
-        <a href="history.html?userId=${uid}" class="nav-fast">⏳ 歷史訂單</a>
-        <a href="favorites.html?userId=${uid}" class="nav-fast">❤️ 我的收藏</a>
+        <a href="orders.html?userId=${user.uid}" class="nav-fast">🛒 我的訂單</a>
+        <a href="history.html?userId=${user.uid}" class="nav-fast">⏳ 歷史訂單</a>
+        <a href="favorites.html?userId=${user.uid}" class="nav-fast">❤️ 我的收藏</a>
     `;
     if (role === 'admin' || role === 'buyer') {
         menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
@@ -272,8 +272,8 @@ function renderDynamicMenu(role, uid) {
     if (role === 'admin' || role === 'seller') {
         menuHTML += `
             <div class="menu-divider"></div>
-            <a href="seller.html?storeId=${uid}" class="nav-fast">🧑‍🍳 接單管理</a>
-            <a href="manage.html?storeId=${uid}" class="nav-fast">⚙️ 店舖管理</a>
+            <a href="seller.html?storeId=${user.uid}" class="nav-fast">🧑‍🍳 接單管理</a>
+            <a href="manage.html?storeId=${user.uid}" class="nav-fast">⚙️ 店舖管理</a>
             <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
     `;
     }

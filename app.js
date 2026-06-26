@@ -161,9 +161,55 @@ function initAuthSystem() {
         });
     }
 }
-
+// 這個函式負責把表單資料變成要存入資料庫的格式
+function getShopDataForDatabase(ShopFormData, userUid, inviteCode, shopLogoData, isEditMode = false) {
+    const data = {
+        shopName: ShopFormData.name,
+        shopPhone: ShopFormData.phone,
+        city: ShopFormData.city,
+        district: ShopFormData.district,
+        detailAddress: ShopFormData.detailAddress,
+        shopAddress: `${ShopFormData.city}${ShopFormData.district}${ShopFormData.detailAddress}`,
+        shopLat: ShopFormData.lat,
+        shopLng: ShopFormData.lng,
+        inviteCode: inviteCode,
+        status: ShopFormData.status,
+        shopLogo: shopLogoData,
+        prepareTime: ShopFormData.prepareTime,
+        isOnlinePayEnabled: ShopFormData.isOnlinePayEnabled,
+        isCashPayEnabled: ShopFormData.isCashPayEnabled,
+        HashIV: ShopFormData.hashIvValue,
+        HashKey: ShopFormData.hashKeyValue,
+        MerchantID: ShopFormData.merchantIdValue,
+        hasSeating: ShopFormData.hasSeating
+    };
+    // 只有在「新增」時才需要寫入這些欄位
+    if (!isEditMode) {
+        data.sellerUid = userUid;
+        data.createdAt = new Date().toISOString();
+    }
+    return data;
+}
+// 負責把資料填回表單
+function fillShopFormData(data) {
+    document.getElementById('shopName').value = data.shopName || '';
+    document.getElementById('shopPhone').value = data.shopPhone || '';
+    document.getElementById('citySelect').value = data.city || '';
+    document.getElementById('districtSelect').value = data.district || '';
+    document.getElementById('shopAddress').value = data.detailAddress || '';
+    document.getElementById('shopLat').value = data.shopLat || '';
+    document.getElementById('shopLng').value = data.shopLng || '';
+    document.getElementById('shopStatus').value = data.status || 'online';
+    document.getElementById('prepareTimeInput').value = data.prepareTime || 15;
+    document.getElementById('merchantIdInput').value = data.MerchantID || '';
+    document.getElementById('hashKeyInput').value = data.HashKey || '';
+    document.getElementById('hashIvInput').value = data.HashIV || '';
+    document.getElementById('toggleCash').checked = !!data.isCashPayEnabled;
+    document.getElementById('toggleOnline').checked = !!data.isOnlinePayEnabled;
+    document.getElementById('seatingtoggle').checked = !!data.hasSeating;
+}
+// 每次被呼叫時，都抓取當下最新的一手資料
 function getShopFormData() {
-    // 每次被呼叫時，都抓取當下最新的一手資料
     return {
         name: document.getElementById('shopName')?.value.trim(),
         phone: document.getElementById('shopPhone')?.value.trim(),
@@ -187,6 +233,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
         handleUserSyncAndRoleRouting(user);
+        renderFavoriteStores();
     } else {
         console.log("[PACE DEBUG] Auth state: Logged out");
         if (loginBtn) loginBtn.style.display = 'block';
@@ -292,7 +339,7 @@ function renderDynamicMenu(role) {
         menuHTML += `
             <div class="menu-divider"></div>
             <a href="seller.html" class="nav-fast">🧑‍🍳 接單管理</a>
-            <a href="manage.html" class="nav-fast">⚙️ 店舖管理</a>
+            <a href="manage.html?manageId=${userUid}" class="nav-fast">⚙️ 店舖管理</a>
             <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
         `;
     }
@@ -421,12 +468,6 @@ async function renderFavoriteStores() {
         console.error("讀取收藏失敗:", error);
     }
 }
-// 這是 Firebase 的 觀察者 (Observer)。確保登入狀態確認後才執行渲染
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        renderFavoriteStores();
-    }
-});
 // 1. 初始化函式：負責把資料灌入指定的 Select
 function initCitySelect(selectElement) {
     if (!selectElement) return;
@@ -508,11 +549,29 @@ function setupAddressGeocoder() {
     });
 }
 // 確保只有在 register.html 才執行這段檢查
-function initRegisterPage() {
-    // 1. 頁面路徑安全檢查
+async function initRegisterPage() {
+    // 1. 從網址取得 storeId (例如: register.html?storeId=123)
+    const urlParams = new URLSearchParams(window.location.search);
+    const storeId = urlParams.get('storeId');
+    const submitBtn = document.getElementById('submitBtn');
+    // . 頁面路徑安全檢查
     if (!window.location.pathname.includes('register.html')) return;
     console.log("[PACE] Initializing Register Page Logic...");
-    // 2. 位址與經緯度檢查 (包含提交驗證)
+    if (storeId) {
+        console.log("偵測到 storeId，進入編輯模式:", storeId);
+        // 2. 從 Firebase 讀取該店家的資料
+        const storeDoc = await getDoc(doc(db, "stores", storeId));
+        if (storeDoc.exists()) {
+            const data = storeDoc.data();
+            // 3. 把資料填進表單
+            fillShopFormData(data);
+            // 4. 【重要】給按鈕貼上標籤，告訴它待會要執行「更新」
+            submitBtn.dataset.mode = 'edit';
+            submitBtn.dataset.storeId = storeId;
+            submitBtn.innerText = "儲存修改"; // 修改按鈕文字，讓商家知道現在是修改模式
+        }
+    }
+    // . 位址與經緯度檢查 (包含提交驗證)
     if (newebpayContainer) {
         newebpayContainer.innerHTML = `
             <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
@@ -526,7 +585,7 @@ function initRegisterPage() {
     toggleOnline?.addEventListener('change', function () {
         if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
     });
-    // 4. 現金警告邏輯 (事件委派)
+    // . 現金警告邏輯 (事件委派)
     if (toggleCash) {
         toggleCash.checked = false;
         toggleCash.addEventListener('click', (e) => {
@@ -711,7 +770,23 @@ function setupMenuManager() {
         makeItemDraggable(newRow);
     });
 }
+// 菜單文件
+async function refreshMenu(storeId, menuItems) {
+    const menuCollectionRef = collection(db, "stores", storeId, "menu");
 
+    // 1. 取得該店目前的舊菜單文件
+    const querySnapshot = await getDocs(menuCollectionRef);
+
+    // 2. 建立刪除任務 (同時執行，速度很快)
+    const deletePromises = querySnapshot.docs.map(docSnapshot => deleteDoc(docSnapshot.ref));
+    await Promise.all(deletePromises);
+    console.log("舊菜單已清空");
+
+    // 3. 建立寫入任務 (將最新的 menuItems 寫入)
+    const addPromises = menuItems.map(item => addDoc(menuCollectionRef, item));
+    await Promise.all(addPromises);
+    console.log("新菜單已同步");
+}
 /**
  * 監聽特定欄位的變化並更新 UI的工具
  * @param {string} collectionName - 資料庫集合名稱
@@ -899,8 +974,39 @@ document.addEventListener('click', async (e) => {
     }
     // shopSubmitBtn 監聽與手動提交邏輯
     else if (action === 'shopSubmitBtn') {
-        // --- 1. 嚴謹的身分確認與權限檢查 ---
-        const btn = target;
+        // 取得按鈕上的標籤來判斷要做什麼
+        const btn = document.getElementById('submitBtn');
+        const mode = btn.dataset.mode;// 'edit' 或 undefined
+        const storeId = btn.dataset.storeId || auth.currentUser?.uid; // 編輯模式用參數，新增用當前 UID
+        const ShopFormData = getShopFormData();
+        // --- 菜單打包 ---
+        const menuRows = document.querySelectorAll('.menu-item-row');
+        const menuItems = [];
+        menuRows.forEach((row) => {
+            const toggle = row.querySelector('.menu-soldout-toggle');
+            const supply = toggle ? toggle.checked : true; // 預設為 true (有貨)
+            const nameVal = row.querySelector('.item-name-input').value.trim();
+            if (!nameVal) return;
+            const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';
+            let itemObj = {
+                name: nameVal,
+                supply: supply,
+                note: row.querySelector('.item-note-input').value.trim(),
+                image: row.querySelector('.preview-img').src
+            };
+            if (isSizeMode) {
+                itemObj.priceType = 'multi';
+                itemObj.prices = {
+                    large: row.querySelector('.price-input-large').value,
+                    medium: row.querySelector('.price-input-medium').value,
+                    small: row.querySelector('.price-input-small').value
+                };
+            } else {
+                itemObj.priceType = 'single';
+                itemObj.price = parseInt(row.querySelector('.price-input').value) || 0;
+            }
+            menuItems.push(itemObj);
+        });
         const lat = document.getElementById('shopLat')?.value.trim();
         const lng = document.getElementById('shopLng')?.value.trim();
         if (!lat || !lng) {
@@ -908,7 +1014,6 @@ document.addEventListener('click', async (e) => {
             document.getElementById('shopLat')?.focus();
             return; // 直接中斷，不往下執行
         }
-        const ShopFormData = getShopFormData();
         const user = auth.currentUser;
         if (!user) {
             alert("⚠️ 請先登入帳號！");
@@ -934,36 +1039,7 @@ document.addEventListener('click', async (e) => {
         }
         const logoEl = document.getElementById('shopLogoPreview');
         const shopLogoData = (logoEl && logoEl.style.display !== 'none') ? logoEl.src : "";
-        // --- 3. 菜單打包 ---
-        const menuRows = document.querySelectorAll('.menu-item-row');
-        const menuItems = [];
-        menuRows.forEach((row, index) => {
-            const toggle = row.querySelector('.menu-soldout-toggle');
-            const supply = toggle ? toggle.checked : true; // 預設為 true (有貨)
-            const nameVal = row.querySelector('.item-name-input').value.trim();
-            if (!nameVal) return;
-            const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';
-            let itemObj = {
-                id: `item_${index}`,
-                name: nameVal,
-                supply: supply,
-                note: row.querySelector('.item-note-input').value.trim(),
-                image: row.querySelector('.preview-img').src
-            };
-            if (isSizeMode) {
-                itemObj.priceType = 'multi';
-                itemObj.prices = {
-                    large: row.querySelector('.price-input-large').value,
-                    medium: row.querySelector('.price-input-medium').value,
-                    small: row.querySelector('.price-input-small').value
-                };
-            } else {
-                itemObj.priceType = 'single';
-                itemObj.price = parseInt(row.querySelector('.price-input').value) || 0;
-            }
-            menuItems.push(itemObj);
-        });
-        // --- 4. 邀請碼驗證 ---
+        // --- 3. 邀請碼驗證 ---
         const inviteCode = document.getElementById('shopInviteCode')?.value.trim() || '';
         if (inviteCode) {
             const promoQuery = query(collection(db, "promo_codes"), where("code", "==", inviteCode), where("isActive", "==", true));
@@ -975,43 +1051,29 @@ document.addEventListener('click', async (e) => {
             const promoDoc = querySnapshot.docs[0];
             await updateDoc(promoDoc.ref, { isActive: false, usedBy: user.uid });
         }
-        // --- 5. 資料組裝與送出 ---
-        const shopData = {
-            sellerUid: user.uid,
-            shopName: ShopFormData.name,
-            shopPhone: ShopFormData.phone,
-            city: ShopFormData.city,
-            district: ShopFormData.district,
-            detailAddress: ShopFormData.detailAddress,
-            // 雖然你有獨立欄位，但保留 shopAddress 也很方便前端直接顯示
-            shopAddress: `${ShopFormData.city}${ShopFormData.district}${ShopFormData.detailAddress}`,
-            shopLat: ShopFormData.lat,
-            shopLng: ShopFormData.lng,
-            inviteCode: inviteCode,
-            status: ShopFormData.status,
-            shopLogo: shopLogoData,
-            prepareTime: ShopFormData.prepareTime,
-            isOnlinePayEnabled: ShopFormData.isOnlinePayEnabled,
-            isCashPayEnabled: ShopFormData.isCashPayEnabled,
-            HashIV: ShopFormData.hashIvValue,
-            HashKey: ShopFormData.hashKeyValue,
-            MerchantID: ShopFormData.merchantIdValue,
-            hasSeating: ShopFormData.hasSeating,
-            menuList: menuItems,
-            createdAt: new Date().toISOString()
-        };
-        btn.disabled = true;
+        btn.disabled = true; // 這裡鎖定按鈕，防止使用者連按
         try {
-            // 1. 處理店家資料
-            await setDoc(doc(db, "stores", user.uid), shopData);
+            if (mode === 'edit') {
+                // 模式 A：更新既有資料
+                const shopData = getShopDataForDatabase(ShopFormData, user.uid, inviteCode, shopLogoData, true);
+                await updateDoc(doc(db, "stores", storeId), shopData);
+            } else {
+                // 模式 B：新增
+                const shopData = getShopDataForDatabase(ShopFormData, user.uid, inviteCode, shopLogoData, false);
+                await setDoc(doc(db, "stores", user.uid), shopData);
+            }
+            // 1. 處理菜單資料
+            const targetStoreId = (mode === 'edit') ? storeId : user.uid;
+            await refreshMenu(targetStoreId, menuItems);
+            console.log("店家與菜單已成功儲存至子集合！");
             // 2. 處理角色身分（只在非 admin 時更新）
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
             const userData = userSnap.data();
             // 只要不是 admin，就一律更新為 seller
-            if (userData?.role !== 'admin') {
+
+            if (userData?.role !== 'admin')
                 await updateDoc(userRef, { role: "seller" });
-            }
             alert("🎉 開張成功！");
             window.location.href = "seller.html";
         } catch (dbError) {
@@ -1185,9 +1247,10 @@ async function initStorePage() {
         }
         const menuList = storeData.menuList || storeData.menu || [];
         menuContainer.innerHTML = "";
-        menuList.forEach((item, index) => {
+        const availableItems = menuList.filter(item => item.supply !== false);
+        availableItems.forEach((item, index) => {
             // 確保 ID 格式與你的 cart-manager 一致
-            const itemId = `${currentStoreId}|||item_${index}`;
+            const itemId = `${currentStoreId}|||${item.id}`;
             const merchantNote = item.note || "";
             // 1. 抓取購物車存檔資料
             const cartData = JSON.parse(localStorage.getItem('pacetake_cart')) || [];
@@ -1425,10 +1488,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAddressGeocoder();
     initRegisterPage();
     setupMenuManager();
-    initAppListeners();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
     initStorePage();
     refreshTotalCartUI();
     initCartDOMState();
+    initAppListeners();
     console.log("系統初始化完成");
 });

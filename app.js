@@ -260,6 +260,7 @@ function updateUIForUser(user, currentRole) {
 
 function renderDynamicMenu(role, user) {
     if (!dropdownMenu) return;
+    currentUserId = user.uid;
     let menuHTML = '';
     menuHTML += `
         <a href="orders.html" class="nav-fast">🛒 我的訂單</a>

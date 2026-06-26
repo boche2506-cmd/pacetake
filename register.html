@@ -1252,7 +1252,12 @@
 
 
 
-
+        document.addEventListener('DOMContentLoaded', () => {
+            setupAddressGeocoder();
+            initRegisterPage();
+            setupMenuManager();
+            console.log("系統初始化完成");
+        });
     </script>
 </body>
 

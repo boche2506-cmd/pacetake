@@ -1152,9 +1152,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderFavoriteStores();
     initCitySelect(document.getElementById('citySelect'));
     getBrowserLocation();
-    setupAddressGeocoder();
-    initRegisterPage();
-    setupMenuManager();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
     initStorePage();
     refreshTotalCartUI();

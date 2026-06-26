@@ -93,7 +93,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
         handleUserSyncAndRoleRouting(user);
-        renderFavoriteStores();
+        renderDynamicMenu(userRole, user.uid);
     } else {
         console.log("[PACE DEBUG] Auth state: Logged out");
         if (loginBtn) loginBtn.style.display = 'block';
@@ -105,7 +105,6 @@ onAuthStateChanged(auth, (user) => {
         if (statusDot) statusDot.classList.remove('active');
         if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
         if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
-        renderDynamicMenu('userRole, user.uid');
         fetchStoresFromFirebase();
     }
 });

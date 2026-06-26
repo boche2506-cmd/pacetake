@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 // 在你的網頁 script 或其他 JS 檔案中：
 // 接下來就可以直接呼叫這些函式了
@@ -15,7 +15,7 @@ const firebaseConfig = {
     measurementId: "G-888XL8JTHW",
 };
 // 在 app.js 的最後一行
-export { signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp };
+export { signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp };
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
@@ -65,7 +65,6 @@ const districtSelect = document.getElementById('districtSelect');
 const gpsPinBtn = document.getElementById('gpsPinBtn');
 const addressDetailLightbox = document.getElementById('addressDetailLightbox');
 const modalAddressText = document.getElementById('modalAddressText');
-const closeAddressModalBtn = document.getElementById('closeAddressModalBtn');
 const globalSearchInput = document.getElementById('globalSearchInput');
 const statusDot = document.getElementById('statusDot');
 const statusText = document.getElementById('statusText');
@@ -82,23 +81,35 @@ const userNameDisplay = document.getElementById('userNameDisplay');
 // 監聽 Firebase 登入狀態
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
+        // 使用者已經登入 (可能是匿名，也可能是正式會員)
+        console.log("當前使用者 ID:", user.uid);
+        console.log("是否為匿名:", user.isAnonymous);
+        // 開始進行點餐或載入購物車
         handleUserSyncAndRoleRouting(user);
     } else {
-        console.log("[PACE DEBUG] Auth state: Logged out");
-        if (loginBtn) loginBtn.style.display = 'block';
-        if (avatarBtn) {
-            avatarBtn.style.display = 'none';
-            dropdownMenu.style.display = 'none';
-            dropdownMenu.innerHTML = '';
-        }
-        if (statusDot) statusDot.classList.remove('active');
-        if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
-        if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
-        renderDynamicMenu('guest');
-        fetchStoresFromFirebase();
+        // --- 這裡是「徹底未登入」：觸發匿名登入 ---
+        console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");
+        signInAnonymously(auth).catch((error) => {
+            console.error("匿名登入失敗:", error);
+            // 如果匿名失敗，才退回到你原本的「訪客」UI 顯示
+            showGuestUI();
+        });
     }
 });
+// 把原本寫在 else 裡的那坨 UI 程式碼抽成一個函式，方便呼叫
+function showGuestUI() {
+    if (loginBtn) loginBtn.style.display = 'block';
+    if (avatarBtn) {
+        avatarBtn.style.display = 'none';
+        dropdownMenu.style.display = 'none';
+        dropdownMenu.innerHTML = '';
+    }
+    if (statusDot) statusDot.classList.remove('active');
+    if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
+    if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
+    renderDynamicMenu('guest');
+    fetchStoresFromFirebase();
+}
 
 function initAuthSystem() {
     console.log("[PACE DEBUG] Initializing Auth UI...");
@@ -178,27 +189,38 @@ function initAuthSystem() {
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
     currentUserId = user.uid;
-    console.log("[PACE DEBUG] User synced:", user.uid);
-
-    let currentRole = "buyer";
     try {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userRef);
         if (userDoc.exists()) {
-            currentRole = userDoc.data().role || "buyer";
+            // --- 這裡是「老客戶登入」---
+            console.log("登入成功：更新上次登入時間");
+            await updateDoc(userRef, {
+                lastLogin: new Date().toISOString()
+            });
+            const currentRole = userDoc.data().role || "buyer";
+            updateUIForUser(user, currentRole);
         } else {
-            await setDoc(doc(db, "users", user.uid), {
+            // --- 這裡是「新客戶註冊」---
+            console.log("註冊成功：建立初始資料");
+            const initialData = {
                 uid: user.uid,
                 email: user.email,
-                displayName: user.displayName || "新會員",
                 role: "buyer",
                 createdAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString() // 順便記錄第一次登入時間
-            });
+                lastLogin: new Date().toISOString()
+            };
+            if (!user.isAnonymous) {
+                initialData.email = user.email;
+                initialData.displayName = user.displayName || "新會員";
+            }
+            // 統一寫入資料庫
+            await setDoc(userRef, initialData);
+            updateUIForUser(user, "buyer");
         }
     } catch (e) {
         console.error("Role routing error:", e);
     }
-    updateUIForUser(user, currentRole);
     fetchStoresFromFirebase();
 }
 // 從firebase抓資料
@@ -250,7 +272,8 @@ function updateUIForUser(user, currentRole) {
 }
 
 function renderDynamicMenu(role) {
-    if (!dropdownMenu) return;
+    const menuContainer = document.getElementById('dropdownMenu');
+    if (!menuContainer) return;
     let menuHTML = '';
     menuHTML += `
         <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
@@ -279,7 +302,7 @@ function renderDynamicMenu(role) {
         <div class="menu-divider"></div>
         <button data-action="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
     `;
-    dropdownMenu.innerHTML = menuHTML;
+    menuContainer.innerHTML = menuHTML;
 }
 
 function initThemeSystem() {
@@ -603,10 +626,16 @@ document.addEventListener('click', async (e) => {
         } catch (error) {
             console.error("Google 登入失敗：", error);
         }
+        try {
+            const result = await signInWithPopup(auth, provider);
+            await handleUserSyncAndRoleRouting(result.user);
+        } catch (error) {
+            console.error("Google 登入失敗：", error);
+            alert("連線失敗，請檢查網路服務！");
+        }
     }
     else if (action === 'logoutBtn') {
         await signOut(auth);
-        location.reload();
         // 不用寫 location.reload()，onAuthStateChanged 偵測到登出後會自動切換 UI
     }
     else {

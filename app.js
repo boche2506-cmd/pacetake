@@ -93,7 +93,6 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("[PACE DEBUG] Auth state: Logged in", user.uid);
         handleUserSyncAndRoleRouting(user);
-        renderDynamicMenu(userRole, user.uid);
     } else {
         console.log("[PACE DEBUG] Auth state: Logged out");
         if (loginBtn) loginBtn.style.display = 'block';
@@ -105,6 +104,7 @@ onAuthStateChanged(auth, (user) => {
         if (statusDot) statusDot.classList.remove('active');
         if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
         if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
+        renderDynamicMenu('guest');
         fetchStoresFromFirebase();
     }
 });
@@ -258,13 +258,13 @@ function updateUIForUser(user, currentRole) {
     renderDynamicMenu(currentRole);
 }
 
-function renderDynamicMenu(role, uid) {
+function renderDynamicMenu(role, user) {
     if (!dropdownMenu) return;
     let menuHTML = '';
     menuHTML += `
-        <a href="orders.html?userId=${user.uid}" class="nav-fast">🛒 我的訂單</a>
-        <a href="history.html?userId=${user.uid}" class="nav-fast">⏳ 歷史訂單</a>
-        <a href="favorites.html?userId=${user.uid}" class="nav-fast">❤️ 我的收藏</a>
+        <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
+        <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
+        <a href="favorites.html" class="nav-fast">❤️ 我的收藏</a>
     `;
     if (role === 'admin' || role === 'buyer') {
         menuHTML += `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(暫不收費)</a>`;
@@ -273,7 +273,7 @@ function renderDynamicMenu(role, uid) {
         menuHTML += `
             <div class="menu-divider"></div>
             <a href="seller.html?storeId=${user.uid}" class="nav-fast">🧑‍🍳 接單管理</a>
-            <a href="manage.html?storeId=${uid}" class="nav-fast">⚙️ 店舖管理</a>
+            <a href="manage.html" class="nav-fast">⚙️ 店舖管理</a>
             <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
     `;
     }

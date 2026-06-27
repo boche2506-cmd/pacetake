@@ -371,7 +371,12 @@
         import { app, auth, db, provider, currentStoreInfo, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
         const params = new URLSearchParams(window.location.search);
         const currentStoreId = urlParams.get('storeId');
-
+        const urlParams = new URLSearchParams(window.location.search);
+        const storeId = urlParams.get('storeId');
+        if (!storeId || storeId !== currentUserId) {
+            console.warn("存取權限不足或網址參數錯誤");
+            // 可以選擇導回首頁或顯示錯誤訊息
+        }
         if (storeId) {
             console.log("當前管理的店家 ID 是:", storeId);
             // 接下來你就可以用這個 storeId 去讀取資料庫

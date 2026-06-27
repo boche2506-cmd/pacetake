@@ -291,9 +291,9 @@ function renderDynamicMenu(role) {
     const userId = currentUserId || 'guest';
     // 1. 個人連結區塊 (誰都能看，或依照登入狀態調整)
     let personalLinks = `
-        <a href="orders.html" class="nav-fast">🛒 我的訂單</a>
-        <a href="history.html" class="nav-fast">⏳ 歷史訂單</a>
-        <a href="favorites.html" class="nav-fast">❤️ 我的收藏</a>
+        <a href="orders.html?userId=${userId}" class="nav-fast">🛒 我的訂單</a>
+        <a href="history.html?userId=${userId}" class="nav-fast">⏳ 歷史訂單</a>
+        <a href="favorites.html?userId=${userId}" class="nav-fast">❤️ 我的收藏</a>
     `;
     // 2. 店舖與管理連結區塊
     let shopLinks = '';
@@ -311,19 +311,20 @@ function renderDynamicMenu(role) {
         registerLink = `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店</a>`;
     }
     // 最終組合
-    dropdownMenu.innerHTML = personalLinks + registerLink + shopLinks;
+    let adminLink = '';
     if (role === 'admin') {
-        menuHTML += `
+        adminLink = `
         <div class="menu-divider"></div>
         <a href="javascript:void(0)" data-action="toggleAdmin" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
         <a href="javascript:void(0)" data-action="issuePromo" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
     `;
     }
-    menuHTML += `
+    let logoutLink = '';
+    logoutLink = `
         <div class="menu-divider"></div>
         <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
     `;
-    dropdownMenu.innerHTML = menuHTML;
+    dropdownMenu.innerHTML = personalLinks + registerLink + shopLinks + adminLink + logoutLink;
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {

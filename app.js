@@ -73,11 +73,10 @@ const heartIcon = document.getElementById('heart-icon');
 const menuContainer = document.getElementById('menuContainer');
 const storeDistanceText = document.getElementById('storeDistanceText');
 const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
-const loginLightbox = document.getElementById('loginLightbox');
-const avatarBtnMenu = document.getElementById('avatarBtnMenu');
 const dropdownMenu = document.getElementById('dropdownMenu');
-const loginBtn = document.getElementById('loginBtn');
 const userNameDisplay = document.getElementById('userNameDisplay');
+const loginLightbox = document.getElementById('loginLightbox');
+const emailFormSection = document.getElementById('emailFormSection');
 // 監聽 Firebase 登入狀態
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -165,8 +164,9 @@ async function fetchStoresFromFirebase() {
 }
 
 function updateUIForUser(user, currentRole) {
-    // 如果程式執行到這裡，表示 user 一定存在，可以安心讀取資料
-    // 角色顯示邏輯
+    const userAvatarImg = document.getElementById('userAvatarImg');
+    const defaultIcon = document.getElementById('defaultIcon');
+    // 角色顯示邏輯// 如果程式執行到這裡，表示 user 一定存在，可以安心讀取資料
     if (userNameDisplay) {
         if (currentRole === "admin") {
             userNameDisplay.innerHTML = `👑 總管`;
@@ -176,10 +176,7 @@ function updateUIForUser(user, currentRole) {
             userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
         }
     }
-    const userAvatarImg = document.getElementById('userAvatarImg');
-    const defaultIcon = document.getElementById('defaultIcon');
-    // 頭像處理邏輯 (結合你的建議)
-    // 只要有圖就設給 src
+    // 只要有圖就設給 src // 頭像處理邏輯
     if (!user.isAnonymous && user.photoURL) {
         userAvatarImg.src = user.photoURL;
         userAvatarImg.style.display = 'block'; // 顯示圖片
@@ -232,102 +229,13 @@ function renderDynamicMenu(role, user) {
     if (user.isAnonymous) {
         authActionLink = `
         <div class="menu-divider"></div>
-        <button class="loginBtn" id="loginBtn" style="color: var(--brand-green); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🔐 登入/註冊</button>`;
+        <button class="loginBtn" data-action="loginBtn" style="color: var(--brand-green); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🔐 登入/註冊</button>`;
     } else {
         authActionLink = `
         <div class="menu-divider"></div>
-        <button class="logoutBtn" id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>`;
+        <button class="logoutBtn" data-action="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>`;
     }
     dropdownMenu.innerHTML = personalLinks + registerLink + shopLinks + adminLink + authActionLink;
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            console.log("[PACE DEBUG] Logout clicked.");
-            try {
-                await signOut(auth);
-                location.reload();
-            } catch (error) {
-                console.error("Logout error:", error);
-            }
-        });
-    }
-    if (loginBtn && loginLightbox) {
-        loginBtn.addEventListener('click', () => loginLightbox.style.display = 'flex');
-    }
-
-}
-
-function initAuthSystem() {
-    console.log("[PACE DEBUG] Initializing Auth UI...");
-    const customReturnBtn = document.getElementById('customReturnBtn');
-    const toggleEmailFormBtn = document.getElementById('toggleEmailFormBtn');
-    const emailFormSection = document.getElementById('emailFormSection');
-    const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
-    const loginPasswordInput = document.getElementById('loginPassword');
-    const emailLoginAction = document.getElementById('emailLoginAction');
-    const loginEmailInput = document.getElementById('loginEmail');
-    const googleLoginAction = document.getElementById('googleLoginAction');
-    // 3. 登入視窗切換邏輯
-    if (customReturnBtn && loginLightbox) {
-        customReturnBtn.addEventListener('click', () => loginLightbox.style.display = 'none');
-    }
-    // 4. 表單隱藏/密碼顯現邏輯
-    if (toggleEmailFormBtn && emailFormSection) {
-        toggleEmailFormBtn.addEventListener('click', () => {
-            emailFormSection.style.display = emailFormSection.style.display === 'none' ? 'block' : 'none';
-        });
-    }
-    if (togglePasswordVisibility && loginPasswordInput) {
-        togglePasswordVisibility.addEventListener('click', () => {
-            const isPass = loginPasswordInput.type === 'password';
-            loginPasswordInput.type = isPass ? 'text' : 'password';
-            togglePasswordVisibility.textContent = isPass ? '🙈' : '👁️';
-        });
-    }
-    if (emailLoginAction) {
-        emailLoginAction.addEventListener('click', async () => {
-            const originalText = emailLoginAction.textContent; // 記住原本的字
-            emailLoginAction.disabled = true; // 鎖住按鈕
-            emailLoginAction.textContent = "處理中..."; // 給使用者提示
-            console.log("[PACE DEBUG] Email login action.");
-            const email = loginEmailInput.value.trim();
-            const password = loginPasswordInput.value;
-            if (!email || !password) {
-                alert("密碼或 Email 欄位不可為空！");
-                return;
-            }
-            try {
-                const result = await signInWithEmailAndPassword(auth, email, password);
-                await handleUserSyncAndRoleRouting(result.user);
-            } catch (loginError) {
-                if (loginError.code === "auth/user-not-found" || loginError.code === "auth/invalid-credential") {
-                    try {
-                        const result = await createUserWithEmailAndPassword(auth, email, password);
-                        await handleUserSyncAndRoleRouting(result.user);
-                    } catch (regError) {
-                        alert("註冊密碼強度不足，或帳號已被佔用！");
-                    }
-                } else {
-                    alert("登入密碼有誤，請再確認一次！");
-                }
-            } finally {
-                emailLoginAction.disabled = false; // 處理完後解鎖
-                emailLoginAction.textContent = originalText; // 恢復文字
-            }
-        });
-    }
-    if (googleLoginAction) {
-        googleLoginAction.addEventListener('click', async () => {
-            console.log("[PACE DEBUG] Google login action.");
-            try {
-                const result = await signInWithPopup(auth, provider);
-                await handleUserSyncAndRoleRouting(result.user);
-            } catch (error) {
-                console.error("Google 登入失敗：", error);
-                alert("連線失敗，請檢查網路服務！");
-            }
-        });
-    }
 }
 
 function initThemeSystem() {
@@ -584,88 +492,163 @@ document.addEventListener('click', async (e) => {
     const target = e.target.closest('[data-action]');
     if (!target) return;
     const action = target.getAttribute('data-action');
-    // 發行邀請碼
-    if (action === 'issuePromo') {
-        const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
-        if (!code || code.trim() === "") return;
-        try {
-            await setDoc(doc(db, "promo_codes", code.trim()), {
-                code: code.trim(),
-                createdBy: currentUserId,
-                createdAt: new Date().toISOString(),
-                isActive: true,
-                usedBy: null
-            });
-            alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！`);
-        } catch (error) {
-            console.error("邀請碼發行失敗:", error);
-            alert("發行失敗，請檢查您的系統權限配置！");
-        }
-    }
-    // 收藏按鈕監聽器
-    else if (action === 'favorite-btn') {
-        const user = auth.currentUser;
-        if (!user) {
-            alert("⚠️ 請先登入才能收藏店家喔！");
-            return;
-        }
-        const data = window.currentStoreInfo || {};
-        const { id } = data; // 確保有 id
-        const favoriteData = {
-            sellerUid: data.sellerUid || null, // 若為 undefined，存為 null
-            shopLogo: data.shopLogo || "",
-            shopName: data.shopName || "",
-            shopAddress: data.shopAddress || "",
-            shopLat: data.shopLat ?? 0, // 使用 Nullish coalescing operator
-            shopLng: data.shopLng ?? 0,
-            isCashPayEnabled: !!data.isCashPayEnabled, // 強制轉為布林值
-            isOnlinePayEnabled: !!data.isOnlinePayEnabled,
-            hasSeating: !!data.hasSeating,
-            createdAt: new Date().toISOString()
-        };
-        const favRef = doc(db, "users", user.uid, "favorites", id);
-        try {
-            const docSnap = await getDoc(favRef);
-            if (docSnap.exists()) {
-                await deleteDoc(favRef);
-                heartIcon.innerText = "🤍";
-                alert(`💔 已將「${data.shopName}」移除`);
-            } else {
-                // 使用處理過的 favoriteData
-                await setDoc(favRef, favoriteData);
-                heartIcon.innerText = "❤️";
-                alert(`❤️ 已將「${data.shopName}」加入最愛！`);
+    switch (action) {
+        // 發行邀請碼
+        case 'issuePromo': {
+            const code = prompt('請輸入要發行的VIP 邀請碼 (例如: PACE2026):');
+            if (!code || code.trim() === "") return;
+            try {
+                await setDoc(doc(db, "promo_codes", code.trim()), {
+                    code: code.trim(),
+                    createdBy: currentUserId,
+                    createdAt: new Date().toISOString(),
+                    isActive: true,
+                    usedBy: null
+                });
+                alert(`🎟️ 邀請碼「${code}」已成功寫入 Firebase！`);
+            } catch (error) {
+                console.error("邀請碼發行失敗:", error);
+                alert("發行失敗，請檢查您的系統權限配置！");
             }
-        } catch (error) {
-            console.error("操作失敗:", error);
-            alert("系統錯誤，請稍後再試。");
+            break;
         }
-    }
-    else if (action === 'gpsPinBtn') {
-        console.log("[PACE DEBUG] GPS Pin clicked.");
-        getBrowserLocation();
-        if (addressDetailLightbox) addressDetailLightbox.style.display = 'flex';
-    }
-    else if (action === 'closeAddressModalBtn') {
-        addressDetailLightbox.style.display = 'none';
-    }
-    else if (action === 'avatarBtnMenu') {
-        // 2. 下拉選單邏輯
-        dropdownMenu.classList.toggle('active');
-        // 如果選單打開了
-        if (dropdownMenu.classList.contains('active')) {
-            // 使用 setTimeout 是為了避免「點擊按鈕的瞬間」就被監聽器判定為「點擊外部」
-            setTimeout(() => {
-                document.addEventListener('click', closeMenuOutside);
-            }, 0);
-        } else {
-            // 如果手動關閉了，移除監聽
-            document.removeEventListener('click', closeMenuOutside);
+        // 收藏按鈕監聽器
+        case 'favorite-btn': {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("⚠️ 請先登入才能收藏店家喔！");
+                return;
+            }
+            const data = window.currentStoreInfo || {};
+            const { id } = data; // 確保有 id
+            const favoriteData = {
+                sellerUid: data.sellerUid || null, // 若為 undefined，存為 null
+                shopLogo: data.shopLogo || "",
+                shopName: data.shopName || "",
+                shopAddress: data.shopAddress || "",
+                shopLat: data.shopLat ?? 0, // 使用 Nullish coalescing operator
+                shopLng: data.shopLng ?? 0,
+                isCashPayEnabled: !!data.isCashPayEnabled, // 強制轉為布林值
+                isOnlinePayEnabled: !!data.isOnlinePayEnabled,
+                hasSeating: !!data.hasSeating,
+                createdAt: new Date().toISOString()
+            };
+            const favRef = doc(db, "users", user.uid, "favorites", id);
+            try {
+                const docSnap = await getDoc(favRef);
+                if (docSnap.exists()) {
+                    await deleteDoc(favRef);
+                    heartIcon.innerText = "🤍";
+                    alert(`💔 已將「${data.shopName}」移除`);
+                } else {
+                    // 使用處理過的 favoriteData
+                    await setDoc(favRef, favoriteData);
+                    heartIcon.innerText = "❤️";
+                    alert(`❤️ 已將「${data.shopName}」加入最愛！`);
+                }
+            } catch (error) {
+                console.error("操作失敗:", error);
+                alert("系統錯誤，請稍後再試。");
+            }
+            break;
         }
-    }
-    else {
-        // 如果有需要處理預設情況或錯誤紀錄，可以寫在這裡
-        console.log('未知的 action:', action);
+        case 'gpsPinBtn': {
+            console.log("[PACE DEBUG] GPS Pin clicked.");
+            getBrowserLocation();
+            if (addressDetailLightbox) addressDetailLightbox.style.display = 'flex';
+            break;
+        }
+        case 'closeAddressModalBtn': {
+            addressDetailLightbox.style.display = 'none';
+            break;
+        }
+        case 'avatarBtnMenu': {
+            // 2. 下拉選單邏輯
+            dropdownMenu.classList.toggle('active');
+            // 如果選單打開了
+            if (dropdownMenu.classList.contains('active')) {
+                // 使用 setTimeout 是為了避免「點擊按鈕的瞬間」就被監聽器判定為「點擊外部」
+                setTimeout(() => {
+                    document.addEventListener('click', closeMenuOutside);
+                }, 0);
+            } else {
+                // 如果手動關閉了，移除監聽
+                document.removeEventListener('click', closeMenuOutside);
+            }
+            break;
+        }
+        case 'loginBtn': {
+            loginLightbox.style.display = 'flex';
+            break;
+        }
+        case 'customReturnBtn': {
+            loginLightbox.style.display = 'none';
+            break;
+        }
+        case 'logoutBtn': {
+            console.log("[PACE DEBUG] Logout clicked.");
+            try {
+                await signOut(auth);
+                location.reload();
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+            break;
+        }
+        case 'toggleEmailFormBtn': {
+            emailFormSection.classList.toggle('active');
+            break;
+        }
+        case 'togglePasswordVisibility': {
+            const input = document.getElementById('loginPassword');
+            if (!input) return;
+            const isPass = input.type === 'password';
+            input.type = isPass ? 'text' : 'password';
+            target.textContent = isPass ? '🙈' : '👁️';
+            break;
+        }
+        case 'emailLogin': {
+            const emailInput = document.getElementById('loginEmail');
+            const passInput = document.getElementById('loginPassword');
+            const email = emailInput?.value.trim();
+            const password = passInput?.value;
+            if (!email || !password) {
+                alert("密碼或 Email 欄位不可為空！");
+                return;
+            }
+            const originalText = target.textContent;
+            target.disabled = true;
+            target.textContent = "處理中...";
+            try {
+                const result = await signInWithEmailAndPassword(auth, email, password);
+                await handleUserSyncAndRoleRouting(result.user);
+            } catch (err) {
+                if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") {
+                    try {
+                        const result = await createUserWithEmailAndPassword(auth, email, password);
+                        await handleUserSyncAndRoleRouting(result.user);
+                    } catch (regErr) {
+                        alert("註冊密碼強度不足，或帳號已被佔用！");
+                    }
+                } else {
+                    alert("登入密碼有誤，請再確認一次！");
+                }
+            } finally {
+                target.disabled = false;
+                target.textContent = originalText;
+            }
+            break;
+        }
+        case 'googleLogin': {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                await handleUserSyncAndRoleRouting(result.user);
+            } catch (err) {
+                console.error("Google 登入失敗：", err);
+                alert("連線失敗，請檢查網路服務！");
+            }
+            break;
+        }
     }
 });
 // 定義一個獨立的函式，方便隨時新增或移除監聽
@@ -714,6 +697,13 @@ async function initStorePage() {
         return;
     }
     // 頁面初始化時，根據 Firebase 狀態更新愛心
+    if (auth.currentUser) {
+        try {
+            await syncHeartIcon();
+        } catch (err) {
+            console.error("同步愛心狀態失敗:", err);
+        }
+    }
     async function syncHeartIcon() {
         if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
         const user = auth.currentUser;
@@ -770,13 +760,6 @@ async function initStorePage() {
             hasSeating: !!storeData.hasSeating
         };
         console.log("全域商店資訊已更新：", window.currentStoreInfo);
-        if (auth.currentUser) {
-            try {
-                await syncHeartIcon();
-            } catch (err) {
-                console.error("同步愛心狀態失敗:", err);
-            }
-        }
         // 1. 先抓出 Firebase 的座標 (記得轉成數字)
         const sLat = parseFloat(storeData.shopLat || storeData.lat);
         const sLng = parseFloat(storeData.shopLng || storeData.lng);
@@ -1047,7 +1030,6 @@ export function initCartDOMState() {
 }
 // 🚀 初始化區塊
 document.addEventListener('DOMContentLoaded', () => {
-    initAuthSystem();
     fetchStoresFromFirebase();
     initThemeSystem();
     renderFavoriteStores();

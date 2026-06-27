@@ -152,10 +152,11 @@
                     <a href="index.html" class="logo-link">
                         <img src="png/pace3.png" alt="派思 官方網站">
                     </a>
-                    <div class="pace-avatar-icon">
-                        <span id="defaultIcon" class="avatar-icon">👤</span>
+                    <div class="avatar-container">
+                        <span id="defaultIcon">👤</span>
                         <img id="userAvatarImg" src=""
-                            style="display: none; border-radius: 50%;height: 13cqw; width: 13cqw;">
+                            style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"
+                            onerror="this.style.display='none'; document.getElementById('defaultIcon').style.display='block';">
                     </div>
                 </div>
                 <div class="two">
@@ -163,10 +164,10 @@
                         <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
                         <span>店內價外帶自取/點餐系統</span>
                     </div>
-                    <button class="login-btn" id="loginBtn">登入/註冊</button>
-                    <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
-                        <span class="user-name" id="userNameDisplay"></span></button>
-                    <div class="dropdown-menu" id="dropdownMenu"></div>
+                    <div class="avatarBtnMenu" data-action="avatarBtnMenu">
+                        <span class="user-name" id="userNameDisplay"></span>
+                        <div class="dropdown-menu" id="dropdownMenu"></div>
+                    </div>
                 </div>
             </header>
 
@@ -221,7 +222,7 @@
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
             <div class="modal-card">
                 <div class="modal-title" style=" font-weight: 600; color: var(--text-main);">加入PACE 派思</div>
-                <button class="modal-btn google" data-action="googleLoginAction"
+                <button class="modal-btn google" data-action="googleLogin"
                     style="box-shadow: 0 0.2cqw 0.125 rgba(0,0,0,0.05);">
                     <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:0.5cqw;">
                         <path fill="#4285F4"
@@ -235,7 +236,7 @@
                     </svg>
                     Google 登入
                 </button>
-                <button id="toggleEmailFormBtn"
+                <button data-action="toggleEmailFormBtn"
                     style="display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 5cqw; background-color: white; border: 0.2cqw solid #e5e7eb; border-radius: 2cqw; padding: 3cqw 0; font-size: 5cqw; font-weight: 600; color: #374151; cursor: pointer; box-shadow: 0 0.5cqw 2cqw rgba(0,0,0,0.05);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.5cqw;">
@@ -244,8 +245,7 @@
                     </svg>
                     使用電子郵件登入
                 </button>
-                <div id="emailFormSection"
-                    style="display: none; margin-top: 5cqw; text-align: left; height: 100%; box-sizing: border-box; background-color: var(--bg-Container); border: 0.2cqw solid var(--border-color); ">
+                <div id="emailFormSection" class="email-form">
                     <div style="margin-bottom: 1cqw;">
                         <label for="loginEmail"
                             style="display:block; margin-bottom: 5cqw; font-size:5cqw; color:#6b7280; font-weight:700;">電子郵件</label>
@@ -259,13 +259,13 @@
                             <input type="password" id="loginPassword" placeholder="請輸入密碼"
                                 autocomplete="current-password"
                                 style="width: 100%; padding:0.25cqw 0.75cqw; border:0.2cqw solid #e5e7eb; border-radius:2cqw; box-sizing:border-box; font-size:5cqw; background-color:#f9fafb; color: #111111;">
-                            <button type="button" id="togglePasswordVisibility"
+                            <button type="button" data-action="togglePasswordVisibility"
                                 style="position: absolute; right: 5cqw; background: none; border: none; cursor: pointer; font-size: 5cqw; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
                         </div>
-                    </div> <button id="emailLoginAction"
+                    </div> <button data-action="emailLogin"
                         style="background-color: #059669; color: white; border: none; width: 100%; padding: 0.25cqw; border-radius: 0.5cqw; font-size: 5cqw; font-weight: 700; cursor: pointer; box-shadow: 0 0.25cqw 0.5cqw rgba(255, 255, 255, 0.15);">電子郵件登入
                         / 註冊</button>
-                </div><span class="modal-close" id="customReturnBtn"
+                </div><span class="modal-close" data-action="customReturnBtn"
                     style="margin-top: 0.5cqw; text-decoration: underline; cursor: pointer; display: block; text-align: center;">暫時返回</span>
             </div>
         </div>

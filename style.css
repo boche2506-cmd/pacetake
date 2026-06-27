@@ -391,6 +391,7 @@ img,
     justify-content: center;
     align-items: center;
     padding: 1cqw;
+    z-index: 150;
 }
 
 .modal-card {
@@ -446,4 +447,18 @@ img,
     background-color: #FFFFFF;
     color: #374151;
     border-color: #E2E8F0;
+}
+
+.email-form {
+    display: none; /* 預設隱藏 */
+    margin-top: 5cqw;
+    text-align: left;
+    height: 100%;
+    box-sizing: border-box;
+    background-color: var(--bg-Container);
+    border: 0.2cqw solid var(--border-color);
+}
+
+.email-form.active {
+    display: block; /* 加上 active 後顯示 */
 }

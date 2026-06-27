@@ -83,8 +83,18 @@ onAuthStateChanged(auth, (user) => {
         // 使用者已經登入 (可能是匿名，也可能是正式會員)
         console.log("當前使用者 ID:", user.uid);
         console.log("是否為匿名:", user.isAnonymous);
-        // 開始進行點餐或載入購物車
-        handleUserSyncAndRoleRouting(user);
+        // --- 優化點：檢查 sessionStorage 是否已經有角色資料 ---
+        const cachedRole = sessionStorage.getItem(`userRole_${user.uid}`);
+        if (cachedRole) {
+            // 如果有快取，直接渲染選單，完全不用等待資料庫回應
+            console.log("[PACE DEBUG] 偵測到快取角色，直接渲染:", cachedRole);
+            renderDynamicMenu(cachedRole, user);
+        } else {
+            // 如果沒有，才進行完整的同步與路由
+            const role = await handleUserSyncAndRoleRouting(user);
+            // 同步完後，把角色存起來
+            sessionStorage.setItem(`userRole_${user.uid}`, role);
+        }
     } else {
         // --- 這裡是「徹底未登入」：觸發匿名登入 ---
         console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");

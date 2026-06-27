@@ -191,7 +191,8 @@ img,
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
-    font-size: 13cqw; /* 👤 的大小 */
+    font-size: 13cqw;
+    /* 👤 的大小 */
 }
 
 .two {
@@ -202,7 +203,6 @@ img,
     justify-content: space-between;
     align-items: flex-end;
     box-sizing: border-box;
-    position: relative;
 }
 
 .pace {
@@ -237,11 +237,10 @@ img,
     box-sizing: border-box;
 }
 
-.user-avatar-btn {
+.avatarBtnMenu {
     height: 100%;
     max-width: 30%;
-    /* 💡 建議先註解掉，或確保它夠寬，膠囊按鈕放了圖文需要寬度 */
-    min-width: fit-content;
+    min-width: 30%;
     /* 💡 新增：確保按鈕至少能完整塞下內文 */
     padding: 0 1.5cqw;
     /* 調整內襯，讓膠囊兩側有舒服的留白 */
@@ -251,8 +250,8 @@ img,
     box-shadow: var(--shadow-sm);
     cursor: pointer;
     box-sizing: border-box;
+    position: relative;
     display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
 }
@@ -281,7 +280,6 @@ img,
     /* 讓高度跟字體大小（4cqw）差不多高或稍微大一點 */
     width: auto;
     object-fit: contain;
-    display: inline-block;
 }
 
 /* 1. 選單本體的外觀與定位 */
@@ -307,6 +305,10 @@ img,
     /* 漂浮陰影效果 */
     z-index: 100;
     /* 確保一定在最上層 */
+}
+
+.dropdown-menu.active {
+    display: block;
 }
 
 /* 2. 控制選單內每一行 <a> 超連結的排版（解決擠扁換行問題） */
@@ -340,7 +342,7 @@ img,
 }
 
 /* 4. 特殊調整：JS 裡面最後一行的「登出按鈕」 */
-#logoutBtn {
+.dropdown-menu .logoutBtn {
     width: 100%;
     /* 覆蓋你寫在行內的 60%，點擊範圍比較大 */
     display: block;
@@ -351,9 +353,25 @@ img,
     /* 讓字體大小跟其他選項一致 */
 }
 
-#logoutBtn:hover {
+.dropdown-menu .logoutBtn:hover {
     background-color: #fff0f0;
     /* 登出按鈕移過去時顯示淡淡的紅色 */
+}
+
+.dropdown-menu .loginBtn {
+    width: 100%;
+    /* 覆蓋你寫在行內的 60%，點擊範圍比較大 */
+    display: block;
+    text-align: left;
+    padding: 0.5cqw 1cqw;
+    /* 跟上面的超連結對齊 */
+    font-size: 5cqw;
+    /* 讓字體大小跟其他選項一致 */
+}
+
+.dropdown-menu .loginBtn:hover {
+    background-color: #f3fff0;
+    /* 登出按鈕移過去時顯示淡淡的綠色 */
 }
 
 /* ==========================================================================

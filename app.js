@@ -74,7 +74,7 @@ const menuContainer = document.getElementById('menuContainer');
 const storeDistanceText = document.getElementById('storeDistanceText');
 const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
 const loginLightbox = document.getElementById('loginLightbox');
-const avatarBtn = document.getElementById('avatarBtn');
+const avatarBtnMenu = document.getElementById('avatarBtnMenu');
 const dropdownMenu = document.getElementById('dropdownMenu');
 const loginBtn = document.getElementById('loginBtn');
 const userNameDisplay = document.getElementById('userNameDisplay');
@@ -96,14 +96,9 @@ onAuthStateChanged(auth, (user) => {
         });
     }
 });
-// 把原本寫在 else 裡的那坨 UI 程式碼抽成一個函式，方便呼叫
+// 這裡是「徹底未登入」：觸發匿名登入 
 function showGuestUI() {
-    if (loginBtn) loginBtn.style.display = 'block';
-    if (avatarBtn) {
-        avatarBtn.style.display = 'none';
-        dropdownMenu.style.display = 'none';
-        dropdownMenu.innerHTML = '';
-    }
+    console.log("[PACE DEBUG] 進入訪客模式 (無法取得任何身分)");
     if (statusDot) statusDot.classList.remove('active');
     if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
     if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
@@ -132,7 +127,6 @@ async function handleUserSyncAndRoleRouting(user) {
             console.log("註冊成功：建立初始資料");
             const initialData = {
                 uid: user.uid,
-                email: user.email,
                 role: "buyer",
                 createdAt: new Date().toISOString(),
                 lastLogin: new Date().toISOString()
@@ -172,9 +166,6 @@ async function fetchStoresFromFirebase() {
 
 function updateUIForUser(user, currentRole) {
     // 如果程式執行到這裡，表示 user 一定存在，可以安心讀取資料
-    if (loginBtn) loginBtn.style.display = 'none';
-    if (avatarBtn) avatarBtn.style.display = 'flex';
-    if (loginLightbox) loginLightbox.style.display = 'none';
     // 角色顯示邏輯
     if (userNameDisplay) {
         if (currentRole === "admin") {
@@ -201,11 +192,10 @@ function updateUIForUser(user, currentRole) {
     // 狀態處理
     if (statusDot) statusDot.classList.add('active');
     if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
-    renderDynamicMenu(currentRole);
+    renderDynamicMenu(currentRole, user);
 }
 
-function renderDynamicMenu(role, isAnonymous) {
-    const dropdownMenu = document.getElementById('dropdownMenu');
+function renderDynamicMenu(role, user) {
     if (!dropdownMenu) return;
     // 確保有 userId，沒有的話用 'guest' 佔位
     const userId = currentUserId || 'guest';
@@ -239,14 +229,14 @@ function renderDynamicMenu(role, isAnonymous) {
         <a href="javascript:void(0)" data-action="issuePromo" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>`;
     }
     let authActionLink = '';
-    if (isAnonymous) {
+    if (user.isAnonymous) {
         authActionLink = `
         <div class="menu-divider"></div>
-        <button class="login-btn" id="loginBtn"style="color: var(--brand-green); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🔐 登入/註冊</button>`;
+        <button class="loginBtn" id="loginBtn" style="color: var(--brand-green); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🔐 登入/註冊</button>`;
     } else {
         authActionLink = `
         <div class="menu-divider"></div>
-        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>`;
+        <button class="logoutBtn" id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>`;
     }
     dropdownMenu.innerHTML = personalLinks + registerLink + shopLinks + adminLink + authActionLink;
     const logoutBtn = document.getElementById('logoutBtn');
@@ -277,18 +267,6 @@ function initAuthSystem() {
     const emailLoginAction = document.getElementById('emailLoginAction');
     const loginEmailInput = document.getElementById('loginEmail');
     const googleLoginAction = document.getElementById('googleLoginAction');
-    // 2. 下拉選單邏輯
-    if (avatarBtn && dropdownMenu) {
-        avatarBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-        });
-        document.addEventListener('click', (e) => {
-            if (!avatarBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.style.display = 'none';
-            }
-        });
-    }
     // 3. 登入視窗切換邏輯
     if (customReturnBtn && loginLightbox) {
         customReturnBtn.addEventListener('click', () => loginLightbox.style.display = 'none');
@@ -671,11 +649,35 @@ document.addEventListener('click', async (e) => {
     else if (action === 'closeAddressModalBtn') {
         addressDetailLightbox.style.display = 'none';
     }
+    else if (action === 'avatarBtnMenu') {
+        // 2. 下拉選單邏輯
+        dropdownMenu.classList.toggle('active');
+        // 如果選單打開了
+        if (dropdownMenu.classList.contains('active')) {
+            // 使用 setTimeout 是為了避免「點擊按鈕的瞬間」就被監聽器判定為「點擊外部」
+            setTimeout(() => {
+                document.addEventListener('click', closeMenuOutside);
+            }, 0);
+        } else {
+            // 如果手動關閉了，移除監聽
+            document.removeEventListener('click', closeMenuOutside);
+        }
+    }
     else {
         // 如果有需要處理預設情況或錯誤紀錄，可以寫在這裡
         console.log('未知的 action:', action);
     }
 });
+// 定義一個獨立的函式，方便隨時新增或移除監聽
+function closeMenuOutside(e) {
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const avatarBtnMenu = document.querySelector('[data-action="avatarBtnMenu"]');
+
+    if (!dropdownMenu.contains(e.target) && e.target !== avatarBtnMenu) {
+        dropdownMenu.classList.remove('active');
+        document.removeEventListener('click', closeMenuOutside); // 關閉後立刻移除監聽器
+    }
+}
 // 封裝成一個獨立的初始化函式
 function initPullToRefresh() {
     const topGroup = document.querySelector('.sticky-top-group');

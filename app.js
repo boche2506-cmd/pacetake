@@ -78,7 +78,7 @@ const userNameDisplay = document.getElementById('userNameDisplay');
 const loginLightbox = document.getElementById('loginLightbox');
 const emailFormSection = document.getElementById('emailFormSection');
 // 監聽 Firebase 登入狀態
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     if (user) {
         // 使用者已經登入 (可能是匿名，也可能是正式會員)
         console.log("當前使用者 ID:", user.uid);

@@ -4,7 +4,7 @@
     --border-color: #E2E8F0;
     --text-main: #0F172A;
     --text-muted: #64748B;
-    --brand-orange : #ff8800;
+    --brand-orange: #ff8800;
     --brand-blue: #0062FF;
     --brand-green: #10B981;
     --brand-red: #EF4444;
@@ -24,7 +24,7 @@
     --border-color: #262626;
     --text-main: #F5F5F5;
     --text-muted: #A3A3A3;
-    --brand-orange : #dd8940;
+    --brand-orange: #dd8940;
     --brand-blue: #2F80ED;
     --brand-green: #34D399;
     --brand-red: #F87171;
@@ -160,7 +160,7 @@ img,
     max-width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; 
+    justify-content: flex-end;
     align-items: stretch;
     box-sizing: border-box;
 }
@@ -185,29 +185,13 @@ img,
     box-sizing: border-box;
 }
 
-.pace-avatar-icon {
-    height: 100%;
-    max-width: 30%;
-    display: flex;
-    align-items: center;
-}
-
-.avatar-icon {
-    font-size: 12cqw;
-    height: 100%;
-    max-width: 100%;
+.avatar-container {
+    width: 13cqw;
+    height: 13cqw;
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
-}
-
-.userAvatarImg {
-    height: 70%;
-    max-width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-    box-sizing: border-box;
+    font-size: 13cqw; /* 👤 的大小 */
 }
 
 .two {
@@ -251,28 +235,6 @@ img,
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
-}
-
-.login-btn {
-    height: 90%;
-    max-width: 25%;
-    font-size: 4cqw;
-    font-weight: 500;
-    background-color: var(--brand-blue);
-    color: #FFFFFF;
-    border: 0.2cqw solid var(--border-color);
-    padding: 2cqw 4cqw;
-    border-radius: 10cqw;
-    box-shadow: var(--shadow-sm);
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-    line-height: 1;
-    /* 讓行距跟著字體一起自動調整 */
-    white-space: nowrap;
 }
 
 .user-avatar-btn {

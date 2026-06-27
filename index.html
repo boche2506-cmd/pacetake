@@ -410,10 +410,11 @@
                     <a href="index.html" class="logo-link">
                         <img src="png/pace3.png" alt="派思 官方網站">
                     </a>
-                    <div class="pace-avatar-icon">
-                        <span id="defaultIcon" class="avatar-icon">👤</span>
+                    <div class="avatar-container">
+                        <span id="defaultIcon">👤</span>
                         <img id="userAvatarImg" src=""
-                            style="display: none; border-radius: 50%;height: 13cqw; width: 13cqw;">
+                            style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"
+                            onerror="this.style.display='none'; document.getElementById('defaultIcon').style.display='block';">
                     </div>
                 </div>
                 <div class="two">
@@ -421,8 +422,7 @@
                         <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
                         <span>店內價外帶自取/點餐系統</span>
                     </div>
-                    <button class="login-btn" id="loginBtn">登入/註冊</button>
-                    <button class="user-avatar-btn" id="avatarBtn" style="display: none;">
+                    <button class="user-avatar-btn" id="avatarBtn">
                         <span class="user-name" id="userNameDisplay"></span></button>
                     <div class="dropdown-menu" id="dropdownMenu"></div>
                 </div>

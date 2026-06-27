@@ -111,6 +111,162 @@ function showGuestUI() {
     fetchStoresFromFirebase();
 }
 
+async function handleUserSyncAndRoleRouting(user) {
+    if (!user) return;
+    currentUserId = user.uid;
+    // 確保這裡使用 user.isAnonymous
+    console.log("[PACE DEBUG] User synced. Is Anonymous:", user.isAnonymous);
+    try {
+        const userRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+            // --- 這裡是「老客戶登入」---
+            console.log("登入成功：更新上次登入時間");
+            await updateDoc(userRef, {
+                lastLogin: new Date().toISOString()
+            });
+            const currentRole = userDoc.data().role || "buyer";
+            updateUIForUser(user, currentRole);
+        } else {
+            // --- 這裡是「新客戶註冊」---
+            console.log("註冊成功：建立初始資料");
+            const initialData = {
+                uid: user.uid,
+                email: user.email,
+                role: "buyer",
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString()
+            };
+            if (!user.isAnonymous) {
+                initialData.email = user.email;
+                initialData.displayName = user.displayName || "新會員";
+            }
+            else {
+                // 如果是匿名，你可以額外註記一個欄位方便後台辨識
+                initialData.isAnonymous = true;
+            }
+            // 統一寫入資料庫
+            await setDoc(userRef, initialData);
+            updateUIForUser(user, "buyer");
+        }
+    } catch (e) {
+        console.error("Role routing error:", e);
+    }
+    fetchStoresFromFirebase();
+}
+// 從firebase抓資料
+async function fetchStoresFromFirebase() {
+    try {
+        console.log("[PACE DEBUG] Fetching stores.");
+        const querySnapshot = await getDocs(collection(db, "stores"));
+        allStores = [];
+        querySnapshot.forEach((doc) => {
+            allStores.push({ id: doc.id, ...doc.data() });
+        });
+        filterAndRenderStores();
+    } catch (error) {
+        console.error("讀取店家失敗：", error);
+        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
+    }
+}
+
+function updateUIForUser(user, currentRole) {
+    // 如果程式執行到這裡，表示 user 一定存在，可以安心讀取資料
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (avatarBtn) avatarBtn.style.display = 'flex';
+    if (loginLightbox) loginLightbox.style.display = 'none';
+    // 角色顯示邏輯
+    if (userNameDisplay) {
+        if (currentRole === "admin") {
+            userNameDisplay.innerHTML = `👑 總管`;
+        } else if (currentRole === "seller") {
+            userNameDisplay.innerHTML = `🏪 老闆`;
+        } else {
+            userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
+        }
+    }
+    const userAvatarImg = document.getElementById('userAvatarImg');
+    const defaultIcon = document.getElementById('defaultIcon');
+    // 頭像處理邏輯 (結合你的建議)
+    // 只要有圖就設給 src
+    if (!user.isAnonymous && user.photoURL) {
+        userAvatarImg.src = user.photoURL;
+        userAvatarImg.style.display = 'block'; // 顯示圖片
+        defaultIcon.style.display = 'none';    // 隱藏文字
+    } else {
+        userAvatarImg.src = '';                // 清空 src
+        userAvatarImg.style.display = 'none';  // 隱藏圖片
+        defaultIcon.style.display = 'block';   // 顯示文字
+    }
+    // 狀態處理
+    if (statusDot) statusDot.classList.add('active');
+    if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
+    renderDynamicMenu(currentRole);
+}
+
+function renderDynamicMenu(role, isAnonymous) {
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    if (!dropdownMenu) return;
+    // 確保有 userId，沒有的話用 'guest' 佔位
+    const userId = currentUserId || 'guest';
+    // 1. 個人連結區塊 (誰都能看，或依照登入狀態調整)
+    let personalLinks = `
+        <a href="orders.html?userId=${userId}" class="nav-fast">🛒 我的訂單</a>
+        <a href="history.html?userId=${userId}" class="nav-fast">⏳ 歷史訂單</a>
+        <a href="favorites.html?userId=${userId}" class="nav-fast">❤️ 我的收藏</a>
+    `;
+    // 2. 店舖與管理連結區塊
+    let shopLinks = '';
+    if (role === 'admin' || role === 'seller') {
+        shopLinks = `
+            <div class="menu-divider"></div>
+            <div class="menu-header">店舖管理</div> <a href="seller.html?storeId=${userId}" class="nav-fast">🧑‍🍳 接單管理</a>
+            <a href="manage.html?storeId=${userId}" class="nav-fast">⚙️ 店舖管理</a>
+            <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
+        `;
+    }
+    // 3. 開店連結區塊
+    let registerLink = '';
+    if (role === 'admin' || role === 'buyer') {
+        registerLink = `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店</a>`;
+    }
+    // 最終組合
+    let adminLink = '';
+    if (role === 'admin') {
+        adminLink = `
+        <div class="menu-divider"></div>
+        <a href="javascript:void(0)" data-action="toggleAdmin" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
+        <a href="javascript:void(0)" data-action="issuePromo" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>`;
+    }
+    let authActionLink = '';
+    if (isAnonymous) {
+        authActionLink = `
+        <div class="menu-divider"></div>
+        <button class="login-btn" id="loginBtn"style="color: var(--brand-green); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🔐 登入/註冊</button>`;
+    } else {
+        authActionLink = `
+        <div class="menu-divider"></div>
+        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>`;
+    }
+    dropdownMenu.innerHTML = personalLinks + registerLink + shopLinks + adminLink + authActionLink;
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            console.log("[PACE DEBUG] Logout clicked.");
+            try {
+                await signOut(auth);
+                location.reload();
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+        });
+    }
+    if (loginBtn && loginLightbox) {
+        loginBtn.addEventListener('click', () => loginLightbox.style.display = 'flex');
+    }
+
+}
+
 function initAuthSystem() {
     console.log("[PACE DEBUG] Initializing Auth UI...");
     const customReturnBtn = document.getElementById('customReturnBtn');
@@ -134,9 +290,6 @@ function initAuthSystem() {
         });
     }
     // 3. 登入視窗切換邏輯
-    if (loginBtn && loginLightbox) {
-        loginBtn.addEventListener('click', () => loginLightbox.style.display = 'flex');
-    }
     if (customReturnBtn && loginLightbox) {
         customReturnBtn.addEventListener('click', () => loginLightbox.style.display = 'none');
     }
@@ -194,146 +347,6 @@ function initAuthSystem() {
             } catch (error) {
                 console.error("Google 登入失敗：", error);
                 alert("連線失敗，請檢查網路服務！");
-            }
-        });
-    }
-}
-
-async function handleUserSyncAndRoleRouting(user) {
-    if (!user) return;
-    currentUserId = user.uid;
-    try {
-        const userRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
-            // --- 這裡是「老客戶登入」---
-            console.log("登入成功：更新上次登入時間");
-            await updateDoc(userRef, {
-                lastLogin: new Date().toISOString()
-            });
-            const currentRole = userDoc.data().role || "buyer";
-            updateUIForUser(user, currentRole);
-        } else {
-            // --- 這裡是「新客戶註冊」---
-            console.log("註冊成功：建立初始資料");
-            const initialData = {
-                uid: user.uid,
-                email: user.email,
-                role: "buyer",
-                createdAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString()
-            };
-            if (!user.isAnonymous) {
-                initialData.email = user.email;
-                initialData.displayName = user.displayName || "新會員";
-            }
-            // 統一寫入資料庫
-            await setDoc(userRef, initialData);
-            updateUIForUser(user, "buyer");
-        }
-    } catch (e) {
-        console.error("Role routing error:", e);
-    }
-    fetchStoresFromFirebase();
-}
-// 從firebase抓資料
-async function fetchStoresFromFirebase() {
-    try {
-        console.log("[PACE DEBUG] Fetching stores.");
-        const querySnapshot = await getDocs(collection(db, "stores"));
-        allStores = [];
-        querySnapshot.forEach((doc) => {
-            allStores.push({ id: doc.id, ...doc.data() });
-        });
-        filterAndRenderStores();
-    } catch (error) {
-        console.error("讀取店家失敗：", error);
-        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
-    }
-}
-
-function updateUIForUser(user, currentRole) {
-    // 如果程式執行到這裡，表示 user 一定存在，可以安心讀取資料
-    if (loginBtn) loginBtn.style.display = 'none';
-    if (avatarBtn) avatarBtn.style.display = 'flex';
-    if (loginLightbox) loginLightbox.style.display = 'none';
-    // 角色顯示邏輯
-    if (userNameDisplay) {
-        if (currentRole === "admin") {
-            userNameDisplay.innerHTML = `👑 總管`;
-        } else if (currentRole === "seller") {
-            userNameDisplay.innerHTML = `🏪 老闆`;
-        } else {
-            userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
-        }
-    }
-    const userAvatarImg = document.getElementById('userAvatarImg');
-    const defaultIcon = document.getElementById('defaultIcon');
-    // 頭像處理邏輯 (結合你的建議)
-    if (user.photoURL && userAvatarImg && defaultIcon) {
-        userAvatarImg.src = user.photoURL;
-        userAvatarImg.style.display = 'block';
-        defaultIcon.style.display = 'none';
-    } else if (defaultIcon) {
-        if (userAvatarImg) userAvatarImg.style.display = 'none';
-        defaultIcon.style.display = 'block';
-    }
-    // 狀態處理
-    if (statusDot) statusDot.classList.add('active');
-    if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
-    renderDynamicMenu(currentRole);
-}
-
-function renderDynamicMenu(role) {
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    if (!dropdownMenu) return;
-    // 確保有 userId，沒有的話用 'guest' 佔位
-    const userId = currentUserId || 'guest';
-    // 1. 個人連結區塊 (誰都能看，或依照登入狀態調整)
-    let personalLinks = `
-        <a href="orders.html?userId=${userId}" class="nav-fast">🛒 我的訂單</a>
-        <a href="history.html?userId=${userId}" class="nav-fast">⏳ 歷史訂單</a>
-        <a href="favorites.html?userId=${userId}" class="nav-fast">❤️ 我的收藏</a>
-    `;
-    // 2. 店舖與管理連結區塊
-    let shopLinks = '';
-    if (role === 'admin' || role === 'seller') {
-        shopLinks = `
-            <div class="menu-divider"></div>
-            <div class="menu-header">店舖管理</div> <a href="seller.html?storeId=${userId}" class="nav-fast">🧑‍🍳 接單管理</a>
-            <a href="manage.html?storeId=${userId}" class="nav-fast">⚙️ 店舖管理</a>
-            <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
-        `;
-    }
-    // 3. 開店連結區塊
-    let registerLink = '';
-    if (role === 'admin' || role === 'buyer') {
-        registerLink = `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店</a>`;
-    }
-    // 最終組合
-    let adminLink = '';
-    if (role === 'admin') {
-        adminLink = `
-        <div class="menu-divider"></div>
-        <a href="javascript:void(0)" data-action="toggleAdmin" class="nav-fast" style="color: var(--brand-blue);">🔮 派思核心控制台</a>
-        <a href="javascript:void(0)" data-action="issuePromo" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
-    `;
-    }
-    let logoutLink = '';
-    logoutLink = `
-        <div class="menu-divider"></div>
-        <button id="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>
-    `;
-    dropdownMenu.innerHTML = personalLinks + registerLink + shopLinks + adminLink + logoutLink;
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            console.log("[PACE DEBUG] Logout clicked.");
-            try {
-                await signOut(auth);
-                location.reload();
-            } catch (error) {
-                console.error("Logout error:", error);
             }
         });
     }

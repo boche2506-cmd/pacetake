@@ -88,7 +88,7 @@ onAuthStateChanged(auth, async (user) => {
         if (cachedRole) {
             // 如果有快取，直接渲染選單，完全不用等待資料庫回應
             console.log("[PACE DEBUG] 偵測到快取角色，直接渲染:", cachedRole);
-            renderDynamicMenu(cachedRole, user);
+            updateUIForUser(cachedRole, user);
         } else {
             // 如果沒有，才進行完整的同步與路由
             const role = await handleUserSyncAndRoleRouting(user);

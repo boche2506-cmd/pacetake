@@ -78,26 +78,21 @@ const userNameDisplay = document.getElementById('userNameDisplay');
 const loginLightbox = document.getElementById('loginLightbox');
 const emailFormSection = document.getElementById('emailFormSection');
 // 監聽 Firebase 登入狀態
-onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-        signInAnonymously(auth); // 匿名登入
-        return;
-    }
-
-    // A. 優先渲染：直接拿 sessionStorage 的快取，0.001 秒完成
-    const cachedRole = sessionStorage.getItem(`userRole_${user.uid}`);
-    if (cachedRole) {
-        renderDynamicMenu(cachedRole, user);
-    }
-
-    // B. 背景更新：即使 UI 已經渲染，我們還是可以在背景同步最新角色資訊
-    // 這叫「優雅降級」或「樂觀更新」
-    const freshRole = await handleUserSyncAndRoleRouting(user);
-    sessionStorage.setItem(`userRole_${user.uid}`, freshRole);
-
-    // 如果快取跟資料庫撈出來的不一樣，再更新一次
-    if (freshRole !== cachedRole) {
-        renderDynamicMenu(freshRole, user);
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // 使用者已經登入 (可能是匿名，也可能是正式會員)
+        console.log("當前使用者 ID:", user.uid);
+        console.log("是否為匿名:", user.isAnonymous);
+        // 開始進行點餐或載入購物車
+        handleUserSyncAndRoleRouting(user);
+    } else {
+        // --- 這裡是「徹底未登入」：觸發匿名登入 ---
+        console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");
+        signInAnonymously(auth).catch((error) => {
+            console.error("匿名登入失敗:", error);
+            // 如果匿名失敗，才退回到你原本的「訪客」UI 顯示
+            showGuestUI();
+        });
     }
 });
 // 這裡是「徹底未登入」：觸發匿名登入 
@@ -632,6 +627,9 @@ document.addEventListener('click', async (e) => {
                     try {
                         const result = await createUserWithEmailAndPassword(auth, email, password);
                         await handleUserSyncAndRoleRouting(result.user);
+                        if (loginLightbox) {
+                            loginLightbox.style.display = 'none';
+                        }
                     } catch (regErr) {
                         alert("註冊密碼強度不足，或帳號已被佔用！");
                     }
@@ -648,6 +646,9 @@ document.addEventListener('click', async (e) => {
             try {
                 const result = await signInWithPopup(auth, provider);
                 await handleUserSyncAndRoleRouting(result.user);
+                if (loginLightbox) {
+                    loginLightbox.style.display = 'none';
+                }
             } catch (err) {
                 console.error("Google 登入失敗：", err);
                 alert("連線失敗，請檢查網路服務！");

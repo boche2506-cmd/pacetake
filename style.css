@@ -91,7 +91,7 @@ img,
     /* 圖片寬度填滿容器 */
     max-height: 100%;
     /* 圖片高度填滿容器 */
-    object-fit: contain;
+    object-fit: cover;
     /* 關鍵：確保完整顯示，不裁切，短邊留空 */
     display: block;
     background-color: transparent;

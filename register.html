@@ -916,7 +916,13 @@
         </script>
     <script type="module" src="app.js"></script>
     <script type="module">
-        import { app, auth, db, provider, currentStoreInfo, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
+        import { app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
+        let allStores = [];
+        let buyerLat = null;
+        let buyerLng = null;
+        let currentBuyerAddress = "正在獲取定位中...";
+        let currentUserId = null;
+        let activeDragItem = null;
         const shopSubmitBtn = document.getElementById('shopSubmitBtn');
         const submitBtn = document.getElementById('submitBtn');
         const menuUploadList = document.getElementById('menuUploadList');

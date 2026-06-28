@@ -170,7 +170,7 @@ function updateUIForUser(user, currentRole) {
         if (currentRole === "admin") {
             userNameDisplay.innerHTML = `👑 總管`;
         } else if (currentRole === "seller") {
-            userNameDisplay.innerHTML = `🏪 老闆`;
+            userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 老闆`;
         } else {
             userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
         }

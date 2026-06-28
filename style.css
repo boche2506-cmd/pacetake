@@ -239,8 +239,8 @@ img,
 
 .avatarBtnMenu {
     height: 100%;
-    max-width: 25%;
-    min-width: 25%;
+    max-width: 28%;
+    min-width: 28%;
     /* 💡 新增：確保按鈕至少能完整塞下內文 */
     padding: 0 1.5cqw;
     /* 調整內襯，讓膠囊兩側有舒服的留白 */

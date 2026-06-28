@@ -85,6 +85,7 @@ onAuthStateChanged(auth, (user) => {
         console.log("是否為匿名:", user.isAnonymous);
         // 開始進行點餐或載入購物車
         handleUserSyncAndRoleRouting(user);
+        renderFavoriteStores();
     } else {
         // --- 這裡是「徹底未登入」：觸發匿名登入 ---
         console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");
@@ -179,17 +180,18 @@ function updateUIForUser(user, currentRole) {
         userAvatarImg.src = user.photoURL;
         userAvatarImg.style.display = 'block'; // 顯示圖片
         defaultIcon.style.display = 'none';    // 隱藏文字
-        statusDot.classList.add('active');
-        statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
+        if (statusDot && statusText) {
+            statusDot.classList.add('active');
+            statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
+        }
     } else {
         userAvatarImg.src = '';                // 清空 src
         userAvatarImg.style.display = 'none';  // 隱藏圖片
         defaultIcon.style.display = 'block';   // 顯示文字
-    }
-    // 狀態處理
-    if (user.isAnonymous) {
-        statusDot.classList.remove('active');
-        statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
+        if (statusDot && statusText) {
+            statusDot.classList.remove('active');
+            statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
+        }
     }
     renderDynamicMenu(currentRole, user);
 }
@@ -351,12 +353,6 @@ async function renderFavoriteStores() {
         console.error("讀取收藏失敗:", error);
     }
 }
-// 確保登入狀態確認後才執行渲染,不用會有時間差
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        renderFavoriteStores();
-    }
-});
 // 1. 初始化函式：負責把資料灌入指定的 Select
 function initCitySelect(selectElement) {
     if (!selectElement) return;
@@ -704,22 +700,6 @@ async function initStorePage() {
         window.location.href = "index.html";
         return;
     }
-    // 頁面初始化時，根據 Firebase 狀態更新愛心
-    async function syncHeartIcon() {
-        if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
-        const user = auth.currentUser;
-        if (!user) {
-            heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
-            return;
-        }
-        try {
-            const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
-            const docSnap = await getDoc(favRef);
-            heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
-        } catch (e) {
-            console.error("同步收藏失敗:", e);
-        }
-    }
     document.body.setAttribute('data-store-id', currentStoreId);
     try {
         // --- 這裡放回你原有的 Firebase 讀取邏輯 ---
@@ -766,6 +746,22 @@ async function initStorePage() {
                 await syncHeartIcon();
             } catch (err) {
                 console.error("同步愛心狀態失敗:", err);
+            }
+        }
+        // 頁面初始化時，根據 Firebase 狀態更新愛心
+        async function syncHeartIcon() {
+            if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
+            const user = auth.currentUser;
+            if (!user) {
+                heartIcon.innerText = "🤍"; // 沒登入固定顯示白色
+                return;
+            }
+            try {
+                const favRef = doc(db, "users", user.uid, "favorites", window.currentStoreInfo.id);
+                const docSnap = await getDoc(favRef);
+                heartIcon.innerText = docSnap.exists() ? "❤️" : "🤍";
+            } catch (e) {
+                console.error("同步收藏失敗:", e);
             }
         }
         // 1. 先抓出 Firebase 的座標 (記得轉成數字)

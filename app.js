@@ -659,7 +659,6 @@ document.addEventListener('click', async (e) => {
 function closeMenuOutside(e) {
     const dropdownMenu = document.getElementById('dropdownMenu');
     const avatarBtnMenu = document.querySelector('[data-action="avatarBtnMenu"]');
-
     if (!dropdownMenu.contains(e.target) && e.target !== avatarBtnMenu) {
         dropdownMenu.classList.remove('active');
         document.removeEventListener('click', closeMenuOutside); // 關閉後立刻移除監聽器
@@ -702,36 +701,27 @@ async function initStorePage() {
     }
     document.body.setAttribute('data-store-id', currentStoreId);
     try {
-        // --- 這裡放回你原有的 Firebase 讀取邏輯 ---
-        let storeData = null;
-        const firebaseFirestore = window.firebase ? window.firebase.firestore() : null;
-        if (typeof db !== 'undefined' && typeof doc === 'function') {
-            const docSnap = await getDoc(doc(db, "stores", currentStoreId));
-            if (!docSnap.exists()) {
-                if (auth.currentUser) {
-                    // 1. 定位到使用者收藏夾中，對應的那位店家的文件
-                    // 路徑：users -> [使用者UID] -> favorites -> [該店家的sellerUid]
-                    const favoriteDocRef = doc(db, "users", auth.currentUser.uid, "favorites", currentStoreId);
-                    try {
-                        // 2. 執行刪除，直接把這份文件移除
-                        await deleteDoc(favoriteDocRef);
-                        console.log("已從收藏夾中清除失效店家：", currentStoreId);
-                    } catch (error) {
-                        console.error("清理收藏時發生錯誤，但仍將導向：", error);
-                    }
-                    // 不管有沒有刪除成功，最後都導回，確保使用者不會卡在壞掉的頁面
-                    window.location.href = "favorites.html";
+        const storeDoc = await getDoc(doc(db, "stores", currentStoreId));
+        if (!storeDoc.exists()) {
+            if (auth.currentUser) {
+                // 1. 定位到使用者收藏夾中，對應的那位店家的文件
+                // 路徑：users -> [使用者UID] -> favorites -> [該店家的sellerUid]
+                const favoriteDocRef = doc(db, "users", auth.currentUser.uid, "favorites", currentStoreId);
+                try {
+                    // 2. 執行刪除，直接把這份文件移除
+                    await deleteDoc(favoriteDocRef);
+                    console.log("已從收藏夾中清除失效店家：", currentStoreId);
+                } catch (error) {
+                    console.error("清理收藏時發生錯誤，但仍將導向：", error);
                 }
-                alert("該店家已下架，已自動從您的收藏中移除。");
+                // 不管有沒有刪除成功，最後都導回，確保使用者不會卡在壞掉的頁面
                 window.location.href = "favorites.html";
-                return;
             }
-            if (docSnap.exists()) storeData = docSnap.data();
-            console.log("Firebase 拿到的資料：", storeData); // <-- 加上這行！
-            // 順便檢查一下這裡有沒有值
-            console.log("Logo 欄位的值：", storeData.shopLogo);
+            alert("該店家已下架，已自動從您的收藏中移除。");
+            window.location.href = "favorites.html";
+            return;
         }
-        if (!storeData) throw new Error("無法從資料庫找到該店家資料");
+        const storeData = storeDoc.data();
         window.currentStoreInfo = {
             ...storeData, // 這行會自動把 storeData 的所有欄位全部放入，無需一行行寫
             id: currentStoreId, // 確保 ID 被正確寫入
@@ -741,13 +731,7 @@ async function initStorePage() {
             hasSeating: !!storeData.hasSeating
         };
         console.log("全域商店資訊已更新：", window.currentStoreInfo);
-        if (auth.currentUser) {
-            try {
-                await syncHeartIcon();
-            } catch (err) {
-                console.error("同步愛心狀態失敗:", err);
-            }
-        }
+        if (auth.currentUser) await syncHeartIcon();
         // 頁面初始化時，根據 Firebase 狀態更新愛心
         async function syncHeartIcon() {
             if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
@@ -800,7 +784,11 @@ async function initStorePage() {
         } else {
             target.innerText = '🏪';
         }
-        const menuList = storeData.menuList || storeData.menu || [];
+        // 2. 新增：從子集合抓取菜單
+        const menuQuery = collection(db, "stores", currentStoreId, "menu");
+        const menuSnapshot = await getDocs(menuQuery);
+        // 3. 將抓到的資料轉成陣列
+        const menuList = menuSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         menuContainer.innerHTML = "";
         const availableItems = menuList.filter(item => item.supply !== false);
         availableItems.forEach((item, index) => {
@@ -1036,7 +1024,6 @@ export function initCartDOMState() {
 document.addEventListener('DOMContentLoaded', () => {
     fetchStoresFromFirebase();
     initThemeSystem();
-    renderFavoriteStores();
     initCitySelect(document.getElementById('citySelect'));
     getBrowserLocation();
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡

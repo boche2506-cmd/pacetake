@@ -872,7 +872,7 @@ async function initStorePage() {
             // ----------------------------
             foodCard.innerHTML = `
                 <div class="food-img-info">
-                    <div class="food-img">${item.image ? `<img src="${item.image}" style="width:100%; height:100%; border-radius:inherit; position: absolute;">` : '🍱'}</div>
+                    <div class="food-img">${item.image ? `<img src="${item.image}" style="width:100%; height:100%; border-radius:inherit; object-fit: cover; position: absolute;">` : '🍱'}</div>
                     <div class="food-info">
                     <div class="food-name-note-display">
                     <div class="food-name">${item.name || '未命名'}</div>

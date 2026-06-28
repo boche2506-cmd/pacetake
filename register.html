@@ -996,25 +996,32 @@
         }
         // 確保只有在 register.html 才執行這段檢查
         async function initRegisterPage() {
+            // . 頁面路徑安全檢查
+            if (!window.location.pathname.includes('register.html')) return;
+            if (!submitBtn) return;
             // 1. 從網址取得 storeId (例如: register.html?storeId=123)
             const urlParams = new URLSearchParams(window.location.search);
             const storeId = urlParams.get('storeId');
-            // . 頁面路徑安全檢查
-            if (!window.location.pathname.includes('register.html')) return;
             console.log("[PACE] Initializing Register Page Logic...");
             if (storeId) {
                 console.log("偵測到 storeId，進入編輯模式:", storeId);
-                // 2. 從 Firebase 讀取該店家的資料
-                const storeDoc = await getDoc(doc(db, "stores", storeId));
-                if (storeDoc.exists()) {
-                    const data = storeDoc.data();
-                    // 3. 把資料填進表單
-                    fillShopFormData(data);
-                    // 4. 【重要】給按鈕貼上標籤，告訴它待會要執行「更新」
-                    submitBtn.dataset.mode = 'edit';
-                    submitBtn.dataset.storeId = storeId;
-                    submitBtn.innerText = "儲存修改"; // 修改按鈕文字，讓商家知道現在是修改模式
+                try {
+                    // 2. 從 Firebase 讀取該店家的資料
+                    const storeDoc = await getDoc(doc(db, "stores", storeId));
+                    if (storeDoc.exists()) {
+                        fillShopFormData(storeDoc.data());
+                        submitBtn.dataset.mode = 'edit';
+                        submitBtn.dataset.storeId = storeId;
+                        submitBtn.innerText = "儲存修改";
+                    }
+                } catch (error) {
+                    console.error("編輯模式讀取失敗:", error);
                 }
+            } else {
+                console.log("未偵測到 storeId，進入新增模式");
+                // 明確設定為 create
+                submitBtn.dataset.mode = 'create';
+                submitBtn.innerText = "建立店鋪";
             }
         }
         // 監聽詳細地址輸入框，當離開欄位時自動查詢
@@ -1305,8 +1312,8 @@
             if (action === 'shopSubmitBtn') {
                 // 取得按鈕上的標籤來判斷要做什麼
                 const btn = document.getElementById('submitBtn');
-                const mode = btn.dataset.mode;// 'edit' 或 undefined
-                const storeId = btn.dataset.storeId || auth.currentUser?.uid; // 編輯模式用參數，新增用當前 UID
+                const mode = btn.dataset.mode || 'create'; // 加上預設值，確保即使沒設也能跑新增
+                const storeId = btn.dataset.storeId; // 只有編輯模式才會有值參數，新增用當前 UID
                 const ShopFormData = getShopFormData();
                 // --- 菜單打包 ---
                 const menuRows = document.querySelectorAll('.menu-item-row');

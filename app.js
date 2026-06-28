@@ -98,8 +98,6 @@ onAuthStateChanged(auth, (user) => {
 // 這裡是「徹底未登入」：觸發匿名登入 
 function showGuestUI() {
     console.log("[PACE DEBUG] 進入訪客模式 (無法取得任何身分)");
-    if (statusDot) statusDot.classList.remove('active');
-    if (statusText) statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
     if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
     renderDynamicMenu('guest');
     fetchStoresFromFirebase();
@@ -181,14 +179,18 @@ function updateUIForUser(user, currentRole) {
         userAvatarImg.src = user.photoURL;
         userAvatarImg.style.display = 'block'; // 顯示圖片
         defaultIcon.style.display = 'none';    // 隱藏文字
+        statusDot.classList.add('active');
+        statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
     } else {
         userAvatarImg.src = '';                // 清空 src
         userAvatarImg.style.display = 'none';  // 隱藏圖片
         defaultIcon.style.display = 'block';   // 顯示文字
     }
     // 狀態處理
-    if (statusDot) statusDot.classList.add('active');
-    if (statusText) statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
+    if (user.isAnonymous) {
+        statusDot.classList.remove('active');
+        statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
+    }
     renderDynamicMenu(currentRole, user);
 }
 
@@ -703,13 +705,6 @@ async function initStorePage() {
         return;
     }
     // 頁面初始化時，根據 Firebase 狀態更新愛心
-    if (auth.currentUser) {
-        try {
-            await syncHeartIcon();
-        } catch (err) {
-            console.error("同步愛心狀態失敗:", err);
-        }
-    }
     async function syncHeartIcon() {
         if (!heartIcon) return; // 防呆：如果網頁沒這按鈕就跳出
         const user = auth.currentUser;
@@ -766,6 +761,13 @@ async function initStorePage() {
             hasSeating: !!storeData.hasSeating
         };
         console.log("全域商店資訊已更新：", window.currentStoreInfo);
+        if (auth.currentUser) {
+            try {
+                await syncHeartIcon();
+            } catch (err) {
+                console.error("同步愛心狀態失敗:", err);
+            }
+        }
         // 1. 先抓出 Firebase 的座標 (記得轉成數字)
         const sLat = parseFloat(storeData.shopLat || storeData.lat);
         const sLng = parseFloat(storeData.shopLng || storeData.lng);

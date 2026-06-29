@@ -159,7 +159,7 @@
                 <div class="action-buttons">
                     <button class="btn" data-action="manage-orders">訂單</button>
                     <button class="btn" data-action="manage-menu">菜單</button>
-                    <button class="btn" data-action="store-settings">設定</button>
+                    <button class="btn" data-action="store-settings">⚙️資料修改</button>
                 </div>
             </footer>
         </div>
@@ -227,7 +227,7 @@
         let activeDragItem = null;
         const urlParams = new URLSearchParams(window.location.search);
         const storeId = urlParams.get('storeId');
-        async function initPage() {
+        /*async function initPage() {
             // 這裡會暫停，直到 authReady 被 resolve，也就是 Firebase 說「好，我知道是誰了」
             const user = await authReady;
             if (!user) {
@@ -244,7 +244,29 @@
             }
             // 驗證完全過關，執行你的主程式
             console.log("驗證通過，開始載入管理介面...");
-        }
+        }*/
+        // 在 manage.html 的 JS 中加入：
+        document.addEventListener('click', async (e) => {
+            // 1. 判斷點擊的是不是我們設定的按鈕
+            const target = e.target.closest('[data-action]');
+            if (!target) return;
+            const action = target.getAttribute('data-action');
+            switch (action) {
+                case 'store-settings': {
+                    // 2. 因為這是 manage.html，你一定已經透過某種方式拿到了當前的 storeId
+                    // (例如你渲染頁面時已經知道該店 ID，或者存放在某個變數)
+                    // 假設你在渲染頁面時已經有一個變數叫 currentStoreId
+                    if (typeof currentStoreId === 'undefined' || !currentStoreId) {
+                        alert("找不到商店資訊，無法設定。");
+                        return;
+                    }
+
+                    // 3. 執行跳轉，帶上 storeId
+                    window.location.href = `register.html?storeId=${currentStoreId}`;
+                    break;
+                }
+            }
+        });
         // 💾 QR Code 效能解放優化：即時高速原生 API 生成並下載 SVG
         // 準備一個隱藏的容器
         function QRCode() {
@@ -276,7 +298,7 @@
                     </g>
                     <text x="200" y="430" font-family="sans-serif" font-size="16" font-weight="800" fill="#111111" text-anchor="middle">手機掃碼 ‧ 免投 App 點單</text>
                 </svg>
-            `;
+                `;
                 // 5. 下載流程 (維持不變)
                 const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
                 const url = URL.createObjectURL(blob);

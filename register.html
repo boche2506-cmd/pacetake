@@ -902,7 +902,14 @@
                 console.log("偵測到 storeId，進入編輯模式:", storeId);
                 try {
                     // 2. 從 Firebase 讀取該店家的資料
-                    const storeDoc = await getDoc(doc(db, "stores", storeId));
+                    // 1. 同時讀取「商店資料」與「菜單子集合」
+                    const storeDocRef = doc(db, "stores", storeId);
+                    const menuColRef = collection(db, "stores", storeId, "menu");
+                    // 使用 Promise.all 同時發出兩個請求，效率更高
+                    const [storeDoc, menuSnapshot] = await Promise.all([
+                        getDoc(storeDocRef),
+                        getDocs(menuColRef) // 抓取 menu 子集合內的所有文件
+                    ]);
                     if (storeDoc.exists()) {
                         const storeData = storeDoc.data();
                         // --- 【關鍵修正】補上這段擁有者檢查 ---
@@ -913,10 +920,20 @@
                             window.location.href = "index.html";
                             return;
                         }
-                        fillShopFormData(storeDoc.data());
+                        fillShopFormData(storeDoc.data());// 這裡填入欄位
                         submitBtn.dataset.mode = 'edit';
                         submitBtn.dataset.storeId = storeId;
                         submitBtn.innerText = "儲存修改";
+                    }
+                    // 3. 處理菜單資料 (這裡就是你要抓的 menu)
+                    const menuItems = menuSnapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    console.log("撈到的菜單資料:", menuItems);
+                    // 這裡你需要一個函式把 menuItems 渲染到畫面上
+                    if (menuItems.length > 0) {
+                        renderMenuToUI(menuItems);
                     }
                 } catch (error) {
                     console.error("編輯模式讀取失敗:", error);
@@ -994,6 +1011,81 @@
                 data.createdAt = new Date().toISOString();
             }
             return data;
+        }
+        function createNewItemRow(itemData = {}) {
+            const newRow = document.createElement('div');
+            newRow.className = 'menu-item-row';
+            newRow.innerHTML = `
+                        <div class="menu-item">
+                            <div class="img-upload-box" id="uploadBox">
+                                <input type="file" id="imageInput" class="image-input" accept="image/*"
+                                    style="display: none;">
+                                <img class="preview-img" src=""
+                                    style="display: none; position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
+                                <div class="upload-placeholder"
+                                    style="font-size: 8cqw;  width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    📷<span>上傳照片</span></div>
+                            </div>
+                            <div class="item-fields" style="width: 100%; gap: 0.5cqw;">
+                                <input type="text" class="input-style item-name-input"
+                                    style="height:8cqw; width: 100%; padding: 0 2cqw;" placeholder="品項名稱(必填)" required>
+                                <div class="price-input-wrapper">
+                                    <span class="price-symbol">$</span>
+                                    <input type="number" class="input-style price-input"
+                                        style="height:8cqw; width: 100%;padding-left:5cqw;" placeholder="金額(必填)" min="0"
+                                        required>
+                                </div>
+                            </div>
+                            <button type="button" class="new-size">如需規格</button>
+                            <div class="item-right-ctrls"
+                                style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
+                                <div class="drag-handle"
+                                    style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
+                                    ☰</div>
+                                <button type="button" class="del-row-btn"
+                                    style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                            </div>
+                        </div>
+                        <div class="new-size-price"
+                            style="display: none; height: 8cqw; width: 100%; flex-direction: row; justify-content: space-around; gap: 1cqw;">
+                            <div class="price-input-wrapper">
+                                <span class="price-symbol">大$</span>
+                                <input type="number" class="input-style price-input-large"
+                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
+                                    required>
+                            </div>
+                            <div class="price-input-wrapper">
+                                <span class="price-symbol">中$</span>
+                                <input type="number" class="input-style price-input-medium"
+                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額" min="0">
+                            </div>
+                            <div class="price-input-wrapper">
+                                <span class="price-symbol">小$</span>
+                                <input type="number" class="input-style price-input-small"
+                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="remark" style="width: 100%; gap: 1cqw">
+                            <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 80%;"
+                                placeholder="備註">
+                            <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle"
+                                    checked>
+                                <span class="toggle-slider">
+                                    <span class="on-text">販售中</span>
+                                    <span class="off-text">暫停</span>
+                                </span>
+                            </label>
+                        </div>`;
+            menuUploadList.appendChild(newRow);
+            makeItemDraggable(newRow);
+            return newRow; // 回傳這行元素，方便後面操作
+        }
+        function renderMenuToUI(menuItems) {
+            menuUploadList.innerHTML = ''; // 清空目前所有商品列
+            menuItems.forEach(item => {
+                createNewItemRow(item); // 直接呼叫剛剛寫好的函式，自動填入資料
+            });
         }
         // 監聽詳細地址輸入框，當離開欄位時自動查詢
         function setupAddressGeocoder() {
@@ -1127,72 +1219,7 @@
             });
             // --- 4. 新增行按鈕邏輯 ---
             addItemRowBtn?.addEventListener('click', () => {
-                const newRow = document.createElement('div');
-                newRow.className = 'menu-item-row';
-                newRow.innerHTML = `
-                        <div class="menu-item">
-                            <div class="img-upload-box" id="uploadBox">
-                                <input type="file" id="imageInput" class="image-input" accept="image/*"
-                                    style="display: none;">
-                                <img class="preview-img" src=""
-                                    style="display: none; position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
-                                <div class="upload-placeholder"
-                                    style="font-size: 8cqw;  width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                    📷<span>上傳照片</span></div>
-                            </div>
-                            <div class="item-fields" style="width: 100%; gap: 0.5cqw;">
-                                <input type="text" class="input-style item-name-input"
-                                    style="height:8cqw; width: 100%; padding: 0 2cqw;" placeholder="品項名稱(必填)" required>
-                                <div class="price-input-wrapper">
-                                    <span class="price-symbol">$</span>
-                                    <input type="number" class="input-style price-input"
-                                        style="height:8cqw; width: 100%;padding-left:5cqw;" placeholder="金額(必填)" min="0"
-                                        required>
-                                </div>
-                            </div>
-                            <button type="button" class="new-size">如需規格</button>
-                            <div class="item-right-ctrls"
-                                style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
-                                <div class="drag-handle"
-                                    style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
-                                    ☰</div>
-                                <button type="button" class="del-row-btn"
-                                    style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
-                            </div>
-                        </div>
-                        <div class="new-size-price"
-                            style="display: none; height: 8cqw; width: 100%; flex-direction: row; justify-content: space-around; gap: 1cqw;">
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">大$</span>
-                                <input type="number" class="input-style price-input-large"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
-                                    required>
-                            </div>
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">中$</span>
-                                <input type="number" class="input-style price-input-medium"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額" min="0">
-                            </div>
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">小$</span>
-                                <input type="number" class="input-style price-input-small"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="remark" style="width: 100%; gap: 1cqw">
-                            <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 80%;"
-                                placeholder="備註">
-                            <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle"
-                                    checked>
-                                <span class="toggle-slider">
-                                    <span class="on-text">販售中</span>
-                                    <span class="off-text">暫停</span>
-                                </span>
-                            </label>
-                        </div>`;
-                menuUploadList.appendChild(newRow);
-                makeItemDraggable(newRow);
+                createNewItemRow();
             });
         }
         // 菜單文件

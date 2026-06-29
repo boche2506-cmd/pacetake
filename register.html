@@ -910,8 +910,8 @@
         const addItemRowBtn = document.getElementById('addItemRowBtn');
         // 確保只有在 register.html 才執行這段檢查
         async function initRegisterPage() {
-            /*if (!window.location.pathname.includes('register.html')) return;
-            const user = await authReady;*/
+            if (!window.location.pathname.includes('register.html')) return;
+            const user = await authReady;
             if (user.isAnonymous) {
                 alert("尚未登入，請先前往登入頁面。");
                 window.location.href = "index.html";

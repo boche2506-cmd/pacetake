@@ -225,6 +225,8 @@
         let currentBuyerAddress = "正在獲取定位中...";
         let currentUserId = null;
         let activeDragItem = null;
+        const urlParams = new URLSearchParams(window.location.search);
+        const storeId = urlParams.get('storeId');
         async function initPage() {
             // 這裡會暫停，直到 authReady 被 resolve，也就是 Firebase 說「好，我知道是誰了」
             const user = await authReady;
@@ -233,8 +235,6 @@
                 window.location.href = "login.html";
                 return;
             }
-            const urlParams = new URLSearchParams(window.location.search);
-            const storeId = urlParams.get('storeId');
             console.log("網址抓到的 ID:", storeId);
             console.log("登入的 UID:", auth.currentUser.uid);
             if (!storeId || storeId !== user.uid) {
@@ -245,30 +245,27 @@
             // 驗證完全過關，執行你的主程式
             console.log("驗證通過，開始載入管理介面...");
         }
-        if (storeId) {
-            console.log("當前管理的店家 ID 是:", storeId);
-            // 接下來你就可以用這個 storeId 去讀取資料庫
-            // 💾 QR Code 效能解放優化：即時高速原生 API 生成並下載 SVG
-            // 準備一個隱藏的容器
-            const qrContainer = document.createElement('div');
-            qrContainer.style.display = 'none';
-            document.body.appendChild(qrContainer);
-            bindFastClick(generateDownloadBtn, async () => {
-                // 1. 設定你的商店網址
-                const storeUrl = `https://pacetake.tw/store.html?storeId=${storeId}`;
-                // 2. 使用 QRCode.js 生成 SVG
-                const qrcode = new QRCode(qrContainer, {
-                    text: storeUrl,
-                    width: 200,
-                    height: 200,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-                // 3. 取得生成的 SVG 原始碼
-                const qrSvg = qrContainer.querySelector('svg').outerHTML;
-                // 4. 把這個 SVG 塞進你原本的模板外框裡
-                const svgString = `
+        // 💾 QR Code 效能解放優化：即時高速原生 API 生成並下載 SVG
+        // 準備一個隱藏的容器
+        const qrContainer = document.createElement('div');
+        qrContainer.style.display = 'none';
+        document.body.appendChild(qrContainer);
+        bindFastClick(generateDownloadBtn, async () => {
+            // 1. 設定你的商店網址
+            const storeUrl = `https://www.pacetake.tw/store.html?storeId=${storeId}`;
+            // 2. 使用 QRCode.js 生成 SVG
+            const qrcode = new QRCode(qrContainer, {
+                text: storeUrl,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            // 3. 取得生成的 SVG 原始碼
+            const qrSvg = qrContainer.querySelector('svg').outerHTML;
+            // 4. 把這個 SVG 塞進你原本的模板外框裡
+            const svgString = `
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
                     <rect width="400" height="500" rx="30" fill="#0066FF"/>
                     <rect x="20" y="20" width="360" height="460" rx="20" fill="#ffffff"/>
@@ -279,18 +276,17 @@
                     <text x="200" y="430" font-family="sans-serif" font-size="16" font-weight="800" fill="#111111" text-anchor="middle">手機掃碼 ‧ 免投 App 點單</text>
                 </svg>
             `;
-                // 5. 下載流程 (維持不變)
-                const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `pacetake-qr-${storeId}.svg`;
-                link.click();
-                URL.revokeObjectURL(url);
-                // 清理一下生成的 QR Code
-                qrContainer.innerHTML = '';
-            });
-        }
+            // 5. 下載流程 (維持不變)
+            const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `pacetake-qr-${storeId}.svg`;
+            link.click();
+            URL.revokeObjectURL(url);
+            // 清理一下生成的 QR Code
+            qrContainer.innerHTML = '';
+        });
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
             console.log("系統初始化完成");

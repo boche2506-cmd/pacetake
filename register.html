@@ -888,7 +888,7 @@
         // 確保只有在 register.html 才執行這段檢查
         async function initRegisterPage() {
             const user = await authReady;
-            if (!user) {
+            if (!user.isAnonymous) {
                 window.location.href = "login.html";
                 return;
             }

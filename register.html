@@ -885,6 +885,41 @@
         const submitBtn = document.getElementById('submitBtn');
         const menuUploadList = document.getElementById('menuUploadList');
         const addItemRowBtn = document.getElementById('addItemRowBtn');
+        // 確保只有在 register.html 才執行這段檢查
+        async function initRegisterPage() {
+            const user = await authReady;
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+            // . 頁面路徑安全檢查
+            if (!window.location.pathname.includes('register.html')) return;
+            if (!submitBtn) return;
+            // 1. 從網址取得 storeId (例如: register.html?storeId=123)
+            const urlParams = new URLSearchParams(window.location.search);
+            const storeId = urlParams.get('storeId');
+            console.log("[PACE] Initializing Register Page Logic...");
+            if (storeId) {
+                console.log("偵測到 storeId，進入編輯模式:", storeId);
+                try {
+                    // 2. 從 Firebase 讀取該店家的資料
+                    const storeDoc = await getDoc(doc(db, "stores", storeId));
+                    if (storeDoc.exists()) {
+                        fillShopFormData(storeDoc.data());
+                        submitBtn.dataset.mode = 'edit';
+                        submitBtn.dataset.storeId = storeId;
+                        submitBtn.innerText = "儲存修改";
+                    }
+                } catch (error) {
+                    console.error("編輯模式讀取失敗:", error);
+                }
+            } else {
+                console.log("未偵測到 storeId，進入新增模式");
+                // 明確設定為 create
+                submitBtn.dataset.mode = 'create';
+                submitBtn.innerText = "建立店鋪";
+            }
+        }
         // 負責把資料填回表單
         function fillShopFormData(data) {
             document.getElementById('shopName').value = data.shopName || '';
@@ -951,36 +986,6 @@
                 data.createdAt = new Date().toISOString();
             }
             return data;
-        }
-        // 確保只有在 register.html 才執行這段檢查
-        async function initRegisterPage() {
-            // . 頁面路徑安全檢查
-            if (!window.location.pathname.includes('register.html')) return;
-            if (!submitBtn) return;
-            // 1. 從網址取得 storeId (例如: register.html?storeId=123)
-            const urlParams = new URLSearchParams(window.location.search);
-            const storeId = urlParams.get('storeId');
-            console.log("[PACE] Initializing Register Page Logic...");
-            if (storeId) {
-                console.log("偵測到 storeId，進入編輯模式:", storeId);
-                try {
-                    // 2. 從 Firebase 讀取該店家的資料
-                    const storeDoc = await getDoc(doc(db, "stores", storeId));
-                    if (storeDoc.exists()) {
-                        fillShopFormData(storeDoc.data());
-                        submitBtn.dataset.mode = 'edit';
-                        submitBtn.dataset.storeId = storeId;
-                        submitBtn.innerText = "儲存修改";
-                    }
-                } catch (error) {
-                    console.error("編輯模式讀取失敗:", error);
-                }
-            } else {
-                console.log("未偵測到 storeId，進入新增模式");
-                // 明確設定為 create
-                submitBtn.dataset.mode = 'create';
-                submitBtn.innerText = "建立店鋪";
-            }
         }
         // 監聽詳細地址輸入框，當離開欄位時自動查詢
         function setupAddressGeocoder() {
@@ -1382,8 +1387,8 @@
             }
         });
         document.addEventListener('DOMContentLoaded', () => {
-            setupAddressGeocoder();
             initRegisterPage();
+            setupAddressGeocoder();
             setupMenuManager();
             console.log("系統初始化完成");
         });

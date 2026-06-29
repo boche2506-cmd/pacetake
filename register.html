@@ -716,7 +716,7 @@
                     <div>
                         <div>現場付現</div><small>開啟現場付款，需自行承擔未取貨風險</small>
                     </div>
-                    <label class="toggle-switch"><input type="checkbox" id="toggleCash"><span
+                    <label class="toggle-switch"><input type="checkbox" data-action="toggleCash" id="toggleCash"><span
                             class="slider"></span></label>
                 </div>
                 <div class="seating">
@@ -804,15 +804,15 @@
                     <button id="submitBtn" class="submit-btn" data-action="shopSubmitBtn" type="button">建立店鋪</button>
                 </footer>
             </div>
-            <div class="lightbox-modal" id="cashWarningModal" style="display: none;">
+            <div class="lightbox-modal" data-action="cashWarningModal" id="cashWarningModal" style="display: none;">
                 <div class="modal-card">
                     <div class="modal-title">⚠️ 開啟現場付現風險提示</div>
                     <div class="modal-desc">
                         您正準備開啟「現場付現」功能。請注意，若遇到買家蓄意棄單、逾時未取，相關食材與營業損失需由店鋪自行全額吸收。請問是否同意此條款？
                     </div>
                     <div class="modal-action-btns">
-                        <button class="cancel-btn" id="warningCancelBtn">不同意</button>
-                        <button class="confirm-btn" id="warningConfirmBtn">我同意</button>
+                        <button class="cancel-btn" data-action="warningCancelBtn" id="warningCancelBtn">不同意</button>
+                        <button class="confirm-btn" data-action="warningConfirmBtn" id="warningConfirmBtn">我同意</button>
                     </div>
                 </div>
             </div>
@@ -881,42 +881,18 @@
         let currentBuyerAddress = "正在獲取定位中...";
         let currentUserId = null;
         let activeDragItem = null;
-        const areaData = {
-            "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
-            "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
-            "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
-            "桃園市": ["桃園區", "中壢區", "大溪區", "楊梅區", "蘆竹區", "大園區", "龜山區", "八德區", "龍潭區", "平鎮區", "新屋區", "觀音區", "復興區"],
-            "新竹市": ["東區", "北區", "香山區"],
-            "新竹縣": ["竹北市", "竹東鎮", "新埔鎮", "關西鎮", "湖口鄉", "新豐鄉", "芎林鄉", "橫山鄉", "北埔鄉", "寶山鄉", "峨眉鄉", "尖石鄉", "五峰鄉"],
-            "苗栗縣": ["苗栗市", "頭份市", "竹南鎮", "後龍鎮", "通霄鎮", "苑裡鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "公館鄉", "銅鑼鄉", "三義鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "南庄鄉", "泰安鄉"],
-            "台中市": ["中區", "東區", "南區", "西區", "北區", "西屯區", "南屯區", "北屯區", "豐原區", "東勢區", "大甲區", "清水區", "沙鹿區", "梧棲區", "后里區", "神岡區", "潭子區", "大雅區", "新社區", "石岡區", "外埔區", "大安區", "烏日區", "大肚區", "龍井區", "霧峰區", "太平區", "大里區", "和平區"],
-            "彰化縣": ["彰化市", "員林市", "鹿港鎮", "和美鎮", "北斗鎮", "溪湖鎮", "田中鎮", "二林鎮", "線西鄉", "伸港鄉", "福興鄉", "秀水鄉", "花壇鄉", "芬園鄉", "大村鄉", "埔鹽鄉", "埔心鄉", "永靖鄉", "社頭鄉", "二水鄉", "田尾鄉", "埤頭鄉", "芳苑鄉", "大城鄉", "竹塘鄉", "溪州鄉"],
-            "南投縣": ["南投市", "埔里鎮", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
-            "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "西螺鎮", "土庫鎮", "北港鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "東勢鄉", "褒忠鄉", "臺西鄉", "元長鄉", "四湖鄉", "口湖鄉", "水林鄉"],
-            "嘉義市": ["東區", "西區"],
-            "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
-            "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
-            "高雄市": ["新興區", "前金區", "苓雅區", "鹽埕區", "鼓山區", "旗津區", "前鎮區", "三民區", "楠梓區", "小港區", "左營區", "仁武區", "大社區", "岡山區", "路竹區", "阿蓮區", "田寮區", "燕巢區", "橋頭區", "梓官區", "彌陀區", "永安區", "湖內區", "鳳山區", "大寮區", "林園區", "鳥松區", "大樹區", "旗山區", "美濃區", "六龜區", "內門區", "杉林區", "甲仙區", "桃源區", "那瑪夏區", "茂林區"],
-            "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "崁頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
-            "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
-            "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
-            "臺東縣": ["臺東市", "成功鎮", "關山鎮", "卑名鄉", "大武鄉", "太麻里鄉", "東河鄉", "長濱鄉", "鹿野鄉", "池上鄉", "綠島鄉", "延平鄉", "海端鄉", "達仁鄉", "金峰鄉", "蘭嶼鄉"],
-            "澎湖縣": ["馬公市", "湖西鄉", "白沙鄉", "西嶼鄉", "望安鄉", "七美鄉"],
-            "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
-            "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
-        };
         const submitBtn = document.getElementById('submitBtn');
         const menuUploadList = document.getElementById('menuUploadList');
         const addItemRowBtn = document.getElementById('addItemRowBtn');
         // 確保只有在 register.html 才執行這段檢查
         async function initRegisterPage() {
-            if (!window.location.pathname.includes('register.html')) return;
+            /*if (!window.location.pathname.includes('register.html')) return;*/
             const user = await authReady;
-            if (user.isAnonymous) {
-                alert("尚未登入，請先前往登入頁面。");
-                window.location.href = "index.html";
-                return;
-            }
+            /*if (user.isAnonymous) {
+               alert("尚未登入，請先前往登入頁面。");
+               window.location.href = "index.html";
+               return;
+            }*/
             // . 頁面路徑安全檢查
             // 1. 從網址取得 storeId (例如: register.html?storeId=123)
             const urlParams = new URLSearchParams(window.location.search);
@@ -925,8 +901,6 @@
             if (storeId) {
                 console.log("偵測到 storeId，進入編輯模式:", storeId);
                 try {
-                    initNewebpayUI();
-                    initCitySelect(document.getElementById('citySelect'));
                     // 2. 從 Firebase 讀取該店家的資料
                     // 1. 同時讀取「商店資料」與「菜單子集合」
                     const [storeDoc, menuSnapshot] = await Promise.all([
@@ -943,13 +917,7 @@
                             window.location.href = "index.html";
                             return;
                         }
-                        // 填入城市後，要觸發地區選單的更新 (讓地區能被正確填入)
-                        const cityEl = document.getElementById('citySelect');
-                        cityEl.value = storeData.city;
-                        updateDistrictSelect(storeData.city, document.getElementById('districtSelect'));
-                        document.getElementById('districtSelect').value = storeData.district;
-                        // 填入其他欄位
-                        fillShopFormData(storeDoc.data);// 這裡填入欄位
+                        fillShopFormData(storeDoc.data());// 這裡填入欄位
                         submitBtn.dataset.mode = 'edit';
                         submitBtn.dataset.storeId = storeId;
                         submitBtn.innerText = "儲存修改";
@@ -976,41 +944,38 @@
         }
         // 負責把資料填回表單
         function fillShopFormData(data) {
-            const fields = [
-                { id: 'shopName', key: 'shopName' },
-                { id: 'shopPhone', key: 'shopPhone' },
-                { id: 'citySelect', key: 'city' },
-                { id: 'districtSelect', key: 'district' },
-                { id: 'shopAddress', key: 'detailAddress' },
-                { id: 'shopLat', key: 'shopLat' },
-                { id: 'shopLng', key: 'shopLng' },
-                { id: 'shopStatus', key: 'status' },
-                { id: 'prepareTimeInput', key: 'prepareTime' },
-                { id: 'merchantIdInput', key: 'MerchantID' },
-                { id: 'hashKeyInput', key: 'HashKey' },
-                { id: 'hashIvInput', key: 'HashIV' }
-            ]; fields.forEach(field => {
-                const el = document.getElementById(field.id);
+            // 這裡定義一個輔助函式，專門負責安全地填入資料
+            const safeSet = (id, value, isCheckbox = false) => {
+                const el = document.getElementById(id);
                 if (el) {
-                    el.value = data[field.key] || '';
-                    console.log(`成功填入: ${field.id}`);
+                    if (isCheckbox) {
+                        el.checked = !!value;
+                    } else {
+                        el.value = value || '';
+                    }
                 } else {
-                    console.error(`❌ 兇手找到了！HTML 找不到這個 ID: "${field.id}"`);
+                    console.warn(`[Info] ID "${id}" 目前不存在於頁面上，跳過回填。`);
                 }
-            }); const toggles = [
-                { id: 'toggleCash', key: 'isCashPayEnabled' },
-                { id: 'toggleOnline', key: 'isOnlinePayEnabled' },
-                { id: 'seatingtoggle', key: 'hasSeating' }
-            ];
+            };
+            // 開始安全回填
+            safeSet('shopName', data.shopName);
+            safeSet('shopPhone', data.shopPhone);
+            safeSet('citySelect', data.city);
+            safeSet('districtSelect', data.district);
+            safeSet('shopAddress', data.detailAddress);
+            safeSet('shopLat', data.shopLat);
+            safeSet('shopLng', data.shopLng);
+            safeSet('shopStatus', data.status); // 如果格子沒做，這行只會觸發 Warning，不會崩潰
+            safeSet('prepareTimeInput', data.prepareTime);
+            safeSet('merchantIdInput', data.MerchantID);
+            safeSet('hashKeyInput', data.HashKey);
+            safeSet('hashIvInput', data.HashIV);
 
-            toggles.forEach(t => {
-                const el = document.getElementById(t.id);
-                if (el) {
-                    el.checked = !!data[t.key];
-                } else {
-                    console.error(`❌ Checkbox 找不到 ID: "${t.id}"`);
-                }
-            });
+            // Checkbox 記得用 true
+            safeSet('toggleCash', data.isCashPayEnabled, true);
+            safeSet('toggleOnline', data.isOnlinePayEnabled, true);
+            safeSet('seatingtoggle', data.hasSeating, true);
+            console.table(data);
         }
         // 每次被呼叫時，都抓取當下最新的一手資料
         function getShopFormData() {
@@ -1136,46 +1101,6 @@
                 createNewItemRow(item); // 直接呼叫剛剛寫好的函式，自動填入資料
             });
         }
-        function initNewebpayUI() {
-            if (!newebpayContainer) return;
-            // 渲染 HTML
-            newebpayContainer.innerHTML = `.<label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
-                    <div style="display:flex; flex-direction:column; gap:0.5cqw;">
-                        <input type="text" id="merchantIdInput" class="input-style" style="height:8cqw;" placeholder="請輸入 商店代號 (MerchantID)">
-                        <input type="text" id="hashKeyInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashKey">
-                        <input type="text" id="hashIvInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashIV">
-                    </div>`;
-            // 設定初始狀態
-            const toggleOnline = document.getElementById('toggleOnline');
-            if (toggleOnline) {
-                newebpayContainer.style.display = toggleOnline.checked ? 'block' : 'none';
-                // 重新綁定監聽器
-                toggleOnline.addEventListener('change', function () {
-                    newebpayContainer.style.display = this.checked ? 'block' : 'none';
-                });
-            }
-        }
-        // 初始化城市
-        function initCitySelect(selectElement) {
-            if (!selectElement) return;
-            selectElement.innerHTML = '<option value="">請選擇城市</option>'; // 清空重填
-            Object.keys(areaData).forEach(city => {
-                const opt = document.createElement('option');
-                opt.value = city; opt.innerText = city;
-                selectElement.appendChild(opt);
-            });
-        }
-        // 初始化行政區 (根據城市)
-        function updateDistrictSelect(city, districtElement) {
-            if (!districtElement) return;
-            districtElement.innerHTML = '<option value="">請選擇行政區</option>';
-            const districts = areaData[city] || [];
-            districts.forEach(dist => {
-                const opt = document.createElement('option');
-                opt.value = dist; opt.innerText = dist;
-                districtElement.appendChild(opt);
-            });
-        }
         // 監聽詳細地址輸入框，當離開欄位時自動查詢
         function setupAddressGeocoder() {
             // 1. 頁面路徑安全檢查
@@ -1211,6 +1136,37 @@
             if (box) {
                 const input = box.querySelector('.image-input');
                 if (input) input.click();
+            }
+        });
+        // 直接在整個網頁範圍監聽 change
+        document.addEventListener('change', (e) => {
+            // 如果觸發的是 .image-input
+            if (e.target.classList.contains('image-input')) {
+                const input = e.target;
+                const box = input.closest('.img-upload-box, .shop-logo-box');
+                if (!box) return;
+                const file = input.files[0];
+                if (!file) return;
+                const img = box.querySelector('.preview-img');
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const tempImg = new Image();
+                    tempImg.src = event.target.result;
+                    tempImg.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800;
+                        const scaleSize = MAX_WIDTH / tempImg.width;
+                        canvas.width = tempImg.width > MAX_WIDTH ? MAX_WIDTH : tempImg.width;
+                        canvas.height = tempImg.width > MAX_WIDTH ? tempImg.height * scaleSize : tempImg.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+                        if (img) {
+                            img.src = canvas.toDataURL('image/jpeg', 0.7);
+                            img.style.display = 'block';
+                        }
+                    };
+                };
+                reader.readAsDataURL(file);
             }
         });
         // 拖曳菜單專屬函式區 新增菜單(賣家)
@@ -1325,37 +1281,6 @@
             await Promise.all(addPromises);
             console.log("新菜單已同步");
         }
-        // 直接在整個網頁範圍監聽 change
-        document.addEventListener('change', (e) => {
-            // 如果觸發的是 .image-input
-            if (e.target.classList.contains('image-input')) {
-                const input = e.target;
-                const box = input.closest('.img-upload-box, .shop-logo-box');
-                if (!box) return;
-                const file = input.files[0];
-                if (!file) return;
-                const img = box.querySelector('.preview-img');
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const tempImg = new Image();
-                    tempImg.src = event.target.result;
-                    tempImg.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 800;
-                        const scaleSize = MAX_WIDTH / tempImg.width;
-                        canvas.width = tempImg.width > MAX_WIDTH ? MAX_WIDTH : tempImg.width;
-                        canvas.height = tempImg.width > MAX_WIDTH ? tempImg.height * scaleSize : tempImg.height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
-                        if (img) {
-                            img.src = canvas.toDataURL('image/jpeg', 0.7);
-                            img.style.display = 'block';
-                        }
-                    };
-                };
-                reader.readAsDataURL(file);
-            }
-        });
         // . 現金警告邏輯 (事件委派)
         const toggleCash = document.getElementById('toggleCash');
         const cashWarningModal = document.getElementById('cashWarningModal');
@@ -1363,17 +1288,32 @@
         const warningCancelBtn = document.getElementById('warningCancelBtn');
         const toggleOnline = document.getElementById('toggleOnline');
         const newebpayContainer = document.getElementById('newebpayContainer');
-        if (toggleCash) {
-            toggleCash.checked = false;
-            toggleCash.addEventListener('click', (e) => {
-                if (toggleCash.checked) {
+        toggleOnline?.addEventListener('change', function () {
+            if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
+        });
+        if (newebpayContainer) {
+            newebpayContainer.innerHTML = `
+                    <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
+                    <div style="display:flex; flex-direction:column; gap:0.5cqw;">
+                        <input type="text" id="merchantIdInput" class="input-style" style="height:8cqw;" placeholder="請輸入 商店代號 (MerchantID)">
+                        <input type="text" id="hashKeyInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashKey">
+                        <input type="text" id="hashIvInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashIV">
+                    </div>
+                    `;
+        }
+        // Listener'click'
+        document.addEventListener('click', async (e) => {
+            const target = e.target.closest('[data-action]');
+            if (!target) return;
+            const action = target.getAttribute('data-action');
+            if (action === 'toggleCash') {
+                toggleCash.checked = false;
+                if (action === 'toggleCash') {
                     toggleCash.checked = false;
                     e.preventDefault();
                     if (cashWarningModal) cashWarningModal.style.display = 'flex';
                 }
-            });
-        }
-        document.addEventListener('click', (e) => {
+            }
             if (e.target.id === 'warningConfirmBtn') {
                 if (toggleCash) toggleCash.checked = true;
                 if (cashWarningModal) cashWarningModal.style.display = 'none';
@@ -1381,15 +1321,6 @@
                 if (toggleCash) toggleCash.checked = false;
                 if (cashWarningModal) cashWarningModal.style.display = 'none';
             }
-        });
-        toggleOnline?.addEventListener('change', function () {
-            if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
-        });
-        // Listener'click'
-        document.addEventListener('click', async (e) => {
-            const target = e.target.closest('[data-action]');
-            if (!target) return;
-            const action = target.getAttribute('data-action');
             // shopSubmitBtn 監聽與手動提交邏輯
             if (action === 'shopSubmitBtn') {
                 // 取得按鈕上的標籤來判斷要做什麼

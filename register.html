@@ -903,12 +903,9 @@
                 try {
                     // 2. 從 Firebase 讀取該店家的資料
                     // 1. 同時讀取「商店資料」與「菜單子集合」
-                    const storeDocRef = doc(db, "stores", storeId);
-                    const menuColRef = collection(db, "stores", storeId, "menu");
-                    // 使用 Promise.all 同時發出兩個請求，效率更高
                     const [storeDoc, menuSnapshot] = await Promise.all([
-                        getDoc(storeDocRef),
-                        getDocs(menuColRef) // 抓取 menu 子集合內的所有文件
+                        getDoc(doc(db, "stores", storeId)),
+                        getDocs(collection(db, "stores", storeId, "menu"))
                     ]);
                     if (storeDoc.exists()) {
                         const storeData = storeDoc.data();

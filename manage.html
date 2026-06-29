@@ -35,7 +35,8 @@
             padding: 3cqw;
             border-radius: 5cqw;
             /* 大圓角更現代 */
-            flex: 1; /* 平分空間 */
+            flex: 1;
+            /* 平分空間 */
         }
 
         .stat-item {
@@ -225,6 +226,8 @@
         let activeDragItem = null;
         const urlParams = new URLSearchParams(window.location.search);
         const storeId = urlParams.get('storeId');
+        console.log("網址抓到的 ID:", storeId);
+        console.log("登入的 UID:", auth.currentUser.uid);
         if (!storeId || storeId !== currentUserId) {
             console.warn("存取權限不足或網址參數錯誤");
             // 可以選擇導回首頁或顯示錯誤訊息

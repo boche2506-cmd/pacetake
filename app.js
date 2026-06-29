@@ -868,10 +868,7 @@ async function initStorePage() {
                     </div>${priceHTML}
                     </div>
                 </div>    
-                <div class="note-wrapper">
-                    <input type="text" class="input-style" placeholder="✍️ 填寫客製化備註..." value="${buyerNote}">
-                </div>
-            `;
+                `;
             menuContainer.appendChild(foodCard);
         });
         // --- 事件綁定 ---

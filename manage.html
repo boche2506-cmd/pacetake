@@ -12,254 +12,89 @@
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 帳務記帳本區塊 */
-        .main-content {
-            padding: 20px;
+        .dashboard-container {
+            height: 73%;
+            max-width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            padding: 1cqw;
+            gap: 1cqw;
+            box-sizing: border-box;
+        }
+
+        /* 將所有區塊改成卡片式設計 */
+        .chart-section,
+        .time-settings,
+        .finance-stats {
+            color: var(--text-main);
+            box-shadow: var(--shadow-sm);
+            background-color: var(--card-bg);
+            border: 0.3cqw solid var(--border-color);
+            border: none;
+            padding: 3cqw;
+            border-radius: 5cqw;
+            /* 大圓角更現代 */
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2cqw;
         }
 
         .section-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            font-size: 4cqw;
+            margin-top: 0;
         }
 
-        .ledger-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .ledger-row-main {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .ledger-stat h3 {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .ledger-stat div {
-            font-size: 26px;
-            font-weight: 900;
-            color: var(--text-main);
-            margin-top: 4px;
-        }
-
-        .ledger-stat .revenue-num {
-            color: var(--brand-blue);
-        }
-
-        .ledger-divider {
-            height: 1px;
-            background-color: var(--border-color);
-            margin-bottom: 10px;
-        }
-
-        .ledger-row-sub {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        /* 菜單與售罄管理排版 */
-        .menu-management-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .manage-food-card {
-            display: flex;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 12px;
-            gap: 12px;
-            align-items: center;
-            box-shadow: var(--shadow-sm);
-            position: relative;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .food-img {
-            width: 65px;
-            height: 65px;
-            border-radius: 12px;
-            background-color: var(--bg-global);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            flex-shrink: 0;
-            border: 1px solid var(--border-color);
-        }
-
-        .food-info-fields {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex-grow: 1;
-        }
-
-        .food-name-txt {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .food-price-txt {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--brand-blue);
-        }
-
-        /* 動作控制右側 */
-        .manage-actions {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        /* 原生滑動開關器（售罄開關） */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 22px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
+        .bottom-bar {
+            height: 12%;
+            max-width: 100%;
             bottom: 0;
-            background-color: var(--brand-green);
-            /* 預設開關未啟動代表營業中（綠燈） */
-            transition: .2s;
-            border-radius: 22px;
-        }
-
-        .slider::before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .2s;
-            border-radius: 50%;
-        }
-
-        /* 當開關被勾選時，代表啟用「售罄防線」（變紅燈） */
-        input:checked+.slider {
-            background-color: var(--brand-red);
-        }
-
-        input:checked+.slider::before {
-            transform: translateX(22px);
-        }
-
-        .delete-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
+            left: 0;
+            /* 根據你的需求調整高度 */
             display: flex;
             align-items: center;
-            gap: 2px;
-        }
-
-        .delete-btn:hover {
-            color: var(--brand-red);
-        }
-
-        /* 新增品項大按鈕 */
-        .add-item-btn {
-            background-color: var(--bg-global);
-            border: 1px dashed var(--border-color);
-            color: var(--brand-blue);
-            height: 48px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            margin-top: 4px;
-        }
-
-        /* 地推專用 QR Code 貼紙區 */
-        .qrcode-sticker-card {
+            justify-content: space-between;
+            padding: 0 2cqw;
+            color: var(--text-main);
+            box-shadow: var(--shadow-sm);
             background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
-            text-align: center;
+            border: 0.3cqw solid var(--border-color);
+            border-radius: 5cqw;
         }
 
-        .qrcode-url-display {
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            padding: 8px 12px;
-            border-radius: 10px;
-            font-size: 12px;
-            color: var(--brand-blue);
-            font-weight: 700;
-            margin: 8px 0 14px 0;
-            word-break: break-all;
+        .msg-container {
+            flex: 1;
+            /* 佔據所有剩餘空間 */
+            font-size: 3.5cqw;
+            color: var(--text-main);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            /* 文字過長時顯示點點點 */
         }
 
-        .download-sticker-btn {
-            background-color: var(--brand-blue);
+        .action-buttons {
+            display: flex;
+            gap: 2cqw;
+            /* 按鈕之間的間距 */
+        }
+
+        .btn {
+            background-color: #007AFF;
+            /* Apple 風格的藍色 */
             color: white;
-            border: none;
-            width: 100%;
-            height: 44px;
-            border-radius: 22px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
+            font-weight: 600;
+            padding: 2cqw 4cqw;
+            border-radius: 2cqw;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(4px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
     </style>
 </head>
@@ -291,30 +126,39 @@
                     </div>
                 </div>
             </header>
-
-            <main class="main-content">
-                <!-- 帳務記帳本 -->
-                <section>
-                    <div class="section-title">今日帳務記帳本</div>
-                    <div class="ledger-card">
-                        <div class="ledger-row-main">
-                            <div class="ledger-stat">
-                                <h3>今日總接單量</h3>
-                                <div>42 單</div>
-                            </div>
-                            <div class="ledger-stat" style="text-align: right;">
-                                <h3>今日總營業額</h3>
-                                <div class="revenue-num">$5,340</div>
-                            </div>
-                        </div>
-                        <div class="ledger-divider"></div>
-                        <div class="ledger-row-sub">
-                            <span>💵 現場付現實收：$1,240</span>
-                            <span>💳 藍線上支付：$4,100</span>
+            <main class="dashboard-container">
+                <div class="chart-section">
+                    <canvas id="incomeChart"></canvas>
+                </div>
+                <div class="finance-stats">
+                    <h3 class="section-title">財務統計</h3>
+                    <div class="stat-item"><span>接單數</span> <strong>55</strong></div>
+                    <div class="stat-item"><span>線上收入</span> <strong>222</strong></div>
+                    <div class="stat-item"><span>現金收入</span> <strong>1111</strong></div>
+                    <hr>
+                    <div class="stat-item"><span>合計</span> <strong>1333</strong></div>
+                </div>
+                <div class="info-section">
+                    <div class="time-settings">
+                        <h3 class="section-title">營業時間設定</h3>
+                        <div id="timeRows">
+                            <p>週一 ~ 週日 (00:00)~(00:00)</p>
                         </div>
                     </div>
-                </section>
+                </div>
             </main>
+
+            <footer class="bottom-bar">
+                <div id="statusMessage" class="msg-container">
+                    系統準備就緒
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn" data-action="manage-orders">訂單</button>
+                    <button class="btn" data-action="manage-menu">菜單</button>
+                    <button class="btn" data-action="store-settings">設定</button>
+                </div>
+            </footer>
         </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
             <div class="modal-card">
@@ -368,6 +212,7 @@
         </div>
     </div>
     <script type="module" src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
         import { app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
         let allStores = [];

@@ -14,7 +14,7 @@
     <style>
         .store {
             /* 這裡的高度與寬度原本是 15% 和 100%，我們用 cqw 重新定義它們的比例 */
-            height: 11%;
+            height: 13%;
             max-width: 100%;
             display: flex;
             flex-direction: column;
@@ -23,12 +23,12 @@
             align-items: stretch;
             box-sizing: border-box;
             border-bottom: 0.2cqw solid var(--border-color);
-            padding: 1cqw;
+            padding: 0.25cqw;
             /* 使用 cqw 控制外襯 padding */
         }
 
         .store-header-info {
-            height: 55%;
+            height: 65%;
             max-width: 100%;
             display: flex;
             flex-direction: row;
@@ -47,21 +47,28 @@
             box-sizing: border-box;
             height: 100%;
             max-width: 100%;
-            font-size: 6cqw;
+            font-size: 8cqw;
             padding: 1cqw;
             background-color: transparent;
             border: transparent;
             border-radius: 50%;
             color: var(--text-main);
             cursor: pointer;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .fav-icon:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
 
         .store-logo-display {
-            width: 13cqw;
+            width: 15cqw;
             /* 你想要的寬度 */
-            height: 13cqw;
+            height: 15cqw;
             /* 你想要的高度 */
-            object-fit: contain;
+            object-fit: cover;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -70,9 +77,9 @@
 
         /* 確保塞進去的圖片能填滿盒子 */
         .store-logo-display img {
-            width: 13cqw;
+            width: 15cqw;
             /* 依比例放大/縮小 */
-            height: 13cqw;
+            height: 15cqw;
             background-color: var(--bg-global);
             border-radius: 3cqw;
             display: flex;
@@ -94,7 +101,7 @@
         }
 
         .store-meta {
-            height: 45%;
+            height: 35%;
             width: 100%;
             display: flex;
             flex-direction: row;
@@ -106,8 +113,18 @@
             font-size: 3.75cqw;
         }
 
+        .storeAddressText {
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .storeAddressText:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
+        }
+
         .menuContainer {
-            height: 62%;
+            height: 60%;
             max-width: 100%;
             overflow-y: auto;
             display: flex;
@@ -121,8 +138,8 @@
 
         /* 卡片基礎樣式 */
         .food-card {
-            min-height: 28cqw;
-            width: 100%;
+            min-height: 24cqw;
+            max-width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -132,19 +149,20 @@
             background-color: var(--card-bg);
             border: 0.3cqw solid var(--border-color);
             border-radius: 3cqw;
-            padding: 0.125cqw;
             text-decoration: none;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             box-sizing: border-box;
         }
 
         .food-img-info {
-            min-height: 22cqw;
+            min-height: 24cqw;
             width: 100%;
             display: flex;
+            flex-direction: row;
             align-items: center;
             color: inherit;
             border-radius: 3cqw;
+            padding: 0.125cqw;
             gap: 0.5cqw;
             text-decoration: none;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -157,8 +175,8 @@
         }
 
         .food-img {
-            width: 22cqw;
-            height: 22cqw;
+            width: 23cqw;
+            height: 23cqw;
             display: block;
             justify-content: center;
             align-items: center;
@@ -167,7 +185,7 @@
             font-size: 5cqw;
             /* 裡面的 Emoji 大小 */
             flex-shrink: 0;
-            object-fit: contain;
+            object-fit: cover;
             box-sizing: border-box;
             position: relative;
         }
@@ -185,7 +203,7 @@
         }
 
         .food-name-note-display {
-            height: 50%;
+            height: 48%;
             width: 100%;
             display: flex;
             flex-direction: row;
@@ -233,7 +251,7 @@
         }
 
         .one-size-row {
-            height: 50%;
+            height: 48%;
             width: 20cqw;
             display: flex;
             flex-direction: column;
@@ -242,7 +260,7 @@
         }
 
         .size-options {
-            height: 50%;
+            height: 48%;
             width: 100%;
             display: flex;
             flex-direction: row;
@@ -262,16 +280,13 @@
 
         .size-label,
         .food-price {
-            height: 50%;
+            height: 45%;
             width: 100%;
-            border: 0.2cqw solid #ddd;
             border-radius: 1.5cqw;
             cursor: pointer;
             font-size: 4.25cqw;
-            color: white;
+            color: var(--brand-blue);
             transition: all 0.2s;
-            background: #ff5722;
-            border-color: #ff5722;
             font-weight: bold;
             display: flex;
             flex-direction: row;
@@ -289,22 +304,7 @@
             align-items: center;
             line-height: 1.1;
         }
-
-        .note-wrapper {
-            height: 5cqw;
-            width: 100%;
-            font-size: 4cqw;
-            font-weight: 600;
-            line-height: 1.1;
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: center;
-            box-sizing: border-box;
-            white-space: nowrap;
-            padding: 0 2cqw;
-        }
-
+        
         .input-style {
             width: 100%;
             height: 90%;
@@ -318,20 +318,46 @@
             line-height: 1.1;
         }
 
-        .minus-btn,
+        .minus-btn {
+            width: 6cqw;
+            height: 6cqw;
+            border-radius: 50%;
+            border: none;
+            background: #eee;
+            color: var(--brand-red);
+            font-size: 6cqw;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.1;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
         .plus-btn {
             width: 6cqw;
             height: 6cqw;
             border-radius: 50%;
             border: none;
             background: #eee;
+            color: var(--brand-green);
             font-size: 6cqw;
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
+            justify-content: center;
             align-items: center;
             line-height: 1.1;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .minus-btn:active,
+        .plus-btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
 
         .qty-number {
@@ -382,6 +408,13 @@
             cursor: pointer;
             text-decoration: none;
             box-shadow: var(--shadow-sm);
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .checkout-btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
     </style>
 </head>
@@ -422,7 +455,7 @@
                     </button>
                 </div>
                 <div class="store-meta">
-                    <a id="storeAddressText">📍 載入中...</a>
+                    <a class="storeAddressText" id="storeAddressText">📍 載入中...</a>
                     <span id="storeDistanceText">⚡ 計算中...</span>
                 </div>
             </div>

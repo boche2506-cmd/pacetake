@@ -82,24 +82,13 @@
             border: none;
             cursor: pointer;
             white-space: nowrap;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
         }
 
-        .footer-action {
-            flex-shrink: 0;
-            padding: 2cqw;
-            border-top: 0.2cqw solid var(--border-color);
-        }
-
-        .submit-btn {
-            background-color: var(--brand-blue);
-            color: white;
-            border: none;
-            width: 100%;
-            height: 12cqw;
-            border-radius: 5cqw;
-            font-size: 4cqw;
-            font-weight: 700;
-            cursor: pointer;
+        .query-btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
 
         /* 👑 招牌圖片與店鋪名稱並排排版 */
@@ -155,22 +144,6 @@
             background-color: var(--bg-global);
             border: 0.2cqw solid var(--border-color);
             font-size: 4cqw;
-        }
-
-        .switch-info {
-            display: flex;
-            flex-direction: column;
-            gap: 1cqw;
-        }
-
-        .switch-title {
-            font-size: 4cqw;
-            font-weight: 600;
-        }
-
-        .switch-desc {
-            font-size: 3cqw;
-            color: var(--text-muted);
         }
 
         /* 原生滑動開關器 */
@@ -497,6 +470,13 @@
             border-radius: 2cqw;
             cursor: pointer;
             white-space: nowrap;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .del-row-btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
 
         .drag-handle {
@@ -527,15 +507,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.2s;
             margin-top: 1cqw;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
         }
 
         .add-row-btn:active {
             background-color: var(--border-color);
+            transform: scale(0.95);
         }
 
-        /* 底部註冊大鈕 */
         .footer-action {
             bottom: 0;
             left: 0;
@@ -545,6 +526,7 @@
             border-top: 0.2cqw solid var(--border-color);
         }
 
+        /* 底部註冊大鈕 */
         .submit-btn {
             background-color: var(--brand-blue);
             color: white;
@@ -556,6 +538,13 @@
             font-weight: 700;
             cursor: pointer;
             box-shadow: 0 1cqw 4cqw rgba(0, 102, 255, 0.3);
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .submit-btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
 
         .submit-btn:disabled {
@@ -564,46 +553,15 @@
             cursor: not-allowed;
         }
 
-        /* 半透明警語燈箱彈窗 */
-        .lightbox-modal {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(1cqw);
-            -webkit-backdrop-filter: blur(1cqw);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-            padding: 5cqw;
-        }
-
-        .modal-card {
-            background-color: var(--bg-Container);
-            border: 0.2cqw solid var(--border-color);
-            border-radius: 5cqw;
-            width: 100%;
-            max-width: 100cqw;
-            padding: 5cqw;
-            box-shadow: var(--shadow-md);
-            text-align: center;
-        }
-
-        .modal-title {
-            font-size: 4cqw;
-            font-weight: 700;
-            color: var(--brand-red);
-            margin-bottom: 3cqw;
-        }
-
         .modal-desc {
-            font-size: 3cqw;
+            font-size: 5cqw;
             color: var(--text-main);
             line-height: 1;
-            margin-bottom: 3cqw;
+            word-break: break-all;
+            background-color: var(--bg-global);
+            padding: 1cqw;
+            border-radius: 2cqw;
+            border: 0.2cqw solid var(--border-color);
             text-align: left;
         }
 
@@ -1076,7 +1034,10 @@
             function startDrag(e, row) {
                 if (e.cancelable) e.preventDefault();
                 activeDragItem = row;
-                row.style.opacity = '0.5';
+                row.style.transform = 'scale(1.02)'; // 微放大
+                row.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)'; // 浮起來的陰影
+                row.style.zIndex = '500';
+                row.style.transition = 'transform 0.2s, box-shadow 0.2s'; // 平滑動畫
                 row.style.border = '0.2cqw dashed var(--brand-blue)';
                 if (e.type.startsWith('touch')) {
                     window.addEventListener('touchmove', onDragMove, { passive: false });
@@ -1105,6 +1066,8 @@
             }
             function onDragEnd() {
                 if (!activeDragItem) return;
+                activeDragItem.style.transform = 'scale(1)';
+                activeDragItem.style.boxShadow = 'none';
                 activeDragItem.style.opacity = '1';
                 activeDragItem.style.border = '0.2cqw solid var(--border-color)';
                 activeDragItem = null;

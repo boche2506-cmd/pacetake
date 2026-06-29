@@ -69,6 +69,33 @@
             align-items: center;
             box-sizing: border-box;
             line-height: 1;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .gps-trigger-btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
+        }
+
+        .close-modal-btn {
+            background-color: var(--brand-blue);
+            color: white;
+            margin-top: 5cqw;
+            border: none;
+            width: 50%;
+            height: 30%;
+            border-radius: 2cqw;
+            font-size: 5cqw;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .close-modal-btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
 
         /* 下拉選單群組 (縣市 + 區域) */
@@ -186,6 +213,7 @@
             text-decoration: none;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             box-sizing: border-box;
+            /* 按下去會有一點點回饋感 */
         }
 
         .store-card:hover {
@@ -195,8 +223,8 @@
 
         /* 左側店家圖示外殼 */
         .store-img {
-            width: 22cqw;
-            height: 22cqw;
+            width: 23cqw;
+            height: 23cqw;
             display: block;
             justify-content: center;
             align-items: center;
@@ -323,7 +351,7 @@
 
         /* 左側：訂單狀態訊息區塊 */
         .status-msg {
-            height: 60%;
+            height: 65%;
             max-width: 65%;
             font-size: 4.5cqw;
             /* 字體改用 cqw */
@@ -335,6 +363,13 @@
             text-decoration: none;
             line-height: 1;
             /* 💡 新增：給予舒適的行高，讓兩行字並存時不擁擠 */
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .status-msg:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
 
         /* 🔴 預設未啟用狀態的狀態點 */
@@ -378,12 +413,19 @@
             align-items: center;
             text-decoration: none;
             box-shadow: var(--shadow-sm);
-            height: 45%;
+            height: 55%;
             max-width: 35%;
             padding: 0 2cqw;
             box-sizing: border-box;
             white-space: nowrap;
             /* 確保結帳文字絕對不折行 */
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .cart-status-btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
 
         /* 順手幫你保留的 badge 設定（未來如果有泡泡通知顯示數字可以用） */
@@ -487,8 +529,7 @@
                 <div class="modal-title" style="color: var(--brand-blue); font-weight: 700;">📍 目前位置</div>
                 <div class="modal-desc-address" id="modalAddressText"
                     style="margin-bottom: 0.5cqw; margin-top: 0.5cqw;">尚未獲取定位，請開啟 GPS。</div>
-                <button class="close-modal-btn" data-action="closeAddressModalBtn"
-                    style="background-color: var(--brand-blue); color: white; margin-top: 5cqw; border: none; width: 50%; height: 30%; border-radius: 2cqw; font-size: 5cqw; font-weight: 700; cursor: pointer;">確認</button>
+                <button class="close-modal-btn" data-action="closeAddressModalBtn">確認</button>
             </div>
         </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">

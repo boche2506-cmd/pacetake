@@ -227,7 +227,7 @@
         let activeDragItem = null;
         const urlParams = new URLSearchParams(window.location.search);
         const storeId = urlParams.get('storeId');
-        /*async function initPage() {
+        async function initPage() {
             // 這裡會暫停，直到 authReady 被 resolve，也就是 Firebase 說「好，我知道是誰了」
             const user = await authReady;
             if (!user) {
@@ -237,14 +237,14 @@
             }
             console.log("網址抓到的 ID:", storeId);
             console.log("登入的 UID:", auth.currentUser.uid);
-            if (!storeId || storeId !== user.uid) {
-                alert("存取權限不足！您無權管理此商店，將為您導回首頁。");
-                window.location.href = "index.html";
-                return; // 務必保留 return，斷開後續渲染
-            }
+            /*if (!storeId || storeId !== user.uid) {
+                  alert("存取權限不足！您無權管理此商店，將為您導回首頁。");
+                  window.location.href = "index.html";
+                  return; // 務必保留 return，斷開後續渲染
+              }*/
             // 驗證完全過關，執行你的主程式
             console.log("驗證通過，開始載入管理介面...");
-        }*/
+        }
         // 在 manage.html 的 JS 中加入：
         document.addEventListener('click', async (e) => {
             // 1. 判斷點擊的是不是我們設定的按鈕

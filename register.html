@@ -910,8 +910,8 @@
         const addItemRowBtn = document.getElementById('addItemRowBtn');
         // 確保只有在 register.html 才執行這段檢查
         async function initRegisterPage() {
-            if (!window.location.pathname.includes('register.html')) return;
-            const user = await authReady;
+            /*if (!window.location.pathname.includes('register.html')) return;
+            const user = await authReady;*/
             if (user.isAnonymous) {
                 alert("尚未登入，請先前往登入頁面。");
                 window.location.href = "index.html";
@@ -976,21 +976,41 @@
         }
         // 負責把資料填回表單
         function fillShopFormData(data) {
-            document.getElementById('shopName').value = data.shopName || '';
-            document.getElementById('shopPhone').value = data.shopPhone || '';
-            document.getElementById('citySelect').value = data.city || '';
-            document.getElementById('districtSelect').value = data.district || '';
-            document.getElementById('shopAddress').value = data.detailAddress || '';
-            document.getElementById('shopLat').value = data.shopLat || '';
-            document.getElementById('shopLng').value = data.shopLng || '';
-            document.getElementById('shopStatus').value = data.status || 'online';
-            document.getElementById('prepareTimeInput').value = data.prepareTime || 15;
-            document.getElementById('merchantIdInput').value = data.MerchantID || '';
-            document.getElementById('hashKeyInput').value = data.HashKey || '';
-            document.getElementById('hashIvInput').value = data.HashIV || '';
-            document.getElementById('toggleCash').checked = !!data.isCashPayEnabled;
-            document.getElementById('toggleOnline').checked = !!data.isOnlinePayEnabled;
-            document.getElementById('seatingtoggle').checked = !!data.hasSeating;
+            const fields = [
+                { id: 'shopName', key: 'shopName' },
+                { id: 'shopPhone', key: 'shopPhone' },
+                { id: 'citySelect', key: 'city' },
+                { id: 'districtSelect', key: 'district' },
+                { id: 'shopAddress', key: 'detailAddress' },
+                { id: 'shopLat', key: 'shopLat' },
+                { id: 'shopLng', key: 'shopLng' },
+                { id: 'shopStatus', key: 'status' },
+                { id: 'prepareTimeInput', key: 'prepareTime' },
+                { id: 'merchantIdInput', key: 'MerchantID' },
+                { id: 'hashKeyInput', key: 'HashKey' },
+                { id: 'hashIvInput', key: 'HashIV' }
+            ]; fields.forEach(field => {
+                const el = document.getElementById(field.id);
+                if (el) {
+                    el.value = data[field.key] || '';
+                    console.log(`成功填入: ${field.id}`);
+                } else {
+                    console.error(`❌ 兇手找到了！HTML 找不到這個 ID: "${field.id}"`);
+                }
+            }); const toggles = [
+                { id: 'toggleCash', key: 'isCashPayEnabled' },
+                { id: 'toggleOnline', key: 'isOnlinePayEnabled' },
+                { id: 'seatingtoggle', key: 'hasSeating' }
+            ];
+
+            toggles.forEach(t => {
+                const el = document.getElementById(t.id);
+                if (el) {
+                    el.checked = !!data[t.key];
+                } else {
+                    console.error(`❌ Checkbox 找不到 ID: "${t.id}"`);
+                }
+            });
         }
         // 每次被呼叫時，都抓取當下最新的一手資料
         function getShopFormData() {

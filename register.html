@@ -1139,7 +1139,12 @@
         function initNewebpayUI() {
             if (!newebpayContainer) return;
             // 渲染 HTML
-            newebpayContainer.innerHTML = `...你的 HTML...`;
+            newebpayContainer.innerHTML = `.<label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
+                    <div style="display:flex; flex-direction:column; gap:0.5cqw;">
+                        <input type="text" id="merchantIdInput" class="input-style" style="height:8cqw;" placeholder="請輸入 商店代號 (MerchantID)">
+                        <input type="text" id="hashKeyInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashKey">
+                        <input type="text" id="hashIvInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashIV">
+                    </div>`;
             // 設定初始狀態
             const toggleOnline = document.getElementById('toggleOnline');
             if (toggleOnline) {
@@ -1380,16 +1385,6 @@
         toggleOnline?.addEventListener('change', function () {
             if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
         });
-        if (newebpayContainer) {
-            newebpayContainer.innerHTML = `
-                    <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
-                    <div style="display:flex; flex-direction:column; gap:0.5cqw;">
-                        <input type="text" id="merchantIdInput" class="input-style" style="height:8cqw;" placeholder="請輸入 商店代號 (MerchantID)">
-                        <input type="text" id="hashKeyInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashKey">
-                        <input type="text" id="hashIvInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashIV">
-                    </div>
-                    `;
-        }
         // Listener'click'
         document.addEventListener('click', async (e) => {
             const target = e.target.closest('[data-action]');

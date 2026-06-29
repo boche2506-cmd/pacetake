@@ -881,20 +881,19 @@
         let currentBuyerAddress = "正在獲取定位中...";
         let currentUserId = null;
         let activeDragItem = null;
-        const shopSubmitBtn = document.getElementById('shopSubmitBtn');
         const submitBtn = document.getElementById('submitBtn');
         const menuUploadList = document.getElementById('menuUploadList');
         const addItemRowBtn = document.getElementById('addItemRowBtn');
         // 確保只有在 register.html 才執行這段檢查
         async function initRegisterPage() {
+            if (!window.location.pathname.includes('register.html')) return;
             const user = await authReady;
             if (!user.isAnonymous) {
-                window.location.href = "login.html";
+                alert("尚未登入，請先前往登入頁面。");
+                window.location.href = "index.html";
                 return;
             }
             // . 頁面路徑安全檢查
-            if (!window.location.pathname.includes('register.html')) return;
-            if (!submitBtn) return;
             // 1. 從網址取得 storeId (例如: register.html?storeId=123)
             const urlParams = new URLSearchParams(window.location.search);
             const storeId = urlParams.get('storeId');
@@ -905,6 +904,15 @@
                     // 2. 從 Firebase 讀取該店家的資料
                     const storeDoc = await getDoc(doc(db, "stores", storeId));
                     if (storeDoc.exists()) {
+                        const storeData = storeDoc.data();
+                        // --- 【關鍵修正】補上這段擁有者檢查 ---
+                        // 檢查資料庫裡的 sellerUid 是不是當前登入者的 UID
+                        // 注意：請確保你的資料庫 store 文件裡有存 sellerUid 欄位
+                        if (storeData.sellerUid !== user.uid) {
+                            alert("權限不足，您無法修改別人的商店資料！");
+                            window.location.href = "index.html";
+                            return;
+                        }
                         fillShopFormData(storeDoc.data());
                         submitBtn.dataset.mode = 'edit';
                         submitBtn.dataset.storeId = storeId;

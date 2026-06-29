@@ -1021,14 +1021,14 @@ export function initCartDOMState() {
 }
 // 🚀 初始化區塊
 document.addEventListener('DOMContentLoaded', () => {
-    fetchStoresFromFirebase();
-    initThemeSystem();
-    initCitySelect(document.getElementById('citySelect'));
-    getBrowserLocation();
+    fetchStoresFromFirebase();// 從firebase抓資料
+    initThemeSystem();//網頁載入時套用顏色
+    initCitySelect(document.getElementById('citySelect'));// 負責把資料灌入指定的 Select
+    getBrowserLocation();//gpsPinBtn
     initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
-    initStorePage();
-    refreshTotalCartUI();
-    initCartDOMState();
-    initAppListeners();
+    initStorePage();// 🎯 PACE 專屬：store.html 
+    refreshTotalCartUI();//** * 🛒 購物車管理
+    initCartDOMState();//回填當前店家購物車的資料
+    initAppListeners();//Firebase 即時監聽
     console.log("系統初始化完成");
 });

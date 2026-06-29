@@ -253,14 +253,6 @@
             const action = target.getAttribute('data-action');
             switch (action) {
                 case 'store-settings': {
-                    // 2. 因為這是 manage.html，你一定已經透過某種方式拿到了當前的 storeId
-                    // (例如你渲染頁面時已經知道該店 ID，或者存放在某個變數)
-                    // 假設你在渲染頁面時已經有一個變數叫 currentStoreId
-                    if (typeof StoreId === 'undefined' || !auth.currentUser.uid) {
-                        alert("找不到商店資訊，無法設定。");
-                        return;
-                    }
-
                     // 3. 執行跳轉，帶上 storeId
                     window.location.href = `register.html?storeId=${auth.currentUser.uid}`;
                     break;

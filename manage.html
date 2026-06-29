@@ -218,20 +218,32 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="module">
-        import { app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
+        import { authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
         let allStores = [];
         let buyerLat = null;
         let buyerLng = null;
         let currentBuyerAddress = "正在獲取定位中...";
         let currentUserId = null;
         let activeDragItem = null;
-        const urlParams = new URLSearchParams(window.location.search);
-        const storeId = urlParams.get('storeId');
-        console.log("網址抓到的 ID:", storeId);
-        console.log("登入的 UID:", auth.currentUser.uid);
-        if (!storeId || storeId !== currentUserId) {
-            console.warn("存取權限不足或網址參數錯誤");
-            // 可以選擇導回首頁或顯示錯誤訊息
+        async function initPage() {
+            // 這裡會暫停，直到 authReady 被 resolve，也就是 Firebase 說「好，我知道是誰了」
+            const user = await authReady;
+            if (!user) {
+                alert("尚未登入，請先前往登入頁面。");
+                window.location.href = "login.html";
+                return;
+            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const storeId = urlParams.get('storeId');
+            console.log("網址抓到的 ID:", storeId);
+            console.log("登入的 UID:", auth.currentUser.uid);
+            if (!storeId || storeId !== user.uid) {
+                alert("存取權限不足！您無權管理此商店，將為您導回首頁。");
+                window.location.href = "index.html";
+                return; // 務必保留 return，斷開後續渲染
+            }
+            // 驗證完全過關，執行你的主程式
+            console.log("驗證通過，開始載入管理介面...");
         }
         if (storeId) {
             console.log("當前管理的店家 ID 是:", storeId);
@@ -279,6 +291,9 @@
                 qrContainer.innerHTML = '';
             });
         }
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("系統初始化完成");
+        });
     </script>
 </body>
 

@@ -124,6 +124,7 @@ img,
     Container-name: phone;
     margin: 0 auto;
     cursor: default;
+    overflow: hidden;
 }
 
 #buyerView,

@@ -101,32 +101,84 @@ img,
    3. 核心佈局架構 (Layout)
    ========================================================================== */
 /* 手機外框 - 加強置中穩定性 */
-.phone-wrapper {
-    -webkit-overflow-scrolling: touch;
-    /* 【加在這裡】讓滑動變順暢 */
-    height: 100vh;
-    /* 高度撐滿視窗 */
-    height: 100dvh;
-    aspect-ratio: 9 / 16;
+/*.phone-wrapper {*/
+/*height: 100vh;
+/*height: 100dvh;
+    /*aspect-ratio: 9 / 16;
     /* 強制維持 9:16 比例 */
-    max-width: 100vw;
+/*max-width: 100vw;
     /* 不超過螢幕寬度 */
-    max-width: 100dvw;
-    background-color: var(--bg-Container);
-    display: flex;
-    flex-direction: column;
+/*max-width: 100dvw;
+    /*background-color: var(--bg-Container);
+    /*display: flex;
+    /*flex-direction: column;
     /* 垂直排列 */
-    justify-content: space-between;
-    border: 0.2cqw solid var(--border-color);
+/*justify-content: space-between;
+    /*border: 0.2cqw solid var(--border-color);
     border-radius: 5%;
     box-shadow: var(--shadow-md);
     padding: 1cqw;
     Container-type: size;
     /* 讓這個容器成為所有內部元素的參考點 */
-    Container-name: phone;
+/*Container-name: phone;
     margin: 0 auto;
     cursor: default;
     overflow: hidden;
+}*/
+.phone-wrapper {
+    /* 預設：針對電腦版 (維持比例) */
+    height: 100vh;
+    height: 100dvh;
+    /* 避免頂天立地，留點呼吸空間 */
+    aspect-ratio: 9 / 16;
+    max-width: 100vw;
+    max-width: 100dvw;
+    /* 其他通用樣式 */
+    background-color: var(--bg-Container);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1cqw;
+    overflow: hidden;
+    border-radius: 5cqw;
+    /* 手機建議用固定 px 或 rem */
+    margin: 0 auto;
+    /* 防止滑動到頂部時拖動到整個瀏覽器視窗 */
+    overscroll-behavior-y: contain;
+    /* 讓這個容器成為所有內部元素的參考點 */
+    Container-type: size;
+    Container-name: phone;
+    /* 滑鼠指標樣式 */
+    cursor: default;
+
+    /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* 隱藏 Firefox 的卷軸 */
+    scrollbar-width: none;
+    /* 確保內容依然可以滑動 */
+    -ms-overflow-style: none;
+}
+
+/* 針對手機版 (通常寬度小於 600px) */
+@media (max-width: 600px) {
+    .phone-wrapper {
+        width: 100dvw;
+        height: 100dvh;
+        aspect-ratio: auto;
+        /* 解除長寬比限制 */
+        border-radius: 0;
+        /* 手機滿版通常不需要圓角 */
+        border: none;
+        /* 手機滿版移除邊框 */
+        overscroll-behavior-y: contain;
+        /* 防止滑動到頂部時拖動到整個瀏覽器視窗 */
+        Container-type: size;
+        Container-name: phone;
+    }
 }
 
 #buyerView,

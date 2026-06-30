@@ -134,6 +134,16 @@
             padding: 1cqw 1.75cqw 1cqw 0.5cqw;
             /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
             box-sizing: border-box;
+
+            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            /* 隱藏 Firefox 的卷軸 */
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
         }
 
         /* 卡片基礎樣式 */
@@ -304,7 +314,7 @@
             align-items: center;
             line-height: 1.1;
         }
-        
+
         .input-style {
             width: 100%;
             height: 90%;

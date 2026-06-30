@@ -974,7 +974,7 @@
         function fillShopFormData(data) {
             document.getElementById('shopName').value = data.shopName || '';
             document.getElementById('shopPhone').value = data.shopPhone || '';
-            fillLocationData(storeData.city, storeData.district);
+            fillLocationData(data.city, data.district);
             document.getElementById('shopAddress').value = data.detailAddress || '';
             document.getElementById('shopLat').value = data.shopLat || '';
             document.getElementById('shopLng').value = data.shopLng || '';

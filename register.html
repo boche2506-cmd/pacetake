@@ -114,6 +114,16 @@
 
         .select-row select {
             flex: 1;
+            overflow-y: auto;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            /* 隱藏 Firefox 的卷軸 */
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
         }
 
         .coords-row {
@@ -363,6 +373,62 @@
             font-size: 4cqw;
         }
 
+        .category-header {
+            width: 100%;
+            height: 8cqw;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            box-sizing: border-box;
+            /* 防止輸入框爆開 */
+            overflow-X: auto;
+            box-sizing: border-box;
+            gap: 0.5cqw;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            /* 隱藏 Firefox 的卷軸 */
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
+        }
+
+        .add-category-btn,
+        .add-category {
+            font-size: 4cqw;
+            /* 字體改用 cqw */
+            color: var(--brand-blue);
+            background-color: var(--card-bg);
+            border: 0.3cqw solid var(--border-color);
+            /* 邊框粗細 cqw */
+            border-radius: 5cqw;
+            /* 圓角改用 cqw */
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: var(--shadow-sm);
+            height: 7cqw;
+            /* 讓它在 location-bar 裡自然撐高 */
+            max-width: 30cqw;
+            /* 給予固定的 cqw 寬度 */
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            line-height: 1.1;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .add-category-btn:active,
+        .add-category:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
+        }
+
         /* 菜單動態上架排版 */
         .menu-upload-list {
             min-height: 24cqw;
@@ -373,6 +439,8 @@
             align-items: stretch;
             box-sizing: border-box;
             grid-template-columns: 1fr 1fr;
+            padding: 0.5cqw 1cqw;
+            border-top: 0.2cqw solid var(--border-color);
         }
 
         /* 👑 菜單排版大魔改：單列橫向佈局 */
@@ -509,7 +577,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 1cqw;
             transition: transform 0.2s;
             /* 按下去會有一點點回饋感 */
         }
@@ -525,7 +592,7 @@
             justify-content: space-around;
             align-items: stretch;
             gap: 1cqw;
-            padding: 2cqw;
+            padding: 0.5cqw 1cqw;
             background-color: var(--bg-Container);
             border-top: 0.2cqw solid var(--border-color);
         }
@@ -733,8 +800,14 @@
                     </span>
                 </div>
             </div>
+
             <div class="form-section">
                 <div class="section-title">菜單商品上架(會裁切成1:1圖片)</div>
+                <div class="category-header">
+                    <div class="add-category"><input type="text" class="input-style" placeholder="分類名稱(必填)" required>
+                    </div>
+                    <button class="add-category-btn" data-action="addcategorybtn">+ 新增分類</button>
+                </div>
                 <div class="menu-upload-list" id="menuUploadList">
                     <div class="menu-item-row">
                         <div class="menu-item">
@@ -770,7 +843,8 @@
                     </div>
                 </div>
                 <footer class="footer-action">
-                    <button type="button" class="add-row-btn" id="addItemRowBtn" style="width: 100%; height: 10cqw;">＋
+                    <button type="button" class="add-row-btn" data-action="addItemRowBtn"
+                        style="width: 100%; height: 10cqw;">＋
                         新增下一個品項</button>
                     <button id="submitBtn" class="submit-btn" data-action="shopSubmitBtn" type="button">建立店鋪</button>
                 </footer>
@@ -855,7 +929,6 @@
         let activeDragItem = null;
         const submitBtn = document.getElementById('submitBtn');
         const menuUploadList = document.getElementById('menuUploadList');
-        const addItemRowBtn = document.getElementById('addItemRowBtn');
         const newebpayContainer = document.getElementById('newebpayContainer');
         // 確保只有在 register.html 才執行這段檢查
         async function initRegisterPage() {
@@ -1249,8 +1322,16 @@
                 }
             });
             // --- 4. 新增行按鈕邏輯 ---
-            addItemRowBtn?.addEventListener('click', () => {
-                createNewItemRow();
+            document.addEventListener('click', async (e) => {
+                const target = e.target.closest('[data-action]');
+                if (!target) return;
+                const action = target.getAttribute('data-action');
+                if (action === 'addItemRowBtn') {
+                    createNewItemRow();
+                }
+                if (action === 'addcategorybtn') {
+
+                }
             });
         }
         // 菜單文件

@@ -129,6 +129,15 @@
             /* 讓裡面的文字不會太貼邊框 */
             box-sizing: border-box;
             line-height: 1;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            /* 隱藏 Firefox 的卷軸 */
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
         }
 
         /* 下層：搜尋列外殼 */

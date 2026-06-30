@@ -950,12 +950,31 @@
                 createNewItemRow();
             }
         }
+        // 專門處理縣市與區域回填的函式
+        function fillLocationData(targetCity, targetDistrict) {
+            // 假設你的下拉選單 ID 分別是 'citySelect' 和 'districtSelect'
+            // ❗請記得改成你 HTML 裡真實的 ID❗
+            const cityElement = document.getElementById('citySelect');
+            const districtElement = document.getElementById('districtSelect');
+            if (!cityElement || !targetCity) return;
+            // 1. 先強制把縣市的 value 設定好
+            cityElement.value = targetCity;
+            // 2. 靈魂操作：用程式發送一個 'change' 事件，喚醒 app.js 裡面的連動邏輯！
+            const event = new Event('change');
+            cityElement.dispatchEvent(event);
+            // 3. 此時 app.js 已經光速把區域名單建好了，我們再把區域選上
+            if (districtElement && targetDistrict) {
+                // 加一點點延遲以防萬一 app.js 渲染太慢 (通常不需要，但保險一點)
+                setTimeout(() => {
+                    districtElement.value = targetDistrict;
+                }, 50);
+            }
+        }
         // 負責把資料填回表單
         function fillShopFormData(data) {
             document.getElementById('shopName').value = data.shopName || '';
             document.getElementById('shopPhone').value = data.shopPhone || '';
-            document.getElementById('citySelect').value = data.city || '';
-            document.getElementById('districtSelect').value = data.district || '';
+            fillLocationData(storeData.city, storeData.district);
             document.getElementById('shopAddress').value = data.detailAddress || '';
             document.getElementById('shopLat').value = data.shopLat || '';
             document.getElementById('shopLng').value = data.shopLng || '';

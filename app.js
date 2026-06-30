@@ -450,47 +450,43 @@ function initCitySelect(selectElement) {
     });
 }
 // Listener'change'
-const path = window.location.pathname;
-const isTargetPage = path.includes('index.html') || path === '/' || path.includes('register.html');
-if (isTargetPage) {
-    document.addEventListener('change', async (e) => {
-        const target = e.target.closest('[data-action-change]');
-        if (!target) return;
-        const action = target.getAttribute('data-action-change');
-        const selectedValue = target.value;
-        const path = window.location.pathname;
-        // 1. 處理「城市選擇」邏輯
-        if (action === 'citySelect') {
-            const districtSelect = document.querySelector('#districtSelect');
-            if (districtSelect) {
-                districtSelect.innerHTML = '<option value="">選擇區域</option>';
-                if (areaData[selectedValue]) {
-                    areaData[selectedValue].forEach(dist => {
-                        const opt = document.createElement('option');
-                        opt.value = dist;
-                        opt.innerText = dist;
-                        districtSelect.appendChild(opt);
-                    });
-                }
-            }
-            // 分流執行：只有在 index.html 才篩選商店
-            if (path.includes('index.html') || path === '/') {
-                filterAndRenderStores();
+document.addEventListener('change', async (e) => {
+    const target = e.target.closest('[data-action-change]');
+    if (!target) return;
+    const action = target.getAttribute('data-action-change');
+    const selectedValue = target.value;
+    const path = window.location.pathname;
+    // 1. 處理「城市選擇」邏輯
+    if (action === 'citySelect') {
+        const districtSelect = document.querySelector('#districtSelect');
+        if (districtSelect) {
+            districtSelect.innerHTML = '<option value="">選擇區域</option>';
+            if (areaData[selectedValue]) {
+                areaData[selectedValue].forEach(dist => {
+                    const opt = document.createElement('option');
+                    opt.value = dist;
+                    opt.innerText = dist;
+                    districtSelect.appendChild(opt);
+                });
             }
         }
-        // 處理「區域選擇」的邏輯
-        else if (action === 'districtSelect') {
-            // 分流執行：只有在 index.html 才篩選商店
-            if (path.includes('index.html') || path === '/') {
-                filterAndRenderStores();
-            }
+        // 分流執行：只有在 index.html 才篩選商店
+        if (path.includes('index.html') || path === '/') {
+            filterAndRenderStores();
         }
-        // 3. 其他處理
-        else {
-            console.log('未知的 action:', action);
+    }
+    // 處理「區域選擇」的邏輯
+    else if (action === 'districtSelect') {
+        // 分流執行：只有在 index.html 才篩選商店
+        if (path.includes('index.html') || path === '/') {
+            filterAndRenderStores();
         }
-    });
-}
+    }
+    // 3. 其他處理
+    else {
+        console.log('未知的 action:', action);
+    }
+});
 // Listener'click'
 document.addEventListener('click', async (e) => {
     const target = e.target.closest('[data-action]');

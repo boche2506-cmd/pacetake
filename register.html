@@ -21,6 +21,130 @@
             overflow-y: auto;
         }
 
+
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+            box-sizing: border-box;
+        }
+
+        .input-group label {
+            font-size: 4cqw;
+            font-weight: 600;
+            color: var(--text-main);
+            padding: 0.5cqw;
+        }
+
+        .input-style {
+            width: 100%;
+            height: 7cqw;
+            color: var(--text-main);
+            background-color: var(--bg-global);
+            border: 0.2cqw solid var(--border-color);
+            border-radius: 2cqw;
+            padding: 0 2cqw;
+            font-size: 3.5cqw;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        input:checked+.slider {
+            background-color: var(--brand-blue);
+        }
+
+        input:checked+.slider::before {
+            transform: translateX(5cqw);
+        }
+
+        .shop-logo-box,
+        .img-upload-box {
+            width: 15cqw;
+            height: 15cqw;
+            border-radius: 2cqw;
+            border: 0.2cqw dashed var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 8cqw;
+            background-color: var(--bg-global);
+            cursor: pointer;
+            color: var(--text-muted);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+
+        .shop-logo-box span,
+        .img-upload-box span {
+            font-size: 3cqw;
+            font-weight: 500;
+            margin-top: 0.5cqw;
+        }
+
+        /* 👑 招牌圖片與店鋪名稱並排排版 */
+        .shop-Phone-block {
+            height: 15cqw;
+            width: 100%;
+            gap: 0.25cqw;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .shop-Phone {
+            height: 100%;
+            max-width: 100%;
+            gap: 0.25cqw;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: stretch;
+            flex: 1;
+        }
+
+        /* 縣市區域並排選單 */
+        .select-row {
+            display: flex;
+            gap: 0.25cqw;
+        }
+
+        .select-row select {
+            flex: 1;
+        }
+
+        .coords-row {
+            display: flex;
+            gap: 0.25cqw;
+            align-items: flex-end;
+        }
+
+        .query-btn {
+            height: 7cqw;
+            padding: 0 2cqw;
+            font-size: 3.5cqw;
+            background: var(--brand-blue);
+            color: white;
+            border-radius: 2cqw;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .query-btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
+        }
+
         .section {
             overflow-y: auto;
         }
@@ -37,100 +161,7 @@
             letter-spacing: 1cqw;
             text-transform: uppercase;
             padding: 0.5cqw;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 1cqw;
-        }
-
-        .input-group label {
-            font-size: 4cqw;
-            font-weight: 600;
-            color: var(--text-main);
-            padding: 0.5cqw;
-        }
-
-        .input-style {
-            width: 100%;
-            height: 8cqw;
-            color: var(--text-main);
-            background-color: var(--bg-global);
-            border: 0.2cqw solid var(--border-color);
-            border-radius: 2cqw;
-            padding: 0 2cqw;
-            font-size: 3.5cqw;
-            outline: none;
-        }
-
-        /* 經緯度區塊 */
-
-        .coords-row {
-            display: flex;
-            gap: 1cqw;
-            align-items: flex-end;
-        }
-
-        .query-btn {
-            height: 8cqw;
-            padding: 0 2cqw;
-            font-size: 3cqw;
-            background: var(--brand-blue);
-            color: white;
-            border-radius: 2cqw;
-            border: none;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: transform 0.2s;
-            /* 按下去會有一點點回饋感 */
-        }
-
-        .query-btn:active {
-            transform: scale(0.95);
-            /* 按下去變小一點，模擬點擊感 */
-        }
-
-        /* 👑 招牌圖片與店鋪名稱並排排版 */
-        .shop-name-block {
-            display: flex;
-            gap: 1cqw;
-            align-items: center;
-            width: 100%;
-        }
-
-        .shop-logo-box {
-            width: 17cqw;
-            height: 17cqw;
-            border-radius: 2cqw;
-            border: 0.2cqw dashed var(--border-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 8cqw;
-            background-color: var(--bg-global);
-            cursor: pointer;
-            color: var(--text-muted);
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .shop-logo-box span {
-            font-size: 4cqw;
-            font-weight: 500;
-            margin-top: 1cqw;
-        }
-
-        /* 縣市區域並排選單 */
-        .select-row {
-            display: flex;
-            gap: 1cqw;
-        }
-
-        .select-row select {
-            flex: 1;
+            line-height: 1.1;
         }
 
         /* 金流切換防禦線排版 */
@@ -139,11 +170,18 @@
             justify-content: space-between;
             align-items: center;
             border-radius: 2cqw;
-            padding: 2cqw;
+            padding: 0.5cqw 2cqw;
             color: var(--text-muted);
             background-color: var(--bg-global);
             border: 0.2cqw solid var(--border-color);
             font-size: 4cqw;
+            line-height: 1.1;
+        }
+
+        /* 藍新金流隱藏區塊 */
+        .newebpay-box {
+            display: none;
+            animation: fadeIn 0.2s ease;
         }
 
         /* 原生滑動開關器 */
@@ -184,83 +222,16 @@
             border-radius: 50%;
         }
 
-        input:checked+.slider {
-            background-color: var(--brand-blue);
-        }
-
-        input:checked+.slider::before {
-            transform: translateX(5cqw);
-        }
-
-        /* 藍新金流隱藏區塊 */
-        .newebpay-box {
-            display: none;
-            animation: fadeIn 0.2s ease;
-        }
-
-        /* 菜單動態上架排版 */
-        .menu-upload-list {
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* 👑 菜單排版大魔改：單列橫向佈局 */
-        .menu-item-row {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            background-color: var(--card-bg);
-            border: 0.2cqw solid var(--border-color);
-            border-radius: 2cqw;
-            padding: 0.125cqw;
-            align-items: center;
-            box-shadow: var(--shadow-sm);
-            position: relative;
-            gap: 0.25cqw;
-        }
-
-        .menu-item {
-            width: 100%;
-            display: flex;
-            border-radius: 2cqw;
-            padding: 0.125cqw;
-            align-items: center;
-            gap: 0.5cqw;
-        }
-
-        .remark {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            flex-direction: row;
-            border-radius: 2cqw;
-            padding: 0.125cqw;
-            align-items: center;
-            gap: 0.5cqw;
-        }
-
-        .seating {
-            width: 100%;
-            height: 8cqw;
-            display: flex;
-            justify-content: flex-start;
-            flex-direction: row;
-            align-items: center;
-            gap: 1cqw;
-            color: var(--text-main);
-            background-color: var(--bg-global);
-            border: 0.2cqw solid var(--border-color);
-            border-radius: 2cqw;
-            padding: 0 2cqw;
-            font-size: 4cqw;
-        }
-
         .seatingtoggle-switch,
         .menu-soldout-switch {
             position: relative;
             display: inline-block;
-            width: 20%;
+            width: 18cqw;
             height: 7cqw;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
         }
 
         .seatingtoggle-switch input,
@@ -280,6 +251,7 @@
             border-radius: 7cqw;
             transition: 0.4s;
             display: flex;
+            flex-direction: row;
             align-items: center;
             justify-content: center;
             color: white;
@@ -292,7 +264,7 @@
             content: "";
             height: 5cqw;
             width: 5cqw;
-            right: 1.375cqw;
+            right: 1.25cqw;
             /* 圓圈初始在左邊 */
             bottom: 1cqw;
             background-color: white;
@@ -376,88 +348,118 @@
             /* 把字往左擠，閃開右邊的白圈圈 */
         }
 
-        .img-upload-box {
-            width: 17cqw;
-            height: 17cqw;
-            border-radius: 2cqw;
-            border: 0.2cqw dashed var(--border-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 8cqw;
-            font-weight: 500;
-            background-color: var(--bg-global);
-            cursor: pointer;
-            color: var(--text-muted);
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .upload-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        .seating {
             width: 100%;
-            height: 100%;
+            height: 8cqw;
+            display: flex;
+            justify-content: flex-start;
+            flex-direction: row;
+            align-items: center;
+            gap: 1cqw;
+            color: var(--text-main);
+            background-color: var(--bg-global);
+            border: 0.2cqw solid var(--border-color);
+            border-radius: 2cqw;
+            font-size: 4cqw;
         }
 
-        .img-upload-box span {
-            font-size: 4cqw;
-            font-weight: 500;
-            margin-top: 1cqw;
+        /* 菜單動態上架排版 */
+        .menu-upload-list {
+            min-height: 24cqw;
+            width: 100%;
+            display: grid;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: stretch;
+            box-sizing: border-box;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        /* 👑 菜單排版大魔改：單列橫向佈局 */
+        .menu-item-row {
+            height: 24cqw;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--card-bg);
+            border: 0.2cqw solid var(--border-color);
+            border-radius: 2cqw;
+            padding: 0.125cqw;
+            justify-content: center;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .menu-item {
+            height: 15cqw;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            border-radius: 2cqw;
+            padding: 0.125cqw;
+            align-items: center;
+            justify-content: space-around;
+            align-items: stretch;
+            box-sizing: border-box;
+            flex: 1;
         }
 
         .item-fields {
+            max-width: 100%;
+            height: 15cqw;
             display: flex;
             flex-direction: column;
-            min-width: 0;
+            justify-content: space-around;
+            align-items: stretch;
+            box-sizing: border-box;
+            flex: 1;
             /* 防止輸入框爆開 */
         }
 
-        .price-input-wrapper {
-            position: relative;
+        .remark {
+            width: 100%;
+            height: 8cqw;
             display: flex;
+            flex-direction: row;
+            justify-content: space-between;
             align-items: center;
+            box-sizing: border-box;
+            flex: 1;
+            /* 防止輸入框爆開 */
+        }
+
+        .remark-btn {
+            max-width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            align-items: center;
+            box-sizing: border-box;
+            flex: 1;
+            /* 防止輸入框爆開 */
+        }
+
+        .item-price {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            position: relative;
         }
 
         .price-symbol {
             position: absolute;
-            left: 2cqw;
-            font-size: 3cqw;
+            font-size: 4cqw;
             font-weight: 600;
             color: var(--text-muted);
-        }
-
-        .price-input {
-            padding-left: 5cqw;
-        }
-
-        .new-size {
-            height: 17cqw;
-            width: 8cqw;
-            color: var(--text-muted);
-            background-color: var(--bg-global);
-            border: 0.2cqw solid var(--border-color);
-            font-size: 3.5cqw;
-            font-weight: 500;
-            padding: 0.5cqw;
-            border-radius: 2cqw;
-            cursor: pointer;
-            line-height: 1;
             display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-
-        }
-
-        /* 👑 刪除與排序移到右側控制區 */
-        .item-right-ctrls {
-            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
             align-items: center;
-            flex-shrink: 0;
+            padding: 0cqw 2cqw;
         }
 
         .del-row-btn {
@@ -518,9 +520,11 @@
         }
 
         .footer-action {
-            bottom: 0;
-            left: 0;
-            right: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: stretch;
+            gap: 1cqw;
             padding: 2cqw;
             background-color: var(--bg-Container);
             border-top: 0.2cqw solid var(--border-color);
@@ -629,24 +633,24 @@
                 </div>
             </header>
             <div class="input-group">
-                <label>店鋪聯絡電話</label>
-                <input type="tel" id="shopPhone" class="input-style" placeholder="請輸入店鋪或老闆的手機號碼(必填)"
-                    pattern="[0-9]{9,10}">
+                <label>店鋪名稱</label>
+                <input type="text" id="shopName" class="input-style" placeholder="請輸入店鋪招牌名稱(必填)">
             </div>
             <div class="input-group">
-                <label>店鋪招牌與名稱(請使用1:1圖片)</label>
-                <div class="shop-name-block" style="display: flex; gap: 1cqw; align-items: center;">
-                    <div class="shop-logo-box" id="shopLogoBox"
-                        style="width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                <label>店鋪招牌與聯絡電話(會裁切成1:1圖片)</label>
+                <div class="shop-Phone-block">
+                    <div class="shop-logo-box" id="shopLogoBox">
+                        📸<span>上傳招牌</span>
                         <input type="file" id="shopLogoInput" class="image-input" accept="image/*"
                             style="display: none;">
                         <img id="shopLogoPreview" class="preview-img" src=""
                             style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw; position: absolute;">
-                        <div class="upload-placeholder">📸<span>上傳招牌</span></div>
                     </div>
-                    <div style="display: flex; flex-direction: column; gap: 1cqw; flex-grow: 1;">
-                        <input type="text" id="shopName" class="input-style" placeholder="請輸入店鋪招牌名稱(必填)">
-                        <div style="display: flex; gap: 1cqw;">
+                    <div class="shop-Phone">
+                        <input type="tel" id="shopPhone" class="input-style" placeholder="請輸入店鋪或老闆的手機號碼(必填)"
+                            pattern="[0-9]{9,10}">
+
+                        <div class="select-row">
                             <select id="citySelect" class="input-style" data-action-change="citySelect">
                                 <option value="">選擇縣市</option>
                                 <option value="臺北市">臺北市</option>
@@ -680,7 +684,7 @@
                 </div>
             </div>
             <div class="input-group">
-                <label>詳細地址</label>
+                <label>詳細地址(縣市區域不需重複填寫)</label>
                 <input type="text" id="shopAddress" class="input-style" placeholder="請輸入巷弄門牌(必填)">
             </div>
             <div class="input-group">
@@ -705,16 +709,14 @@
             <div class="form-section">
                 <div class="section-title">支援藍新金流 API(每筆交易需支付藍新金流手續費，非平台收取)</div>
                 <div class="switch-row">
-                    <div>
-                        <div>線上刷卡 / LINE Pay</div><small>安全防護最高，買家先付款才接單</small>
+                    <div class="input-group"><label> 線上刷卡 / LINE Pay</label><small>安全防護最高，買家先付款才接單</small>
                     </div>
                     <label class="toggle-switch"><input type="checkbox" id="toggleOnline"><span
                             class="slider"></span></label>
                 </div>
                 <div class="input-group newebpay-box" id="newebpayContainer" style="display: none;"></div>
                 <div class="switch-row">
-                    <div>
-                        <div>現場付現</div><small>開啟現場付款，需自行承擔未取貨風險</small>
+                    <div class="input-group"><label>現場付現</label><small>開啟現場付款，需自行承擔未取貨風險</small>
                     </div>
                     <label class="toggle-switch"><input type="checkbox" data-action="toggleCash" id="toggleCash"><span
                             class="slider"></span></label>
@@ -732,75 +734,44 @@
                 </div>
             </div>
             <div class="form-section">
-                <div class="section-title">菜單商品上架(請使用1:1圖片)</div>
+                <div class="section-title">菜單商品上架(會裁切成1:1圖片)</div>
                 <div class="menu-upload-list" id="menuUploadList">
                     <div class="menu-item-row">
                         <div class="menu-item">
-                            <div class="img-upload-box" id="uploadBox">
+                            <div class="img-upload-box" id="uploadBox">📷<span>上傳照片</span>
                                 <input type="file" id="imageInput" class="image-input" accept="image/*"
                                     style="display: none;">
                                 <img class="preview-img" src=""
                                     style="display: none; position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
-                                <div class="upload-placeholder"
-                                    style="font-size: 8cqw;  width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                    📷<span>上傳照片</span></div>
                             </div>
-                            <div class="item-fields" style="width: 100%; gap: 0.5cqw;">
-                                <input type="text" class="input-style item-name-input"
-                                    style="height:8cqw; width: 100%; padding: 0 2cqw;" placeholder="品項名稱(必填)" required>
-                                <div class="price-input-wrapper">
-                                    <span class="price-symbol">$</span>
-                                    <input type="number" class="input-style price-input"
-                                        style="height:8cqw; width: 100%;padding-left:5cqw;" placeholder="金額(必填)" min="0"
-                                        required>
+                            <div class="item-fields">
+                                <div class="item-name"><input type="text" class="input-style" placeholder="品項名稱(必填)"
+                                        required></div>
+                                <div class="item-price"><span class="price-symbol">$</span>
+                                    <input type="number" class="input-style" placeholder="   金額(必填)" min="0" required>
                                 </div>
                             </div>
-                            <button type="button" class="new-size">如需規格</button>
-                            <div class="item-right-ctrls"
-                                style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
-                                <div class="drag-handle"
-                                    style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
-                                    ☰</div>
-                                <button type="button" class="del-row-btn"
-                                    style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
-                            </div>
                         </div>
-                        <div class="new-size-price"
-                            style="display: none; height: 8cqw; width: 100%; flex-direction: row; justify-content: space-around; gap: 1cqw;">
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">大$</span>
-                                <input type="number" class="input-style price-input-large"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
-                                    required>
-                            </div>
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">中$</span>
-                                <input type="number" class="input-style price-input-medium"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額" min="0">
-                            </div>
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">小$</span>
-                                <input type="number" class="input-style price-input-small"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="remark" style="width: 100%; gap: 1cqw">
-                            <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 80%;"
-                                placeholder="備註">
+                        <div class="remark">
                             <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle"
                                     checked>
                                 <span class="toggle-slider">
                                     <span class="on-text">販售中</span>
                                     <span class="off-text">暫停</span>
-                                </span>
-                            </label>
+                                </span></label>
+                            <div class="remark-btn">
+                                <button type="button" class="del-row-btn"
+                                    style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                                <div class="drag-handle"
+                                    style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
+                                    ☰</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <button type="button" class="add-row-btn" id="addItemRowBtn" style="width: 100%; height: 10cqw;">＋
-                    新增下一個品項</button>
                 <footer class="footer-action">
+                    <button type="button" class="add-row-btn" id="addItemRowBtn" style="width: 100%; height: 10cqw;">＋
+                        新增下一個品項</button>
                     <button id="submitBtn" class="submit-btn" data-action="shopSubmitBtn" type="button">建立店鋪</button>
                 </footer>
             </div>
@@ -838,7 +809,8 @@
                     style="display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 5cqw; background-color: white; border: 0.2cqw solid #e5e7eb; border-radius: 3cqw; padding: 3cqw 0; font-size: 5cqw; font-weight: 600; color: #374151; cursor: pointer; box-shadow: 0 0.5cqw 2cqw rgba(0,0,0,0.05);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.5cqw;">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                        </path>
                         <polyline points="22,6 12,13 2,6"></polyline>
                     </svg>
                     使用電子郵件登入
@@ -955,7 +927,6 @@
                 // 明確設定為 create
                 submitBtn.dataset.mode = 'create';
                 submitBtn.innerText = "建立店鋪";
-                createNewItemRow();
             }
         }
         // 讓區域選單根據縣市「長出」選項
@@ -1069,97 +1040,48 @@
             newRow.className = 'menu-item-row';
             newRow.innerHTML = `
                         <div class="menu-item">
-                            <div class="img-upload-box" id="uploadBox">
+                            <div class="img-upload-box" id="uploadBox">📷<span>上傳照片</span>
                                 <input type="file" id="imageInput" class="image-input" accept="image/*"
                                     style="display: none;">
                                 <img class="preview-img" src=""
                                     style="display: none; position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
-                                <div class="upload-placeholder"
-                                    style="font-size: 8cqw;  width: 17cqw; height: 17cqw; border: 0.2cqw dashed var(--border-color); border-radius: 2cqw; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                    📷<span>上傳照片</span></div>
                             </div>
-                            <div class="item-fields" style="width: 100%; gap: 0.5cqw;">
-                                <input type="text" class="input-style item-name-input"
-                                    style="height:8cqw; width: 100%; padding: 0 2cqw;" placeholder="品項名稱(必填)" required>
-                                <div class="price-input-wrapper">
-                                    <span class="price-symbol">$</span>
-                                    <input type="number" class="input-style price-input"
-                                        style="height:8cqw; width: 100%;padding-left:5cqw;" placeholder="金額(必填)" min="0"
-                                        required>
+                            <div class="item-fields">
+                                <div class="item-name"><input type="text" class="input-style" placeholder="品項名稱(必填)"
+                                        required></div>
+                                <div class="item-price"><span class="price-symbol">$</span>
+                                    <input type="number" class="input-style" placeholder="   金額(必填)" min="0" required>
                                 </div>
                             </div>
-                            <button type="button" class="new-size">如需規格</button>
-                            <div class="item-right-ctrls"
-                                style="gap: 0.5cqw; display: flex; flex-direction: column; justify-content: center;">
-                                <div class="drag-handle"
-                                    style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
-                                    ☰</div>
-                                <button type="button" class="del-row-btn"
-                                    style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
-                            </div>
                         </div>
-                        <div class="new-size-price"
-                            style="display: none; height: 8cqw; width: 100%; flex-direction: row; justify-content: space-around; gap: 1cqw;">
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">大$</span>
-                                <input type="number" class="input-style price-input-large"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
-                                    required>
-                            </div>
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">中$</span>
-                                <input type="number" class="input-style price-input-medium"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額" min="0">
-                            </div>
-                            <div class="price-input-wrapper">
-                                <span class="price-symbol">小$</span>
-                                <input type="number" class="input-style price-input-small"
-                                    style="height:8cqw; flex: 1;padding-left:7cqw;" placeholder="金額(必填)" min="0"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="remark" style="width: 100%; gap: 1cqw">
-                            <input type="text" class="input-style item-note-input" style="height: 8cqw; max-width: 80%;"
-                                placeholder="備註">
+                        <div class="remark">
                             <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle"
                                     checked>
                                 <span class="toggle-slider">
                                     <span class="on-text">販售中</span>
                                     <span class="off-text">暫停</span>
-                                </span>
-                            </label>
+                                </span></label>
+                            <div class="remark-btn">
+                                <button type="button" class="del-row-btn"
+                                    style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                                <div class="drag-handle"
+                                    style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
+                                    ☰</div>
+                            </div>
                         </div>`;
             menuUploadList.appendChild(newRow);
             makeItemDraggable(newRow);
             // --- 👇 新增：判斷如果是「編輯回填」，就把資料塞入剛剛建立的 DOM 裡面 ---
             if (itemData && Object.keys(itemData).length > 0) {
-                // 1. 填入品名與備註
+                // 1. 填入品名
                 newRow.querySelector('.item-name-input').value = itemData.name || '';
-                newRow.querySelector('.item-note-input').value = itemData.note || '';
                 // 2. 處理商品圖片
                 if (itemData.image) {
                     const img = newRow.querySelector('.preview-img');
                     img.src = itemData.image;
                     img.style.display = 'block';
                 }
-                // 3. 處理價格與多規格 (對應您 submit 時打包的 itemObj.priceType)
-                if (itemData.priceType === 'multi' && itemData.prices) {
-                    // 如果是多規格，觸發展開規格區域
-                    const sizePriceContainer = newRow.querySelector('.new-size-price');
-                    const mainPriceInput = newRow.querySelector('.price-input');
-                    sizePriceContainer.style.display = 'flex';
-                    mainPriceInput.disabled = true;
-                    mainPriceInput.style.textDecoration = 'line-through';
-                    mainPriceInput.style.backgroundColor = 'var(--bg-Container)';
-                    mainPriceInput.required = false;
-                    // 填入大中小價格
-                    newRow.querySelector('.price-input-large').value = itemData.prices.large || '';
-                    newRow.querySelector('.price-input-medium').value = itemData.prices.medium || '';
-                    newRow.querySelector('.price-input-small').value = itemData.prices.small || '';
-                } else {
-                    // 單一價格
-                    newRow.querySelector('.price-input').value = itemData.price || '';
-                }
+                newRow.querySelector('.price-input').value = itemData.price || '';
                 // 4. 處理上下架狀態 (對應您 submit 打包的 itemObj.supply)
                 // 注意：您的預設是 true (販售中)
                 if (itemData.supply === false) {
@@ -1319,19 +1241,6 @@
                     }
                     row.remove();
                 }
-                // 規格切換邏輯
-                if (target.classList.contains('new-size')) {
-                    const mainPriceInput = row.querySelector('.price-input');
-                    const sizePriceContainer = row.querySelector('.new-size-price');
-                    if (!mainPriceInput || !sizePriceContainer) return;
-
-                    const isHidden = sizePriceContainer.style.display === 'none' || sizePriceContainer.style.display === '';
-                    sizePriceContainer.style.display = isHidden ? 'flex' : 'none';
-                    mainPriceInput.disabled = isHidden;
-                    mainPriceInput.style.textDecoration = isHidden ? 'line-through' : 'none';
-                    mainPriceInput.style.backgroundColor = isHidden ? 'var(--bg-Container)' : '';
-                    mainPriceInput.required = !isHidden;
-                }
             });
             menuUploadList.addEventListener('change', (e) => {
                 if (e.target.classList.contains('menu-soldout-toggle')) {
@@ -1412,24 +1321,13 @@
                     const supply = toggle ? toggle.checked : true; // 預設為 true (有貨)
                     const nameVal = row.querySelector('.item-name-input').value.trim();
                     if (!nameVal) return;
-                    const isSizeMode = row.querySelector('.new-size-price').style.display === 'flex';
                     let itemObj = {
                         name: nameVal,
                         supply: supply,
-                        note: row.querySelector('.item-note-input').value.trim(),
-                        image: row.querySelector('.preview-img').src
+                        image: row.querySelector('.preview-img').src,
+                        priceType: 'single', // 強制設定為單一價格
+                        price: parseInt(row.querySelector('.price-input').value) || 0 // 直接抓取單一價格欄位
                     };
-                    if (isSizeMode) {
-                        itemObj.priceType = 'multi';
-                        itemObj.prices = {
-                            large: row.querySelector('.price-input-large').value,
-                            medium: row.querySelector('.price-input-medium').value,
-                            small: row.querySelector('.price-input-small').value
-                        };
-                    } else {
-                        itemObj.priceType = 'single';
-                        itemObj.price = parseInt(row.querySelector('.price-input').value) || 0;
-                    }
                     menuItems.push(itemObj);
                 });
                 const lat = document.getElementById('shopLat')?.value.trim();

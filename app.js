@@ -667,7 +667,7 @@ function closeMenuOutside(e) {
     }
 }
 // 封裝成一個獨立的初始化函式
-function initPullToRefresh() {
+/*function initPullToRefresh() {
     const topGroup = document.querySelector('.sticky-top-group');
     let startY = 0;
     let isReloading = false; // 加入鎖定開關，防止連點
@@ -687,7 +687,7 @@ function initPullToRefresh() {
             }
         }, { passive: true });
     }
-}
+}*/
 // ==========================================
 // 🎯 PACE 專屬：store.html 終極完美動態渲染模組 (含首頁卡片替換、加減鍵、備註欄)
 // ==========================================
@@ -1025,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initThemeSystem();//網頁載入時套用顏色
     initCitySelect(document.getElementById('citySelect'));// 負責把資料灌入指定的 Select
     getBrowserLocation();//gpsPinBtn
-    initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡
+    /*initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡*/
     initStorePage();// 🎯 PACE 專屬：store.html 
     refreshTotalCartUI();//** * 🛒 購物車管理
     initCartDOMState();//回填當前店家購物車的資料

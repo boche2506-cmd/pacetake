@@ -874,7 +874,7 @@
         </script>
     <script type="module" src="app.js"></script>
     <script type="module">
-        import { areaData, authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
+        import { authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
         let allStores = [];
         let buyerLat = null;
         let buyerLng = null;
@@ -884,15 +884,16 @@
         const submitBtn = document.getElementById('submitBtn');
         const menuUploadList = document.getElementById('menuUploadList');
         const addItemRowBtn = document.getElementById('addItemRowBtn');
+        const newebpayContainer = document.getElementById('newebpayContainer');
         // 確保只有在 register.html 才執行這段檢查
         async function initRegisterPage() {
-            /*if (!window.location.pathname.includes('register.html')) return;*/
-            const user = await authReady;
-            /*if (user.isAnonymous) {
-               alert("尚未登入，請先前往登入頁面。");
-               window.location.href = "index.html";
-               return;
-            }*/
+            /*if (!window.location.pathname.includes('register.html')) return;
+            const user = await authReady;*/
+            if (user.isAnonymous) {
+                alert("尚未登入，請先前往登入頁面。");
+                window.location.href = "index.html";
+                return;
+            }
             // . 頁面路徑安全檢查
             // 1. 從網址取得 storeId (例如: register.html?storeId=123)
             const urlParams = new URLSearchParams(window.location.search);
@@ -921,6 +922,9 @@
                         submitBtn.dataset.mode = 'edit';
                         submitBtn.dataset.storeId = storeId;
                         submitBtn.innerText = "儲存修改";
+                    } else {
+                        alert("找不到該店鋪資料！");
+                        return;
                     }
                     // 3. 處理菜單資料 (這裡就是你要抓的 menu)
                     const menuItems = menuSnapshot.docs.map(doc => ({
@@ -931,51 +935,52 @@
                     // 這裡你需要一個函式把 menuItems 渲染到畫面上
                     if (menuItems.length > 0) {
                         renderMenuToUI(menuItems);
+                    } else {
+                        // 如果舊資料沒有菜單，給他一個空白的輸入列
+                        createNewItemRow();
                     }
                 } catch (error) {
                     console.error("編輯模式讀取失敗:", error);
+                    alert("讀取資料失敗，請檢查網路連線。");
                 }
             } else {
                 console.log("未偵測到 storeId，進入新增模式");
                 // 明確設定為 create
                 submitBtn.dataset.mode = 'create';
                 submitBtn.innerText = "建立店鋪";
+                createNewItemRow();
             }
         }
         // 負責把資料填回表單
         function fillShopFormData(data) {
-            // 這裡定義一個輔助函式，專門負責安全地填入資料
-            const safeSet = (id, value, isCheckbox = false) => {
-                const el = document.getElementById(id);
-                if (el) {
-                    if (isCheckbox) {
-                        el.checked = !!value;
-                    } else {
-                        el.value = value || '';
-                    }
-                } else {
-                    console.warn(`[Info] ID "${id}" 目前不存在於頁面上，跳過回填。`);
+            document.getElementById('shopName').value = data.shopName || '';
+            document.getElementById('shopPhone').value = data.shopPhone || '';
+            document.getElementById('citySelect').value = data.city || '';
+            document.getElementById('districtSelect').value = data.district || '';
+            document.getElementById('shopAddress').value = data.detailAddress || '';
+            document.getElementById('shopLat').value = data.shopLat || '';
+            document.getElementById('shopLng').value = data.shopLng || '';
+            document.getElementById('shopStatus').value = data.status || 'online';
+            document.getElementById('prepareTimeInput').value = data.prepareTime || 15;
+            document.getElementById('merchantIdInput').value = data.MerchantID || '';
+            document.getElementById('hashKeyInput').value = data.HashKey || '';
+            document.getElementById('hashIvInput').value = data.HashIV || '';
+            document.getElementById('toggleCash').checked = !!data.isCashPayEnabled;
+            document.getElementById('toggleOnline').checked = !!data.isOnlinePayEnabled;
+            document.getElementById('seatingtoggle').checked = !!data.hasSeating;
+            if (data.shopLogo) {
+                const logoPreview = document.getElementById('shopLogoPreview'); // 請確認您的 img ID 是否為這個
+                if (logoPreview) {
+                    logoPreview.src = data.shopLogo;
+                    logoPreview.style.display = 'block';
                 }
-            };
-            // 開始安全回填
-            safeSet('shopName', data.shopName);
-            safeSet('shopPhone', data.shopPhone);
-            safeSet('citySelect', data.city);
-            safeSet('districtSelect', data.district);
-            safeSet('shopAddress', data.detailAddress);
-            safeSet('shopLat', data.shopLat);
-            safeSet('shopLng', data.shopLng);
-            safeSet('shopStatus', data.status); // 如果格子沒做，這行只會觸發 Warning，不會崩潰
-            safeSet('prepareTimeInput', data.prepareTime);
-            safeSet('merchantIdInput', data.MerchantID);
-            safeSet('hashKeyInput', data.HashKey);
-            safeSet('hashIvInput', data.HashIV);
+            }
+            // 如果有開啟線上付款，要把金流設定的容器打開
+            const newebpayContainer = document.getElementById('newebpayContainer');
+            if (newebpayContainer && data.isOnlinePayEnabled) {
+                newebpayContainer.style.display = 'block';
 
-            // Checkbox 記得用 true
-            safeSet('toggleCash', data.isCashPayEnabled, true);
-            safeSet('toggleOnline', data.isOnlinePayEnabled, true);
-            safeSet('seatingtoggle', data.hasSeating, true);
-            console.table(data);
+            }
         }
         // 每次被呼叫時，都抓取當下最新的一手資料
         function getShopFormData() {
@@ -1093,6 +1098,48 @@
                         </div>`;
             menuUploadList.appendChild(newRow);
             makeItemDraggable(newRow);
+            // --- 👇 新增：判斷如果是「編輯回填」，就把資料塞入剛剛建立的 DOM 裡面 ---
+            if (itemData && Object.keys(itemData).length > 0) {
+                // 1. 填入品名與備註
+                newRow.querySelector('.item-name-input').value = itemData.name || '';
+                newRow.querySelector('.item-note-input').value = itemData.note || '';
+
+                // 2. 處理商品圖片
+                if (itemData.image) {
+                    const img = newRow.querySelector('.preview-img');
+                    img.src = itemData.image;
+                    img.style.display = 'block';
+                }
+
+                // 3. 處理價格與多規格 (對應您 submit 時打包的 itemObj.priceType)
+                if (itemData.priceType === 'multi' && itemData.prices) {
+                    // 如果是多規格，觸發展開規格區域
+                    const sizePriceContainer = newRow.querySelector('.new-size-price');
+                    const mainPriceInput = newRow.querySelector('.price-input');
+
+                    sizePriceContainer.style.display = 'flex';
+                    mainPriceInput.disabled = true;
+                    mainPriceInput.style.textDecoration = 'line-through';
+                    mainPriceInput.style.backgroundColor = 'var(--bg-Container)';
+                    mainPriceInput.required = false;
+
+                    // 填入大中小價格
+                    newRow.querySelector('.price-input-large').value = itemData.prices.large || '';
+                    newRow.querySelector('.price-input-medium').value = itemData.prices.medium || '';
+                    newRow.querySelector('.price-input-small').value = itemData.prices.small || '';
+                } else {
+                    // 單一價格
+                    newRow.querySelector('.price-input').value = itemData.price || '';
+                }
+
+                // 4. 處理上下架狀態 (對應您 submit 打包的 itemObj.supply)
+                // 注意：您的預設是 true (販售中)
+                if (itemData.supply === false) {
+                    const toggle = newRow.querySelector('.menu-soldout-toggle');
+                    if (toggle) toggle.checked = false;
+                    newRow.classList.add('sold-out');
+                }
+            }
             return newRow; // 回傳這行元素，方便後面操作
         }
         function renderMenuToUI(menuItems) {
@@ -1287,7 +1334,6 @@
         const warningConfirmBtn = document.getElementById('warningConfirmBtn');
         const warningCancelBtn = document.getElementById('warningCancelBtn');
         const toggleOnline = document.getElementById('toggleOnline');
-        const newebpayContainer = document.getElementById('newebpayContainer');
         toggleOnline?.addEventListener('change', function () {
             if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
         });

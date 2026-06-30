@@ -887,69 +887,68 @@
         const newebpayContainer = document.getElementById('newebpayContainer');
         // 確保只有在 register.html 才執行這段檢查
         async function initRegisterPage() {
-            /*if (!window.location.pathname.includes('register.html')) return;
-            const user = await authReady;*/
-            if (user.isAnonymous) {
+            /*if (!window.location.pathname.includes('register.html')) return;*/
+            const user = await authReady;
+            /*if (user.isAnonymous) {
                 alert("尚未登入，請先前往登入頁面。");
                 window.location.href = "index.html";
-                return;
-            }
-            // . 頁面路徑安全檢查
-            // 1. 從網址取得 storeId (例如: register.html?storeId=123)
-            const urlParams = new URLSearchParams(window.location.search);
-            const storeId = urlParams.get('storeId');
-            console.log("[PACE] Initializing Register Page Logic...");
-            if (storeId) {
-                console.log("偵測到 storeId，進入編輯模式:", storeId);
-                try {
-                    // 2. 從 Firebase 讀取該店家的資料
-                    // 1. 同時讀取「商店資料」與「菜單子集合」
-                    const [storeDoc, menuSnapshot] = await Promise.all([
-                        getDoc(doc(db, "stores", storeId)),
-                        getDocs(collection(db, "stores", storeId, "menu"))
-                    ]);
-                    if (storeDoc.exists()) {
-                        const storeData = storeDoc.data();
-                        // --- 【關鍵修正】補上這段擁有者檢查 ---
-                        // 檢查資料庫裡的 sellerUid 是不是當前登入者的 UID
-                        // 注意：請確保你的資料庫 store 文件裡有存 sellerUid 欄位
-                        if (storeData.sellerUid !== user.uid) {
-                            alert("權限不足，您無法修改別人的商店資料！");
-                            window.location.href = "index.html";
-                            return;
-                        }
-                        fillShopFormData(storeDoc.data());// 這裡填入欄位
-                        submitBtn.dataset.mode = 'edit';
-                        submitBtn.dataset.storeId = storeId;
-                        submitBtn.innerText = "儲存修改";
-                    } else {
-                        alert("找不到該店鋪資料！");
+                return;*/
+        }
+        // . 頁面路徑安全檢查
+        // 1. 從網址取得 storeId (例如: register.html?storeId=123)
+        const urlParams = new URLSearchParams(window.location.search);
+        const storeId = urlParams.get('storeId');
+        console.log("[PACE] Initializing Register Page Logic...");
+        if (storeId) {
+            console.log("偵測到 storeId，進入編輯模式:", storeId);
+            try {
+                // 2. 從 Firebase 讀取該店家的資料
+                // 1. 同時讀取「商店資料」與「菜單子集合」
+                const [storeDoc, menuSnapshot] = await Promise.all([
+                    getDoc(doc(db, "stores", storeId)),
+                    getDocs(collection(db, "stores", storeId, "menu"))
+                ]);
+                if (storeDoc.exists()) {
+                    const storeData = storeDoc.data();
+                    // --- 【關鍵修正】補上這段擁有者檢查 ---
+                    // 檢查資料庫裡的 sellerUid 是不是當前登入者的 UID
+                    // 注意：請確保你的資料庫 store 文件裡有存 sellerUid 欄位
+                    if (storeData.sellerUid !== user.uid) {
+                        alert("權限不足，您無法修改別人的商店資料！");
+                        window.location.href = "index.html";
                         return;
                     }
-                    // 3. 處理菜單資料 (這裡就是你要抓的 menu)
-                    const menuItems = menuSnapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    console.log("撈到的菜單資料:", menuItems);
-                    // 這裡你需要一個函式把 menuItems 渲染到畫面上
-                    if (menuItems.length > 0) {
-                        renderMenuToUI(menuItems);
-                    } else {
-                        // 如果舊資料沒有菜單，給他一個空白的輸入列
-                        createNewItemRow();
-                    }
-                } catch (error) {
-                    console.error("編輯模式讀取失敗:", error);
-                    alert("讀取資料失敗，請檢查網路連線。");
+                    fillShopFormData(storeDoc.data());// 這裡填入欄位
+                    submitBtn.dataset.mode = 'edit';
+                    submitBtn.dataset.storeId = storeId;
+                    submitBtn.innerText = "儲存修改";
+                } else {
+                    alert("找不到該店鋪資料！");
+                    return;
                 }
-            } else {
-                console.log("未偵測到 storeId，進入新增模式");
-                // 明確設定為 create
-                submitBtn.dataset.mode = 'create';
-                submitBtn.innerText = "建立店鋪";
-                createNewItemRow();
+                // 3. 處理菜單資料 (這裡就是你要抓的 menu)
+                const menuItems = menuSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                console.log("撈到的菜單資料:", menuItems);
+                // 這裡你需要一個函式把 menuItems 渲染到畫面上
+                if (menuItems.length > 0) {
+                    renderMenuToUI(menuItems);
+                } else {
+                    // 如果舊資料沒有菜單，給他一個空白的輸入列
+                    createNewItemRow();
+                }
+            } catch (error) {
+                console.error("編輯模式讀取失敗:", error);
+                alert("讀取資料失敗，請檢查網路連線。");
             }
+        } else {
+            console.log("未偵測到 storeId，進入新增模式");
+            // 明確設定為 create
+            submitBtn.dataset.mode = 'create';
+            submitBtn.innerText = "建立店鋪";
+            createNewItemRow();
         }
         // 負責把資料填回表單
         function fillShopFormData(data) {

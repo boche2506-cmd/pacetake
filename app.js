@@ -355,16 +355,6 @@ async function renderFavoriteStores() {
         console.error("讀取收藏失敗:", error);
     }
 }
-// 1. 初始化函式：負責把資料灌入指定的 Select
-function initCitySelect(selectElement) {
-    if (!selectElement) return;
-    Object.keys(areaData).forEach(city => {
-        const opt = document.createElement('option');
-        opt.value = city;
-        opt.innerText = city;
-        selectElement.appendChild(opt);
-    });
-}
 
 function getBrowserLocation() {
     // 🛡️ 守護：如果不是首頁，直接離開
@@ -449,45 +439,58 @@ document.addEventListener('input', (e) => {
         console.log('未知的 action:', action);
     }
 });
+// 1. 初始化函式：負責把資料灌入指定的 Select
+function initCitySelect(selectElement) {
+    if (!selectElement) return;
+    Object.keys(areaData).forEach(city => {
+        const opt = document.createElement('option');
+        opt.value = city;
+        opt.innerText = city;
+        selectElement.appendChild(opt);
+    });
+}
 // Listener'change'
-document.addEventListener('change', async (e) => {
-    const target = e.target.closest('[data-action-change]');
-    if (!target) return;
-    const action = target.getAttribute('data-action-change');
-    const selectedValue = target.value;
-    const path = window.location.pathname;
-    // 1. 處理「城市選擇」邏輯
-    if (action === 'citySelect') {
-        const isTargetPage = path.includes('index.html') || path === '/' || path.includes('register.html');
-        const districtSelect = document.querySelector('#districtSelect');
-        if (districtSelect) {
-            districtSelect.innerHTML = '<option value="">選擇區域</option>';
-            if (areaData[selectedValue]) {
-                areaData[selectedValue].forEach(dist => {
-                    const opt = document.createElement('option');
-                    opt.value = dist;
-                    opt.innerText = dist;
-                    districtSelect.appendChild(opt);
-                });
+const path = window.location.pathname;
+const isTargetPage = path.includes('index.html') || path === '/' || path.includes('register.html');
+if (isTargetPage) {
+    document.addEventListener('change', async (e) => {
+        const target = e.target.closest('[data-action-change]');
+        if (!target) return;
+        const action = target.getAttribute('data-action-change');
+        const selectedValue = target.value;
+        const path = window.location.pathname;
+        // 1. 處理「城市選擇」邏輯
+        if (action === 'citySelect') {
+            const districtSelect = document.querySelector('#districtSelect');
+            if (districtSelect) {
+                districtSelect.innerHTML = '<option value="">選擇區域</option>';
+                if (areaData[selectedValue]) {
+                    areaData[selectedValue].forEach(dist => {
+                        const opt = document.createElement('option');
+                        opt.value = dist;
+                        opt.innerText = dist;
+                        districtSelect.appendChild(opt);
+                    });
+                }
+            }
+            // 分流執行：只有在 index.html 才篩選商店
+            if (path.includes('index.html') || path === '/') {
+                filterAndRenderStores();
             }
         }
-        // 分流執行：只有在 index.html 才篩選商店
-        if (path.includes('index.html') || path === '/' || path.includes('register.html')) {
-            filterAndRenderStores();
+        // 處理「區域選擇」的邏輯
+        else if (action === 'districtSelect') {
+            // 分流執行：只有在 index.html 才篩選商店
+            if (path.includes('index.html') || path === '/') {
+                filterAndRenderStores();
+            }
         }
-    }
-    // 處理「區域選擇」的邏輯
-    else if (action === 'districtSelect') {
-        // 分流執行：只有在 index.html 才篩選商店
-        if (path.includes('index.html') || path === '/' || path.includes('register.html')) {
-            filterAndRenderStores();
+        // 3. 其他處理
+        else {
+            console.log('未知的 action:', action);
         }
-    }
-    // 3. 其他處理
-    else {
-        console.log('未知的 action:', action);
-    }
-});
+    });
+}
 // Listener'click'
 document.addEventListener('click', async (e) => {
     const target = e.target.closest('[data-action]');

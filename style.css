@@ -141,7 +141,7 @@ img,
     justify-content: space-between;
     padding: 1cqw;
     overflow: hidden;
-    border-radius: 5cqw;
+    border-radius: 5%;
     /* 手機建議用固定 px 或 rem */
     margin: 0 auto;
     /* 防止滑動到頂部時拖動到整個瀏覽器視窗 */

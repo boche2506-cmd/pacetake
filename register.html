@@ -909,6 +909,14 @@
                     ]);
                     if (storeDoc.exists()) {
                         const storeData = storeDoc.data();
+                        const citySelect = document.getElementById('citySelect');
+                        citySelect.value = storeData.city;
+                        updateDistrictOptions(storeData.city, storeData.district);
+
+                        // 3. 監聽縣市切換（以後使用者自己手動改縣市時才會用到）
+                        citySelect.addEventListener('change', (e) => {
+                            updateDistrictOptions(e.target.value);
+                        });
                         // --- 【關鍵修正】補上這段擁有者檢查 ---
                         // 檢查資料庫裡的 sellerUid 是不是當前登入者的 UID
                         // 注意：請確保你的資料庫 store 文件裡有存 sellerUid 欄位
@@ -951,10 +959,19 @@
             }
         }
         // 讓區域選單根據縣市「長出」選項
-        function updateDistrictOptions(city, defaultDistrict = '') {
+        // 確保 register.html 裡面有載入 areaData 的變數（如果沒有，要補上這行）
+        // const areaData = { "基隆市": ["仁愛區", "信義區", ...], ... }; 
+        function updateDistrictOptions(city, districtValue) {
             const districtSelect = document.getElementById('districtSelect');
-            districtSelect.innerHTML = '<option value="">選擇區域</option>'; // 重置
-            if (city && areaData[city]) {
+            if (!districtSelect) return;
+            // 1. 如果 areaData 不存在，先報警檢查
+            if (typeof areaData === 'undefined') {
+                console.error("錯誤：areaData 沒有定義！請檢查是否在 register.html 載入了縣市資料檔");
+                return;
+            }
+            // 2. 清空並重建
+            districtSelect.innerHTML = '<option value="">選擇區域</option>';
+            if (areaData[city]) {
                 areaData[city].forEach(dist => {
                     const opt = document.createElement('option');
                     opt.value = dist;
@@ -962,13 +979,13 @@
                     districtSelect.appendChild(opt);
                 });
             }
-            // 如果有預設值（回填模式時），就把它選上
-            if (defaultDistrict) {
-                districtSelect.value = defaultDistrict;
+            // 3. 賦值
+            if (districtValue) {
+                districtSelect.value = districtValue;
             }
         }
         // 負責把資料填回表單
-        function fillShopFormData(data) {
+        async function fillShopFormData(data) {
             document.getElementById('shopName').value = data.shopName || '';
             document.getElementById('shopPhone').value = data.shopPhone || '';
             document.getElementById('citySelect').value = data.city || '';

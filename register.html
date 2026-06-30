@@ -1102,26 +1102,22 @@
                 // 1. 填入品名與備註
                 newRow.querySelector('.item-name-input').value = itemData.name || '';
                 newRow.querySelector('.item-note-input').value = itemData.note || '';
-
                 // 2. 處理商品圖片
                 if (itemData.image) {
                     const img = newRow.querySelector('.preview-img');
                     img.src = itemData.image;
                     img.style.display = 'block';
                 }
-
                 // 3. 處理價格與多規格 (對應您 submit 時打包的 itemObj.priceType)
                 if (itemData.priceType === 'multi' && itemData.prices) {
                     // 如果是多規格，觸發展開規格區域
                     const sizePriceContainer = newRow.querySelector('.new-size-price');
                     const mainPriceInput = newRow.querySelector('.price-input');
-
                     sizePriceContainer.style.display = 'flex';
                     mainPriceInput.disabled = true;
                     mainPriceInput.style.textDecoration = 'line-through';
                     mainPriceInput.style.backgroundColor = 'var(--bg-Container)';
                     mainPriceInput.required = false;
-
                     // 填入大中小價格
                     newRow.querySelector('.price-input-large').value = itemData.prices.large || '';
                     newRow.querySelector('.price-input-medium').value = itemData.prices.medium || '';
@@ -1130,7 +1126,6 @@
                     // 單一價格
                     newRow.querySelector('.price-input').value = itemData.price || '';
                 }
-
                 // 4. 處理上下架狀態 (對應您 submit 打包的 itemObj.supply)
                 // 注意：您的預設是 true (販售中)
                 if (itemData.supply === false) {
@@ -1222,57 +1217,55 @@
             handle.addEventListener('mousedown', (e) => startDrag(e, row));
             handle.addEventListener('touchstart', (e) => startDrag(e, row), { passive: false });
         }
+        function startDrag(e, row) {
+            if (e.cancelable) e.preventDefault();
+            activeDragItem = row;
+            row.style.transform = 'scale(1.02)'; // 微放大
+            row.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)'; // 浮起來的陰影
+            row.style.zIndex = '500';
+            row.style.transition = 'transform 0.2s, box-shadow 0.2s'; // 平滑動畫
+            row.style.border = '0.2cqw dashed var(--brand-blue)';
+            if (e.type.startsWith('touch')) {
+                window.addEventListener('touchmove', onDragMove, { passive: false });
+                window.addEventListener('touchend', onDragEnd);
+            } else {
+                window.addEventListener('mousemove', onDragMove);
+                window.addEventListener('mouseup', onDragEnd);
+            }
+        }
+        function onDragMove(e) {
+            if (!activeDragItem || !menuUploadList) return;
+            if (e.cancelable) e.preventDefault();
+            const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+            requestAnimationFrame(() => {
+                const siblings = [...menuUploadList.querySelectorAll('.menu-item-row')].filter(el => el !== activeDragItem);
+                const nextSibling = siblings.find(sibling => {
+                    const box = sibling.getBoundingClientRect();
+                    return clientY <= box.top + box.height / 2;
+                });
+                if (nextSibling && activeDragItem !== nextSibling) {
+                    menuUploadList.insertBefore(activeDragItem, nextSibling);
+                } else if (!nextSibling && activeDragItem !== menuUploadList.lastElementChild) {
+                    menuUploadList.appendChild(activeDragItem);
+                }
+            });
+        }
+        function onDragEnd() {
+            if (!activeDragItem) return;
+            activeDragItem.style.transform = 'scale(1)';
+            activeDragItem.style.boxShadow = 'none';
+            activeDragItem.style.opacity = '1';
+            activeDragItem.style.border = '0.2cqw solid var(--border-color)';
+            activeDragItem = null;
+            window.removeEventListener('mousemove', onDragMove);
+            window.removeEventListener('mouseup', onDragEnd);
+            window.removeEventListener('touchmove', onDragMove);
+            window.removeEventListener('touchend', onDragEnd);
+        }
         function setupMenuManager() {
             // 如果頁面沒有菜單容器，就直接跳出，不執行任何邏輯
             if (!menuUploadList) return;
             // --- 1. 拖曳功能模組 ---
-            let activeDragItem = null;
-            makeItemDraggable(row);
-            function startDrag(e, row) {
-                if (e.cancelable) e.preventDefault();
-                activeDragItem = row;
-                row.style.transform = 'scale(1.02)'; // 微放大
-                row.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)'; // 浮起來的陰影
-                row.style.zIndex = '500';
-                row.style.transition = 'transform 0.2s, box-shadow 0.2s'; // 平滑動畫
-                row.style.border = '0.2cqw dashed var(--brand-blue)';
-                if (e.type.startsWith('touch')) {
-                    window.addEventListener('touchmove', onDragMove, { passive: false });
-                    window.addEventListener('touchend', onDragEnd);
-                } else {
-                    window.addEventListener('mousemove', onDragMove);
-                    window.addEventListener('mouseup', onDragEnd);
-                }
-            }
-            function onDragMove(e) {
-                if (!activeDragItem || !menuUploadList) return;
-                if (e.cancelable) e.preventDefault();
-                const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-                requestAnimationFrame(() => {
-                    const siblings = [...menuUploadList.querySelectorAll('.menu-item-row')].filter(el => el !== activeDragItem);
-                    const nextSibling = siblings.find(sibling => {
-                        const box = sibling.getBoundingClientRect();
-                        return clientY <= box.top + box.height / 2;
-                    });
-                    if (nextSibling && activeDragItem !== nextSibling) {
-                        menuUploadList.insertBefore(activeDragItem, nextSibling);
-                    } else if (!nextSibling && activeDragItem !== menuUploadList.lastElementChild) {
-                        menuUploadList.appendChild(activeDragItem);
-                    }
-                });
-            }
-            function onDragEnd() {
-                if (!activeDragItem) return;
-                activeDragItem.style.transform = 'scale(1)';
-                activeDragItem.style.boxShadow = 'none';
-                activeDragItem.style.opacity = '1';
-                activeDragItem.style.border = '0.2cqw solid var(--border-color)';
-                activeDragItem = null;
-                window.removeEventListener('mousemove', onDragMove);
-                window.removeEventListener('mouseup', onDragEnd);
-                window.removeEventListener('touchmove', onDragMove);
-                window.removeEventListener('touchend', onDragEnd);
-            }
             // --- 2. 初始化已存在的項目 ---
             document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
             // --- 3. 統一的事件委派 (點擊與變更) ---

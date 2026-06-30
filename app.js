@@ -34,7 +34,7 @@ let currentBuyerAddress = "正在獲取定位中...";
 let currentUserId = null;
 let activeDragItem = null;
 
-export const areaData = {
+const areaData = {
     "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
     "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
     "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
@@ -458,6 +458,7 @@ document.addEventListener('change', async (e) => {
     const path = window.location.pathname;
     // 1. 處理「城市選擇」邏輯
     if (action === 'citySelect') {
+        const isTargetPage = path.includes('index.html') || path === '/' || path.includes('register.html');
         const districtSelect = document.querySelector('#districtSelect');
         if (districtSelect) {
             districtSelect.innerHTML = '<option value="">選擇區域</option>';
@@ -471,14 +472,14 @@ document.addEventListener('change', async (e) => {
             }
         }
         // 分流執行：只有在 index.html 才篩選商店
-        if (path.includes('index.html') || path === '/') {
+        if (path.includes('index.html') || path === '/' || path.includes('register.html')) {
             filterAndRenderStores();
         }
     }
     // 處理「區域選擇」的邏輯
     else if (action === 'districtSelect') {
         // 分流執行：只有在 index.html 才篩選商店
-        if (path.includes('index.html') || path === '/') {
+        if (path.includes('index.html') || path === '/' || path.includes('register.html')) {
             filterAndRenderStores();
         }
     }

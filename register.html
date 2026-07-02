@@ -375,25 +375,60 @@
 
         .category-header {
             width: 100%;
-            height: 8cqw;
+            height: 12cqw;
             display: flex;
             flex-direction: row;
             justify-content: flex-start;
             align-items: center;
             box-sizing: border-box;
             /* 防止輸入框爆開 */
-            overflow-X: auto;
+            overflow-x: auto;
             box-sizing: border-box;
             gap: 0.5cqw;
+            line-height: 1.1;
+        }
 
-            &::-webkit-scrollbar {
-                display: none;
-            }
+        .tabs-wrapper {
+            max-width: 100%;
+            height: 7cqw;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
 
-            /* 隱藏 Firefox 的卷軸 */
-            scrollbar-width: none;
-            /* 確保內容依然可以滑動 */
-            -ms-overflow-style: none;
+        .category-tab-btn {
+            font-size: 4cqw;
+            /* 字體改用 cqw */
+            color: var(--brand-blue);
+            background-color: var(--card-bg);
+            border: 0.3cqw solid var(--border-color);
+            /* 邊框粗細 cqw */
+            border-radius: 5cqw;
+            /* 圓角改用 cqw */
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: var(--shadow-sm);
+            height: 7cqw;
+            /* 讓它在 location-bar 裡自然撐高 */
+            max-width: 28cqw;
+            /* 給予固定的 cqw 寬度 */
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            line-height: 1.1;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+            flex-shrink: 0;
+        }
+
+        .category-tab-btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
 
         .add-category-btn,
@@ -421,6 +456,7 @@
             line-height: 1.1;
             transition: transform 0.2s;
             /* 按下去會有一點點回饋感 */
+            flex-shrink: 0;
         }
 
         .add-category-btn:active,
@@ -1039,19 +1075,55 @@
                 submitBtn.innerText = "建立店鋪";
             }
         }
-        function renderMenuToUI(menuItems) {
-            // 🎯 關鍵修正：開直升機找人！直接抓目前身上有「active」貼紙的那個分頁大盒子！
-            const currentWorkingList = document.querySelector('.menu-upload-list.active');
-            // 防呆機制：萬一剛好沒人在畫面上，就不做事以免噴錯
-            if (!currentWorkingList) {
-                console.error("糟了老闆！renderMenuToUI 找不到目前活著的 active 分頁！");
-                return;
+        function renderMenuToUI(categories) {
+            const tabsWrapper = document.getElementById('tabsWrapper');
+            const header = document.querySelector('.category-header');
+            // 🧹 【步驟一：大掃除】先把畫面上之前殘留的動態歷史分頁和按鈕全部清空
+            tabsWrapper.innerHTML = '';
+            document.querySelectorAll('.menu-upload-list').forEach(list => {
+                if (list.id !== 'menuUploadList') {
+                    list.remove(); // 刪掉舊的歷史大盒子
+                }
+            });
+            // 把原本預設的第一個空白工作區隱藏並拔掉 active
+            const defaultBlankList = document.getElementById('menuUploadList');
+            if (defaultBlankList) {
+                defaultBlankList.style.display = 'none';
+                defaultBlankList.classList.remove('active');
             }
-            // 🎯 精準打擊：只清空「目前看得到、活著的這一頁」的內容
-            currentWorkingList.innerHTML = '';
-            // 自動把商品一列一列生出來
-            menuItems.forEach(item => {
-                createNewItemRow(item); // 呼叫你改好的無腦版函式，它自己會認 active 塞進去
+            // 🏗️ 【步驟二：重建時空】開始跑迴圈，有幾個分類就蓋幾棟樓
+            categories.forEach((catObj, index) => {
+                categoryCounter++; // 讓全域計數器累加，確保 ID 絕不重複
+                const uniqueStoredId = `category-list-${categoryCounter}`;
+                // 👶 建立分頁標籤按鈕
+                const newTabBtn = document.createElement('button');
+                newTabBtn.type = 'button';
+                // 🎯 預設讓回傳的第一個分類發光亮起 (active)
+                newTabBtn.className = index === 0 ? 'category-tab-btn active' : 'category-tab-btn';
+                newTabBtn.textContent = catObj.category; // 填入分類名稱（如：主食類）
+                newTabBtn.setAttribute('data-action', 'switchcategory');
+                newTabBtn.setAttribute('data-target', uniqueStoredId);
+                // 🎯 這裡也一樣塞入 ❌
+                newTabBtn.innerHTML = `
+                        <span>${catObj.category}</span>
+                        <span class="tab-del-x" data-action="deletecategory" style="margin-left: 8px; cursor: pointer; color: #ff4d4d;">❌</span>
+                    `;
+                tabsWrapper.appendChild(newTabBtn);
+                // 👶 建立對應的商品容器大盒子
+                const newListContainer = document.createElement('div');
+                // 🎯 預設讓第一個分類的大盒子顯示，其他全部先藏起來
+                newListContainer.className = index === 0 ? 'menu-upload-list active' : 'menu-upload-list';
+                newListContainer.id = uniqueStoredId;
+                newListContainer.style.display = index === 0 ? 'grid' : 'none';
+                // 插進標頭正下方
+                header.insertAdjacentElement('afterend', newListContainer);
+                // 📥 【步驟三：填入商品】抓出這個分類底下的 items 陣列，通通塞進這個剛蓋好的大盒子裡
+                if (catObj.items && Array.isArray(catObj.items)) {
+                    catObj.items.forEach(item => {
+                        // 💡 關鍵：我們直接把 newListContainer 當作第二個參數傳過去！
+                        createNewItemRow(item, newListContainer);
+                    });
+                }
             });
         }
         // 讓區域選單根據縣市「長出」選項
@@ -1176,7 +1248,7 @@
             await Promise.all(addPromises);
             console.log("新菜單已同步");
         }
-        function createNewItemRow(itemData = {}) {
+        function createNewItemRow(itemData = {}, targetContainer = null) {
             const currentWorkingList = document.querySelector('.menu-upload-list.active');
             const newRow = document.createElement('div');
             newRow.className = 'menu-item-row';
@@ -1213,7 +1285,7 @@
             if (currentWorkingList) {
                 currentWorkingList.appendChild(newRow); // ⭕ 乖乖塞進當前這一頁
             } else {
-                console.error("糟了老闆！塞入商品列時，找不到任何活著的 .active 分頁！");
+                console.error("糟了老闆！塞入商品列時，找不到任何活著的分頁！");
             }
             // 🎯 3. 賦予這行新商品靈魂（啟動拖曳功能）
             makeItemDraggable(newRow);
@@ -1366,13 +1438,43 @@
             window.removeEventListener('touchmove', onDragMove);
             window.removeEventListener('touchend', onDragEnd);
         }
-        // --- 1. 拖曳功能模組 ---
-        // --- 2. 初始化已存在的項目 ---
-        // --- 3. 統一的事件委派 (點擊與變更) ---
+
+        //統一的事件委派 (點擊與變更) ---
         document.addEventListener('change', (e) => {
             if (e.target.classList.contains('menu-soldout-toggle')) {
                 const row = e.target.closest('.menu-item-row');
                 if (row) row.classList.toggle('sold-out', !e.target.checked);
+            }
+        });
+        // 🎯 1. 全域雙擊監聽：雙擊任何分類標籤，直接開啟編輯模式
+        document.addEventListener('dblclick', (e) => {
+            const target = e.target.closest('[data-action="switchcategory"]');
+            if (!target) return;
+            target.contentEditable = true;
+            target.focus();
+            target.style.outline = "2px dashed #ff9800"; // 提示正在編輯
+        });
+        // 🎯 2. 全域離開監聽：滑鼠點到別的地方，立刻鎖定文字
+        // 💡 小知識：因為 'blur' 事件不會冒泡，全域抓不到，所以要改用會冒泡的 'focusout'！
+        document.addEventListener('focusout', (e) => {
+            const target = e.target.closest('[data-action="switchcategory"]');
+            // 防呆：只有當這個標籤正在「編輯中」才處理
+            if (!target || target.contentEditable !== 'true') return;
+            target.contentEditable = false;
+            target.style.outline = "none";
+            // 防呆：萬一名字被刪光，給個預設值
+            if (!target.textContent.trim()) {
+                target.textContent = "未命名分類";
+            }
+            console.log("標籤名稱已透過全域委派更新為:", target.textContent.trim());
+        });
+        // 🎯 3. 全域鍵盤監聽：在編輯時按下 Enter，直接觸發結束
+        document.addEventListener('keydown', (e) => {
+            const target = e.target.closest('[data-action="switchcategory"]');
+            if (!target || target.contentEditable !== 'true') return;
+            if (e.key === 'Enter') {
+                e.preventDefault(); // 阻止按鈕內換行
+                target.blur();      // 游標離開，會自動觸發上面的 'focusout' 鎖定文字
             }
         });
         // --- 4. 新增行按鈕邏輯 ---
@@ -1451,6 +1553,11 @@
                 newTabBtn.textContent = categoryName;
                 newTabBtn.setAttribute('data-action', 'switchcategory');
                 newTabBtn.setAttribute('data-target', uniqueStoredId);
+                // 🎯 關鍵修改：用一個 span 包住字，並在旁邊塞一個帶有 data-action="deletecategory" 的 ❌
+                newTabBtn.innerHTML = `
+                            <span>${categoryName}</span>
+                            <span class="tab-del-x" data-action="deletecategory" style="margin-left: 8px; cursor: pointer; color: #ff4d4d;">❌</span>
+                            `;
                 tabsWrapper.appendChild(newTabBtn);
                 // 先把其他按鈕的 active 拔掉，確保只有剛生成的這顆在亮
                 document.querySelectorAll('.category-tab-btn').forEach(btn => {
@@ -1527,6 +1634,45 @@
                     }
                 });
             }
+            // 🎯 登登登登！直接加在這裡！
+            else if (action === 'deletecategory') {
+                // 1. 🔥 超級關鍵：阻止事件冒泡！
+                // 沒加這行的話，點 ❌ 的同時也會觸發外面按鈕的 switchcategory，網頁會噴錯迷路
+                e.stopPropagation();
+                // 2. 向上抓到這顆分類大按鈕，以及它對應的商品大盒子 ID
+                const tabBtn = target.closest('.category-tab-btn');
+                const targetListId = tabBtn.getAttribute('data-target');
+                const categoryName = tabBtn.querySelector('span').textContent.trim();
+                // 3. 安全防呆：問一下老闆是不是手滑
+                if (!confirm(`確定要刪除整個「${categoryName}」分類，以及裡面的所有商品嗎？（按下儲存後才會真正從資料庫刪除）`)) {
+                    return;
+                }
+                // 4. 開始拆房子：刪除對應的商品大盒子容器
+                const contentList = document.getElementById(targetListId);
+                if (contentList) {
+                    contentList.remove();
+                }
+                // 5. 刪除這個分頁標籤按鈕本身
+                tabBtn.remove();
+                console.log(`已成功刪除 ${categoryName} 分類`);
+                // 6. 🛠️ 【核心補丁：防滯留機制】
+                // 萬一老闆刪除的是「當前正在看、亮著 active」的那一頁，畫面會變空白。
+                // 我們必須貼心地幫他自動切換到別的分頁！
+                if (tabBtn.classList.contains('active')) {
+                    const remainingTabs = document.querySelectorAll('.category-tab-btn');
+                    if (remainingTabs.length > 0) {
+                        // 如果還有其他分類，就自動點擊第一個分類，幫老闆切過去
+                        remainingTabs[0].click();
+                    } else {
+                        // 如果分類都被刪光光了，就讓原本那個最早的預設空白工作區重新復活
+                        const defaultBlankList = document.getElementById('menuUploadList');
+                        if (defaultBlankList) {
+                            defaultBlankList.style.display = 'grid';
+                            defaultBlankList.classList.add('active');
+                        }
+                    }
+                }
+            }
             else if (action === 'toggleCash') {
                 toggleCash.checked = false;
                 if (action === 'toggleCash') {
@@ -1549,22 +1695,49 @@
                 const mode = btn.dataset.mode || 'create'; // 加上預設值，確保即使沒設也能跑新增
                 const storeId = btn.dataset.storeId; // 只有編輯模式才會有值參數，新增用當前 UID
                 const ShopFormData = getShopFormData();
-                // --- 菜單打包 ---
-                const menuRows = document.querySelectorAll('.menu-item-row');
-                const menuItems = [];
-                menuRows.forEach((row) => {
-                    const toggle = row.querySelector('.menu-soldout-toggle');
-                    const supply = toggle ? toggle.checked : true; // 預設為 true (有貨)
-                    const nameVal = row.querySelector('.item-name-input').value.trim();
-                    if (!nameVal) return;
-                    let itemObj = {
-                        name: nameVal,
-                        supply: supply,
-                        image: row.querySelector('.preview-img').src,
-                        priceType: 'single', // 強制設定為單一價格
-                        price: parseInt(row.querySelector('.price-input').value) || 0 // 直接抓取單一價格欄位
-                    };
-                    menuItems.push(itemObj);
+                // 1. 【核心改變】改成先抓取所有的「分頁大盒子」
+                const allLists = document.querySelectorAll('.menu-upload-list');
+                const categorizedMenu = []; // 準備裝全部分類的大禮包
+                allLists.forEach((list) => {
+                    // 2. 針對「這一個大盒子」，抓取它裡面的所有商品列
+                    const menuRows = list.querySelectorAll('.menu-item-row');
+                    if (menuRows.length === 0) return; // 如果這一頁完全沒有商品列，直接跳過
+                    // 3. 【關鍵解鎖】找出這一個大盒子對應的「分類名稱」是什麼？
+                    let categoryName = '未分類';
+                    if (list.id !== 'menuUploadList') {
+                        // 如果不是最新工作區，代表它是被封存的歷史分頁。
+                        // 我們拿它的 id 去對應的頁籤按鈕（Tab）身上抓文字！
+                        const correspondingTab = document.querySelector(`.category-tab-btn[data-target="${list.id}"]`);
+                        if (correspondingTab) {
+                            categoryName = correspondingTab.textContent.trim();
+                        }
+                    } else {
+                        // 如果它的 id 還叫 menuUploadList，代表是最新空白工作區
+                        categoryName = '最新工作區';
+                        // 💡 註：如果你不希望使用者存到空的工作區，可以在後面判斷如果 items 是空的就不打包。
+                    }
+                    const menuItems = [];
+                    menuRows.forEach((row) => {
+                        const toggle = row.querySelector('.menu-soldout-toggle');
+                        const supply = toggle ? toggle.checked : true; // 預設為 true (有貨)
+                        const nameVal = row.querySelector('.item-name-input').value.trim();
+                        if (!nameVal) return;
+                        let itemObj = {
+                            name: nameVal,
+                            supply: supply,
+                            image: row.querySelector('.preview-img').src,
+                            priceType: 'single', // 強制設定為單一價格
+                            price: parseInt(row.querySelector('.price-input').value) || 0 // 直接抓取單一價格欄位
+                        };
+                        menuItems.push(itemObj);
+                    });
+                    // 5. 如果這個分類裡面真的有打包到有效商品，才塞進大禮包
+                    if (menuItems.length > 0) {
+                        categorizedMenu.push({
+                            category: categoryName,
+                            items: menuItems
+                        });
+                    }
                 });
                 const lat = document.getElementById('shopLat')?.value.trim();
                 const lng = document.getElementById('shopLng')?.value.trim();
@@ -1623,7 +1796,7 @@
                     }
                     // 1. 處理菜單資料
                     const targetStoreId = (mode === 'edit') ? storeId : user.uid;
-                    await refreshMenu(targetStoreId, menuItems);
+                    await refreshMenu(targetStoreId, categorizedMenu);
                     console.log("店家與菜單已成功儲存至子集合！");
                     // 2. 處理角色身分（只在非 admin 時更新）
                     const userRef = doc(db, "users", user.uid);

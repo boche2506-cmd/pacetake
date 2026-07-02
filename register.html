@@ -411,7 +411,7 @@
             box-shadow: var(--shadow-sm);
             height: 7cqw;
             /* 讓它在 location-bar 裡自然撐高 */
-            max-width: 30cqw;
+            max-width: 28cqw;
             /* 給予固定的 cqw 寬度 */
             display: flex;
             flex-direction: row;
@@ -511,11 +511,25 @@
         }
 
         .item-price {
+            max-width: 100%;
+            height: 8cqw;
             display: flex;
             flex-direction: row;
             justify-content: flex-start;
             align-items: center;
-            position: relative;
+        }
+
+        .item-name {
+            max-width: 100%;
+            height: 8cqw;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .item-price input {
+            padding-left: 5cqw;
         }
 
         .price-symbol {
@@ -800,15 +814,17 @@
                     </span>
                 </div>
             </div>
-
             <div class="form-section">
                 <div class="section-title">菜單商品上架(會裁切成1:1圖片)</div>
                 <div class="category-header">
-                    <div class="add-category"><input type="text" class="input-style" placeholder="分類名稱(必填)" required>
+                    <div class="tabs-wrapper" id="tabsWrapper"></div>
+                    <div class="add-category">
+                        <input type="text" class="input-style" placeholder="分類名稱(必填)" required
+                            data-action="switchtoblank">
                     </div>
                     <button class="add-category-btn" data-action="addcategorybtn">+ 新增分類</button>
                 </div>
-                <div class="menu-upload-list" id="menuUploadList">
+                <div class="menu-upload-list active" id="menuUploadList">
                     <div class="menu-item-row">
                         <div class="menu-item">
                             <div class="img-upload-box" id="uploadBox">📷<span>上傳照片</span>
@@ -833,7 +849,7 @@
                                     <span class="off-text">暫停</span>
                                 </span></label>
                             <div class="remark-btn">
-                                <button type="button" class="del-row-btn"
+                                <button type="button" class="del-row-btn" data-action="delRowBtn"
                                     style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
                                 <div class="drag-handle"
                                     style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
@@ -928,8 +944,13 @@
         let currentUserId = null;
         let activeDragItem = null;
         const submitBtn = document.getElementById('submitBtn');
-        const menuUploadList = document.getElementById('menuUploadList');
         const newebpayContainer = document.getElementById('newebpayContainer');
+        const toggleCash = document.getElementById('toggleCash');
+        const cashWarningModal = document.getElementById('cashWarningModal');
+        const warningConfirmBtn = document.getElementById('warningConfirmBtn');
+        const warningCancelBtn = document.getElementById('warningCancelBtn');
+        const toggleOnline = document.getElementById('toggleOnline');
+        let categoryCounter = 0;
         // 確保只有在 register.html 才執行這段檢查
         async function initRegisterPage() {
             /*if (!window.location.pathname.includes('register.html')) return;*/
@@ -942,7 +963,23 @@
             // 1. 從網址取得 storeId (例如: register.html?storeId=123)
             const urlParams = new URLSearchParams(window.location.search);
             const storeId = urlParams.get('storeId');
-            console.log("[PACE] Initializing Register Page Logic...");
+            console.log("[PACE] Initializing Register Page Logic...");// . 現金警告邏輯 (事件委派)
+            if (newebpayContainer) {
+                // 1. 渲染 HTML 內容
+                newebpayContainer.innerHTML = `
+                <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
+                <div style="display:flex; flex-direction:column; gap:0.5cqw;">
+                    <input type="text" id="merchantIdInput" class="input-style" style="height:8cqw;" placeholder="請輸入 商店代號 (MerchantID)">
+                    <input type="text" id="hashKeyInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashKey">
+                    <input type="text" id="hashIvInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashIV">
+                </div>`;
+                // 2. 綁定開關監聽器（因為在 if 裡面，這裡不需要再重複檢查 newebpayContainer 了）
+                toggleOnline?.addEventListener('change', (e) => {
+                    newebpayContainer.style.display = e.target.checked ? 'block' : 'none';
+                });
+                // 3. 【防呆同步】一進畫面時，自動根據開關目前的狀態決定要顯示還是隱藏
+                newebpayContainer.style.display = toggleOnline?.checked ? 'block' : 'none';
+            }
             if (storeId) {
                 console.log("偵測到 storeId，進入編輯模式:", storeId);
                 try {
@@ -1002,9 +1039,27 @@
                 submitBtn.innerText = "建立店鋪";
             }
         }
+        function renderMenuToUI(menuItems) {
+            // 🎯 關鍵修正：開直升機找人！直接抓目前身上有「active」貼紙的那個分頁大盒子！
+            const currentWorkingList = document.querySelector('.menu-upload-list.active');
+            // 防呆機制：萬一剛好沒人在畫面上，就不做事以免噴錯
+            if (!currentWorkingList) {
+                console.error("糟了老闆！renderMenuToUI 找不到目前活著的 active 分頁！");
+                return;
+            }
+            // 🎯 精準打擊：只清空「目前看得到、活著的這一頁」的內容
+            currentWorkingList.innerHTML = '';
+            // 自動把商品一列一列生出來
+            menuItems.forEach(item => {
+                createNewItemRow(item); // 呼叫你改好的無腦版函式，它自己會認 active 塞進去
+            });
+        }
         // 讓區域選單根據縣市「長出」選項
         // 確保 register.html 裡面有載入 areaData 的變數（如果沒有，要補上這行）
-        // const areaData = { "基隆市": ["仁愛區", "信義區", ...], ... }; 
+        // const areaData = { "基隆市": ["仁愛區", "信義區", ...], ... };
+        document.getElementById('citySelect').addEventListener('change', (e) => {
+            updateDistrictOptions(e.target.value);
+        });
         function updateDistrictOptions(city, districtValue) {
             const districtSelect = document.getElementById('districtSelect');
             if (!districtSelect) return;
@@ -1056,7 +1111,6 @@
             const newebpayContainer = document.getElementById('newebpayContainer');
             if (newebpayContainer && data.isOnlinePayEnabled) {
                 newebpayContainer.style.display = 'block';
-
             }
         }
         // 每次被呼叫時，都抓取當下最新的一手資料
@@ -1108,11 +1162,25 @@
             }
             return data;
         }
+        // 菜單文件
+        async function refreshMenu(storeId, menuItems) {
+            const menuCollectionRef = collection(db, "stores", storeId, "menu");
+            // 1. 取得該店目前的舊菜單文件
+            const querySnapshot = await getDocs(menuCollectionRef);
+            // 2. 建立刪除任務 (同時執行，速度很快)
+            const deletePromises = querySnapshot.docs.map(docSnapshot => deleteDoc(docSnapshot.ref));
+            await Promise.all(deletePromises);
+            console.log("舊菜單已清空");
+            // 3. 建立寫入任務 (將最新的 menuItems 寫入)
+            const addPromises = menuItems.map(item => addDoc(menuCollectionRef, item));
+            await Promise.all(addPromises);
+            console.log("新菜單已同步");
+        }
         function createNewItemRow(itemData = {}) {
+            const currentWorkingList = document.querySelector('.menu-upload-list.active');
             const newRow = document.createElement('div');
             newRow.className = 'menu-item-row';
-            newRow.innerHTML = `
-                        <div class="menu-item">
+            newRow.innerHTML = `<div class="menu-item">
                             <div class="img-upload-box" id="uploadBox">📷<span>上傳照片</span>
                                 <input type="file" id="imageInput" class="image-input" accept="image/*"
                                     style="display: none;">
@@ -1135,28 +1203,37 @@
                                     <span class="off-text">暫停</span>
                                 </span></label>
                             <div class="remark-btn">
-                                <button type="button" class="del-row-btn"
+                                <button type="button" class="del-row-btn" data-action="delRowBtn"
                                     style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
                                 <div class="drag-handle"
                                     style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
                                     ☰</div>
                             </div>
                         </div>`;
-            menuUploadList.appendChild(newRow);
+            if (currentWorkingList) {
+                currentWorkingList.appendChild(newRow); // ⭕ 乖乖塞進當前這一頁
+            } else {
+                console.error("糟了老闆！塞入商品列時，找不到任何活著的 .active 分頁！");
+            }
+            // 🎯 3. 賦予這行新商品靈魂（啟動拖曳功能）
             makeItemDraggable(newRow);
             // --- 👇 新增：判斷如果是「編輯回填」，就把資料塞入剛剛建立的 DOM 裡面 ---
             if (itemData && Object.keys(itemData).length > 0) {
-                // 1. 填入品名
-                newRow.querySelector('.item-name-input').value = itemData.name || '';
+                // 1. 填入品名（利用父層 .item-name 進去抓裡面的 input）
+                const nameInput = newRow.querySelector('.item-name input');
+                if (nameInput) nameInput.value = itemData.name || '';
                 // 2. 處理商品圖片
                 if (itemData.image) {
                     const img = newRow.querySelector('.preview-img');
-                    img.src = itemData.image;
-                    img.style.display = 'block';
+                    if (img) {
+                        img.src = itemData.image;
+                        img.style.display = 'grid';
+                    }
                 }
-                newRow.querySelector('.price-input').value = itemData.price || '';
-                // 4. 處理上下架狀態 (對應您 submit 打包的 itemObj.supply)
-                // 注意：您的預設是 true (販售中)
+                // 3. 填入金額（利用父層 .item-price 進去抓裡面的 input）
+                const priceInput = newRow.querySelector('.item-price input');
+                if (priceInput) priceInput.value = itemData.price || '';
+                // 4. 處理上下架狀態
                 if (itemData.supply === false) {
                     const toggle = newRow.querySelector('.menu-soldout-toggle');
                     if (toggle) toggle.checked = false;
@@ -1164,12 +1241,6 @@
                 }
             }
             return newRow; // 回傳這行元素，方便後面操作
-        }
-        function renderMenuToUI(menuItems) {
-            menuUploadList.innerHTML = ''; // 清空目前所有商品列
-            menuItems.forEach(item => {
-                createNewItemRow(item); // 直接呼叫剛剛寫好的函式，自動填入資料
-            });
         }
         // 監聽詳細地址輸入框，當離開欄位時自動查詢
         function setupAddressGeocoder() {
@@ -1239,10 +1310,8 @@
                 reader.readAsDataURL(file);
             }
         });
-        document.getElementById('citySelect').addEventListener('change', (e) => {
-            updateDistrictOptions(e.target.value);
-        });
         // 拖曳菜單專屬函式區 新增菜單(賣家)
+        document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
         function makeItemDraggable(row) {
             const handle = row.querySelector('.drag-handle');
             if (!handle) return;
@@ -1266,19 +1335,22 @@
             }
         }
         function onDragMove(e) {
-            if (!activeDragItem || !menuUploadList) return;
+            if (!activeDragItem) return;
             if (e.cancelable) e.preventDefault();
+            // 🎯 2. 精準導航：直接抓出「當前被拖曳的品項，究竟正踩在哪個分頁容器裡」
+            const currentList = activeDragItem.closest('.menu-upload-list');
+            if (!currentList) return; // 安全防呆
             const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
             requestAnimationFrame(() => {
-                const siblings = [...menuUploadList.querySelectorAll('.menu-item-row')].filter(el => el !== activeDragItem);
+                const siblings = [...currentList.querySelectorAll('.menu-item-row')].filter(el => el !== activeDragItem);
                 const nextSibling = siblings.find(sibling => {
                     const box = sibling.getBoundingClientRect();
                     return clientY <= box.top + box.height / 2;
                 });
                 if (nextSibling && activeDragItem !== nextSibling) {
-                    menuUploadList.insertBefore(activeDragItem, nextSibling);
-                } else if (!nextSibling && activeDragItem !== menuUploadList.lastElementChild) {
-                    menuUploadList.appendChild(activeDragItem);
+                    currentList.insertBefore(activeDragItem, nextSibling);
+                } else if (!nextSibling && activeDragItem !== currentList.lastElementChild) {
+                    currentList.appendChild(activeDragItem);
                 }
             });
         }
@@ -1294,85 +1366,168 @@
             window.removeEventListener('touchmove', onDragMove);
             window.removeEventListener('touchend', onDragEnd);
         }
-        function setupMenuManager() {
-            // 如果頁面沒有菜單容器，就直接跳出，不執行任何邏輯
-            if (!menuUploadList) return;
-            // --- 1. 拖曳功能模組 ---
-            // --- 2. 初始化已存在的項目 ---
-            document.querySelectorAll('.menu-item-row').forEach(row => makeItemDraggable(row));
-            // --- 3. 統一的事件委派 (點擊與變更) ---
-            // 我們只綁定在 menuUploadList 上，這樣新增的項目也會自動擁有這些功能
-            menuUploadList.addEventListener('click', (e) => {
-                const target = e.target;
-                const row = target.closest('.menu-item-row');
-                if (!row) return;
-                // 刪除按鈕邏輯
-                if (target.classList.contains('del-row-btn')) {
-                    if (menuUploadList.querySelectorAll('.menu-item-row').length <= 1) {
-                        alert("報告老闆，店裡至少要留一項商品才能開張喔！");
-                        return;
-                    }
-                    row.remove();
-                }
-            });
-            menuUploadList.addEventListener('change', (e) => {
-                if (e.target.classList.contains('menu-soldout-toggle')) {
-                    const row = e.target.closest('.menu-item-row');
-                    if (row) row.classList.toggle('sold-out', !e.target.checked);
-                }
-            });
-            // --- 4. 新增行按鈕邏輯 ---
-            document.addEventListener('click', async (e) => {
-                const target = e.target.closest('[data-action]');
-                if (!target) return;
-                const action = target.getAttribute('data-action');
-                if (action === 'addItemRowBtn') {
-                    createNewItemRow();
-                }
-                if (action === 'addcategorybtn') {
-
-                }
-            });
-        }
-        // 菜單文件
-        async function refreshMenu(storeId, menuItems) {
-            const menuCollectionRef = collection(db, "stores", storeId, "menu");
-            // 1. 取得該店目前的舊菜單文件
-            const querySnapshot = await getDocs(menuCollectionRef);
-            // 2. 建立刪除任務 (同時執行，速度很快)
-            const deletePromises = querySnapshot.docs.map(docSnapshot => deleteDoc(docSnapshot.ref));
-            await Promise.all(deletePromises);
-            console.log("舊菜單已清空");
-            // 3. 建立寫入任務 (將最新的 menuItems 寫入)
-            const addPromises = menuItems.map(item => addDoc(menuCollectionRef, item));
-            await Promise.all(addPromises);
-            console.log("新菜單已同步");
-        }
-        // . 現金警告邏輯 (事件委派)
-        const toggleCash = document.getElementById('toggleCash');
-        const cashWarningModal = document.getElementById('cashWarningModal');
-        const warningConfirmBtn = document.getElementById('warningConfirmBtn');
-        const warningCancelBtn = document.getElementById('warningCancelBtn');
-        const toggleOnline = document.getElementById('toggleOnline');
-        toggleOnline?.addEventListener('change', function () {
-            if (newebpayContainer) newebpayContainer.style.display = this.checked ? 'block' : 'none';
+        // --- 1. 拖曳功能模組 ---
+        // --- 2. 初始化已存在的項目 ---
+        // --- 3. 統一的事件委派 (點擊與變更) ---
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('menu-soldout-toggle')) {
+                const row = e.target.closest('.menu-item-row');
+                if (row) row.classList.toggle('sold-out', !e.target.checked);
+            }
         });
-        if (newebpayContainer) {
-            newebpayContainer.innerHTML = `
-                    <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
-                    <div style="display:flex; flex-direction:column; gap:0.5cqw;">
-                        <input type="text" id="merchantIdInput" class="input-style" style="height:8cqw;" placeholder="請輸入 商店代號 (MerchantID)">
-                        <input type="text" id="hashKeyInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashKey">
-                        <input type="text" id="hashIvInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashIV">
-                    </div>
-                    `;
-        }
-        // Listener'click'
+        // --- 4. 新增行按鈕邏輯 ---
         document.addEventListener('click', async (e) => {
             const target = e.target.closest('[data-action]');
             if (!target) return;
             const action = target.getAttribute('data-action');
-            if (action === 'toggleCash') {
+            if (action === 'addItemRowBtn') {
+                const currentWorkingList = document.querySelector('.menu-upload-list.active');
+                if (!currentWorkingList) {
+                    console.error("糟了老闆！找不到目前活著的 active 分頁容器！");
+                    return;
+                }
+                createNewItemRow();
+            }
+            else if (action === 'delRowBtn') {
+                // 🎯 精準抓到被點擊的「那一行品項」
+                const row = target.closest('.menu-item-row');
+                // 🎯 【關鍵防線】抓到這行品項「目前隸屬的分頁容器」（不管是哪一頁、有沒有外殼都抓得準）
+                const currentList = target.closest('.menu-upload-list');
+                // 🎯 安全機制：只計算「當前點擊的這一頁」裡面有幾道菜，完全不會被其他分頁干擾
+                if (currentList && currentList.querySelectorAll('.menu-item-row').length <= 1) {
+                    alert("報告老闆，店裡至少要留一項商品才能開張喔！");
+                    return;
+                }
+                // 驗證無誤，正式從網頁上功成身退
+                if (row) row.remove();
+            }
+            else if (action === 'switchtoblank') {
+                const blankWorkingList = document.getElementById('menuUploadList');
+                // 🎯 超聰明防呆判斷（升級貼紙版）：
+                // 如果最新工作區身上本來就貼著 active，代表他本來就在這頁填資料！
+                // 那就直接結束，絕對不去動它，保護使用者輸入的資料。
+                if (blankWorkingList && blankWorkingList.classList.contains('active')) {
+                    return;
+                }
+                // --- 只有當他是在「歷史分類頁」點擊輸入框時，才會執行下面的切換 ---
+                document.querySelectorAll('.menu-upload-list').forEach(list => {
+                    list.style.display = 'none';
+                    list.classList.remove('active'); // 🎯 關鍵修正：把所有大盒子的 active 貼紙通通撕掉！
+                });
+                if (blankWorkingList) {
+                    blankWorkingList.style.display = 'grid';
+                    blankWorkingList.classList.add('active'); // 🎯 關鍵修正：把 active 貼紙精準貼回最新工作區！
+                }
+                // 清空所有分類標籤的亮燈（因為現在回到了尚未歸類的最新工作區）
+                document.querySelectorAll('.category-tab-btn').forEach(btn => btn.classList.remove('active'));
+            }
+            // =======================================================
+            // ➕ 動作二：點擊 「+ 新增分類」
+            // =======================================================
+            else if (action === 'addcategorybtn') {
+                const header = document.querySelector('.category-header');
+                const input = header.querySelector('.add-category input');
+                const categoryName = input.value.trim();
+                // 防呆：沒填文字不給過
+                if (!categoryName) {
+                    alert('請先輸入分類名稱(必填)！');
+                    return;
+                }
+                categoryCounter++;
+                const uniqueStoredId = `category-list-${categoryCounter}`;
+                // 1. 抓取當前正在編輯的 menuUploadList
+                const currentWorkingList = document.getElementById('menuUploadList');
+                if (currentWorkingList) {
+                    // 變更 ID 為獨立標記（封存起來），並將它隱藏
+                    currentWorkingList.id = uniqueStoredId;
+                    currentWorkingList.style.display = 'none';
+                    currentWorkingList.classList.remove('active');
+                }
+                // 2. 憑空生成新分頁按鈕，塞進原本全空的 tabsWrapper 盒子裡
+                const tabsWrapper = document.getElementById('tabsWrapper');
+                const newTabBtn = document.createElement('button');
+                newTabBtn.type = 'button';
+                newTabBtn.className = 'category-tab-btn active'; // 新生成的分類直接高亮
+                newTabBtn.textContent = categoryName;
+                newTabBtn.setAttribute('data-action', 'switchcategory');
+                newTabBtn.setAttribute('data-target', uniqueStoredId);
+                tabsWrapper.appendChild(newTabBtn);
+                // 先把其他按鈕的 active 拔掉，確保只有剛生成的這顆在亮
+                document.querySelectorAll('.category-tab-btn').forEach(btn => {
+                    if (btn !== newTabBtn) btn.classList.remove('active');
+                });
+                // 3. 在 category-header 正下方插進全新空白容器，並接管 id="menuUploadList"
+                const newListContainer = document.createElement('div');
+                newListContainer.className = 'menu-upload-list active';
+                newListContainer.id = 'menuUploadList'; // 接手成為最新的活動工作區
+                // 完美還原你指定的初始品項列 HTML 結構
+                newListContainer.innerHTML = `
+                    <div class="menu-item-row">
+                        <div class="menu-item">
+                            <div class="img-upload-box" id="uploadBox">📷<span>上傳照片</span>
+                                <input type="file" id="imageInput" class="image-input" accept="image/*"
+                                    style="display: none;">
+                                <img class="preview-img" src=""
+                                    style="display: none; position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw;">
+                            </div>
+                            <div class="item-fields">
+                                <div class="item-name"><input type="text" class="input-style" placeholder="品項名稱(必填)"
+                                        required></div>
+                                <div class="item-price"><span class="price-symbol">$</span>
+                                    <input type="number" class="input-style" placeholder="   金額(必填)" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="remark">
+                            <label class="menu-soldout-switch"><input type="checkbox" class="menu-soldout-toggle"
+                                    checked>
+                                <span class="toggle-slider">
+                                    <span class="on-text">販售中</span>
+                                    <span class="off-text">暫停</span>
+                                </span></label>
+                            <div class="remark-btn">
+                                <button type="button" class="del-row-btn" data-action="delRowBtn"
+                                    style="width: 8cqw; height: 8cqw; display: flex; align-items: center; justify-content: center; font-size: 3cqw;">❌</button>
+                                <div class="drag-handle"
+                                    style="width: 8cqw; height: 8cqw; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 3cqw; cursor: grab;">
+                                    ☰</div>
+                            </div>
+                        </div>
+                    </div>`;
+                // 插件在 Header 的外側正下方
+                header.insertAdjacentElement('afterend', newListContainer);
+                // 4. 收尾：清空輸入框。此時畫面上顯示的是剛建好的分類，新空白頁面在後台待命
+                input.value = '';
+            }
+            // =======================================================
+            // 🔀 動作三：點擊歷史分頁標籤按鈕
+            // =======================================================
+            else if (action === 'switchcategory') {
+                const targetContainerId = target.getAttribute('data-target');
+
+                // 1. 隱藏所有內容容器，並「全面拔掉 active 貼紙」
+                document.querySelectorAll('.menu-upload-list').forEach(list => {
+                    list.style.display = 'none';
+                    list.classList.remove('active'); // 🎯 補上這行：舊的大盒子主角退場，交出貼紙
+                });
+
+                // 2. 顯示點擊按鈕所對應的封存歷史容器，並「貼上 active 貼紙」
+                const targetList = document.getElementById(targetContainerId);
+                if (targetList) {
+                    targetList.style.display = 'grid';   // 保持你原本漂亮的 grid 佈局
+                    targetList.classList.add('active'); // 🎯 補上這行：告訴 JS「現在這一頁才是老大」！
+                }
+
+                // 3. 更新按鈕的高亮樣式（這段你原本寫得非常漂亮，保留！）
+                document.querySelectorAll('.category-tab-btn').forEach(btn => {
+                    if (btn === target) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+            else if (action === 'toggleCash') {
                 toggleCash.checked = false;
                 if (action === 'toggleCash') {
                     toggleCash.checked = false;
@@ -1380,7 +1535,7 @@
                     if (cashWarningModal) cashWarningModal.style.display = 'flex';
                 }
             }
-            if (e.target.id === 'warningConfirmBtn') {
+            else if (e.target.id === 'warningConfirmBtn') {
                 if (toggleCash) toggleCash.checked = true;
                 if (cashWarningModal) cashWarningModal.style.display = 'none';
             } else if (e.target.id === 'warningCancelBtn') {
@@ -1388,7 +1543,7 @@
                 if (cashWarningModal) cashWarningModal.style.display = 'none';
             }
             // shopSubmitBtn 監聽與手動提交邏輯
-            if (action === 'shopSubmitBtn') {
+            else if (action === 'shopSubmitBtn') {
                 // 取得按鈕上的標籤來判斷要做什麼
                 const btn = document.getElementById('submitBtn');
                 const mode = btn.dataset.mode || 'create'; // 加上預設值，確保即使沒設也能跑新增
@@ -1495,7 +1650,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             initRegisterPage();
             setupAddressGeocoder();
-            setupMenuManager();
             console.log("系統初始化完成");
         });
     </script>

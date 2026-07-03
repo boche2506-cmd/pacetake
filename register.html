@@ -1112,7 +1112,7 @@
                 // 🎯 這裡也一樣塞入 ❌
                 newTabBtn.innerHTML = `
                         <span>${catObj.category}</span>
-                        <span class="tab-del-x" data-action="deletecategory" style="margin-left: 8px; cursor: pointer; color: #ff4d4d;">❌</span>
+                        <span class="tab-del-x" data-action="deletecategory" style="margin-left: 8px; cursor: pointer; color: #ff4d4d;"></span>
                     `;
                 tabsWrapper.appendChild(newTabBtn);
                 // 👶 建立對應的商品容器大盒子
@@ -1704,24 +1704,34 @@
                 // 1. 【核心改變】改成先抓取所有的「分頁大盒子」
                 const allLists = document.querySelectorAll('.menu-upload-list');
                 const categorizedMenu = []; // 準備裝全部分類的大禮包
+
                 allLists.forEach((list) => {
                     // 2. 針對「這一個大盒子」，抓取它裡面的所有商品列
                     const menuRows = list.querySelectorAll('.menu-item-row');
                     if (menuRows.length === 0) return; // 如果這一頁完全沒有商品列，直接跳過
-                    // 3. 【關鍵解鎖】找出這一個大盒子對應的「分類名稱」是什麼？
+
+                    // 3. 找出這一個大盒子對應的「分類名稱」是什麼？
                     let categoryName = '未分類';
+
                     if (list.id !== 'menuUploadList') {
-                        // 如果不是最新工作區，代表它是被封存的歷史分頁。
-                        // 我們拿它的 id 去對應的頁籤按鈕（Tab）身上抓文字！
+                        // 【情況 A】如果是被封存的歷史分頁
                         const correspondingTab = document.querySelector(`.category-tab-btn[data-target="${list.id}"]`);
                         if (correspondingTab) {
-                            categoryName = correspondingTab.textContent.trim();
+                            // 🎯 貼心修正：因為按鈕內包含 ❌，我們只抓包著品名的 <span>，才不會把 ❌ 存進資料庫
+                            const textSpan = correspondingTab.querySelector('span');
+                            categoryName = textSpan ? textSpan.textContent.trim() : correspondingTab.textContent.trim();
                         }
                     } else {
-                        // 如果它的 id 還叫 menuUploadList，代表是最新空白工作區
-                        categoryName = '最新工作區';
-                        // 💡 註：如果你不希望使用者存到空的工作區，可以在後面判斷如果 items 是空的就不打包。
+                        // 【情況 B】如果它的 id 還叫 menuUploadList，代表是最新、還停在 input 階段的工作區
+                        // 🎯【核心修改】：直接去抓輸入框裡當前打的字！
+                        const header = document.querySelector('.category-header');
+                        const input = header ? header.querySelector('.add-category input') : null;
+                        const typedCategoryName = input ? input.value.trim() : '';
+
+                        // 💡 防呆判斷：如果輸入框有打字就用打的字；如果完全沒打字，才用預設的 '最新工作區'
+                        categoryName = typedCategoryName || '最新工作區';
                     }
+
                     const menuItems = [];
                     menuRows.forEach((row) => {
                         const toggle = row.querySelector('.menu-soldout-toggle');
@@ -1736,6 +1746,7 @@
                         };
                         menuItems.push(itemObj);
                     });
+
                     // 5. 如果這個分類裡面真的有打包到有效商品，才塞進大禮包
                     if (menuItems.length > 0) {
                         categorizedMenu.push({

@@ -825,39 +825,41 @@ async function initStorePage() {
         const categoryHeader = document.querySelector('.category-header');
         const menuQuery = collection(db, "stores", currentStoreId, "menu");
         const menuSnapshot = await getDocs(menuQuery);
-        // 🎯【修改點 2】：清空舊的內容（改清空 categoryHeader）
+
+        // 🎯【修改點 2】：清空舊的內容
         if (categoryHeader) categoryHeader.innerHTML = "";
         menuContainer.innerHTML = "";
+
         // 2. 第一層迴圈：拆開 Firebase 的分類文件
         menuSnapshot.docs.forEach((doc, catIndex) => {
             const catData = doc.data();
             const categoryName = catData.category || "未命名分類";
             const items = catData.items || [];
+
             // 🎯 密碼對齊一：使用跟你後台完全一樣的 ID 命名格式
             const uniqueStoredId = `category-list-${doc.id}`;
+
             // 🎯 密碼對齊二：生成分類按鈕，Class、Action、Target 完全複製你後台
             const newTabBtn = document.createElement('button');
             newTabBtn.type = 'button';
             newTabBtn.className = catIndex === 0 ? 'category-tab-btn active' : 'category-tab-btn';
             newTabBtn.setAttribute('data-action', 'switchcategory');
             newTabBtn.setAttribute('data-target', uniqueStoredId);
+
             // 純文字 span
             newTabBtn.innerHTML = `<span>${categoryName}</span>`;
-            // 🎯【修改點 3】：直接塞進 categoryHeader 盒子裡（因為沒別人，appendChild 就會乖乖排隊）
+
+            // 🎯【修改點 3】：直接塞進 categoryHeader 盒子裡
             if (categoryHeader) categoryHeader.appendChild(newTabBtn);
-            // 🎯 密碼對齊三：生成商品大盒子，Class 直接套用你的 'menu-upload-list'！
-            const newListContainer = document.createElement('div');
-            newListContainer.className = catIndex === 0 ? 'menu-upload-list active' : 'menu-upload-list';
-            newListContainer.id = uniqueStoredId; // 讓它接管這個 ID 抽屜
-            // 初始控制顯示/隱藏
-            if (catIndex === 0) {
-                newListContainer.style.display = 'grid'; // 亮起來的抽屜
-            } else {
-                newListContainer.style.display = 'none';  // 藏起來的抽屜
-            }
+
+            // ──────────────────────────────────────────────────────────────
+            // 🗑️ 【已刪除原本多餘的 newListContainer 盒子，不再製造 category-list 結構】
+            // ──────────────────────────────────────────────────────────────
+
             // 過濾出有供應的商品
             const availableItems = items.filter(item => item.supply !== false);
-            // 3. 第二層迴圈：把這個分類的菜，通通丟進這個 newListContainer 抽屜裡
+
+            // 3. 第二層迴圈：把這個分類的菜，直接丟進大容器裡
             availableItems.forEach((item, index) => {
                 const itemUniqueId = item.id || `${doc.id}_item_${index}`;
                 const itemId = `${currentStoreId}|||${itemUniqueId}`;
@@ -865,59 +867,65 @@ async function initStorePage() {
                 const savedItem = cartData.find(c => c.id === itemId);
                 const qty = savedItem ? savedItem.qty : 0;
                 const basePrice = parseInt(item.price) || 0;
+
                 const priceHTML = `
-                            <div class="one-size-row">
-                                <span class="food-price" style="font-weight:bold;">$${basePrice}</span>
-                                <div class="quantity-control-panel">
-                                    <button class="minus-btn" data-id="${itemId}">-</button>
-                                    <span class="qty-number" id="qty_${itemId}">${qty}</span>
-                                    <button class="plus-btn" data-id="${itemId}">+</button>
-                                </div>
-                            </div>`;
+            <div class="one-size-row">
+                <span class="food-price" style="font-weight:bold;">$${basePrice}</span>
+                <div class="quantity-control-panel">
+                    <button class="minus-btn" data-id="${itemId}">-</button>
+                    <span class="qty-number" id="qty_${itemId}">${qty}</span>
+                    <button class="plus-btn" data-id="${itemId}">+</button>
+                </div>
+            </div>`;
+
                 const foodCard = document.createElement('div');
                 foodCard.className = 'food-card';
                 foodCard.dataset.id = itemId;
                 foodCard.dataset.price = basePrice;
+
+                // 🎯【核心修正】：把分類標籤貼在卡片自己身上
+                foodCard.dataset.category = uniqueStoredId;
+
+                // 🎯【核心修正】：如果不是第一個分類，預設先隱藏起來
+                if (catIndex !== 0) {
+                    foodCard.style.display = 'none';
+                }
+
                 foodCard.innerHTML = `
-                            <div class="food-img-info">
-                                <div class="food-img">
-                                    ${item.image ? `<img src="${item.image}" style="width:100%; height:100%; border-radius:inherit; object-fit: cover; position: absolute;">` : '🍱'}
-                                </div>
-                                <div class="food-info">
-                                    <div class="food-name-note-display">
-                                        <div class="food-name">${item.name || '未命名'}</div>
-                                        <div class="card-note-display">${merchantNote}</div>
-                                    </div>
-                                    ${priceHTML}
-                                </div>
-                            </div>`;
-                // 塞進當前分類的抽屜
-                newListContainer.appendChild(foodCard);
+            <div class="food-img-info">
+                <div class="food-img">
+                    ${item.image ? `<img src="${item.image}" style="width:100%; height:100%; border-radius:inherit; object-fit: cover; position: absolute;">` : '🍱'}
+                </div>
+                <div class="food-info">
+                    <div class="food-name-note-display">
+                        <div class="food-name">${item.name || '未命名'}</div>
+                        <div class="card-note-display">${merchantNote}</div>
+                    </div>
+                    ${priceHTML}
+                </div>
+            </div>`;
+
+                // 🎯【核心修正】：直接塞進大衣櫃 menuContainer，不再透過中間人！
+                menuContainer.appendChild(foodCard);
             });
-            // 最後，把整個抽屜放進衣櫃（menuContainer）
-            menuContainer.appendChild(newListContainer);
         });
-        // 🎯【修改點 4】：前台分類分頁切換監聽器（事件委派改給 categoryHeader）
+
+        // 🎯【修改點 4】：前台分類分頁切換監聽器（全面改為控制卡片顯示/隱藏）
         if (categoryHeader) {
             categoryHeader.addEventListener('click', (e) => {
-                // 確保點到內層 <span> 的字，也能順利向上升級抓到按鈕本人
                 const targetBtn = e.target.closest('[data-action="switchcategory"]');
-                if (!targetBtn) return; // 如果點到空白處就直接收工
+                if (!targetBtn) return;
 
                 const targetContainerId = targetBtn.getAttribute('data-target');
 
-                // 1. 隱藏所有內容容器，並「全面拔掉 active 貼紙」
-                document.querySelectorAll('.menu-upload-list').forEach(list => {
-                    list.style.display = 'none';
-                    list.classList.remove('active');
+                // 🎯【核心修正】：不找大盒子了，直接遍歷所有商品卡片進行篩選！
+                document.querySelectorAll('.food-card').forEach(card => {
+                    if (card.dataset.category === targetContainerId) {
+                        card.style.display = ''; // 移除隱藏，恢復原本遵守 menuContainer 的 Grid 佈局
+                    } else {
+                        card.style.display = 'none'; // 不是這一類的通通隱藏
+                    }
                 });
-
-                // 2. 顯示點擊按鈕所對應的容器，並「貼上 active 貼紙」
-                const targetList = document.getElementById(targetContainerId);
-                if (targetList) {
-                    targetList.style.display = 'grid';   // 保持你原本漂亮的 grid 佈局
-                    targetList.classList.add('active');
-                }
 
                 // 3. 更新按鈕的高亮樣式
                 document.querySelectorAll('.category-tab-btn').forEach(btn => {
@@ -929,7 +937,8 @@ async function initStorePage() {
                 });
             });
         }
-        // --- 事件綁定（全面瘦身版，維持原樣） ---
+
+        // --- 事件綁定（隨後點擊加減按鈕，維持原樣） ---
         menuContainer.addEventListener('click', (e) => {
             if (!e.target.matches('.plus-btn, .minus-btn')) return;
             const clickedBtn = e.target;
@@ -952,6 +961,7 @@ async function initStorePage() {
                 card
             );
         });
+
         // --- 在 initStorePage 最底部的購物車回填（維持原樣不變） ---
         setTimeout(() => {
             const currentStoreId = document.body.getAttribute('data-store-id');

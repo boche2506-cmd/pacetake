@@ -1883,17 +1883,19 @@
                     return;
                 }
                 // 先檢查該用戶是否已經是賣家，防止重複開鋪
-                try {
-                    const userDocRef = doc(db, "users", user.uid);
-                    const userDoc = await getDoc(userDocRef);
-                    if (userDoc.exists() && userDoc.data().role === "seller") {
-                        alert("您已經擁有店舖了，將為您前往賣家後台。");
-                        window.location.href = "seller.html";
+                if (mode !== 'edit') {
+                    try {
+                        const userDocRef = doc(db, "users", user.uid);
+                        const userDoc = await getDoc(userDocRef);
+                        if (userDoc.exists() && userDoc.data().role === "seller") {
+                            alert("您已經擁有店舖了，將為您前往賣家後台。");
+                            window.location.href = "seller.html";
+                            return;
+                        }
+                    } catch (err) {
+                        console.error("權限檢查失敗:", err);
                         return;
                     }
-                } catch (err) {
-                    console.error("權限檢查失敗:", err);
-                    return;
                 }
                 // --- 2. 基本資訊與防呆 ---
                 if (!ShopFormData.name || !ShopFormData.phone || !ShopFormData.city || !ShopFormData.district || !ShopFormData.detailAddress) {

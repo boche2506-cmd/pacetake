@@ -19,9 +19,17 @@
             height: 100dvh;
             overflow: hidden;
             overflow-y: auto;
+            /* 隱藏 Firefox 的卷軸 */
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
+            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
         }
 
-
+        .phone-wrapper::-webkit-scrollbar {
+            /* Chrome, Safari 隱藏軸線 */
+            display: none;
+        }
 
         .input-group {
             display: flex;
@@ -115,15 +123,16 @@
         .select-row select {
             flex: 1;
             overflow-y: auto;
-
-            &::-webkit-scrollbar {
-                display: none;
-            }
-
             /* 隱藏 Firefox 的卷軸 */
             scrollbar-width: none;
             /* 確保內容依然可以滑動 */
             -ms-overflow-style: none;
+            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+        }
+
+        .select-row select::-webkit-scrollbar {
+            /* Chrome, Safari 隱藏軸線 */
+            display: none;
         }
 
         .coords-row {
@@ -153,10 +162,6 @@
         .query-btn:active {
             transform: scale(0.95);
             /* 按下去變小一點，模擬點擊感 */
-        }
-
-        .section {
-            overflow-y: auto;
         }
 
         .form-section {
@@ -383,20 +388,22 @@
             box-sizing: border-box;
             /* 防止輸入框爆開 */
             overflow-x: auto;
-            box-sizing: border-box;
+            /* 💡 卷軸開在這裡！讓超出範圍的按鈕可以滑動 */
+            white-space: nowrap;
+            /* 強制按鈕們絕對不能換行，一定要排成一條直線 */
             gap: 0.5cqw;
             line-height: 1.1;
+            /* 隱藏 Firefox 的卷軸 */
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
+            cursor: grab;
+            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
         }
 
-        .tabs-wrapper {
-            max-width: 100%;
-            height: 7cqw;
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: center;
-            box-sizing: border-box;
-            flex-shrink: 0;
+        .category-header::-webkit-scrollbar {
+            /* Chrome, Safari 隱藏軸線 */
+            display: none;
         }
 
         .category-tab-btn {
@@ -852,8 +859,7 @@
             </div>
             <div class="form-section">
                 <div class="section-title">菜單商品上架(會裁切成1:1圖片)</div>
-                <div class="category-header">
-                    <div class="tabs-wrapper" id="tabsWrapper"></div>
+                <div class="category-header" id="categoryHeader">
                     <div class="add-category">
                         <input type="text" class="input-style" placeholder="分類名稱(必填)" required
                             data-action="switchtoblank">
@@ -1545,20 +1551,20 @@
                     currentWorkingList.style.display = 'none';
                     currentWorkingList.classList.remove('active');
                 }
-                // 2. 憑空生成新分頁按鈕，塞進原本全空的 tabsWrapper 盒子裡
-                const tabsWrapper = document.getElementById('tabsWrapper');
+                // 2. 🧱 憑空生成新分頁按鈕
                 const newTabBtn = document.createElement('button');
                 newTabBtn.type = 'button';
                 newTabBtn.className = 'category-tab-btn active'; // 新生成的分類直接高亮
-                newTabBtn.textContent = categoryName;
                 newTabBtn.setAttribute('data-action', 'switchcategory');
                 newTabBtn.setAttribute('data-target', uniqueStoredId);
                 // 🎯 關鍵修改：用一個 span 包住字，並在旁邊塞一個帶有 data-action="deletecategory" 的 ❌
                 newTabBtn.innerHTML = `
-                            <span>${categoryName}</span>
-                            <span class="tab-del-x" data-action="deletecategory" style="margin-left: 8px; cursor: pointer; color: #ff4d4d;">❌</span>
+                    <span>${categoryName}</span>
+                    <span class="tab-del-x" data-action="deletecategory" style="margin-left: 8px; cursor: pointer; color: #ff4d4d;">❌</span>
                             `;
-                tabsWrapper.appendChild(newTabBtn);
+                // 🎯【核心改動】：不找 tabsWrapper 了！直接把按鈕塞進 header，且放在「輸入框」的前面
+                const addCategoryBox = header.querySelector('.add-category'); // 抓到輸入框的外層盒子
+                header.insertBefore(newTabBtn, addCategoryBox); // 意思：在 addCategoryBox 前面插入 newTabBtn
                 // 先把其他按鈕的 active 拔掉，確保只有剛生成的這顆在亮
                 document.querySelectorAll('.category-tab-btn').forEach(btn => {
                     if (btn !== newTabBtn) btn.classList.remove('active');

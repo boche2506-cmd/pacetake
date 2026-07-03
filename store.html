@@ -123,27 +123,96 @@
             /* 按下去變小一點，模擬點擊感 */
         }
 
+        .category-header {
+            width: 100%;
+            height: 8%;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            box-sizing: border-box;
+            /* 防止輸入框爆開 */
+            overflow-x: auto;
+            gap: 0.5cqw;
+            line-height: 1.1;
+            /* 隱藏 Firefox 的卷軸 */
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
+            cursor: grab;
+            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+        }
+
+        .category-header::-webkit-scrollbar {
+            /* Chrome, Safari 隱藏軸線 */
+            display: none;
+        }
+
+        .tabs-wrapper {
+            max-width: 100%;
+            height: 7cqw;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .category-tab-btn {
+            font-size: 4cqw;
+            /* 字體改用 cqw */
+            color: var(--brand-blue);
+            background-color: var(--card-bg);
+            border: 0.3cqw solid var(--border-color);
+            /* 邊框粗細 cqw */
+            border-radius: 5cqw;
+            /* 圓角改用 cqw */
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: var(--shadow-sm);
+            height: 7cqw;
+            /* 讓它在 location-bar 裡自然撐高 */
+            max-width: 28cqw;
+            /* 給予固定的 cqw 寬度 */
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            line-height: 1.1;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+            flex-shrink: 0;
+        }
+
+        .category-tab-btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
+        }
+
         .menuContainer {
-            height: 60%;
+            height: 52%;
             max-width: 100%;
             overflow-y: auto;
-            display: flex;
+            display: grid;
             flex-direction: column;
+            grid-template-columns: 1fr 1fr;
             gap: 0.5cqw;
             /* 卡片與卡片之間的間距改用 cqw */
             padding: 1cqw;
             /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
             box-sizing: border-box;
-
-            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
-            &::-webkit-scrollbar {
-                display: none;
-            }
-
             /* 隱藏 Firefox 的卷軸 */
             scrollbar-width: none;
             /* 確保內容依然可以滑動 */
             -ms-overflow-style: none;
+            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+        }
+
+        .menuContainer::-webkit-scrollbar {
+            /* Chrome, Safari 隱藏軸線 */
+            display: none;
         }
 
         /* 卡片基礎樣式 */
@@ -469,9 +538,8 @@
                     <span id="storeDistanceText">⚡ 計算中...</span>
                 </div>
             </div>
-
+            <div class="category-header"></div>
             <main class="menuContainer" id="menuContainer"></main>
-
             <footer class="bottom-bar">
                 <div id="cartSummaryText" class="cart-summary">
                     🛒 購物車已加入<br> 0 項商品 · 總計 $0

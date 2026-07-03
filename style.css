@@ -466,7 +466,7 @@ img,
     justify-content: center;
     align-items: center;
     padding: 1cqw;
-    z-index: 150;
+    z-index: 999;
 }
 
 .modal-card {

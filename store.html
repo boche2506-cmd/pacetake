@@ -201,7 +201,10 @@
             max-width: 100%;
             overflow-y: auto;
             display: grid;
-            flex-direction: column;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: start;
+            align-content: start;
             grid-template-columns: 1fr 1fr;
             gap: 0.25cqw;
             /* 卡片與卡片之間的間距改用 cqw */
@@ -260,17 +263,18 @@
 
         .food-info {
             height: 100%;
-            flex: 1;    /*占滿剩餘寬度*/
+            flex: 1;
+            /*占滿剩餘寬度*/
             display: flex;
             flex-direction: column;
-            justify-content: space-around; 
-            align-items: center; 
+            justify-content: space-around;
+            align-items: center;
             gap: 0.125cqw;
         }
 
         .food-name {
             height: 50%;
-            width:100%;
+            width: 100%;
             font-size: 4cqw;
             /* 字體改用 cqw */
             font-weight: 600;
@@ -286,12 +290,12 @@
             justify-content: flex-start;
             align-items: center;
         }
-        
+
         .one-size-row {
             height: 50%;
             width: 100%;
             display: flex;
-            flex-direction: column; 
+            flex-direction: column;
             justify-content: space-around;
             align-items: center;
         }

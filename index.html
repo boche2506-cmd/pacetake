@@ -201,6 +201,7 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            justify-content: start; 
             gap: 0.5cqw;
             /* 卡片與卡片之間的間距改用 cqw */
             padding: 1cqw;
@@ -210,7 +211,7 @@
             scrollbar-width: none;
             /* 確保內容依然可以滑動 */
             -ms-overflow-style: none;
-             /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
         }
 
         .store-list::-webkit-scrollbar {
@@ -220,10 +221,10 @@
 
         /* 店家單一卡片 */
         .store-card {
-            min-height: 24cqw;
+            height: 24cqw;
             width: 100%;
             display: flex;
-            align-items: center;
+            align-items: start; 
             color: inherit;
             box-shadow: var(--shadow-sm);
             background-color: var(--card-bg);
@@ -244,8 +245,8 @@
 
         /* 左側店家圖示外殼 */
         .store-img {
-            width: 23cqw;
-            height: 23cqw;
+            height: 24cqw;
+            aspect-ratio: 1 / 1;
             display: block;
             justify-content: center;
             align-items: center;

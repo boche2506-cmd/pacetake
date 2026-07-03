@@ -1726,14 +1726,13 @@
                     menuRows.forEach((row) => {
                         const toggle = row.querySelector('.menu-soldout-toggle');
                         const supply = toggle ? toggle.checked : true; // 預設為 true (有貨)
-                        const nameVal = row.querySelector('.item-name-input').value.trim();
+                        const nameVal = row.querySelector('.item-name input').value.trim();
                         if (!nameVal) return;
                         let itemObj = {
                             name: nameVal,
                             supply: supply,
                             image: row.querySelector('.preview-img').src,
-                            priceType: 'single', // 強制設定為單一價格
-                            price: parseInt(row.querySelector('.price-input').value) || 0 // 直接抓取單一價格欄位
+                            price: parseInt(row.querySelector('.item-price input').value) || 0 // 直接抓取單一價格欄位
                         };
                         menuItems.push(itemObj);
                     });

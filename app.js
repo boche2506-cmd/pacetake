@@ -828,14 +828,21 @@ async function initStorePage() {
         // 🎯【修改點 2】：清空舊的內容
         if (categoryHeader) categoryHeader.innerHTML = "";
         menuContainer.innerHTML = "";
-        // 2. 第一層迴圈：拆開 Firebase 的分類文件
-        menuSnapshot.docs.forEach((doc, catIndex) => {
+        // 🔥【關鍵修正】：把撈出來的分類文件轉成陣列，並依照你在後台蓋樓的數字順序進行排序
+        // 這樣能保證 category-list-1 永遠排在 category-list-2 前面，不會被隨機打亂
+        const sortedDocs = menuSnapshot.docs.sort((a, b) => {
+            const numA = parseInt(a.id.replace('category-list-', '')) || 0;
+            const numB = parseInt(b.id.replace('category-list-', '')) || 0;
+            return numA - numB; // 正序排列
+        });
+        // 2. 第一層迴圈：使用排序好的文件陣列（sortedDocs）
+        sortedDocs.forEach((doc, catIndex) => {
             const catData = doc.data();
             const categoryName = catData.category || "未命名分類";
             const items = catData.items || [];
-            // 🎯 密碼對齊一：使用跟你後台完全一樣的 ID 命名格式
-            const uniqueStoredId = `category-list-${doc.id}`;
-            // 🎯 密碼對齊二：生成分類按鈕，Class、Action、Target 完全複製你後台
+            // 🎯 密碼對齊一：使用跟後台完全一樣的 ID
+            const uniqueStoredId = doc.id;
+            // 🎯 密碼對齊二：生成分類按鈕
             const newTabBtn = document.createElement('button');
             newTabBtn.type = 'button';
             newTabBtn.className = catIndex === 0 ? 'category-tab-btn active' : 'category-tab-btn';
@@ -843,11 +850,8 @@ async function initStorePage() {
             newTabBtn.setAttribute('data-target', uniqueStoredId);
             // 純文字 span
             newTabBtn.innerHTML = `<span>${categoryName}</span>`;
-            // 🎯【修改點 3】：直接塞進 categoryHeader 盒子裡
+            // 🎯【修改點 3】：直接塞進 categoryHeader 盒子裡（依排序順序追加）
             if (categoryHeader) categoryHeader.appendChild(newTabBtn);
-            // ──────────────────────────────────────────────────────────────
-            // 🗑️ 【已刪除原本多餘的 newListContainer 盒子，不再製造 category-list 結構】
-            // ──────────────────────────────────────────────────────────────
             // 過濾出有供應的商品
             const availableItems = items.filter(item => item.supply !== false);
             // 3. 第二層迴圈：把這個分類的菜，直接丟進大容器裡
@@ -858,21 +862,21 @@ async function initStorePage() {
                 const qty = savedItem ? savedItem.qty : 0;
                 const basePrice = parseInt(item.price) || 0;
                 const priceHTML = `
-            <div class="one-size-row">
-                <span class="food-price" style="font-weight:bold;">$${basePrice}</span>
-                <div class="quantity-control-panel">
-                    <button class="minus-btn" data-id="${itemId}">-</button>
-                    <span class="qty-number" id="qty_${itemId}">${qty}</span>
-                    <button class="plus-btn" data-id="${itemId}">+</button>
-                </div>
-            </div>`;
+                        <div class="one-size-row">
+                            <span class="food-price" style="font-weight:bold;">$${basePrice}</span>
+                            <div class="quantity-control-panel">
+                                <button class="minus-btn" data-id="${itemId}">-</button>
+                                <span class="qty-number" id="qty_${itemId}">${qty}</span>
+                                <button class="plus-btn" data-id="${itemId}">+</button>
+                            </div>
+                        </div>`;
                 const foodCard = document.createElement('div');
                 foodCard.className = 'food-card';
                 foodCard.dataset.id = itemId;
                 foodCard.dataset.price = basePrice;
-                // 🎯【核心修正】：把分類標籤貼在卡片自己身上
+                // 🎯 把分類標籤貼在卡片自己身上
                 foodCard.dataset.category = uniqueStoredId;
-                // 🎯【核心修正】：如果不是第一個分類，預設先隱藏起來
+                // 🎯 如果不是排序後的第一個分類，預設先隱藏起來
                 if (catIndex !== 0) {
                     foodCard.style.display = 'none';
                 }
@@ -884,7 +888,7 @@ async function initStorePage() {
                         <div class="food-name">${item.name || '未命名'}</div>
                     ${priceHTML}
                 </div>`;
-                // 🎯【核心修正】：直接塞進大衣櫃 menuContainer，不再透過中間人！
+                // 🎯 塞進大衣櫃（此時也會照著排序好的分類依序加入）
                 menuContainer.appendChild(foodCard);
             });
         });

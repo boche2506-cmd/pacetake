@@ -318,6 +318,7 @@ img,
     cursor: pointer;
     box-sizing: border-box;
     position: relative;
+    z-index: 500;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -377,7 +378,7 @@ img,
     /* 上下留點空格 */
     box-shadow: 0 1cqw 4cqw rgba(0, 0, 0, 0.9);
     /* 漂浮陰影效果 */
-    z-index: 500;
+    z-index: 200;
     /* 確保一定在最上層 */
 }
 

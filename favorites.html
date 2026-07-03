@@ -32,16 +32,26 @@
         }
 
         .favoriteContainer {
-            height: 63%;
+            height: 82%;
             max-width: 100%;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 0.5cqw;
             /* 卡片與卡片之間的間距改用 cqw */
-            padding: 1cqw 1.5cqw 1cqw 1cqw;
+            padding: 1cqw;
             /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
             box-sizing: border-box;
+            /* 隱藏 Firefox 的卷軸 */
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
+             /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+        }
+
+        .favoriteContainer::-webkit-scrollbar {
+            /* Chrome, Safari 隱藏軸線 */
+            display: none;
         }
 
         /* 店家單一卡片 */

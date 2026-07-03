@@ -396,6 +396,39 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
+function mouseslide() {
+    const tabs = document.getElementById('categoryHeader');
+    if (!tabs) return;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+    // 1. 滑鼠按下：激活拖曳狀態
+    tabs.addEventListener('mousedown', (e) => {
+        isDown = true;
+        tabs.classList.add('dragging'); // 選擇性：可以加這個 class 改變滑鼠游標样式
+        startX = e.pageX - tabs.offsetLeft;
+        scrollLeft = tabs.scrollLeft;
+    });
+    // 2. 滑鼠離開容器範圍：取消拖曳狀態
+    tabs.addEventListener('mouseleave', () => {
+        isDown = false;
+        tabs.classList.remove('dragging');
+    });
+    // 3. 滑鼠放開：取消拖曳狀態
+    tabs.addEventListener('mouseup', () => {
+        isDown = false;
+        tabs.classList.remove('dragging');
+    });
+    // 4. 滑鼠移動中：計算移動距離並動態捲動
+    tabs.addEventListener('mousemove', (e) => {
+        if (!isDown) return; // 沒按下就不用動
+        e.preventDefault();  // 阻止瀏覽器預設的選取文字行為
+        const x = e.pageX - tabs.offsetLeft;
+        // 🎯 乘以 2 是「滑動靈敏度/速度」，數字越大滑越快
+        const walk = (x - startX) * 2;
+        tabs.scrollLeft = scrollLeft - walk;
+    });
+}
 /**
  * 監聽特定欄位的變化並更新 UI的工具
  * @param {string} collectionName - 資料庫集合名稱
@@ -1035,6 +1068,7 @@ export function initCartDOMState() {
 document.addEventListener('DOMContentLoaded', () => {
     fetchStoresFromFirebase();// 從firebase抓資料
     initThemeSystem();//網頁載入時套用顏色
+    mouseslide();
     initCitySelect(document.getElementById('citySelect'));// 負責把資料灌入指定的 Select
     getBrowserLocation();//gpsPinBtn
     /*initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡*/

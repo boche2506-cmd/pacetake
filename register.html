@@ -1787,6 +1787,17 @@
             else if (action === 'shopSubmitBtn') {
                 // 取得按鈕上的標籤來判斷要做什麼
                 const btn = document.getElementById('submitBtn');
+                // 🎯【新增：未按新增分類的攔截警告】
+                const header = document.querySelector('.category-header');
+                const pendingInput = header ? header.querySelector('.add-category input') : null;
+                if (pendingInput && pendingInput.value.trim() !== '') {
+                    const pendingValue = pendingInput.value.trim();
+                    // 彈出確認視窗，如果按「取消」，就中斷儲存，讓老闆回去按 ➕
+                    if (!confirm(`⚠️ 偵測到您在輸入框填了「${pendingValue}」，但尚未點擊「➕」按鈕建立分類！\n\n點擊「確定」將忽略此文字並繼續儲存。\n點擊「取消」回去補按 ➕ 新增分類。`)) {
+                        pendingInput.focus(); // 自動幫他把游標點進輸入框
+                        return; // 中斷儲存流程
+                    }
+                }
                 const mode = btn.dataset.mode || 'create'; // 加上預設值，確保即使沒設也能跑新增
                 const storeId = btn.dataset.storeId; // 只有編輯模式才會有值參數，新增用當前 UID
                 const ShopFormData = getShopFormData();

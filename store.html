@@ -81,7 +81,7 @@
             justify-content: space-between;
             align-items: center;
             box-sizing: border-box;
-            padding-left: 2cqw;     
+            padding-left: 2cqw;
         }
 
         .fav-icon {
@@ -222,29 +222,13 @@
 
         /* 卡片基礎樣式 */
         .food-card {
-            min-height: 24cqw;
-            max-width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: flex-start;
-            color: inherit;
-            box-shadow: var(--shadow-sm);
-            background-color: var(--card-bg);
-            border: 0.3cqw solid var(--border-color);
-            border-radius: 3cqw;
-            text-decoration: none;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-sizing: border-box;
-        }
-
-        .food-img-info {
-            min-height: 24cqw;
+            height: 24cqw;
             width: 100%;
             display: flex;
             flex-direction: row;
             align-items: center;
             color: inherit;
+            /* 繼承父色 */
             border-radius: 3cqw;
             padding: 0.125cqw;
             gap: 0.5cqw;
@@ -259,8 +243,8 @@
         }
 
         .food-img {
-            width: 23cqw;
-            height: 23cqw;
+            height: 24cqw;
+            aspect-ratio: 1 / 1;
             display: block;
             justify-content: center;
             align-items: center;
@@ -276,30 +260,18 @@
 
         .food-info {
             height: 100%;
-            max-width: 100%;
+            flex: 1;    /*占滿剩餘寬度*/
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
-            flex-grow: 1;
-            overflow: hidden;
+            justify-content: space-around; 
+            align-items: center; 
             gap: 0.125cqw;
         }
 
-        .food-name-note-display {
-            height: 48%;
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: center;
-            box-sizing: border-box;
-        }
-
         .food-name {
-            height: auto;
-            width: 50%;
-            font-size: 5cqw;
+            height: 50%;
+            width:100%;
+            font-size: 4cqw;
             /* 字體改用 cqw */
             font-weight: 600;
             color: var(--text-main);
@@ -314,57 +286,18 @@
             justify-content: flex-start;
             align-items: center;
         }
-
-        .card-note-display {
-            height: auto;
-            width: 50%;
-            font-size: 3cqw;
-            font-weight: 400;
-            color: var(--text-muted);
-            line-height: 1.2;
-            /* 讓行距跟著字體一起自動調整 */
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: center;
-            box-sizing: border-box;
-            white-space: normal;
-            overflow: visible;
-            text-overflow: clip;
-            padding: 0 2cqw;
-        }
-
+        
         .one-size-row {
-            height: 48%;
-            width: 20cqw;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            align-items: center;
-        }
-
-        .size-options {
-            height: 48%;
+            height: 50%;
             width: 100%;
             display: flex;
-            flex-direction: row;
-            justify-content: space-around;
-            align-items: stretch;
-            gap: 2cqw;
-        }
-
-        .size-row {
-            height: 100%;
-            width: 20cqw;
-            display: flex;
-            flex-direction: column;
+            flex-direction: column; 
             justify-content: space-around;
             align-items: center;
         }
 
-        .size-label,
         .food-price {
-            height: 45%;
+            height: 50%;
             width: 100%;
             border-radius: 1.5cqw;
             cursor: pointer;
@@ -380,7 +313,7 @@
         }
 
         .quantity-control-panel {
-            height: 55%;
+            height: 50%;
             width: 100%;
             display: flex;
             flex-direction: row;

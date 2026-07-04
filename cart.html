@@ -486,7 +486,8 @@
         let currentPayType = "";
         let targetStoreId = "";
         let currentDiningType = "TAKE_OUT";
-        // 藍新測試金鑰配置
+
+        // 藍新店家動態金鑰配置（預設為空，動態由 Firebase 覆蓋）
         let currentStoreNewebpay = {
             MerchantID: "",
             HashKey: "",
@@ -494,58 +495,65 @@
         };
         const buyerNameInput = document.getElementById('buyerNameInput');
         const buyerPhoneInput = document.getElementById('buyerPhoneInput');
-        // 🧠 1. 頁面初始化與登入/未登入防線整合
+
+        // 🧠 1. 頁面初始化
         async function initCartPage() {
-            // 🎯 卡住等待 Firebase 身份確認 (支援無登入無痛購物)
+            // 🎯 卡住等待 Firebase 身份確認 (支援無登入無痛購物 / 匿名登入)
             const user = await authReady;
             if (user) {
-                console.log("買家驗證已登入:", user.uid);
-                // 優先序：上次手動填寫的紀錄 > 雲端users檔案的真實資料 > Firebase帳號暱稱
+                console.log("買家驗證已確認，UID:", user.uid, "是否為匿名登入:", user.isAnonymous);
+                // 優先序：上次手動填寫的紀錄 > 雲端users檔案的真實資料
                 const savedName = localStorage.getItem('pace_buyer_name');
                 const savedPhone = localStorage.getItem('pace_buyer_phone');
                 if (savedName) buyerNameInput.value = savedName;
                 if (savedPhone) buyerPhoneInput.value = savedPhone;
-                try {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        if (userData.realName && !buyerNameInput.value) buyerNameInput.value = userData.realName;
-                        if (userData.phone && !buyerPhoneInput.value) buyerPhoneInput.value = userData.phone;
+
+                // 如果不是匿名登入，嘗試去撈雲端真實檔案
+                if (!user.isAnonymous) {
+                    try {
+                        const userDoc = await getDoc(doc(db, "users", user.uid));
+                        if (userDoc.exists()) {
+                            const userData = userDoc.data();
+                            if (userData.realName && !buyerNameInput.value) buyerNameInput.value = userData.realName;
+                            if (userData.phone && !buyerPhoneInput.value) buyerPhoneInput.value = userData.phone;
+                        }
+                    } catch (err) {
+                        console.error("讀取雲端用戶資料失敗，改用本地快取", err);
                     }
-                } catch (err) {
-                    console.error("讀取雲端用戶資料失敗，改用本地快取", err);
                 }
             } else {
-                console.log("買家處於免登入無痛購物中");
+                console.log("買家尚未進入 Firebase Auth 狀態");
             }
-            // 萬一完全沒資料，去撈臨時封存區備份（防手滑或跳轉打回）
+
+            // 萬一完全沒資料，去撈臨時封存區備份
             if (!buyerNameInput.value) buyerNameInput.value = localStorage.getItem('temp_buyer_name') || '';
             if (!buyerPhoneInput.value) buyerPhoneInput.value = localStorage.getItem('temp_buyer_phone') || '';
+
             // 載入購物車與金流設定
             loadCartFromStorage();
+
+            // 🎨 【UI 強制視覺雙校正】確保外帶自取預設亮起藍色
             const takeOutCheckDot = document.getElementById('takeOutCheckDot');
             if (takeOutCheckDot) {
                 takeOutCheckDot.style.backgroundColor = "var(--brand-blue)";
             }
-            // 2. 順便檢查付款方式：如果線上支付正亮著，確保它的圓點也是藍色
             const payOptCredit = document.getElementById('payOptCredit');
             const creditCheckDot = document.getElementById('creditCheckDot');
             if (payOptCredit && payOptCredit.classList.contains('selected') && creditCheckDot) {
                 creditCheckDot.style.backgroundColor = "var(--brand-blue)";
             }
         }
-        // 🛒 2. 從 localStorage 載入資料（做欄位格式防呆相容）
+
+        // 🛒 2. 從 localStorage 載入資料
         function loadCartFromStorage() {
-            // 相容你原本的 getCartData() 或直接拿 localStorage
-            // 這裡做雙重保障，確保抓得到新舊格式
             cartData = (typeof getCartData === 'function') ? getCartData() : (JSON.parse(localStorage.getItem('cart')) || JSON.parse(localStorage.getItem('pacetake_cart')) || []);
             if (cartData.length > 0) {
-                // 提取這部購物車是屬於哪一個店家的
                 targetStoreId = cartData[0].storeId || "";
             }
             renderCart();
         }
-        // 🎨 3. 動態渲染明細與金額計算（免重做，僅加上新舊欄位支援）
+
+        // 🎨 3. 動態渲染明細與金額計算
         function renderCart() {
             const container = document.getElementById('cartItemsContainer');
             if (!container) return;
@@ -560,7 +568,6 @@
             let total = 0;
             cartData.forEach(item => {
                 const itemPrice = parseInt(item.price) || 0;
-                // 🎯【格式兼容】：如果之前的叫 qty，新版叫 quantity，兩者都支援，金額就不會出錯！
                 const itemQty = parseInt(item.quantity || item.qty) || 1;
                 const subtotal = itemPrice * itemQty;
                 total += subtotal;
@@ -582,7 +589,8 @@
             </div>`;
             container.innerHTML = html;
             if (typeof updateBottomCartBadge === 'function') updateBottomCartBadge(totalQty);
-            // 檢查店家的金流設定開關
+
+            // 檢查並配置店家的金流與內用開關
             if (targetStoreId) {
                 checkStorePaymentConfig(targetStoreId);
             } else {
@@ -590,6 +598,8 @@
                 initPaymentSelection(true, true);
             }
         }
+
+        // 🔍 4. 從雲端資料庫動態撈取商家的支付與內用權限
         async function checkStorePaymentConfig(storeId) {
             const payOptCredit = document.getElementById('payOptCredit');
             const creditText = document.getElementById('creditText');
@@ -601,26 +611,29 @@
             const dineOptDineIn = document.getElementById('dineOptDineIn');
             const dineInText = document.getElementById('dineInText');
             const dineInNoticeText = document.getElementById('dineInNoticeText');
-            if (!payOptCredit || !payOptCash) return; // 防呆
+
+            if (!payOptCredit || !payOptCash) return;
+
             try {
                 const storeDoc = await getDoc(doc(db, "stores", storeId));
                 let isCreditAllowed = true;
                 let isCashAllowed = false;
-                let isDineInAllowed = true; // 預設開放內用
+                let isDineInAllowed = true;
+
                 if (storeDoc.exists()) {
                     const storeData = storeDoc.data();
-                    // 🌟 100% 精準對接你的 Firebase 真實欄位！
                     if (storeData.isOnlinePayEnabled !== undefined) isCreditAllowed = storeData.isOnlinePayEnabled;
                     if (storeData.isCashPayEnabled !== undefined) isCashAllowed = storeData.isCashPayEnabled;
+
+                    // 覆蓋動態金鑰
                     currentStoreNewebpay.MerchantID = storeData.newebpayMerchantID || "";
                     currentStoreNewebpay.HashKey = storeData.newebpayHashKey || "";
                     currentStoreNewebpay.HashIV = storeData.newebpayHashIV || "";
-                    // 🪑 答案就在這裡：沒錯！對接你的 Firebase 內用欄位 hasSeating
+
                     if (storeData.hasSeating !== undefined) isDineInAllowed = storeData.hasSeating;
                 }
-                // ==========================================
-                // 💳 1. 線上支付 UI 處理
-                // ==========================================
+
+                // 線上支付 UI 渲染
                 if (isCreditAllowed) {
                     payOptCredit.style.pointerEvents = "auto";
                     payOptCredit.style.cursor = "pointer";
@@ -630,15 +643,13 @@
                     if (creditNoticeText) creditNoticeText.style.display = "none";
                 } else {
                     payOptCredit.style.pointerEvents = "none";
-                    payOptCredit.style.opacity = "0.35"; // 直接讓整個按鈕變灰
+                    payOptCredit.style.opacity = "0.35";
                     payOptCredit.style.filter = "grayscale(1)";
                     if (creditText) creditText.style.color = "var(--text-muted)";
-                    // 🌟 核心修正：顯示你的絕對定位紅字，因為父層 .option-option 是 relative，所以它會完美覆蓋！
                     if (creditNoticeText) creditNoticeText.style.display = "flex";
                 }
-                // ==========================================
-                // 💵 2. 現金付款 UI 處理
-                // ==========================================
+
+                // 現金付款 UI 渲染
                 if (isCashAllowed) {
                     payOptCash.style.pointerEvents = "auto";
                     payOptCash.style.cursor = "pointer";
@@ -648,14 +659,13 @@
                     if (cashNoticeText) cashNoticeText.style.display = "none";
                 } else {
                     payOptCash.style.pointerEvents = "none";
-                    payOptCash.style.opacity = "0.35"; // 直接讓整個按鈕變灰
+                    payOptCash.style.opacity = "0.35";
                     payOptCash.style.filter = "grayscale(1)";
                     if (cashText) cashText.style.color = "var(--text-muted)";
-                    if (cashNoticeText) cashNoticeText.style.display = "flex"; // 🌟 完美覆蓋！
+                    if (cashNoticeText) cashNoticeText.style.display = "flex";
                 }
-                // ==========================================
-                // 🍽️ 3. 店內內用 UI 處理
-                // ==========================================
+
+                // 店內內用 UI 渲染
                 if (dineOptDineIn) {
                     if (isDineInAllowed) {
                         dineOptDineIn.style.pointerEvents = "auto";
@@ -666,20 +676,18 @@
                         if (dineInNoticeText) dineInNoticeText.style.display = "none";
                     } else {
                         dineOptDineIn.style.pointerEvents = "none";
-                        dineOptDineIn.style.opacity = "0.35"; // 直接讓整個按鈕變灰
+                        dineOptDineIn.style.opacity = "0.35";
                         dineOptDineIn.style.filter = "grayscale(1)";
                         if (dineInText) dineInText.style.color = "var(--text-muted)";
-                        if (dineInNoticeText) dineInNoticeText.style.display = "flex"; // 🌟 完美覆蓋！
+                        if (dineInNoticeText) dineInNoticeText.style.display = "flex";
 
-                        // 防呆：如果店家不開內用，強制將全域選擇重置回外帶
                         if (typeof currentDiningType !== 'undefined') currentDiningType = "TAKE_OUT";
                         if (dineOptTakeOut) dineOptTakeOut.classList.add('selected');
                         dineOptDineIn.classList.remove('selected');
                     }
                 }
-                // ==========================================
-                // 🎯 4. 預設選取引導與送出按鈕防禦
-                // ==========================================
+
+                // 預設點亮選取
                 if (isCreditAllowed) {
                     selectPayment("CREDIT");
                 } else if (isCashAllowed) {
@@ -691,7 +699,8 @@
                         submitBtn.innerHTML = "<span>⚠️ 該店家不支援任何支付方式</span>";
                     }
                 }
-                // 執行你原本的初始化點擊事件
+
+                // 重新刷新點擊事件監聽器
                 initPaymentSelection(isCreditAllowed, isCashAllowed);
                 initDiningSelection(isDineInAllowed);
             } catch (err) {
@@ -700,24 +709,23 @@
                 initPaymentSelection(true, true);
             }
         }
+
         function initDiningSelection(isDineInAllowed) {
             const dineOptTakeOut = document.getElementById('dineOptTakeOut');
             const dineOptDineIn = document.getElementById('dineOptDineIn');
             const takeOutCheckDot = document.getElementById('takeOutCheckDot');
             const dineInCheckDot = document.getElementById('dineInCheckDot');
             if (!dineOptTakeOut || !dineOptDineIn) return;
-            // 🛍️ 點擊外帶自取
+
             dineOptTakeOut.onclick = function () {
                 currentDiningType = "TAKE_OUT";
                 dineOptTakeOut.classList.add('selected');
                 dineOptDineIn.classList.remove('selected');
-
-                // 圓點樣式切換（如果你的 CSS 是用 class 控制，這裡也可以改成 toggle class）
                 if (takeOutCheckDot) takeOutCheckDot.style.backgroundColor = "var(--brand-blue)";
                 if (dineInCheckDot) dineInCheckDot.style.backgroundColor = "transparent";
                 if (dineInCheckDot) dineInCheckDot.style.border = "0.2cqw solid var(--border-color)";
             };
-            // 🪑 點擊店內內用（只有在店家有開放時才綁定點擊事件）
+
             if (isDineInAllowed) {
                 dineOptDineIn.onclick = function () {
                     currentDiningType = "DINE_IN";
@@ -729,12 +737,14 @@
                 };
             }
         }
+
         function initPaymentSelection(isCreditAllowed, isCashAllowed) {
             const creditOpt = document.getElementById('payOptCredit');
             const cashOpt = document.getElementById('payOptCash');
             if (isCreditAllowed && creditOpt) creditOpt.onclick = () => selectPayment("CREDIT");
             if (isCashAllowed && cashOpt) cashOpt.onclick = () => selectPayment("CASH");
         }
+
         function selectPayment(type) {
             currentPayType = type;
             const creditDot = document.getElementById('creditCheckDot');
@@ -743,6 +753,7 @@
             const cashOpt = document.getElementById('payOptCash');
             const submitBtn = document.getElementById('submitOrderBtn');
             if (!submitBtn) return;
+
             if (type === "CREDIT") {
                 if (creditOpt) creditOpt.classList.add('selected');
                 if (cashOpt) cashOpt.classList.remove('selected');
@@ -757,8 +768,10 @@
                 submitBtn.innerHTML = `<span>🚀 送出訂單</span>`;
             }
         }
+
         // 主題設置
         document.documentElement.setAttribute('data-theme', localStorage.getItem('pacetake-theme') || 'light');
+
         // 🛠️ 5. 藍新加密演算法核心
         function encryptAES(parameterString, key, iv) {
             const cryptoKey = CryptoJS.enc.Utf8.parse(key);
@@ -771,9 +784,10 @@
             return encrypted.toString();
         }
         function hashSHA256(aesString, key, iv) {
-            const readyString = `HashKey=${key}&${aesString}&HashIV=${iv}`;
+            const readyString = `HashKey=${key}&${aesString}&HashIV=${iv}`; // 👈 檢查這裡！
             return CryptoJS.SHA256(readyString).toString(CryptoJS.enc.Hex).toUpperCase();
         }
+
         // 🚀 6. 按下巨大結帳按鈕 (雙軌分流送單)
         const submitOrderBtn = document.getElementById('submitOrderBtn');
         if (submitOrderBtn) {
@@ -791,31 +805,26 @@
                     return;
                 }
 
-                // 攔截未登入用戶，記憶儲存
+                // 🌟 【免登入/匿名無痛結帳升級】：完全拔除未登入攔截與強制跳轉
                 const user = auth.currentUser;
-                if (!user) {
-                    alert("🔒【PACE 安全提示】偵測到您尚未登入會員！\n系統已為您封存資料，請先登入後結帳。");
-                    localStorage.setItem('temp_buyer_name', buyerName);
-                    localStorage.setItem('temp_buyer_phone', buyerPhone);
-                    window.location.href = "index.html?triggerLogin=true";
-                    return;
-                }
 
-                // 記住這組資料，下次打開自動帶入
+                // 本地快取記錄，方便下次自動帶入
                 localStorage.setItem('pace_buyer_name', buyerName);
                 localStorage.setItem('pace_buyer_phone', buyerPhone);
 
                 const timeStamp = Math.floor(Date.now() / 1000);
                 const orderMerchantOrderNo = "PACE_" + timeStamp;
 
-                // 儲存買家基本資料回 users 集合
-                try {
-                    await setDoc(doc(db, "users", user.uid), {
-                        realName: buyerName,
-                        phone: buyerPhone,
-                        updatedAt: new Date().toISOString()
-                    }, { merge: true });
-                } catch (e) { console.error("同步會員姓名失敗", e); }
+                // 如果使用者存在且非匿名，才將資料回寫雲端 users 集合
+                if (user && !user.isAnonymous) {
+                    try {
+                        await setDoc(doc(db, "users", user.uid), {
+                            realName: buyerName,
+                            phone: buyerPhone,
+                            updatedAt: new Date().toISOString()
+                        }, { merge: true });
+                    } catch (e) { console.error("同步會員姓名失敗", e); }
+                }
 
                 // --- 🛡️ 雙軌分流核心 ---
                 if (currentPayType === "CASH") {
@@ -824,14 +833,14 @@
                         await addDoc(collection(db, "orders"), {
                             orderId: orderMerchantOrderNo,
                             storeId: targetStoreId,
-                            buyerUid: user.uid,
+                            buyerUid: user ? user.uid : "ANONYMOUS",
                             buyerName: buyerName,
                             buyerPhone: buyerPhone,
                             items: cartData,
                             totalAmount: finalTotalAmount,
                             status: "PREPARING",
                             paymentMethod: "CASH",
-                            diningType: currentDiningType, // 🌟 補上：用餐方式（TAKE_OUT / DINE_IN）
+                            diningType: currentDiningType,
                             createdAt: serverTimestamp()
                         });
 
@@ -852,24 +861,20 @@
 
                     const itemNames = cartData.map(i => i.name).join('、');
                     const originalParameters = [
-                        // 🌟 1. 這裡改成使用你宣告的新變數 currentStoreNewebpay.MerchantID
                         `MerchantID=${currentStoreNewebpay.MerchantID || 'MS159240719'}`,
                         `RespondType=JSON`,
                         `TimeStamp=${timeStamp}`,
-                        // 🌟 2. 這裡原本是 NEWEBPAY_CONFIG.Version，直接改成寫死 "2.0"
                         `Version=2.0`,
                         `MerchantOrderNo=${orderMerchantOrderNo}`,
                         `Amt=${finalTotalAmount}`,
                         `ItemDesc=快拿點餐:${itemNames.substring(0, 20)}`,
-                        `Email=${user.email || 'buyer@pacetake.tw'}`,
+                        `Email=${(user && user.email) ? user.email : 'buyer@pacetake.tw'}`,
                         `LoginType=0`,
-
-                        // 🌟 【全管道大開關】通通設為 1 送過去
-                        `CREDIT=1`,    // 啟用信用卡一次付清
-                        `ANDROIDPAY=1`,// 啟用 Google Pay (藍新參數名)
-                        `SAMPAY=1`,    // 啟用 Samsung Pay
-                        `VACC=1`,      // 啟用 ATM 轉帳
-                        `CVS=1`        // 啟用 超商代碼繳費
+                        `CREDIT=1`,
+                        `ANDROIDPAY=1`,
+                        `SAMPAY=1`,
+                        `VACC=1`,
+                        `CVS=1`
                     ].join('&');
 
                     try {
@@ -877,29 +882,37 @@
                         await addDoc(collection(db, "orders"), {
                             orderId: orderMerchantOrderNo,
                             storeId: targetStoreId,
-                            buyerUid: user.uid,
+                            buyerUid: user ? user.uid : "ANONYMOUS",
                             buyerName: buyerName,
                             buyerPhone: buyerPhone,
                             items: cartData,
                             totalAmount: finalTotalAmount,
                             status: "PENDING_PAYMENT",
                             paymentMethod: "CREDIT",
-                            diningType: currentDiningType, // 🌟 補上：用餐方式（TAKE_OUT / DINE_IN）
+                            diningType: currentDiningType,
                             createdAt: serverTimestamp()
                         });
 
-                        // 🌟 補上防禦：跳轉前先把本地購物車清空，不然刷完卡回來車還是滿的
+                        // 清空購物車
                         localStorage.removeItem('cart');
                         localStorage.removeItem('pacetake_cart');
                         localStorage.removeItem('temp_buyer_name');
                         localStorage.removeItem('temp_buyer_phone');
 
                         // 執行藍新雙重高階加密演算法
-                        // 🔍 往下找找看你的加密區塊，要把裡面的金鑰也換掉：
-                        const tradeInfo = encryptAES(originalParameters, currentStoreNewebpay.HashKey || 'OHfk5ihgUykYAHw4XGaAKswrPlpnVpfj', currentStoreNewebpay.HashIV || 'CIntuhlC0cyZscDP');
-                        const tradeSha = hashSHA256(tradeInfo, currentStoreNewebpay.HashKey || 'OHfk5ihgUykYAHw4XGaAKswrPlpnVpfj', currentStoreNewebpay.HashIV || 'CIntuhlC0cyZscDP');
+                        const tradeInfo = encryptAES(
+                            originalParameters,
+                            currentStoreNewebpay.HashKey || 'OHfk5ihgUykYAHw4XGaAKswrPlpnVpfj',
+                            currentStoreNewebpay.HashIV || 'CIntuhlC0cyZscDP'
+                        );
+                        const tradeSha = hashSHA256(
+                            tradeInfo,
+                            currentStoreNewebpay.HashKey || 'OHfk5ihgUykYAHw4XGaAKswrPlpnVpfj',
+                            currentStoreNewebpay.HashIV || 'CIntuhlC0cyZscDP'
+                        );
 
-                        document.getElementById('formMerchantID').value = NEWEBPAY_CONFIG.MerchantID;
+                        // 🌟 修正：此處直接對齊新金鑰，徹底移除已不存在的 NEWEBPAY_CONFIG
+                        document.getElementById('formMerchantID').value = currentStoreNewebpay.MerchantID || 'MS159240719';
                         document.getElementById('formTradeInfo').value = tradeInfo;
                         document.getElementById('formTradeSha').value = tradeSha;
 
@@ -911,6 +924,7 @@
                 }
             });
         }
+
         // 執行初始化
         document.addEventListener('DOMContentLoaded', () => {
             initCartPage();

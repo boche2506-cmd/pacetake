@@ -262,7 +262,7 @@
             border-radius: 50%;
             transition: all 0.15s ease;
             background-color: transparent;
-            border: 0.3cqw solid var(--text-main);
+            border: 0.2cqw solid var(--border-color);
         }
 
         .submitorderbtn {
@@ -487,11 +487,10 @@
         let targetStoreId = "";
         let currentDiningType = "TAKE_OUT";
         // 藍新測試金鑰配置
-        const NEWEBPAY_CONFIG = {
-            MerchantID: "MS159240719",
-            HashKey: "OHfk5ihgUykYAHw4XGaAKswrPlpnVpfj",
-            HashIV: "CIntuhlC0cyZscDP",
-            Version: "2.0"
+        let currentStoreNewebpay = {
+            MerchantID: "",
+            HashKey: "",
+            HashIV: ""
         };
         const buyerNameInput = document.getElementById('buyerNameInput');
         const buyerPhoneInput = document.getElementById('buyerPhoneInput');
@@ -524,6 +523,16 @@
             if (!buyerPhoneInput.value) buyerPhoneInput.value = localStorage.getItem('temp_buyer_phone') || '';
             // 載入購物車與金流設定
             loadCartFromStorage();
+            const takeOutCheckDot = document.getElementById('takeOutCheckDot');
+            if (takeOutCheckDot) {
+                takeOutCheckDot.style.backgroundColor = "var(--brand-blue)";
+            }
+            // 2. 順便檢查付款方式：如果線上支付正亮著，確保它的圓點也是藍色
+            const payOptCredit = document.getElementById('payOptCredit');
+            const creditCheckDot = document.getElementById('creditCheckDot');
+            if (payOptCredit && payOptCredit.classList.contains('selected') && creditCheckDot) {
+                creditCheckDot.style.backgroundColor = "var(--brand-blue)";
+            }
         }
         // 🛒 2. 從 localStorage 載入資料（做欄位格式防呆相容）
         function loadCartFromStorage() {
@@ -603,7 +612,9 @@
                     // 🌟 100% 精準對接你的 Firebase 真實欄位！
                     if (storeData.isOnlinePayEnabled !== undefined) isCreditAllowed = storeData.isOnlinePayEnabled;
                     if (storeData.isCashPayEnabled !== undefined) isCashAllowed = storeData.isCashPayEnabled;
-
+                    currentStoreNewebpay.MerchantID = storeData.newebpayMerchantID || "";
+                    currentStoreNewebpay.HashKey = storeData.newebpayHashKey || "";
+                    currentStoreNewebpay.HashIV = storeData.newebpayHashIV || "";
                     // 🪑 答案就在這裡：沒錯！對接你的 Firebase 內用欄位 hasSeating
                     if (storeData.hasSeating !== undefined) isDineInAllowed = storeData.hasSeating;
                 }
@@ -704,7 +715,7 @@
                 // 圓點樣式切換（如果你的 CSS 是用 class 控制，這裡也可以改成 toggle class）
                 if (takeOutCheckDot) takeOutCheckDot.style.backgroundColor = "var(--brand-blue)";
                 if (dineInCheckDot) dineInCheckDot.style.backgroundColor = "transparent";
-                if (dineInCheckDot) dineInCheckDot.style.border = "2px solid var(--border-color)";
+                if (dineInCheckDot) dineInCheckDot.style.border = "0.2cqw solid var(--border-color)";
             };
             // 🪑 點擊店內內用（只有在店家有開放時才綁定點擊事件）
             if (isDineInAllowed) {
@@ -841,24 +852,24 @@
 
                     const itemNames = cartData.map(i => i.name).join('、');
                     const originalParameters = [
-                        `MerchantID=${NEWEBPAY_CONFIG.MerchantID}`, // 之後換成從資料庫撈店家的
+                        // 🌟 1. 這裡改成使用你宣告的新變數 currentStoreNewebpay.MerchantID
+                        `MerchantID=${currentStoreNewebpay.MerchantID || 'MS159240719'}`,
                         `RespondType=JSON`,
                         `TimeStamp=${timeStamp}`,
-                        `Version=${NEWEBPAY_CONFIG.Version}`,
+                        // 🌟 2. 這裡原本是 NEWEBPAY_CONFIG.Version，直接改成寫死 "2.0"
+                        `Version=2.0`,
                         `MerchantOrderNo=${orderMerchantOrderNo}`,
                         `Amt=${finalTotalAmount}`,
                         `ItemDesc=快拿點餐:${itemNames.substring(0, 20)}`,
                         `Email=${user.email || 'buyer@pacetake.tw'}`,
                         `LoginType=0`,
 
-                        // 🌟 【全管道大開關】通通設為 1 送過去，讓藍新後台自己去跟店家對帳！
+                        // 🌟 【全管道大開關】通通設為 1 送過去
                         `CREDIT=1`,    // 啟用信用卡一次付清
                         `ANDROIDPAY=1`,// 啟用 Google Pay (藍新參數名)
                         `SAMPAY=1`,    // 啟用 Samsung Pay
                         `VACC=1`,      // 啟用 ATM 轉帳
                         `CVS=1`        // 啟用 超商代碼繳費
-                        // 📝 註：LINE Pay 與 街口 在藍新新版規格中通常是走另外的專屬 API 
-                        // 或需要在藍新後台開啟「核心多元支付」，這裡我們先把最標準的這些餵飽它！
                     ].join('&');
 
                     try {
@@ -884,8 +895,9 @@
                         localStorage.removeItem('temp_buyer_phone');
 
                         // 執行藍新雙重高階加密演算法
-                        const tradeInfo = encryptAES(originalParameters, NEWEBPAY_CONFIG.HashKey, NEWEBPAY_CONFIG.HashIV);
-                        const tradeSha = hashSHA256(tradeInfo, NEWEBPAY_CONFIG.HashKey, NEWEBPAY_CONFIG.HashIV);
+                        // 🔍 往下找找看你的加密區塊，要把裡面的金鑰也換掉：
+                        const tradeInfo = encryptAES(originalParameters, currentStoreNewebpay.HashKey || 'OHfk5ihgUykYAHw4XGaAKswrPlpnVpfj', currentStoreNewebpay.HashIV || 'CIntuhlC0cyZscDP');
+                        const tradeSha = hashSHA256(tradeInfo, currentStoreNewebpay.HashKey || 'OHfk5ihgUykYAHw4XGaAKswrPlpnVpfj', currentStoreNewebpay.HashIV || 'CIntuhlC0cyZscDP');
 
                         document.getElementById('formMerchantID').value = NEWEBPAY_CONFIG.MerchantID;
                         document.getElementById('formTradeInfo').value = tradeInfo;

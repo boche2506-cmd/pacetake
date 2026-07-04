@@ -12,151 +12,281 @@
     <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        .content {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .input-style {
+            width: 100%;
+            height: 7cqw;
+            color: var(--text-main);
+            background-color: var(--bg-global);
+            border: 0.2cqw solid var(--border-color);
+            border-radius: 2cqw;
+            padding: 0 2cqw;
+            font-size: 3.5cqw;
+            outline: none;
+            box-sizing: border-box;
         }
 
-        .section-title {
-            font-size: 14px;
+        .ContactInformation {
+            height: 10%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            color: var(--text-main);
+            border-radius: 4cqw;
+            padding: 0.25cqw;
+            margin-top: 0.5cqw;
+        }
+
+        .NamePhone {
+            height: 40%;
+            width: 100%;
+            font-size: 4cqw;
             font-weight: 700;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.1;
+        }
+
+        .Information {
+            height: 60%;
+            width: 100%;
+            /* 與 GPS 按鈕加起來剛好分配總寬度 */
+            /* 縣市和區域中間的間距 */
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            gap: 0.5cqw;
+        }
+
+        .PhoneInformation,
+        .NameInformation {
+            height: 100%;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
             color: var(--text-muted);
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
+            line-height: 1.1;
+        }
+
+        .PhoneInformation input,
+        .NameInformation input {
+            text-align: center;
+            line-height: 1.1;
+        }
+
+        .content {
+            height: 53%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            padding: 1cqw;
+            box-sizing: border-box;
+        }
+
+        .contentspan {
+            height: 5%;
+            width: 100%;
+            font-size: 4cqw;
+            font-weight: 700;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.1;
+            color: var(--text-main);
         }
 
         .bill-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
+            height: 85%;
+            width: 100%;
+            padding: 0 2cqw;
+            overflow-y: auto;
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
+            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+        }
+
+        .bill-card::-webkit-scrollbar {
+            /* Chrome, Safari 隱藏軸線 */
+            display: none;
+        }
+
+        .Remark {
+            height: 10%;
+            width: 100%;
+            font-size: 4cqw;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.1;
+            color: var(--text-main);
+        }
+
+        .Remark input {
+            text-align: center;
+            line-height: 1.1;
+            padding: 1cqw 0;
         }
 
         .bill-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px dashed var(--border-color);
+            padding: 3cqw 0;
+            border-bottom: 0.2cqw dashed var(--border-color);
         }
 
         .item-name {
-            font-size: 15px;
+            font-size: 4cqw;
             font-weight: 600;
+            color: var(--text-main);
         }
 
         .item-qty {
-            font-size: 13px;
+            font-size: 4cqw;
             color: var(--text-muted);
-            margin-left: 6px;
+            margin-left: 1.5cqw;
         }
 
         .item-price {
-            font-size: 15px;
+            font-size: 4cqw;
             font-weight: 700;
+            color: var(--text-main);
         }
 
         .bill-total-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 14px;
+            padding-top: 3.5cqw;
+            color: var(--text-main);
         }
 
         .total-label {
-            font-size: 15px;
-            font-weight: 700;
+            font-size: 5cqw;
+            font-weight: 800;
+            color: var(--text-main);
         }
 
         .total-amount {
-            font-size: 20px;
+            font-size: 5cqw;
             font-weight: 800;
             color: var(--brand-blue);
         }
 
-        .time-defense-box {
+        .footer-action {
             display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .input-style {
+            height: 22%;
+            /* 保留你原本佔外殼的 15% 高度比例 */
             width: 100%;
-            height: 44px;
-            background-color: var(--bg-global);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0 14px;
-            font-size: 14px;
-            color: var(--text-main);
-            outline: none;
-            transition: all 0.15s ease;
+            background-color: var(--blur-bg);
+            /* 邊框 cqw */
+            padding: 1cqw;
+            /* 左右微調內襯，讓留白更好看 */
+            box-sizing: border-box;
+            gap: 0.5cqw;
         }
 
-        .input-style:focus {
-            border-color: var(--brand-blue);
+        .Dining-style,
+        .pay-defense-group {
+            height: 35%;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            border-radius: 3.5cqw;
+            gap: 1cqw;
+            background-color: var(--card-bg);
+            border: 0.2cqw solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            color: var(--text-main);
+        }
+
+        .option-option {
+            height: 95%;
+            width: 48%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
         }
 
         .pay-option {
+            height: 100%;
+            width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 14px;
-            box-shadow: var(--shadow-sm);
+            padding: 0 2cqw;
+            border-radius: 3.5cqw;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
 
         .pay-info {
+            height: 100%;
+            width: 80%;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
+            font-size: 4cqw;
             font-weight: 700;
         }
 
-        .pay-check-dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            transition: all 0.15s ease;
+        .pay-info img {
+            height: 50%;
+            aspect-ratio: 1 / 1;
         }
 
-        .footer-action {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 16px 20px 24px 20px;
-            background-color: var(--bg-container);
-            border-top: 1px solid var(--border-color);
+        .pay-check-dot {
+            width: 4cqw;
+            height: 4cqw;
+            border-radius: 50%;
+            transition: all 0.15s ease;
+            background-color: transparent;
+            border: 0.3cqw solid var(--text-main);
+        }
+
+        .submitorderbtn {
+            height: 30%;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
         }
 
         .submit-order-btn {
+            height: 95%;
+            width: 90%;
             background-color: var(--brand-blue);
             color: white;
             border: none;
-            width: 100%;
-            padding: 16px;
-            border-radius: 14px;
-            font-size: 16px;
+            padding: 4cqw;
+            border-radius: 3.5cqw;
+            font-size: 4cqw;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.15);
+            box-shadow: 0 1cqw 3cqw rgba(0, 102, 255, 0.15);
             transition: all 0.15s ease;
         }
 
@@ -199,78 +329,88 @@
                     </div>
                 </div>
             </header>
+            <div class="ContactInformation">
+                <div class="NamePhone">
+                    <span>📋 取餐聯絡資訊</span>
+                </div>
+                <div class="Information">
+                    <div class="NameInformation"><span>取餐人真實姓名</span>
+                        <input type="text" id="buyerNameInput" class="input-style" placeholder="請輸入方便老闆稱呼的姓名" required>
+                    </div>
+                    <div class="PhoneInformation"><span>手機號碼(聯絡自取用)</span>
+                        <input type="tel" id="buyerPhoneInput" class="input-style" placeholder="例如：0912345678" required>
+                    </div>
+                </div>
+            </div>
             <main class="content">
-                <div>
-                    <div class="section-title">📋 取貨聯絡資訊 (老闆接單安全防線)</div>
-                    <div class="bill-card" style="display: flex; flex-direction: column; gap: 12px;">
-                        <div>
-                            <label
-                                style="font-size: 12px; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">取貨人真實姓名</label>
-                            <input type="text" id="buyerNameInput" class="input-style" placeholder="請輸入方便老闆稱呼的姓名"
-                                required>
+                <div class="contentspan"><span>🛍️ 點餐明細</span></div>
+                <div class="bill-card" id="cartItemsContainer"></div>
+                <div class="Remark"><span>備註</span>
+                    <input type="text" id="Remarkinput" class="input-style" placeholder="請輸入想備註的，但老闆不一定照做^^">
+                </div>
+            </main>
+            <footer class="footer-action">
+                <div class="Dining-style">
+                    <div class="option-option">
+                        <div class="pay-option selected" data-diningtype="TAKE_OUT" id="dineOptTakeOut">
+                            <div class="pay-info">
+                                <img src="png/logo.png" class="buyer" alt="買家圖示">
+                                <span id="takeOutText">外帶自取</span>
+                            </div>
+                            <div class="pay-check-dot" id="takeOutCheckDot">
+                            </div>
                         </div>
-                        <div>
-                            <label
-                                style="font-size: 12px; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">手機號碼
-                                (聯絡自取用)</label>
-                            <input type="tel" id="buyerPhoneInput" class="input-style" placeholder="例如：0912345678"
-                                required>
+                    </div>
+                    <div class="option-option">
+                        <div class="pay-option" data-diningtype="DINE_IN" id="dineOptDineIn">
+                            <div class="pay-info">
+                                <span>🪑</span>
+                                <span id="dineInText">店內內用</span>
+                            </div>
+                            <div class="pay-check-dot" id="dineInCheckDot">
+                            </div>
+                        </div>
+                        <div id="dineInNoticeText"
+                            style="font-size: 3cqw; font-weight: 500; color: var(--brand-red); display: none; position: absolute; padding: 0 2cqw;">
+                            ⚠️ 該店家目前不開放店內內用，僅提供外帶自取喔！
                         </div>
                     </div>
                 </div>
-
-                <div>
-                    <div class="section-title">🛍️ 點餐明細</div>
-                    <div class="bill-card" id="cartItemsContainer">
-                        <div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車空空的喔...</div>
-                    </div>
-                </div>
-
-                <div class="time-defense-box">
-                    <span>⏳</span>
-                    <span id="defenseTimeText">本單預計 15 分鐘後可至店內現場自取。</span>
-                </div>
-
                 <div class="pay-defense-group">
-                    <div class="section-title">💳 支付方式</div>
-
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <div class="pay-option" data-paytype="CREDIT" id="payOptCredit"
-                            style="transition: all 0.2s ease;">
+                    <div class="option-option">
+                        <div class="pay-option" data-paytype="CREDIT" id="payOptCredit">
                             <div class="pay-info">
                                 <span>💳</span>
-                                <span id="creditText">線上信用卡刷卡 (安全加密)</span>
+                                <span id="creditText">線上支付</span>
                             </div>
-                            <div class="pay-check-dot" id="creditCheckDot"
-                                style="width: 16px; height: 16px; border-radius: 50%; background-color: transparent; border: 2px solid var(--border-color);">
+                            <div class="pay-check-dot" id="creditCheckDot">
                             </div>
                         </div>
                         <div id="creditNoticeText"
-                            style="font-size: 12px; font-weight: 600; color: #EF4444; padding-left: 6px; display: none; margin-top: -4px; margin-bottom: 4px;">
-                            ⚠️ 本店家不支援線上刷卡，請使用現金結帳。
+                            style="font-size: 3cqw; font-weight: 500; color: var(--brand-red); display: none; position: absolute; padding: 0 2cqw;">
+                            ⚠️ 此店家不支援線上支付，請使用現金結帳。
                         </div>
-
-                        <div class="pay-option" data-paytype="CASH" id="payOptCash" style="transition: all 0.2s ease;">
+                    </div>
+                    <div class="option-option">
+                        <div class="pay-option" data-paytype="CASH" id="payOptCash">
                             <div class="pay-info">
                                 <span>💵</span>
-                                <span id="cashText">現場現金付款 (到店取貨付現)</span>
+                                <span id="cashText">現金付款</span>
                             </div>
-                            <div class="pay-check-dot" id="cashCheckDot"
-                                style="width: 16px; height: 16px; border-radius: 50%; background-color: transparent; border: 2px solid var(--border-color);">
+                            <div class="pay-check-dot" id="cashCheckDot">
                             </div>
                         </div>
                         <div id="cashNoticeText"
-                            style="font-size: 12px; font-weight: 600; color: #EF4444; padding-left: 6px; display: none; margin-top: -4px;">
-                            ⚠️ 本店家尚未開啟現場付現功能，請使用信用卡安全結帳。
+                            style="font-size: 3cqw; font-weight: 500; color: var(--brand-red); display: none; position: absolute; padding: 0 2cqw;">
+                            ⚠️ 此店家未開啟現金付款，請使用線上支付。
                         </div>
                     </div>
                 </div>
-            </main>
-
-            <footer class="footer-action">
-                <button class="submit-order-btn" id="submitOrderBtn">
-                    <span>🚀 安全前往藍新金流結帳</span>
-                </button>
+                <div class="submitorderbtn">
+                    <button class="submit-order-btn" id="submitOrderBtn">
+                        <span>🚀 送出訂單</span>
+                    </button>
+                </div>
             </footer>
         </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
@@ -333,6 +473,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script type="module" src="app.js"></script>
     <script type="module">
+        import { areaData, authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
+        let allStores = [];
+        let buyerLat = null;
+        let buyerLng = null;
+        let currentBuyerAddress = "正在獲取定位中...";
+        let finalTotalAmount = 0;
+        let cartData = [];
+        let currentPayType = "";
+        let targetStoreId = "";
+        let currentDiningType = "TAKE_OUT";
         // 藍新測試金鑰配置
         const NEWEBPAY_CONFIG = {
             MerchantID: "MS159240719",
@@ -340,168 +490,237 @@
             HashIV: "CIntuhlC0cyZscDP",
             Version: "2.0"
         };
-
-        let finalTotalAmount = 0;
-        let cartData = [];
-        let currentPayType = "";
-        let targetStoreId = "";
-
-        // 🛒 1. 從 localStorage 載入買家在 index.html 選購的真實購物車資料
+        const buyerNameInput = document.getElementById('buyerNameInput');
+        const buyerPhoneInput = document.getElementById('buyerPhoneInput');
+        // 🧠 1. 頁面初始化與登入/未登入防線整合
+        async function initCartPage() {
+            // 🎯 卡住等待 Firebase 身份確認 (支援無登入無痛購物)
+            const user = await authReady;
+            if (user) {
+                console.log("買家驗證已登入:", user.uid);
+                // 優先序：上次手動填寫的紀錄 > 雲端users檔案的真實資料 > Firebase帳號暱稱
+                const savedName = localStorage.getItem('pace_buyer_name');
+                const savedPhone = localStorage.getItem('pace_buyer_phone');
+                if (savedName) buyerNameInput.value = savedName;
+                if (savedPhone) buyerPhoneInput.value = savedPhone;
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        if (userData.realName && !buyerNameInput.value) buyerNameInput.value = userData.realName;
+                        if (userData.phone && !buyerPhoneInput.value) buyerPhoneInput.value = userData.phone;
+                    }
+                } catch (err) {
+                    console.error("讀取雲端用戶資料失敗，改用本地快取", err);
+                }
+            } else {
+                console.log("買家處於免登入無痛購物中");
+            }
+            // 萬一完全沒資料，去撈臨時封存區備份（防手滑或跳轉打回）
+            if (!buyerNameInput.value) buyerNameInput.value = localStorage.getItem('temp_buyer_name') || '';
+            if (!buyerPhoneInput.value) buyerPhoneInput.value = localStorage.getItem('temp_buyer_phone') || '';
+            // 載入購物車與金流設定
+            loadCartFromStorage();
+        }
+        // 🛒 2. 從 localStorage 載入資料（做欄位格式防呆相容）
         function loadCartFromStorage() {
-            cartData = getCartData();
-            // 順便提取這部購物車是屬於哪一個店家的，用來去雲端看店家的金流開關
-            if (cartData.length > 0 && cartData[0].storeId) {
-                targetStoreId = cartData[0].storeId;
+            // 相容你原本的 getCartData() 或直接拿 localStorage
+            // 這裡做雙重保障，確保抓得到新舊格式
+            cartData = (typeof getCartData === 'function') ? getCartData() : (JSON.parse(localStorage.getItem('cart')) || JSON.parse(localStorage.getItem('pacetake_cart')) || []);
+            if (cartData.length > 0) {
+                // 提取這部購物車是屬於哪一個店家的
+                targetStoreId = cartData[0].storeId || "";
             }
             renderCart();
         }
-
-        // 🎨 2. 動態渲染點餐明細與計算總額
+        // 🎨 3. 動態渲染明細與金額計算（免重做，僅加上新舊欄位支援）
         function renderCart() {
             const container = document.getElementById('cartItemsContainer');
             if (!container) return;
-
-            // 💡 新增：用來累加購物車裡所有商品的總數量
             let totalQty = 0;
-
             if (cartData.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車是空的，快去首頁選購吧！</div>`;
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 0.5cqw;">購物車是空的，快去首頁選購吧！</div>`;
                 finalTotalAmount = 0;
-
-                // 💡 關鍵：購物車空了，呼叫更新按鈕計數為 (0)
-                updateBottomCartBadge(totalQty);
+                if (typeof updateBottomCartBadge === 'function') updateBottomCartBadge(0);
                 return;
             }
-
             let html = '';
             let total = 0;
-
             cartData.forEach(item => {
                 const itemPrice = parseInt(item.price) || 0;
-                const itemQty = parseInt(item.qty) || 1;
+                // 🎯【格式兼容】：如果之前的叫 qty，新版叫 quantity，兩者都支援，金額就不會出錯！
+                const itemQty = parseInt(item.quantity || item.qty) || 1;
                 const subtotal = itemPrice * itemQty;
                 total += subtotal;
-
-                // 💡 關鍵：把每一項商品的數量累加起來
                 totalQty += itemQty;
-
                 html += `
-            <div class="bill-item">
-                <div>
-                    <span class="item-name">${item.name}</span>
-                    <span class="item-qty">x${itemQty}</span>
-                </div>
-                <span class="item-price">$${subtotal}</span>
-            </div>
-        `;
+                <div class="bill-item">
+                    <div>
+                        <span class="item-name">${item.name}</span>
+                        <span class="item-qty">x${itemQty}</span>
+                    </div>
+                    <span class="item-price">$${subtotal}</span>
+                </div>`;
             });
-
             finalTotalAmount = total;
-
             html += `
-        <div class="bill-total-row">
-            <span class="total-label">總計金額</span>
-            <span class="total-amount" id="totalAmountText">$${finalTotalAmount}</span>
-        </div>
-    `;
+            <div class="bill-total-row">
+                <span class="total-label">總計金額</span>
+                <span class="total-amount" id="totalAmountText">$${finalTotalAmount}</span>
+            </div>`;
             container.innerHTML = html;
-
-            // 💡 關鍵：渲染完明細後，把最後算出來的總數量丟進去更新底部按鈕！
-            updateBottomCartBadge(totalQty);
-
-            // 👑 修正點：雙軌支付開關檢查機制，應該放在 renderCart 結束之前！
+            if (typeof updateBottomCartBadge === 'function') updateBottomCartBadge(totalQty);
+            // 檢查店家的金流設定開關
             if (targetStoreId) {
                 checkStorePaymentConfig(targetStoreId);
             } else {
-                // 如果是本機隨機產生的模擬資料，預設開啟信用卡
                 selectPayment("CREDIT");
                 initPaymentSelection(true, true);
             }
-        } // 👈 這裡才是 renderCart 真正的結尾！
-
-        // 🏪 3. 核心智慧連動防線：去 Firebase 撈店家設定，決定誰長灰、誰當預設值
+        }
         async function checkStorePaymentConfig(storeId) {
             const payOptCredit = document.getElementById('payOptCredit');
             const creditText = document.getElementById('creditText');
             const creditNoticeText = document.getElementById('creditNoticeText');
-
             const payOptCash = document.getElementById('payOptCash');
             const cashText = document.getElementById('cashText');
             const cashNoticeText = document.getElementById('cashNoticeText');
-
+            const dineOptTakeOut = document.getElementById('dineOptTakeOut');
+            const dineOptDineIn = document.getElementById('dineOptDineIn');
+            const dineInText = document.getElementById('dineInText');
+            const dineInNoticeText = document.getElementById('dineInNoticeText');
+            if (!payOptCredit || !payOptCash) return; // 防呆
             try {
                 const storeDoc = await getDoc(doc(db, "stores", storeId));
-
-                let isCreditAllowed = true;  // 預設給開，相容舊商家資料
-                let isCashAllowed = false;   // 現金自取通常要有勾才算數
-
+                let isCreditAllowed = true;
+                let isCashAllowed = false;
+                let isDineInAllowed = true; // 預設開放內用
                 if (storeDoc.exists()) {
                     const storeData = storeDoc.data();
-                    // 對應當初註冊時存入的欄位，這裡做防錯處理
-                    if (storeData.allowCredit !== undefined) isCreditAllowed = storeData.allowCredit;
-                    if (storeData.allowCash !== undefined) isCashAllowed = storeData.allowCash;
-                }
+                    // 🌟 100% 精準對接你的 Firebase 真實欄位！
+                    if (storeData.isOnlinePayEnabled !== undefined) isCreditAllowed = storeData.isOnlinePayEnabled;
+                    if (storeData.isCashPayEnabled !== undefined) isCashAllowed = storeData.isCashPayEnabled;
 
-                // 🔒 信用卡長灰處理
+                    // 🪑 答案就在這裡：沒錯！對接你的 Firebase 內用欄位 hasSeating
+                    if (storeData.hasSeating !== undefined) isDineInAllowed = storeData.hasSeating;
+                }
+                // ==========================================
+                // 💳 1. 線上支付 UI 處理
+                // ==========================================
                 if (isCreditAllowed) {
-                    payOptCredit.style.opacity = "1";
                     payOptCredit.style.pointerEvents = "auto";
                     payOptCredit.style.cursor = "pointer";
-                    creditText.style.color = "var(--text-main)";
-                    creditNoticeText.style.display = "none";
+                    payOptCredit.style.opacity = "1";
+                    payOptCredit.style.filter = "none";
+                    if (creditText) creditText.style.color = "var(--text-main)";
+                    if (creditNoticeText) creditNoticeText.style.display = "none";
                 } else {
-                    payOptCredit.style.opacity = "0.35";
                     payOptCredit.style.pointerEvents = "none";
-                    creditText.style.color = "var(--text-muted)";
-                    creditNoticeText.style.display = "block";
+                    payOptCredit.style.opacity = "0.35"; // 直接讓整個按鈕變灰
+                    payOptCredit.style.filter = "grayscale(1)";
+                    if (creditText) creditText.style.color = "var(--text-muted)";
+                    // 🌟 核心修正：顯示你的絕對定位紅字，因為父層 .option-option 是 relative，所以它會完美覆蓋！
+                    if (creditNoticeText) creditNoticeText.style.display = "flex";
                 }
-
-                // 🔒 現金自取長灰處理
+                // ==========================================
+                // 💵 2. 現金付款 UI 處理
+                // ==========================================
                 if (isCashAllowed) {
-                    payOptCash.style.opacity = "1";
                     payOptCash.style.pointerEvents = "auto";
                     payOptCash.style.cursor = "pointer";
-                    cashText.style.color = "var(--text-main)";
-                    cashNoticeText.style.display = "none";
+                    payOptCash.style.opacity = "1";
+                    payOptCash.style.filter = "none";
+                    if (cashText) cashText.style.color = "var(--text-main)";
+                    if (cashNoticeText) cashNoticeText.style.display = "none";
                 } else {
-                    payOptCash.style.opacity = "0.35";
                     payOptCash.style.pointerEvents = "none";
-                    cashText.style.color = "var(--text-muted)";
-                    cashNoticeText.style.display = "block";
+                    payOptCash.style.opacity = "0.35"; // 直接讓整個按鈕變灰
+                    payOptCash.style.filter = "grayscale(1)";
+                    if (cashText) cashText.style.color = "var(--text-muted)";
+                    if (cashNoticeText) cashNoticeText.style.display = "flex"; // 🌟 完美覆蓋！
                 }
+                // ==========================================
+                // 🍽️ 3. 店內內用 UI 處理
+                // ==========================================
+                if (dineOptDineIn) {
+                    if (isDineInAllowed) {
+                        dineOptDineIn.style.pointerEvents = "auto";
+                        dineOptDineIn.style.cursor = "pointer";
+                        dineOptDineIn.style.opacity = "1";
+                        dineOptDineIn.style.filter = "none";
+                        if (dineInText) dineInText.style.color = "var(--text-main)";
+                        if (dineInNoticeText) dineInNoticeText.style.display = "none";
+                    } else {
+                        dineOptDineIn.style.pointerEvents = "none";
+                        dineOptDineIn.style.opacity = "0.35"; // 直接讓整個按鈕變灰
+                        dineOptDineIn.style.filter = "grayscale(1)";
+                        if (dineInText) dineInText.style.color = "var(--text-muted)";
+                        if (dineInNoticeText) dineInNoticeText.style.display = "flex"; // 🌟 完美覆蓋！
 
-                // 🎯 智慧化引導流向：決定第一時間該自動幫買家打勾選誰
+                        // 防呆：如果店家不開內用，強制將全域選擇重置回外帶
+                        if (typeof currentDiningType !== 'undefined') currentDiningType = "TAKE_OUT";
+                        if (dineOptTakeOut) dineOptTakeOut.classList.add('selected');
+                        dineOptDineIn.classList.remove('selected');
+                    }
+                }
+                // ==========================================
+                // 🎯 4. 預設選取引導與送出按鈕防禦
+                // ==========================================
                 if (isCreditAllowed) {
                     selectPayment("CREDIT");
                 } else if (isCashAllowed) {
-                    selectPayment("CASH"); // 完美修正！如果沒刷卡但有現金，自動幫買家改勾選現金
+                    selectPayment("CASH");
                 } else {
-                    // 極端狀況防守
                     const submitBtn = document.getElementById('submitOrderBtn');
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = "<span>⚠️ 該店家不支援任何支付方式</span>";
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = "<span>⚠️ 該店家不支援任何支付方式</span>";
+                    }
                 }
-
-                // 綁定可以自由點擊的實體監聽事件
+                // 執行你原本的初始化點擊事件
                 initPaymentSelection(isCreditAllowed, isCashAllowed);
-
+                initDiningSelection(isDineInAllowed);
             } catch (err) {
-                console.error("金流防護罩讀取雲端失敗", err);
-                // 發生任何異常，退守安全底線：開啟信用卡，啟用基本選取事件
+                console.error("金流與用餐讀取失敗，採用預設值", err);
                 selectPayment("CREDIT");
                 initPaymentSelection(true, true);
             }
         }
+        function initDiningSelection(isDineInAllowed) {
+            const dineOptTakeOut = document.getElementById('dineOptTakeOut');
+            const dineOptDineIn = document.getElementById('dineOptDineIn');
+            const takeOutCheckDot = document.getElementById('takeOutCheckDot');
+            const dineInCheckDot = document.getElementById('dineInCheckDot');
+            if (!dineOptTakeOut || !dineOptDineIn) return;
+            // 🛍️ 點擊外帶自取
+            dineOptTakeOut.onclick = function () {
+                currentDiningType = "TAKE_OUT";
+                dineOptTakeOut.classList.add('selected');
+                dineOptDineIn.classList.remove('selected');
 
-        // 🎨 4. 處理實體點擊與勾選圓點之變色效果
+                // 圓點樣式切換（如果你的 CSS 是用 class 控制，這裡也可以改成 toggle class）
+                if (takeOutCheckDot) takeOutCheckDot.style.backgroundColor = "var(--brand-blue)";
+                if (dineInCheckDot) dineInCheckDot.style.backgroundColor = "transparent";
+                if (dineInCheckDot) dineInCheckDot.style.border = "2px solid var(--border-color)";
+            };
+            // 🪑 點擊店內內用（只有在店家有開放時才綁定點擊事件）
+            if (isDineInAllowed) {
+                dineOptDineIn.onclick = function () {
+                    currentDiningType = "DINE_IN";
+                    dineOptDineIn.classList.add('selected');
+                    dineOptTakeOut.classList.remove('selected');
+                    if (dineInCheckDot) dineInCheckDot.style.backgroundColor = "var(--brand-blue)";
+                    if (dineInCheckDot) dineInCheckDot.style.border = "none";
+                    if (takeOutCheckDot) takeOutCheckDot.style.backgroundColor = "transparent";
+                };
+            }
+        }
         function initPaymentSelection(isCreditAllowed, isCashAllowed) {
             const creditOpt = document.getElementById('payOptCredit');
             const cashOpt = document.getElementById('payOptCash');
-
-            if (isCreditAllowed) creditOpt.onclick = () => selectPayment("CREDIT");
-            if (isCashAllowed) cashOpt.onclick = () => selectPayment("CASH");
+            if (isCreditAllowed && creditOpt) creditOpt.onclick = () => selectPayment("CREDIT");
+            if (isCashAllowed && cashOpt) cashOpt.onclick = () => selectPayment("CASH");
         }
-
         function selectPayment(type) {
             currentPayType = type;
             const creditDot = document.getElementById('creditCheckDot');
@@ -509,64 +728,24 @@
             const creditOpt = document.getElementById('payOptCredit');
             const cashOpt = document.getElementById('payOptCash');
             const submitBtn = document.getElementById('submitOrderBtn');
-
+            if (!submitBtn) return;
             if (type === "CREDIT") {
-                creditOpt.classList.add('selected');
-                cashOpt.classList.remove('selected');
-                creditDot.style.backgroundColor = "var(--brand-blue)";
-                creditDot.style.border = "none";
-                cashDot.style.backgroundColor = "transparent";
-                cashDot.style.border = "2px solid var(--border-color)";
-                submitBtn.innerHTML = `<span>🚀 安全前往藍新金流結帳</span>`;
+                if (creditOpt) creditOpt.classList.add('selected');
+                if (cashOpt) cashOpt.classList.remove('selected');
+                if (creditDot) { creditDot.style.backgroundColor = "var(--brand-blue)"; creditDot.style.border = "none"; }
+                if (cashDot) { cashDot.style.backgroundColor = "transparent"; cashDot.style.border = "0.2cqw solid var(--border-color)"; }
+                submitBtn.innerHTML = `<span>🚀 前往線上支付</span>`;
             } else {
-                cashOpt.classList.add('selected');
-                creditOpt.classList.remove('selected');
-                cashDot.style.backgroundColor = "var(--brand-blue)";
-                cashDot.style.border = "none";
-                creditDot.style.backgroundColor = "transparent";
-                creditDot.style.border = "2px solid var(--border-color)";
-                submitBtn.innerHTML = `<span>👨‍🍳 送出訂單，現場付現</span>`;
+                if (cashOpt) cashOpt.classList.add('selected');
+                if (creditOpt) creditOpt.classList.remove('selected');
+                if (cashDot) { cashDot.style.backgroundColor = "var(--brand-blue)"; cashDot.style.border = "none"; }
+                if (creditDot) { creditDot.style.backgroundColor = "transparent"; creditDot.style.border = "0.2cqw solid var(--border-color)"; }
+                submitBtn.innerHTML = `<span>🚀 送出訂單</span>`;
             }
         }
-
-        // 🧠 5. Firebase 登入狀態監聽：名字、電話自動填寫與攔截還原
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                console.log("買家驗證已登入:", user.uid);
-
-                if (user.displayName && !document.getElementById('buyerNameInput').value) {
-                    document.getElementById('buyerNameInput').value = user.displayName;
-                }
-
-                try {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists() && userDoc.data().phone) {
-                        document.getElementById('buyerNameInput').value = userDoc.data().realName || user.displayName;
-                        document.getElementById('buyerPhoneInput').value = userDoc.data().phone || "";
-                    } else {
-                        restoreTempData();
-                    }
-                } catch (err) {
-                    restoreTempData();
-                }
-            } else {
-                console.log("買家處於免登入無痛購物中");
-                restoreTempData();
-            }
-        });
-
-        function restoreTempData() {
-            if (localStorage.getItem('temp_buyer_name')) {
-                document.getElementById('buyerNameInput').value = localStorage.getItem('temp_buyer_name');
-            }
-            if (localStorage.getItem('temp_buyer_phone')) {
-                document.getElementById('buyerPhoneInput').value = localStorage.getItem('temp_buyer_phone');
-            }
-        }
-
+        // 主題設置
         document.documentElement.setAttribute('data-theme', localStorage.getItem('pacetake-theme') || 'light');
-
-        // 🛠️ 7. 藍新 AES & SHA256 加密演算法核心
+        // 🛠️ 5. 藍新加密演算法核心
         function encryptAES(parameterString, key, iv) {
             const cryptoKey = CryptoJS.enc.Utf8.parse(key);
             const cryptoIv = CryptoJS.enc.Utf8.parse(iv);
@@ -577,62 +756,60 @@
             });
             return encrypted.toString();
         }
-
         function hashSHA256(aesString, key, iv) {
             const readyString = `HashKey=${key}&${aesString}&HashIV=${iv}`;
             return CryptoJS.SHA256(readyString).toString(CryptoJS.enc.Hex).toUpperCase();
         }
-
-        // 🚀 8. 按下巨大結帳按鈕：雙層防線全面阻截與對流分支
+        // 🚀 6. 按下巨大結帳按鈕 (雙軌分流送單)
         const submitOrderBtn = document.getElementById('submitOrderBtn');
         if (submitOrderBtn) {
             submitOrderBtn.addEventListener('click', async () => {
-                const buyerName = document.getElementById('buyerNameInput').value.trim();
-                const buyerPhone = document.getElementById('buyerPhoneInput').value.trim();
-
-                // 台灣手機號碼格式驗證
+                const buyerName = buyerNameInput.value.trim();
+                const buyerPhone = buyerPhoneInput.value.trim();
                 const phoneRegex = /^09\d{8}$/;
+
                 if (!buyerName || !phoneRegex.test(buyerPhone)) {
-                    alert("⚠️ 為了確保老闆能聯繫到您，請填寫正確的取貨人姓名與台灣手機號碼(10碼數字)喔！");
+                    alert("⚠️ 請填寫正確的取貨人姓名與台灣手機號碼(10碼數字)喔！");
                     return;
                 }
-
                 if (cartData.length === 0) {
                     alert("您的購物車是空的，無法為您建立任何付款連線。");
                     return;
                 }
 
-                // 【第一層防線】：精準攔截未登入用戶，並封存備份資料
+                // 攔截未登入用戶，記憶儲存
                 const user = auth.currentUser;
                 if (!user) {
-                    alert("🔒【PACE 安全提示】偵測到您尚未登入會員！\n系統已為您封存購物車與剛填寫的手機姓名。\n完成登入，回來即可直接結帳。");
-
+                    alert("🔒【PACE 安全提示】偵測到您尚未登入會員！\n系統已為您封存資料，請先登入後結帳。");
                     localStorage.setItem('temp_buyer_name', buyerName);
                     localStorage.setItem('temp_buyer_phone', buyerPhone);
-
-                    window.location.href = "index.html"; // 強制打回首頁觸發極簡登入
+                    window.location.href = "index.html?triggerLogin=true";
                     return;
                 }
 
-                // 產生獨一無二不重複訂單號
+                // 記住這組資料，下次打開自動帶入
+                localStorage.setItem('pace_buyer_name', buyerName);
+                localStorage.setItem('pace_buyer_phone', buyerPhone);
+
                 const timeStamp = Math.floor(Date.now() / 1000);
                 const orderMerchantOrderNo = "PACE_" + timeStamp;
 
-                // --- 🛡️ 雙軌分流核心判斷 ---
+                // 儲存買家基本資料回 users 集合
+                try {
+                    await setDoc(doc(db, "users", user.uid), {
+                        realName: buyerName,
+                        phone: buyerPhone,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+                } catch (e) { console.error("同步會員姓名失敗", e); }
 
+                // --- 🛡️ 雙軌分流核心 ---
                 if (currentPayType === "CASH") {
-                    // 💵 A 分支：走現場付現流程 (直接存雲端、不扣藍新)
+                    // 💵 A 分支：現場付現流程
                     try {
-                        // 【第二層防線】：同時發動記憶洗回雲端資料庫
-                        await setDoc(doc(db, "users", user.uid), {
-                            realName: buyerName,
-                            phone: buyerPhone,
-                            updatedAt: new Date().toISOString()
-                        }, { merge: true });
-
-                        // 寫入訂單到 Firestore，狀態給予準備中(PREPARING)
                         await addDoc(collection(db, "orders"), {
                             orderId: orderMerchantOrderNo,
+                            storeId: targetStoreId,
                             buyerUid: user.uid,
                             buyerName: buyerName,
                             buyerPhone: buyerPhone,
@@ -640,85 +817,89 @@
                             totalAmount: finalTotalAmount,
                             status: "PREPARING",
                             paymentMethod: "CASH",
-                            createdAt: new Date().toISOString()
+                            diningType: currentDiningType, // 🌟 補上：用餐方式（TAKE_OUT / DINE_IN）
+                            createdAt: serverTimestamp()
                         });
 
-                        // 清空本地打包
+                        // 清空購物車
+                        localStorage.removeItem('cart');
+                        localStorage.removeItem('pacetake_cart');
                         localStorage.removeItem('temp_buyer_name');
                         localStorage.removeItem('temp_buyer_phone');
-                        localStorage.removeItem('pacetake_cart'); // 現金送單完成，清空購物車
 
-                        alert(`🎉 訂單已成功送達店家！\n請於到店取貨時现场支付現金 $${finalTotalAmount} 元喔！`);
+                        alert(`🎉 訂單已成功送達店家！\n請於到店取貨時現場支付現金 $${finalTotalAmount} 元喔！`);
                         window.location.href = "index.html";
-                        return;
-
                     } catch (cashErr) {
                         alert("現場付現單上傳雲端失敗：" + cashErr.message);
-                        return;
                     }
-                }
+                } else {
+                    // 💳 B 分支：線上刷卡流程 (啟動藍新金流連線)
+                    alert(`🛒 安全連線建立成功！\n即將為您導向藍新加密刷卡金流，請於頁面完成付款。`);
 
-                // 💳 B 分支：走線上刷卡流程 (啟動藍新金流連線)
-                alert(`🛒 安全連線建立成功！\n即將為您導向藍新加密刷卡金流，請於頁面完成付款。`);
+                    const itemNames = cartData.map(i => i.name).join('、');
+                    const originalParameters = [
+                        `MerchantID=${NEWEBPAY_CONFIG.MerchantID}`, // 之後換成從資料庫撈店家的
+                        `RespondType=JSON`,
+                        `TimeStamp=${timeStamp}`,
+                        `Version=${NEWEBPAY_CONFIG.Version}`,
+                        `MerchantOrderNo=${orderMerchantOrderNo}`,
+                        `Amt=${finalTotalAmount}`,
+                        `ItemDesc=快拿點餐:${itemNames.substring(0, 20)}`,
+                        `Email=${user.email || 'buyer@pacetake.tw'}`,
+                        `LoginType=0`,
 
-                const itemNames = cartData.map(i => i.name).join('、');
-                const originalParameters = [
-                    `MerchantID=${NEWEBPAY_CONFIG.MerchantID}`,
-                    `RespondType=JSON`,
-                    `TimeStamp=${timeStamp}`,
-                    `Version=${NEWEBPAY_CONFIG.Version}`,
-                    `MerchantOrderNo=${orderMerchantOrderNo}`,
-                    `Amt=${finalTotalAmount}`,
-                    `ItemDesc=快拿自取:${itemNames.substring(0, 20)}`,
-                    `Email=${user.email || 'buyer@pacetake.tw'}`,
-                    `LoginType=0`,
-                    `CREDIT=1`
-                ].join('&');
+                        // 🌟 【全管道大開關】通通設為 1 送過去，讓藍新後台自己去跟店家對帳！
+                        `CREDIT=1`,    // 啟用信用卡一次付清
+                        `ANDROIDPAY=1`,// 啟用 Google Pay (藍新參數名)
+                        `SAMPAY=1`,    // 啟用 Samsung Pay
+                        `VACC=1`,      // 啟用 ATM 轉帳
+                        `CVS=1`        // 啟用 超商代碼繳費
+                        // 📝 註：LINE Pay 與 街口 在藍新新版規格中通常是走另外的專屬 API 
+                        // 或需要在藍新後台開啟「核心多元支付」，這裡我們先把最標準的這些餵飽它！
+                    ].join('&');
 
-                try {
-                    // 【第二層防線】：記憶洗回雲端資料庫
-                    await setDoc(doc(db, "users", user.uid), {
-                        realName: buyerName,
-                        phone: buyerPhone,
-                        updatedAt: new Date().toISOString()
-                    }, { merge: true });
+                    try {
+                        // 先寫入待付款單到雲端
+                        await addDoc(collection(db, "orders"), {
+                            orderId: orderMerchantOrderNo,
+                            storeId: targetStoreId,
+                            buyerUid: user.uid,
+                            buyerName: buyerName,
+                            buyerPhone: buyerPhone,
+                            items: cartData,
+                            totalAmount: finalTotalAmount,
+                            status: "PENDING_PAYMENT",
+                            paymentMethod: "CREDIT",
+                            diningType: currentDiningType, // 🌟 補上：用餐方式（TAKE_OUT / DINE_IN）
+                            createdAt: serverTimestamp()
+                        });
 
-                    // 先寫入一張待付款單到 Firestore (等藍新回傳成功後更新狀態)
-                    await addDoc(collection(db, "orders"), {
-                        orderId: orderMerchantOrderNo,
-                        buyerUid: user.uid,
-                        buyerName: buyerName,
-                        buyerPhone: buyerPhone,
-                        items: cartData,
-                        totalAmount: finalTotalAmount,
-                        status: "PENDING_PAYMENT",
-                        paymentMethod: "CREDIT",
-                        createdAt: new Date().toISOString()
-                    });
+                        // 🌟 補上防禦：跳轉前先把本地購物車清空，不然刷完卡回來車還是滿的
+                        localStorage.removeItem('cart');
+                        localStorage.removeItem('pacetake_cart');
+                        localStorage.removeItem('temp_buyer_name');
+                        localStorage.removeItem('temp_buyer_phone');
 
-                    // 清除臨時資訊
-                    localStorage.removeItem('temp_buyer_name');
-                    localStorage.removeItem('temp_buyer_phone');
+                        // 執行藍新雙重高階加密演算法
+                        const tradeInfo = encryptAES(originalParameters, NEWEBPAY_CONFIG.HashKey, NEWEBPAY_CONFIG.HashIV);
+                        const tradeSha = hashSHA256(tradeInfo, NEWEBPAY_CONFIG.HashKey, NEWEBPAY_CONFIG.HashIV);
 
-                    // 執行藍新雙重高階加密演算法
-                    const tradeInfo = encryptAES(originalParameters, NEWEBPAY_CONFIG.HashKey, NEWEBPAY_CONFIG.HashIV);
-                    const tradeSha = hashSHA256(tradeInfo, NEWEBPAY_CONFIG.HashKey, NEWEBPAY_CONFIG.HashIV);
+                        document.getElementById('formMerchantID').value = NEWEBPAY_CONFIG.MerchantID;
+                        document.getElementById('formTradeInfo').value = tradeInfo;
+                        document.getElementById('formTradeSha').value = tradeSha;
 
-                    document.getElementById('formMerchantID').value = NEWEBPAY_CONFIG.MerchantID;
-                    document.getElementById('formTradeInfo').value = tradeInfo;
-                    document.getElementById('formTradeSha').value = tradeSha;
-
-                    // 咻！表單噴發跳轉藍新刷卡頁面
-                    document.getElementById('newebpayForm').submit();
-
-                } catch (err) {
-                    alert("藍新安全加密防線建立失敗，請聯絡客服：" + err.message);
+                        // 噴發跳轉藍新
+                        document.getElementById('newebpayForm').submit();
+                    } catch (err) {
+                        alert("藍新安全加密防線建立失敗：" + err.message);
+                    }
                 }
             });
         }
-
-        // 初始化載入購物車
-        loadCartFromStorage();
+        // 執行初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initCartPage();
+        });
         window.loadCartFromStorage = loadCartFromStorage;
         window.selectPayment = selectPayment;
     </script>

@@ -289,8 +289,8 @@ function createStoreCard(store) {
                 <div class="store-name">${finalName}</div>
                 <div class="store-meta">📍 ${finalAddress} <br>⚡ 距離 ${distanceHtml}</div>
                 <div class="store-tags">
-                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金</span>
-                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 行動</span>
+                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金付款</span>
+                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 線上支付</span>
                     <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用</span>
                 </div>
             </div>

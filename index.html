@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant-TW">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
-    <!-- Favicon & Apple Touch Icon -->
-    <link rel="icon" type="image/png" href="png/logoapple.png" sizes="180x180">
-    <link rel="apple-touch-icon" href="png/logoapple.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
-    <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
+    <!-- PWA 配置 -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <!-- 一般網頁分頁圖示 -->
+    <link rel="icon" type="image/png" href="png/logo-192.png" sizes="192x192">
+    <!-- iPhone 桌面圖示專用（已修改為 180x180 正方形） -->
+    <link rel="apple-touch-icon" href="png/logo-180.png">
     <link rel="stylesheet" href="style.css">
     <style>
         /* 👑 頂部全區常駐吸附天花板 (Sticky) */
@@ -201,7 +203,7 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            justify-content: start; 
+            justify-content: start;
             gap: 0.5cqw;
             /* 卡片與卡片之間的間距改用 cqw */
             padding: 1cqw;
@@ -224,7 +226,7 @@
             height: 24cqw;
             width: 100%;
             display: flex;
-            align-items: start; 
+            align-items: start;
             color: inherit;
             box-shadow: var(--shadow-sm);
             background-color: var(--card-bg);
@@ -606,6 +608,40 @@
         </div>
     </div>
     <script type="module" src="app.js"></script>
+    <script type="module">
+        import { getCartData, modifyCartItemQty, areaData, authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
+        let allStores = [];
+        let buyerLat = null;
+        let buyerLng = null;
+        let currentBuyerAddress = "正在獲取定位中...";
+        let finalTotalAmount = 0;
+        let cartData = [];
+        let currentPayType = "";
+        let targetStoreId = "";
+        let currentDiningType = "TAKE_OUT";
+        // 藍新店家動態金鑰配置（預設為空，動態由 Firebase 覆蓋）
+        let currentStoreNewebpay = {
+            MerchantID: "",
+            HashKey: "",
+            HashIV: ""
+        };
+        // 監聽安裝事件
+        self.addEventListener('install', (event) => {
+            console.log('Service Worker 安裝成功');
+            self.skipWaiting();
+        });
+
+        // 監聽啟動事件
+        self.addEventListener('activate', (event) => {
+            console.log('Service Worker 啟動成功');
+        });
+
+        // 攔截網路請求（PWA 必備，此處採直接放行）
+        self.addEventListener('fetch', (event) => {
+            event.respondWith(fetch(event.request));
+        });
+
+    </script>
 </body>
 
 </html>

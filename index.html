@@ -465,6 +465,45 @@
             transition: color 0.2s ease;
             /* 變色時有個淡淡的過渡感 */
         }
+
+        /* 簡單的按鈕與提示框樣式 */
+        .app-btn {
+            display: none;
+            /* 預設隱藏，由 JS 判斷後顯示 */
+            padding: 3cqw 6cqw;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6cqw;
+            font-size: 4cqw;
+            cursor: pointer;
+            box-shadow: 0 1cqw 1.5cqw rgba(0, 0, 0, 0.1);
+        }
+
+        /* iOS 專用彈出提示框 */
+        .ios-modal {
+            display: none;
+            position: fixed;
+            bottom: 5cqw;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 5cqw;
+            border-radius: 4cqw;
+            box-shadow: 0 1.25cqw 5cqw rgba(0, 0, 0, 0.3);
+            width: 85%;
+            max-width: 87.5cqw;
+            z-index: 999;
+            text-align: center;
+        }
+
+        .ios-modal button {
+            margin-top: 2.5cqw;
+            background: #eee;
+            border: none;
+            padding: 1.25cqw 3.75cqw;
+            border-radius: 1.25cqw;
+        }
     </style>
 </head>
 
@@ -476,6 +515,19 @@
                     <a href="index.html" class="logo-link">
                         <img src="png/pace3.png" alt="派思 官方網站">
                     </a>
+                    <!-- 自訂安裝按鈕（適用於 Android / Chrome） -->
+                    <button id="androidInstallBtn" class="app-btn">新增至手機桌面</button>
+
+                    <!-- 自訂引導按鈕（適用於 iOS / Safari） -->
+                    <button id="iosTriggerBtn" class="app-btn">新增至手機桌面</button>
+
+                    <!-- iOS 專用提示引導視窗 -->
+                    <div id="iosPromptModal" class="ios-modal">
+                        <p><strong>💡 如何將此網站加到桌面：</strong></p>
+                        <p>1. 點選瀏覽器下方的「<strong>分享</strong>」按鈕（正方形加向上箭頭）</p>
+                        <p>2. 往下滑動，選擇「<strong>加入主畫面</strong>」</p>
+                        <button onclick="document.getElementById('iosPromptModal').style.display='none'">我知道了</button>
+                    </div>
                     <div class="avatar-container">
                         <span id="defaultIcon">👤</span>
                         <img id="userAvatarImg" src=""
@@ -640,7 +692,54 @@
         self.addEventListener('fetch', (event) => {
             event.respondWith(fetch(event.request));
         });
+        // ----------------------------------------------------
+        // 註冊 Service Worker
+        // ----------------------------------------------------
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('Service Worker 註冊成功'))
+                .catch(err => console.log('Service Worker 註冊失敗', err));
+        }
 
+        // ----------------------------------------------------
+        // 判斷裝置與操作邏輯
+        // ----------------------------------------------------
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+        // 如果使用者已經下載並從桌面開啟 APP，就不顯示任何按鈕
+        if (!isStandalone) {
+            if (isIOS) {
+                // 如果是 iOS，顯示專用按鈕，點擊彈出引導
+                const iosBtn = document.getElementById('iosTriggerBtn');
+                iosBtn.style.display = 'block';
+                iosBtn.addEventListener('click', () => {
+                    document.getElementById('iosPromptModal').style.display = 'block';
+                });
+            } else {
+                // 如果是 Android / Windows / Mac 等支援標準 PWA 的環境
+                let deferredPrompt;
+                const androidBtn = document.getElementById('androidInstallBtn');
+
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault(); // 阻止 Chrome 預設的底部彈出提示
+                    deferredPrompt = e;  // 儲存事件
+                    androidBtn.style.display = 'block'; // 顯示我們精美的自訂按鈕
+                });
+
+                androidBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt(); // 觸發系統原生安裝詢問
+                        const { outcome } = await deferredPrompt.userChoice;
+                        if (outcome === 'accepted') {
+                            console.log('使用者同意安裝');
+                        }
+                        deferredPrompt = null;
+                        androidBtn.style.display = 'none'; // 安裝後隱藏按鈕
+                    }
+                });
+            }
+        }
     </script>
 </body>
 

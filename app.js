@@ -173,9 +173,9 @@ function updateUIForUser(user, currentRole) {
         if (currentRole === "admin") {
             userNameDisplay.innerHTML = `👑 總管`;
         } else if (currentRole === "seller") {
-            userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 老闆`;
+            userNameDisplay.innerHTML = `<img src="png/logo180.png" class="buyer" alt="買家圖示"> 老闆`;
         } else {
-            userNameDisplay.innerHTML = `<img src="png/logo.png" class="buyer" alt="買家圖示"> 貴賓`;
+            userNameDisplay.innerHTML = `<img src="png/logo180.png" class="buyer" alt="買家圖示"> 貴賓`;
         }
     }
     // 只要有圖就設給 src // 頭像處理邏輯

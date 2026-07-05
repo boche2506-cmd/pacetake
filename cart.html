@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant-TW">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACE 派思 pacetake.tw - 買家首頁</title>
-    <!-- Favicon & Apple Touch Icon -->
-    <link rel="icon" type="image/png" href="png/logoapple.png" sizes="180x180">
-    <link rel="apple-touch-icon" href="png/logoapple.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="png/logoapple.png">
-    <link rel="apple-touch-icon-precomposed" href="png/logoapple.png">
+    <!-- PWA 配置 -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <!-- 一般網頁分頁圖示 -->
+    <link rel="icon" type="image/png" href="png/logo192.png" sizes="192x192">
+    <!-- iPhone 桌面圖示專用（已修改為 180x180 正方形） -->
+    <link rel="apple-touch-icon" href="png/logo180.png">
     <link rel="stylesheet" href="style.css">
     <style>
         .input-style {
@@ -356,7 +358,7 @@
                     <div class="option-option">
                         <div class="pay-option selected" data-diningtype="TAKE_OUT" id="dineOptTakeOut">
                             <div class="pay-info">
-                                <img src="png/logo.png" class="buyer" alt="買家圖示">
+                                <img src="png/logo-180.png" class="buyer" alt="買家圖示">
                                 <span id="takeOutText">外帶自取</span>
                             </div>
                             <div class="pay-check-dot" id="takeOutCheckDot">

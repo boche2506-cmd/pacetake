@@ -26,7 +26,7 @@
         }
 
         .ContactInformation {
-            height: 10%;
+            height: 12%;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -36,7 +36,6 @@
             color: var(--text-main);
             border-radius: 4cqw;
             padding: 0.25cqw;
-            margin-top: 0.5cqw;
         }
 
         .NamePhone {
@@ -85,7 +84,7 @@
         }
 
         .content {
-            height: 53%;
+            height: 51%;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -95,9 +94,9 @@
         }
 
         .contentspan {
-            height: 5%;
+            height: 8%;
             width: 100%;
-            font-size: 4cqw;
+            font-size: 5cqw;
             font-weight: 700;
             display: flex;
             flex-direction: row;
@@ -108,7 +107,7 @@
         }
 
         .bill-card {
-            height: 85%;
+            height: 77%;
             width: 100%;
             padding: 0 2cqw;
             overflow-y: auto;
@@ -124,9 +123,9 @@
         }
 
         .Remark {
-            height: 10%;
+            height: 15%;
             width: 100%;
-            font-size: 4cqw;
+            font-size: 5cqw;
             font-weight: 700;
             display: flex;
             flex-direction: column;
@@ -147,7 +146,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 2cqw 0;
+            padding: 0.5cqw 0;
             border-bottom: 0.2cqw dashed var(--border-color);
         }
 
@@ -160,7 +159,6 @@
         .item-qty {
             font-size: 4cqw;
             color: var(--text-muted);
-            margin-left: 1.5cqw;
         }
 
         .item-price {
@@ -473,10 +471,11 @@
         <input type="text" name="TradeSha" id="formTradeSha">
         <input type="text" name="Version" value="2.0">
     </form>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script type="module" src="app.js"></script>
     <script type="module">
-        import { areaData, authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
+        import { getCartData, modifyCartItemQty, areaData, authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
         let allStores = [];
         let buyerLat = null;
         let buyerLng = null;
@@ -486,7 +485,6 @@
         let currentPayType = "";
         let targetStoreId = "";
         let currentDiningType = "TAKE_OUT";
-
         // 藍新店家動態金鑰配置（預設為空，動態由 Firebase 覆蓋）
         let currentStoreNewebpay = {
             MerchantID: "",
@@ -495,7 +493,6 @@
         };
         const buyerNameInput = document.getElementById('buyerNameInput');
         const buyerPhoneInput = document.getElementById('buyerPhoneInput');
-
         // 🧠 1. 頁面初始化
         async function initCartPage() {
             // 🎯 卡住等待 Firebase 身份確認 (支援無登入無痛購物 / 匿名登入)
@@ -507,7 +504,6 @@
                 const savedPhone = localStorage.getItem('pace_buyer_phone');
                 if (savedName) buyerNameInput.value = savedName;
                 if (savedPhone) buyerPhoneInput.value = savedPhone;
-
                 // 如果不是匿名登入，嘗試去撈雲端真實檔案
                 if (!user.isAnonymous) {
                     try {
@@ -524,14 +520,11 @@
             } else {
                 console.log("買家尚未進入 Firebase Auth 狀態");
             }
-
             // 萬一完全沒資料，去撈臨時封存區備份
             if (!buyerNameInput.value) buyerNameInput.value = localStorage.getItem('temp_buyer_name') || '';
             if (!buyerPhoneInput.value) buyerPhoneInput.value = localStorage.getItem('temp_buyer_phone') || '';
-
             // 載入購物車與金流設定
             loadCartFromStorage();
-
             // 🎨 【UI 強制視覺雙校正】確保外帶自取預設亮起藍色
             const takeOutCheckDot = document.getElementById('takeOutCheckDot');
             if (takeOutCheckDot) {
@@ -543,7 +536,6 @@
                 creditCheckDot.style.backgroundColor = "var(--brand-blue)";
             }
         }
-
         // 🛒 2. 從 localStorage 載入資料
         function loadCartFromStorage() {
             cartData = (typeof getCartData === 'function') ? getCartData() : (JSON.parse(localStorage.getItem('cart')) || JSON.parse(localStorage.getItem('pacetake_cart')) || []);
@@ -552,53 +544,74 @@
             }
             renderCart();
         }
-
         // 🎨 3. 動態渲染明細與金額計算
         function renderCart() {
             const container = document.getElementById('cartItemsContainer');
             if (!container) return;
+            // 🌟 關鍵修改：每次渲染都確保去抓「最新」的資料，而不是依賴舊的全域變數
+            const currentCartData = getCartData();
             let totalQty = 0;
-            if (cartData.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 0.5cqw;">購物車是空的，快去首頁選購吧！</div>`;
-                finalTotalAmount = 0;
+            if (currentCartData.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車是空的，快去首頁選購吧！</div>`;
+                finalTotalAmount = 0; // 記得這裡如果是全域變數，要保持一致
                 if (typeof updateBottomCartBadge === 'function') updateBottomCartBadge(0);
                 return;
             }
             let html = '';
             let total = 0;
-            cartData.forEach(item => {
+            currentCartData.forEach(item => {
                 const itemPrice = parseInt(item.price) || 0;
                 const itemQty = parseInt(item.quantity || item.qty) || 1;
                 const subtotal = itemPrice * itemQty;
                 total += subtotal;
                 totalQty += itemQty;
+                // 🌟 關鍵修改：加入 + - 按鈕的 UI 結構，並加上美化的排版
                 html += `
-                <div class="bill-item">
-                    <div>
-                        <span class="item-name">${item.name}</span>
-                        <span class="item-qty">x${itemQty}</span>
-                    </div>
-                    <span class="item-price">$${subtotal}</span>
-                </div>`;
+                    <div class="bill-item" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.2cqw solid #eee;">
+                        <div style="flex: 1;">
+                            <div class="item-name" style="font-weight: bold; font-size: 4cqw;">${item.name}</div>
+                        </div>
+                        <div class="quantity-control-panel" style="display: flex; align-items: center; gap: 2cqw;">
+                            <button class="minus-btn" data-id="${item.id}" style="width: 7cqw; height: 7cqw; border-radius: 1.5cqw; border: 0.2cqw solid #ddd; background: #fff; cursor: pointer;">-</button>
+                            <span class="item-qty" style="width: 5cqw; text-align: center; font-weight: bold;">${itemQty}</span>
+                            <button class="plus-btn" data-id="${item.id}" style="width: 7cqw; height: 7cqw; border-radius: 1.5cqw; border: 0.2cqw solid #ddd; background: #fff; cursor: pointer;">+</button>
+                        </div>
+                        <div style="width: 17.5cqw; text-align: right; font-weight: bold; color: #ff6b6b;">
+                            $${subtotal}
+                        </div>
+                    </div>`;
             });
             finalTotalAmount = total;
             html += `
-            <div class="bill-total-row">
-                <span class="total-label">總計金額</span>
-                <span class="total-amount" id="totalAmountText">$${finalTotalAmount}</span>
-            </div>`;
+                            <div class="bill-total-row" style=" border-top: 0.5cqw solid #333;">
+                                <span class="total-label">總計金額</span>
+                                <span class="total-amount" id="totalAmountText" style="font-size: 5cqw; color: #ff6b6b;">$${finalTotalAmount}</span>
+                            </div>`;
             container.innerHTML = html;
             if (typeof updateBottomCartBadge === 'function') updateBottomCartBadge(totalQty);
-
             // 檢查並配置店家的金流與內用開關
-            if (targetStoreId) {
+            if (typeof targetStoreId !== 'undefined' && targetStoreId) {
                 checkStorePaymentConfig(targetStoreId);
-            } else {
+            } else if (typeof selectPayment === 'function') {
                 selectPayment("CREDIT");
                 initPaymentSelection(true, true);
             }
         }
-
+        // 🎯 3. 在 renderCart 下方加入這個事件監聽器 (Event Delegation)
+        const cartItemsContainer = document.getElementById('cartItemsContainer');
+        if (cartItemsContainer) {
+            cartItemsContainer.addEventListener('click', (e) => {
+                // 只有點擊到含有 plus-btn 或 minus-btn 的目標才執行
+                if (!e.target.matches('.plus-btn, .minus-btn')) return;
+                const itemId = e.target.getAttribute('data-id');
+                const isPlus = e.target.matches('.plus-btn');
+                const delta = isPlus ? 1 : -1;
+                // 1. 呼叫 app.js 的大腦，修改 LocalStorage 的數據
+                modifyCartItemQty(itemId, delta);
+                // 2. 數據改完後，直接重繪整個購物車清單（金額會自動重算！）
+                renderCart();
+            });
+        }
         // 🔍 4. 從雲端資料庫動態撈取商家的支付與內用權限
         async function checkStorePaymentConfig(storeId) {
             const payOptCredit = document.getElementById('payOptCredit');
@@ -611,20 +624,16 @@
             const dineOptDineIn = document.getElementById('dineOptDineIn');
             const dineInText = document.getElementById('dineInText');
             const dineInNoticeText = document.getElementById('dineInNoticeText');
-
             if (!payOptCredit || !payOptCash) return;
-
             try {
                 const storeDoc = await getDoc(doc(db, "stores", storeId));
                 let isCreditAllowed = true;
                 let isCashAllowed = false;
                 let isDineInAllowed = true;
-
                 if (storeDoc.exists()) {
                     const storeData = storeDoc.data();
                     if (storeData.isOnlinePayEnabled !== undefined) isCreditAllowed = storeData.isOnlinePayEnabled;
                     if (storeData.isCashPayEnabled !== undefined) isCashAllowed = storeData.isCashPayEnabled;
-
                     // 覆蓋動態金鑰
                     currentStoreNewebpay.MerchantID = storeData.MerchantID || "";
                     currentStoreNewebpay.HashKey = storeData.HashKey || "";
@@ -632,7 +641,6 @@
 
                     if (storeData.hasSeating !== undefined) isDineInAllowed = storeData.hasSeating;
                 }
-
                 // 線上支付 UI 渲染
                 if (isCreditAllowed) {
                     payOptCredit.style.pointerEvents = "auto";
@@ -648,7 +656,6 @@
                     if (creditText) creditText.style.color = "var(--text-muted)";
                     if (creditNoticeText) creditNoticeText.style.display = "flex";
                 }
-
                 // 現金付款 UI 渲染
                 if (isCashAllowed) {
                     payOptCash.style.pointerEvents = "auto";
@@ -664,7 +671,6 @@
                     if (cashText) cashText.style.color = "var(--text-muted)";
                     if (cashNoticeText) cashNoticeText.style.display = "flex";
                 }
-
                 // 店內內用 UI 渲染
                 if (dineOptDineIn) {
                     if (isDineInAllowed) {
@@ -686,7 +692,6 @@
                         dineOptDineIn.classList.remove('selected');
                     }
                 }
-
                 // 預設點亮選取
                 if (isCreditAllowed) {
                     selectPayment("CREDIT");
@@ -699,7 +704,6 @@
                         submitBtn.innerHTML = "<span>⚠️ 該店家不支援任何支付方式</span>";
                     }
                 }
-
                 // 重新刷新點擊事件監聽器
                 initPaymentSelection(isCreditAllowed, isCashAllowed);
                 initDiningSelection(isDineInAllowed);
@@ -709,14 +713,12 @@
                 initPaymentSelection(true, true);
             }
         }
-
         function initDiningSelection(isDineInAllowed) {
             const dineOptTakeOut = document.getElementById('dineOptTakeOut');
             const dineOptDineIn = document.getElementById('dineOptDineIn');
             const takeOutCheckDot = document.getElementById('takeOutCheckDot');
             const dineInCheckDot = document.getElementById('dineInCheckDot');
             if (!dineOptTakeOut || !dineOptDineIn) return;
-
             dineOptTakeOut.onclick = function () {
                 currentDiningType = "TAKE_OUT";
                 dineOptTakeOut.classList.add('selected');
@@ -725,7 +727,6 @@
                 if (dineInCheckDot) dineInCheckDot.style.backgroundColor = "transparent";
                 if (dineInCheckDot) dineInCheckDot.style.border = "0.2cqw solid var(--border-color)";
             };
-
             if (isDineInAllowed) {
                 dineOptDineIn.onclick = function () {
                     currentDiningType = "DINE_IN";
@@ -737,14 +738,12 @@
                 };
             }
         }
-
         function initPaymentSelection(isCreditAllowed, isCashAllowed) {
             const creditOpt = document.getElementById('payOptCredit');
             const cashOpt = document.getElementById('payOptCash');
             if (isCreditAllowed && creditOpt) creditOpt.onclick = () => selectPayment("CREDIT");
             if (isCashAllowed && cashOpt) cashOpt.onclick = () => selectPayment("CASH");
         }
-
         function selectPayment(type) {
             currentPayType = type;
             const creditDot = document.getElementById('creditCheckDot');
@@ -753,7 +752,6 @@
             const cashOpt = document.getElementById('payOptCash');
             const submitBtn = document.getElementById('submitOrderBtn');
             if (!submitBtn) return;
-
             if (type === "CREDIT") {
                 if (creditOpt) creditOpt.classList.add('selected');
                 if (cashOpt) cashOpt.classList.remove('selected');
@@ -768,17 +766,14 @@
                 submitBtn.innerHTML = `<span>🚀 送出訂單</span>`;
             }
         }
-
         // 主題設置
         document.documentElement.setAttribute('data-theme', localStorage.getItem('pacetake-theme') || 'light');
-
         // 🛠️ 5. 藍新加密演算法核心
         function encryptAES(parameterString, key, iv) {
             const cryptoKey = CryptoJS.enc.Utf8.parse(key);
             const cryptoIv = CryptoJS.enc.Utf8.parse(iv);
             // 先將原始字串明確轉為 UTF-8，避免中文加密後爛掉
             const plainText = CryptoJS.enc.Utf8.parse(parameterString);
-
             const encrypted = CryptoJS.AES.encrypt(plainText, cryptoKey, {
                 iv: cryptoIv,
                 mode: CryptoJS.mode.CBC,
@@ -791,7 +786,6 @@
             const readyString = `HashKey=${key}&${aesString}&HashIV=${iv}`;
             return CryptoJS.SHA256(readyString).toString(CryptoJS.enc.Hex).toUpperCase();
         }
-
         // 🚀 6. 按下巨大結帳按鈕 (雙軌分流送單)
         const submitOrderBtn = document.getElementById('submitOrderBtn');
         if (submitOrderBtn) {
@@ -799,7 +793,6 @@
                 const buyerName = buyerNameInput.value.trim();
                 const buyerPhone = buyerPhoneInput.value.trim();
                 const phoneRegex = /^09\d{8}$/;
-
                 if (!buyerName || !phoneRegex.test(buyerPhone)) {
                     alert("⚠️ 請填寫正確的取貨人姓名與台灣手機號碼(10碼數字)喔！");
                     return;
@@ -808,17 +801,13 @@
                     alert("您的購物車是空的，無法為您建立任何付款連線。");
                     return;
                 }
-
                 // 🌟 【免登入/匿名無痛結帳升級】：完全拔除未登入攔截與強制跳轉
                 const user = auth.currentUser;
-
                 // 本地快取記錄，方便下次自動帶入
                 localStorage.setItem('pace_buyer_name', buyerName);
                 localStorage.setItem('pace_buyer_phone', buyerPhone);
-
                 const timeStamp = Math.floor(Date.now() / 1000);
                 const orderMerchantOrderNo = "PACE_" + timeStamp;
-
                 // 如果使用者存在且非匿名，才將資料回寫雲端 users 集合
                 if (user && !user.isAnonymous) {
                     try {
@@ -829,13 +818,14 @@
                         }, { merge: true });
                     } catch (e) { console.error("同步會員姓名失敗", e); }
                 }
-
+                const pickupNo = orderMerchantOrderNo.slice(-3);
                 // --- 🛡️ 雙軌分流核心 ---
                 if (currentPayType === "CASH") {
                     // 💵 A 分支：現場付現流程
                     try {
                         await addDoc(collection(db, "orders"), {
                             orderId: orderMerchantOrderNo,
+                            pickupNo: pickupNo, // 🌟 補上這行！
                             storeId: targetStoreId,
                             buyerUid: user ? user.uid : "ANONYMOUS",
                             buyerName: buyerName,
@@ -847,15 +837,22 @@
                             diningType: currentDiningType,
                             createdAt: serverTimestamp()
                         });
-
-                        // 清空購物車
-                        localStorage.removeItem('cart');
-                        localStorage.removeItem('pacetake_cart');
-                        localStorage.removeItem('temp_buyer_name');
-                        localStorage.removeItem('temp_buyer_phone');
-
-                        alert(`🎉 訂單已成功送達店家！\n請於到店取貨時現場支付現金 $${finalTotalAmount} 元喔！`);
-                        window.location.href = "index.html";
+                        Swal.fire({
+                            title: '🎉 訂單送出成功！',
+                            html: `您的取餐號碼為：<br><h1 style="color: #ff6b6b;">🔥 ${pickupNo} 🔥</h1><br>請憑此號碼到店取餐。`,
+                            icon: 'success',
+                            confirmButtonText: '收到',
+                            confirmButtonColor: '#3085d6'
+                        }).then((result) => {
+                            if (result.isConfirmed) {// 清空購物車
+                                localStorage.removeItem('cart');
+                                localStorage.removeItem('pacetake_cart');
+                                localStorage.removeItem('temp_buyer_name');
+                                localStorage.removeItem('temp_buyer_phone');
+                                // 跳轉頁面
+                                window.location.href = "index.html";
+                            }
+                        });
                     } catch (cashErr) {
                         alert("現場付現單上傳雲端失敗：" + cashErr.message);
                     }
@@ -866,7 +863,6 @@
                         return;
                     }
                     const itemNames = cartData.map(i => i.name).join('、');
-
                     // ⚠️ 確保 timeStamp 是「秒」為單位的 10 碼數字 (非常重要)
                     const timeStamp = Math.round(Date.now() / 1000);
                     const originalParameters = [
@@ -884,12 +880,14 @@
                         `SAMPAY=1`,
                         `VACC=1`,
                         `CVS=1`
+                            `ReturnURL=https://www.pacetake.tw/index.html`,
+                        `NotifyURL=https://你的網站網域.com/api/notify` // 如果你還沒做後端接通知，這行先留著
                     ].join('&');
-
                     try {
                         // 先寫入待付款單到雲端
                         await addDoc(collection(db, "orders"), {
                             orderId: orderMerchantOrderNo,
+                            pickupNo: pickupNo, // 🌟 補上這行！
                             storeId: targetStoreId,
                             buyerUid: user ? user.uid : "ANONYMOUS",
                             buyerName: buyerName,
@@ -901,13 +899,11 @@
                             diningType: currentDiningType,
                             createdAt: serverTimestamp()
                         });
-
                         // 清空購物車
                         localStorage.removeItem('cart');
                         localStorage.removeItem('pacetake_cart');
                         localStorage.removeItem('temp_buyer_name');
                         localStorage.removeItem('temp_buyer_phone');
-
                         // 執行藍新雙重高階加密演算法
                         const tradeInfo = encryptAES(
                             originalParameters,
@@ -919,22 +915,18 @@
                             currentStoreNewebpay.HashKey,
                             currentStoreNewebpay.HashIV
                         );
-
                         // 🌟 正宗賦值，各司其職
                         document.getElementById('formMerchantID').value = currentStoreNewebpay.MerchantID;
                         document.getElementById('formTradeInfo').value = tradeInfo;
                         document.getElementById('formTradeSha').value = tradeSha;
-
                         alert(`🛒 安全連線建立成功！\n即將為您導向藍新加密金流，請於頁面完成付款。`);
                         document.getElementById('newebpayForm').submit();
-
                     } catch (err) {
                         alert("藍新安全加密防線建立失敗：" + err.message);
                     }
                 }
             });
         }
-
         // 執行初始化
         document.addEventListener('DOMContentLoaded', () => {
             initCartPage();

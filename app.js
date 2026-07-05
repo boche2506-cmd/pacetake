@@ -1036,6 +1036,23 @@ export function updateLocalStorageData(itemId, itemName, itemPrice, currentStore
     localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
     refreshTotalCartUI();
 }
+// app.js 裡新增這段：專門給購物車列表使用的「純資料修改器」
+export function modifyCartItemQty(itemId, delta) {
+    let localCartData = getCartData(); // 使用你原本寫好的 getCartData
+    const itemIndex = localCartData.findIndex(i => i.id === itemId);
+    if (itemIndex > -1) {
+        // 更新數量
+        localCartData[itemIndex].qty += delta;
+        // 如果數量扣到 0 或以下，就把這項商品從陣列中刪除
+        if (localCartData[itemIndex].qty <= 0) {
+            localCartData.splice(itemIndex, 1);
+        }
+        // 存回 localStorage
+        localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
+        // 統一更新底部的 Badge (沿用你原本寫好的函式)
+        refreshTotalCartUI();
+    }
+}
 
 export function initCartDOMState() {
     const cartItems = getCartData();
@@ -1051,6 +1068,7 @@ export function initCartDOMState() {
         }
     });
 }
+
 // 🚀 初始化區塊
 document.addEventListener('DOMContentLoaded', () => {
     fetchStoresFromFirebase();// 從firebase抓資料

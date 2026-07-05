@@ -977,7 +977,6 @@ async function initStorePage() {
             const itemId = clickedBtn.dataset.id;
             const card = clickedBtn.closest('.food-card');
             const qtyDisplay = clickedBtn.parentElement.querySelector('.qty-number');
-            const noteInput = card.querySelector('.input-style');
             let count = parseInt(qtyDisplay.innerText);
             if (e.target.matches('.plus-btn')) count++;
             else if (count > 0) count--;
@@ -989,7 +988,6 @@ async function initStorePage() {
                 currentPrice,
                 currentStoreId,
                 qtyDisplay,
-                noteInput,
                 card
             );
         });
@@ -1061,10 +1059,9 @@ export async function checkoutToFirebase(buyerPhone, sellerUid) {
     }
 }
 // 這是你現在使用的唯一更新函式
-export function updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, noteInput, card) {
+export function updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, card) {
     let localCartData = getCartData();
     const currentQty = parseInt(qtyDisplay.innerText, 10);
-    const currentNote = noteInput ? noteInput.value.trim() : "";
     // 1. 店家檢查邏輯
     if (localCartData.length > 0 && String(localCartData[0].storeId).trim() !== String(currentStoreId).trim()) {
         if (confirm("⚠️ 購物車內已有其他店家的商品，加入此商品將會清空前店清單，確定繼續嗎？")) {
@@ -1083,7 +1080,6 @@ export function updateLocalStorageData(itemId, itemName, itemPrice, currentStore
             name: itemName,
             price: itemPrice,
             qty: currentQty,
-            note: currentNote,
             storeId: currentStoreId
         });
     }

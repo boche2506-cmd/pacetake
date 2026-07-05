@@ -678,7 +678,7 @@
                 .then(() => console.log('Service Worker 註冊成功'))
                 .catch(err => console.log('註冊失敗，請確認 sw.js 檔案是否存在：', err));
         }
-
+        
         // 2. 綁定頭像點擊事件
         let deferredPrompt;
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;

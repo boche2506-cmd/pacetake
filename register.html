@@ -399,43 +399,12 @@
             -ms-overflow-style: none;
             cursor: grab;
             /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+            touch-action: manipulation
         }
 
         .category-header::-webkit-scrollbar {
             /* Chrome, Safari 隱藏軸線 */
             display: none;
-        }
-
-        .category-tab-btn {
-            font-size: 4cqw;
-            /* 字體改用 cqw */
-            color: var(--brand-blue);
-            background-color: var(--card-bg);
-            border: 0.3cqw solid var(--border-color);
-            /* 邊框粗細 cqw */
-            border-radius: 5cqw;
-            /* 圓角改用 cqw */
-            cursor: pointer;
-            white-space: nowrap;
-            box-shadow: var(--shadow-sm);
-            height: 7cqw;
-            /* 讓它在 location-bar 裡自然撐高 */
-            max-width: 28cqw;
-            /* 給予固定的 cqw 寬度 */
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            box-sizing: border-box;
-            line-height: 1.1;
-            transition: transform 0.2s;
-            /* 按下去會有一點點回饋感 */
-            flex-shrink: 0;
-        }
-
-        .category-tab-btn:active {
-            transform: scale(0.95);
-            /* 按下去變小一點，模擬點擊感 */
         }
 
         .add-category-btn,
@@ -1284,7 +1253,7 @@
                                 <div class="item-name"><input type="text" class="input-style" placeholder="品項名稱(必填)"
                                         required></div>
                                 <div class="item-price"><span class="price-symbol">$</span>
-                                    <input type="number" class="input-style" placeholder="   金額(必填)" min="0" required>
+                                    <input type="number" class="input-style" placeholder="金額(必填)" min="0" required>
                                 </div>
                             </div>
                         </div>
@@ -1677,7 +1646,7 @@
                                 <div class="item-name"><input type="text" class="input-style" placeholder="品項名稱(必填)"
                                         required></div>
                                 <div class="item-price"><span class="price-symbol">$</span>
-                                    <input type="number" class="input-style" placeholder="   金額(必填)" min="0" required>
+                                    <input type="number" class="input-style" placeholder="金額(必填)" min="0" required>
                                 </div>
                             </div>
                         </div>

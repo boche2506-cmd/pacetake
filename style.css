@@ -120,19 +120,23 @@ img,
     align-items: center;
     box-sizing: border-box;
     line-height: 1.1;
-    transition: transform 0.2s;
+    transition: all 0.2s;
     /* 按下去會有一點點回饋感 */
     flex-shrink: 0;
 }
 
+.category-tab-btn.active {
+    color: #ff6b6b;
+    /* 強制覆蓋 */
+    border: 0.3cqw solid #ff6b6b;
+    /* 底部線條與邊框同步變色 */
+    font-weight: bold;
+    background-color: #fff0f0;
+    /* 給點淡淡的背景色，看起來更像被選中 */
+}
+
 .category-tab-btn:active {
     transform: scale(0.95);
-    /* 按下去變小一點，模擬點擊感 */
-    color: #ff6b6b;
-    /* 你的主題色 */
-    border-bottom: 0.5cqw solid #ff6b6b;
-    font-weight: bold;
-    /* 粗體 */
 }
 
 /* ==========================================================================

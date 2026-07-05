@@ -41,13 +41,14 @@
         .NamePhone {
             height: 40%;
             width: 100%;
-            font-size: 4cqw;
+            font-size: 5cqw;
             font-weight: 700;
             display: flex;
             flex-direction: row;
-            justify-content: center;
+            justify-content: space-around;
             align-items: center;
             line-height: 1.1;
+            padding: 0.5cqw;
         }
 
         .Information {
@@ -551,8 +552,24 @@
             // 🌟 關鍵修改：每次渲染都確保去抓「最新」的資料，而不是依賴舊的全域變數
             const currentCartData = getCartData();
             let totalQty = 0;
+            if (currentCartData.length > 0) {
+                const targetStoreId = currentCartData[0].storeId; // 從購物車抓出店家 ID
+                const namePhoneContainer = document.querySelector('.NamePhone');
+                // 檢查容器存在，且還沒塞過按鈕 (避免每次重繪重複塞入)
+                if (namePhoneContainer && !document.getElementById('storeLinkBtn')) {
+                    const storeLinkHtml = `
+                            <div>
+                                <a id="storeLinkBtn" href="store.html?storeId=${targetStoreId}" 
+                                   style="display: inline-flex; align-items: center; gap: 1cqw; padding: 1cqw 3cqw; background: var(--theme-color, #ff6b6b); color: white; text-decoration: none; border-radius: 5cqw; font-size: 4cqw; font-weight: bold;">
+                                   🏪 返回店家繼續選購
+                                </a>
+                            </div>`;
+                    // 將這個連結按鈕，精準地插入到 📋 取餐聯絡資訊 的「最前面」
+                    namePhoneContainer.insertAdjacentHTML('afterbegin', storeLinkHtml);
+                }
+            }
             if (currentCartData.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">購物車是空的，快去首頁選購吧！</div>`;
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 5cqw;">購物車是空的，快去首頁選購吧！</div>`;
                 finalTotalAmount = 0; // 記得這裡如果是全域變數，要保持一致
                 if (typeof updateBottomCartBadge === 'function') updateBottomCartBadge(0);
                 return;
@@ -819,6 +836,8 @@
                     } catch (e) { console.error("同步會員姓名失敗", e); }
                 }
                 const pickupNo = orderMerchantOrderNo.slice(-3);
+                const remarkElement = document.getElementById('Remarkinput');
+                const orderRemark = remarkElement ? remarkElement.value.trim() : "";
                 // --- 🛡️ 雙軌分流核心 ---
                 if (currentPayType === "CASH") {
                     // 💵 A 分支：現場付現流程
@@ -832,6 +851,7 @@
                             buyerPhone: buyerPhone,
                             items: cartData,
                             totalAmount: finalTotalAmount,
+                            remark: orderRemark,
                             status: "PREPARING",
                             paymentMethod: "CASH",
                             diningType: currentDiningType,

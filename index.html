@@ -470,11 +470,11 @@
         .app-btn {
             display: none;
             /* 預設隱藏，由 JS 判斷後顯示 */
-            padding: 3cqw 6cqw;
+            padding: 3cqw;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 6cqw;
+            border-radius: 50%;
             font-size: 4cqw;
             cursor: pointer;
             box-shadow: 0 1cqw 1.5cqw rgba(0, 0, 0, 0.1);
@@ -515,12 +515,6 @@
                     <a href="index.html" class="logo-link">
                         <img src="png/pace3.png" alt="派思 官方網站">
                     </a>
-                    <!-- 自訂安裝按鈕（適用於 Android / Chrome） -->
-                    <button id="androidInstallBtn" class="app-btn">新增至手機桌面</button>
-
-                    <!-- 自訂引導按鈕（適用於 iOS / Safari） -->
-                    <button id="iosTriggerBtn" class="app-btn">新增至手機桌面</button>
-
                     <!-- iOS 專用提示引導視窗 -->
                     <div id="iosPromptModal" class="ios-modal">
                         <p><strong>💡 如何將此網站加到桌面：</strong></p>
@@ -528,7 +522,7 @@
                         <p>2. 往下滑動，選擇「<strong>加入主畫面</strong>」</p>
                         <button onclick="document.getElementById('iosPromptModal').style.display='none'">我知道了</button>
                     </div>
-                    <div class="avatar-container">
+                    <div class="avatar-container" id="avatarPwaTrigger" style="cursor: pointer;">
                         <span id="defaultIcon">👤</span>
                         <img id="userAvatarImg" src=""
                             style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"
@@ -677,69 +671,45 @@
             HashKey: "",
             HashIV: ""
         };
-        // 監聽安裝事件
-        self.addEventListener('install', (event) => {
-            console.log('Service Worker 安裝成功');
-            self.skipWaiting();
-        });
-
-        // 監聽啟動事件
-        self.addEventListener('activate', (event) => {
-            console.log('Service Worker 啟動成功');
-        });
-
-        // 攔截網路請求（PWA 必備，此處採直接放行）
-        self.addEventListener('fetch', (event) => {
-            event.respondWith(fetch(event.request));
-        });
-        // ----------------------------------------------------
-        // 註冊 Service Worker
-        // ----------------------------------------------------
+        // 1. 註冊 Service Worker (PWA 必備，維持原樣)
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js')
                 .then(() => console.log('Service Worker 註冊成功'))
                 .catch(err => console.log('Service Worker 註冊失敗', err));
         }
 
-        // ----------------------------------------------------
-        // 判斷裝置與操作邏輯
-        // ----------------------------------------------------
+        // 2. 綁定頭像點擊事件
+        let deferredPrompt;
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        const avatarTrigger = document.getElementById('avatarPwaTrigger');
 
-        // 如果使用者已經下載並從桌面開啟 APP，就不顯示任何按鈕
-        if (!isStandalone) {
+        // 【Android / Chrome 專用】捕捉系統安裝事件
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); // 阻止瀏覽器預設的底部大橫幅
+            deferredPrompt = e;  // 把安裝事件存起來
+        });
+
+        // 監聽頭像點擊
+        avatarTrigger.addEventListener('click', async () => {
             if (isIOS) {
-                // 如果是 iOS，顯示專用按鈕，點擊彈出引導
-                const iosBtn = document.getElementById('iosTriggerBtn');
-                iosBtn.style.display = 'block';
-                iosBtn.addEventListener('click', () => {
-                    document.getElementById('iosPromptModal').style.display = 'block';
-                });
+                // 如果是 iPhone，點頭像跳出引導視窗
+                document.getElementById('iosPromptModal').style.display = 'block';
             } else {
-                // 如果是 Android / Windows / Mac 等支援標準 PWA 的環境
-                let deferredPrompt;
-                const androidBtn = document.getElementById('androidInstallBtn');
-
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault(); // 阻止 Chrome 預設的底部彈出提示
-                    deferredPrompt = e;  // 儲存事件
-                    androidBtn.style.display = 'block'; // 顯示我們精美的自訂按鈕
-                });
-
-                androidBtn.addEventListener('click', async () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt(); // 觸發系統原生安裝詢問
-                        const { outcome } = await deferredPrompt.userChoice;
-                        if (outcome === 'accepted') {
-                            console.log('使用者同意安裝');
-                        }
+                // 如果是 Android，點頭像直接跳出原生的「新增至主畫面」詢問通知
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('使用者同意安裝');
                         deferredPrompt = null;
-                        androidBtn.style.display = 'none'; // 安裝後隱藏按鈕
                     }
-                });
+                } else {
+                    // 如果已經安裝過，或瀏覽器還沒準備好，點擊就正常不反應（或您可在此自行加上原本頭像的功能）
+                    console.log('目前環境不支援安裝或已安裝');
+                }
             }
-        }
+        });
+
     </script>
 </body>
 

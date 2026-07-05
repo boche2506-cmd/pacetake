@@ -673,9 +673,10 @@
         };
         // 1. 註冊 Service Worker (PWA 必備，維持原樣)
         if ('serviceWorker' in navigator) {
+            // 請確保這裡的路徑是指向您最外層的 sw.js 檔案
             navigator.serviceWorker.register('./sw.js')
                 .then(() => console.log('Service Worker 註冊成功'))
-                .catch(err => console.log('Service Worker 註冊失敗', err));
+                .catch(err => console.log('註冊失敗，請確認 sw.js 檔案是否存在：', err));
         }
 
         // 2. 綁定頭像點擊事件

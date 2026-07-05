@@ -955,6 +955,8 @@
         let currentUserId = null;
         let activeDragItem = null;
         let activeDragTab = null;   // 🎯 新增：專門給標籤用的全域變數
+        let dragStartX = 0;
+        let dragStartY = 0;
         const submitBtn = document.getElementById('submitBtn');
         const newebpayContainer = document.getElementById('newebpayContainer');
         const toggleCash = document.getElementById('toggleCash');
@@ -1448,22 +1450,54 @@
             tabBtn.addEventListener('touchstart', (e) => startTabDrag(e, tabBtn), { passive: false });
         }
         function startTabDrag(e, tabBtn) {
-            // 如果點到的是裡面的 ❌ 刪除按鈕，就跳出，不觸發拖曳
+            // 1. 如果點到刪除按鈕，立刻結束
             if (e.target.closest('[data-action="deletecategory"]')) return;
-            if (e.cancelable) e.preventDefault();
-            activeDragTab = tabBtn;
-            // 賦予標籤浮起來的視覺效果
-            tabBtn.style.transform = 'scale(1.05)';
-            tabBtn.style.opacity = '0.8';
-            tabBtn.style.zIndex = '500';
-            tabBtn.style.transition = 'transform 0.2s, opacity 0.2s';
+            // 2. 記錄起點，暫時不要觸發拖曳視覺效果
+            const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+            dragStartX = clientX;
+            dragStartY = clientY;
+            activeDragTab = tabBtn; // 先存起來
+            // 3. 綁定監測「是否真的在拖曳」的事件
             if (e.type.startsWith('touch')) {
-                window.addEventListener('touchmove', onTabDragMove, { passive: false });
-                window.addEventListener('touchend', onTabDragEnd);
+                window.addEventListener('touchmove', checkIsDragging, { passive: false });
+                window.addEventListener('touchend', endDragCheck);
             } else {
-                window.addEventListener('mousemove', onTabDragMove);
-                window.addEventListener('mouseup', onTabDragEnd);
+                window.addEventListener('mousemove', checkIsDragging);
+                window.addEventListener('mouseup', endDragCheck);
             }
+        }
+        function checkIsDragging(e) {
+            const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+            // 如果移動距離超過 5px，正式啟動拖曳視覺與監聽
+            if (Math.abs(clientX - dragStartX) > 5 || Math.abs(clientY - dragStartY) > 5) {
+                // --- 正式啟動拖曳視覺 ---
+                activeDragTab.style.transform = 'scale(1.05)';
+                activeDragTab.style.opacity = '0.8';
+                activeDragTab.style.zIndex = '500';
+                activeDragTab.style.transition = 'transform 0.2s, opacity 0.2s';
+                // 移除監測器，掛上真正的拖曳位移邏輯
+                removeCheckListeners();
+                if (e.type.startsWith('touch')) {
+                    window.addEventListener('touchmove', onTabDragMove, { passive: false });
+                    window.addEventListener('touchend', onTabDragEnd);
+                } else {
+                    window.addEventListener('mousemove', onTabDragMove);
+                    window.addEventListener('mouseup', onTabDragEnd);
+                }
+            }
+        }
+        function endDragCheck() {
+            // 如果滑鼠放開時還沒達到 5px 拖曳距離，就是一次正常的點擊
+            removeCheckListeners();
+            activeDragTab = null;
+        }
+        function removeCheckListeners() {
+            window.removeEventListener('mousemove', checkIsDragging);
+            window.removeEventListener('mouseup', endDragCheck);
+            window.removeEventListener('touchmove', checkIsDragging);
+            window.removeEventListener('touchend', endDragCheck);
         }
         function onTabDragMove(e) {
             if (!activeDragTab) return;

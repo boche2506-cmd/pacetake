@@ -41,12 +41,11 @@
 * {
     box-sizing: border-box;
     font-family: sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-
 }
 
 html,
 body {
-    margin: 0;
+    margin: 0 auto;
     padding: 0;
     height: 100vh;
     width: 100vw;
@@ -124,6 +123,7 @@ img,
     /* 按下去會有一點點回饋感 */
     flex-shrink: 0;
     padding: 1cqw;
+    touch-action: none;
 }
 
 .category-tab-btn.active {

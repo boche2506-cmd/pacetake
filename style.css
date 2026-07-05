@@ -110,9 +110,9 @@ img,
     cursor: pointer;
     white-space: nowrap;
     box-shadow: var(--shadow-sm);
-    height: 7cqw;
+    height: 100;
     /* 讓它在 location-bar 裡自然撐高 */
-    max-width: 28cqw;
+    min-width: 20cqw;
     /* 給予固定的 cqw 寬度 */
     display: flex;
     flex-direction: row;
@@ -123,6 +123,7 @@ img,
     transition: all 0.2s;
     /* 按下去會有一點點回饋感 */
     flex-shrink: 0;
+    padding: 1cqw;
 }
 
 .category-tab-btn.active {
@@ -219,7 +220,7 @@ img,
         /* 防止滑動到頂部時拖動到整個瀏覽器視窗 */
         Container-type: size;
         Container-name: phone;
-        font-size: 16px
+        font-size: 16px;
     }
 }
 

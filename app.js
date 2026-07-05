@@ -916,6 +916,60 @@ async function initStorePage() {
                 });
             });
         }
+        // --- 滑動切換分類功能 (Swipe to change category) ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        // 1. 綁定在商品卡片的大容器上，偵測手指按下的起始位置
+        if (menuContainer) {
+            menuContainer.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            // 2. 偵測手指離開的位置，並計算滑動方向
+            menuContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipeToSwitchCategory();
+            }, { passive: true });
+        }
+
+        // 3. 判斷滑動方向並觸發對應的「假點擊」
+        function handleSwipeToSwitchCategory() {
+            const swipeThreshold = 50; // 滑動超過 50px 才算數，避免誤觸
+            const deltaX = touchStartX - touchEndX;
+
+            // 如果滑動距離太短，就不做任何事
+            if (Math.abs(deltaX) < swipeThreshold) return;
+
+            // 抓出目前畫面上所有的分類按鈕
+            const allTabs = Array.from(document.querySelectorAll('.category-tab-btn'));
+            if (allTabs.length === 0) return;
+
+            // 找出當前是哪一個按鈕亮著 (active)
+            const currentIndex = allTabs.findIndex(btn => btn.classList.contains('active'));
+            if (currentIndex === -1) return;
+
+            let targetIndex = currentIndex;
+
+            if (deltaX > 0) {
+                // 向左滑 (deltaX > 0) ➡️ 代表想看「下一個」分類
+                targetIndex = Math.min(currentIndex + 1, allTabs.length - 1);
+            } else {
+                // 向右滑 (deltaX < 0) ➡️ 代表想看「上一個」分類
+                targetIndex = Math.max(currentIndex - 1, 0);
+            }
+
+            // 如果目標分類跟現在不一樣，就觸發點擊！
+            if (targetIndex !== currentIndex) {
+                const targetBtn = allTabs[targetIndex];
+
+                // 觸發你原本寫好的點擊事件！(完美連動)
+                targetBtn.click();
+
+                // 🌟 貼心小優化：如果分類很多，上方按鈕列會自動捲動到被選中的按鈕位置
+                targetBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
         // --- 事件綁定（隨後點擊加減按鈕，維持原樣） ---
         menuContainer.addEventListener('click', (e) => {
             if (!e.target.matches('.plus-btn, .minus-btn')) return;

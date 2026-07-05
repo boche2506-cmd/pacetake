@@ -97,6 +97,44 @@ img,
     background-color: transparent;
 }
 
+/* 標籤 */
+.category-tab-btn {
+    font-size: 4cqw;
+    /* 字體改用 cqw */
+    color: var(--brand-blue);
+    background-color: var(--card-bg);
+    border: 0.3cqw solid var(--border-color);
+    /* 邊框粗細 cqw */
+    border-radius: 5cqw;
+    /* 圓角改用 cqw */
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+    height: 7cqw;
+    /* 讓它在 location-bar 裡自然撐高 */
+    max-width: 28cqw;
+    /* 給予固定的 cqw 寬度 */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    line-height: 1.1;
+    transition: transform 0.2s;
+    /* 按下去會有一點點回饋感 */
+    flex-shrink: 0;
+}
+
+.category-tab-btn:active {
+    transform: scale(0.95);
+    /* 按下去變小一點，模擬點擊感 */
+    color: #ff6b6b;
+    /* 你的主題色 */
+    border-bottom: 0.5cqw solid #ff6b6b;
+    font-weight: bold;
+    /* 粗體 */
+}
+
 /* ==========================================================================
    3. 核心佈局架構 (Layout)
    ========================================================================== */
@@ -151,16 +189,15 @@ img,
     Container-name: phone;
     /* 滑鼠指標樣式 */
     cursor: default;
-
     /* 隱藏 Chrome, Safari, Edge 的卷軸 */
-    &::-webkit-scrollbar {
-        display: none;
-    }
-
     /* 隱藏 Firefox 的卷軸 */
     scrollbar-width: none;
     /* 確保內容依然可以滑動 */
     -ms-overflow-style: none;
+}
+
+.phone-wrapper::-webkit-scrollbar {
+    display: none;
 }
 
 /* 針對手機版 (通常寬度小於 600px) */
@@ -178,6 +215,7 @@ img,
         /* 防止滑動到頂部時拖動到整個瀏覽器視窗 */
         Container-type: size;
         Container-name: phone;
+        font-size: 16px
     }
 }
 

@@ -1105,37 +1105,47 @@
             let lastInsertedElement = header;
             // 🏗️ 【步驟二：重建時空】 (使用排序後的 categories)
             categories.forEach((catObj, index) => {
-                categoryCounter++;
-                const uniqueStoredId = `category-list-${categoryCounter}`;
+                // 🌟 【修正關鍵】：不要用全域變數一直加下去！
+                // 既然目前已經是排序好的順序，我們直接用這次渲染的 index 作為它唯一的 DOM 身份證！
+                const uniqueStoredId = `category-list-render-${index}`;
+
                 const newTabBtn = document.createElement('button');
                 newTabBtn.type = 'button';
+                // 確保第一個排進來的人（index === 0）擁有高亮 active
                 newTabBtn.className = index === 0 ? 'category-tab-btn active' : 'category-tab-btn';
                 newTabBtn.setAttribute('data-action', 'switchcategory');
-                newTabBtn.setAttribute('data-target', uniqueStoredId);
+                newTabBtn.setAttribute('data-target', uniqueStoredId); // 🎯 精準對齊
                 newTabBtn.innerHTML = `
-                        <span>${catObj.category}</span>
-                        <span class="tab-del-x" data-action="deletecategory" style="margin-left: 8px; cursor: pointer; color: #ff4d4d;">❌</span>
-                    `;
+            <span>${catObj.category}</span>
+            <span class="tab-del-x" data-action="deletecategory" style="margin-left: 8px; cursor: pointer; color: #ff4d4d;">❌</span>
+        `;
+
                 if (addCategoryBox) {
                     header.insertBefore(newTabBtn, addCategoryBox);
                 } else {
                     header.appendChild(newTabBtn);
                 }
-                // 🎯 記得讓回填出來的舊標籤也立刻擁有剛剛做好的拖曳功能！
+
+                // 讓回填的標籤擁有拖曳功能
                 makeTabDraggable(newTabBtn);
+
                 const newListContainer = document.createElement('div');
                 newListContainer.className = index === 0 ? 'menu-upload-list active' : 'menu-upload-list';
-                newListContainer.id = uniqueStoredId;
+                newListContainer.id = uniqueStoredId; // 🎯 精準對齊大盒子
                 newListContainer.style.display = index === 0 ? 'grid' : 'none';
+
                 // 正序車廂接龍
                 lastInsertedElement.insertAdjacentElement('afterend', newListContainer);
                 lastInsertedElement = newListContainer;
+
                 if (catObj.items && Array.isArray(catObj.items)) {
                     catObj.items.forEach(item => {
                         createNewItemRow(item, newListContainer);
                     });
                 }
             });
+            // 🌟 【防呆同步】：把全域的計數器校正回目前最大的數量，避免之後老闆按「➕」新增全新分類時 ID 衝突
+            categoryCounter = categories.length;
         }
         // 讓區域選單根據縣市「長出」選項
         // 確保 register.html 裡面有載入 areaData 的變數（如果沒有，要補上這行）
@@ -1807,39 +1817,37 @@
                 // 🎯【重大修改二】：用標籤跑迴圈，此時的 index 就是完美的最新實體順序
                 allTabs.forEach((tabBtn, index) => {
                     const targetListId = tabBtn.getAttribute('data-target');
-                    // 用標籤身上的 data-target 精準抓出它對應的那個大盒子
                     const list = document.getElementById(targetListId);
-                    if (!list) return; // 安全防呆
-                    // 2. 針對「這一個大盒子」，抓取它裡面的所有商品列
+                    if (!list) return;
+
                     const menuRows = list.querySelectorAll('.menu-item-row');
-                    if (menuRows.length === 0) return; // 如果這一頁完全沒有商品列，直接跳過
-                    // 3. 找出這一個大盒子對應的「分類名稱」是什麼？
-                    // 🎯 貼心修正：因為按鈕內包含 ❌，我們只抓包著品名的 <span>，才不會把 ❌ 存進資料庫
+
+                    // 🧠 貼心修正：就算分類裡面暫時沒有商品，我們也該把這個「分類小火車」的順序記下來！
+                    // 這樣才不會因為裡面沒商品，導致後面其他分類的 index 錯亂。
                     const textSpan = tabBtn.querySelector('span');
                     const categoryName = textSpan ? textSpan.textContent.trim() : tabBtn.textContent.trim();
                     const menuItems = [];
+
                     menuRows.forEach((row) => {
                         const toggle = row.querySelector('.menu-soldout-toggle');
-                        const supply = toggle ? toggle.checked : true; // 預設為 true (有貨)
+                        const supply = toggle ? toggle.checked : true;
                         const nameVal = row.querySelector('.item-name input').value.trim();
                         if (!nameVal) return;
-                        let itemObj = {
+
+                        menuItems.push({
                             name: nameVal,
                             supply: supply,
                             image: row.querySelector('.preview-img').src,
-                            price: parseInt(row.querySelector('.item-price input').value) || 0 // 直接抓取單一價格欄位
-                        };
-                        menuItems.push(itemObj);
-                    });
-                    // 5. 如果這個分類裡面真的有打包到有效商品，才塞進大禮包
-                    if (menuItems.length > 0) {
-                        categorizedMenu.push({
-                            category: categoryName,
-                            items: menuItems,
-                            // 🔥【核心補丁】：蓋上最新拖曳順序的「號碼牌」，讓資料庫記住它被拖到第幾個！
-                            sortIndex: index
+                            price: parseInt(row.querySelector('.item-price input').value) || 0
                         });
-                    }
+                    });
+
+                    // 🌟 不管裡面有沒有商品，只要這個「標籤」存在，它就配擁有自己當前的 sortIndex！
+                    categorizedMenu.push({
+                        category: categoryName,
+                        items: menuItems, // 可能是空的陣列 []，沒關係，代表空分類
+                        sortIndex: index  // 🎯 這樣就能 100% 保證 標籤1=0, 標籤2=1, 標籤3=2
+                    });
                 });
                 // 🎯【精簡版防呆】：如果畫面剛開完全沒分類（完全空空的初始狀態下），為了保底防呆，直接塞進一個預設
                 if (categorizedMenu.length === 0) {

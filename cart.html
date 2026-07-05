@@ -626,9 +626,9 @@
                     if (storeData.isCashPayEnabled !== undefined) isCashAllowed = storeData.isCashPayEnabled;
 
                     // 覆蓋動態金鑰
-                    currentStoreNewebpay.MerchantID = storeData.newebpayMerchantID || "";
-                    currentStoreNewebpay.HashKey = storeData.newebpayHashKey || "";
-                    currentStoreNewebpay.HashIV = storeData.newebpayHashIV || "";
+                    currentStoreNewebpay.MerchantID = storeData.MerchantID || "";
+                    currentStoreNewebpay.HashKey = storeData.HashKey || "";
+                    currentStoreNewebpay.HashIV = storeData.HashIV || "";
 
                     if (storeData.hasSeating !== undefined) isDineInAllowed = storeData.hasSeating;
                 }
@@ -776,15 +776,19 @@
         function encryptAES(parameterString, key, iv) {
             const cryptoKey = CryptoJS.enc.Utf8.parse(key);
             const cryptoIv = CryptoJS.enc.Utf8.parse(iv);
-            const encrypted = CryptoJS.AES.encrypt(parameterString, cryptoKey, {
+            // 先將原始字串明確轉為 UTF-8，避免中文加密後爛掉
+            const plainText = CryptoJS.enc.Utf8.parse(parameterString);
+
+            const encrypted = CryptoJS.AES.encrypt(plainText, cryptoKey, {
                 iv: cryptoIv,
                 mode: CryptoJS.mode.CBC,
                 padding: CryptoJS.pad.Pkcs7
             });
-            return encrypted.toString();
+            // 藍新規定必須轉為 Hex 字串 (小寫/大寫皆可，CryptoJS 預設小寫)
+            return encrypted.ciphertext.toString(CryptoJS.enc.Hex);
         }
         function hashSHA256(aesString, key, iv) {
-            const readyString = `HashKey=${key}&${aesString}&HashIV=${iv}`; // 👈 檢查這裡！
+            const readyString = `HashKey=${key}&${aesString}&HashIV=${iv}`;
             return CryptoJS.SHA256(readyString).toString(CryptoJS.enc.Hex).toUpperCase();
         }
 
@@ -857,17 +861,22 @@
                     }
                 } else {
                     // 💳 B 分支：線上刷卡流程 (啟動藍新金流連線)
-                    alert(`🛒 安全連線建立成功！\n即將為您導向藍新加密刷卡金流，請於頁面完成付款。`);
-
+                    if (!currentStoreNewebpay.MerchantID || !currentStoreNewebpay.HashKey || !currentStoreNewebpay.HashIV) {
+                        alert("⚠️ 系統提示：該店家尚未配置線上金流參數，請聯繫店家或改用現場付現。");
+                        return;
+                    }
                     const itemNames = cartData.map(i => i.name).join('、');
+
+                    // ⚠️ 確保 timeStamp 是「秒」為單位的 10 碼數字 (非常重要)
+                    const timeStamp = Math.round(Date.now() / 1000);
                     const originalParameters = [
-                        `MerchantID=${currentStoreNewebpay.MerchantID || 'MS159240719'}`,
+                        `MerchantID=${currentStoreNewebpay.MerchantID}`,
                         `RespondType=JSON`,
                         `TimeStamp=${timeStamp}`,
-                        `Version=2.0`,
+                        `Version=2.0`, // 👈 這裡一定要有！
                         `MerchantOrderNo=${orderMerchantOrderNo}`,
                         `Amt=${finalTotalAmount}`,
-                        `ItemDesc=快拿點餐:${itemNames.substring(0, 20)}`,
+                        `ItemDesc=派思點餐:${itemNames.substring(0, 20)}`,
                         `Email=${(user && user.email) ? user.email : 'buyer@pacetake.tw'}`,
                         `LoginType=0`,
                         `CREDIT=1`,
@@ -902,22 +911,23 @@
                         // 執行藍新雙重高階加密演算法
                         const tradeInfo = encryptAES(
                             originalParameters,
-                            currentStoreNewebpay.HashKey || 'OHfk5ihgUykYAHw4XGaAKswrPlpnVpfj',
-                            currentStoreNewebpay.HashIV || 'CIntuhlC0cyZscDP'
+                            currentStoreNewebpay.HashKey,
+                            currentStoreNewebpay.HashIV
                         );
                         const tradeSha = hashSHA256(
                             tradeInfo,
-                            currentStoreNewebpay.HashKey || 'OHfk5ihgUykYAHw4XGaAKswrPlpnVpfj',
-                            currentStoreNewebpay.HashIV || 'CIntuhlC0cyZscDP'
+                            currentStoreNewebpay.HashKey,
+                            currentStoreNewebpay.HashIV
                         );
 
-                        // 🌟 修正：此處直接對齊新金鑰，徹底移除已不存在的 NEWEBPAY_CONFIG
-                        document.getElementById('formMerchantID').value = currentStoreNewebpay.MerchantID || 'MS159240719';
+                        // 🌟 正宗賦值，各司其職
+                        document.getElementById('formMerchantID').value = currentStoreNewebpay.MerchantID;
                         document.getElementById('formTradeInfo').value = tradeInfo;
                         document.getElementById('formTradeSha').value = tradeSha;
 
-                        // 噴發跳轉藍新
+                        alert(`🛒 安全連線建立成功！\n即將為您導向藍新加密金流，請於頁面完成付款。`);
                         document.getElementById('newebpayForm').submit();
+
                     } catch (err) {
                         alert("藍新安全加密防線建立失敗：" + err.message);
                     }

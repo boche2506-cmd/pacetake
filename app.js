@@ -831,9 +831,9 @@ async function initStorePage() {
         // 🔥【關鍵修正】：把撈出來的分類文件轉成陣列，並依照你在後台蓋樓的數字順序進行排序
         // 這樣能保證 category-list-1 永遠排在 category-list-2 前面，不會被隨機打亂
         const sortedDocs = menuSnapshot.docs.sort((a, b) => {
-            const numA = parseInt(a.id.replace('category-list-', '')) || 0;
-            const numB = parseInt(b.id.replace('category-list-', '')) || 0;
-            return numA - numB; // 正序排列
+            const sortA = a.data().sortIndex !== undefined ? a.data().sortIndex : 999;
+            const sortB = b.data().sortIndex !== undefined ? b.data().sortIndex : 999;
+            return sortA - sortB; // 由小到大排序 (0 -> 1 -> 2)
         });
         // 2. 第一層迴圈：使用排序好的文件陣列（sortedDocs）
         sortedDocs.forEach((doc, catIndex) => {

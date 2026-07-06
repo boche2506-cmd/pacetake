@@ -66,8 +66,6 @@ const gpsPinBtn = document.getElementById('gpsPinBtn');
 const addressDetailLightbox = document.getElementById('addressDetailLightbox');
 const modalAddressText = document.getElementById('modalAddressText');
 const globalSearchInput = document.getElementById('globalSearchInput');
-const statusDot = document.getElementById('statusDot');
-const statusText = document.getElementById('statusText');
 const toggleBtn = document.getElementById('themeToggleBtn');
 const heartIcon = document.getElementById('heart-icon');
 const menuContainer = document.getElementById('menuContainer');
@@ -168,6 +166,7 @@ async function fetchStoresFromFirebase() {
 function updateUIForUser(user, currentRole) {
     const userAvatarImg = document.getElementById('userAvatarImg');
     const defaultIcon = document.getElementById('defaultIcon');
+    const statusContainer = document.getElementById('statusmsg');
     // 角色顯示邏輯// 如果程式執行到這裡，表示 user 一定存在，可以安心讀取資料
     if (userNameDisplay) {
         if (currentRole === "admin") {
@@ -183,18 +182,20 @@ function updateUIForUser(user, currentRole) {
         userAvatarImg.src = user.photoURL;
         userAvatarImg.style.display = 'block'; // 顯示圖片
         defaultIcon.style.display = 'none';    // 隱藏文字
-        if (statusDot && statusText) {
-            statusDot.classList.add('active');
-            statusText.innerText = `您好 ${user.displayName || 'PACE用戶'} ~\n目前沒有進行中的訂單喔！`;
-        }
+        statusContainer.innerHTML = `
+            <a class="statusText" href="orders.html">
+                <div class="status-indicator"></div>
+                <span>您好 ${user.displayName || 'PACE用戶'} ~<br>請點此查看訂單狀態！</span>
+            </a>`;
     } else {
         userAvatarImg.src = '';                // 清空 src
         userAvatarImg.style.display = 'none';  // 隱藏圖片
         defaultIcon.style.display = 'block';   // 顯示文字
-        if (statusDot && statusText) {
-            statusDot.classList.remove('active');
-            statusText.innerText = "請連結google帳號\n或使用電子郵件登入";
-        }
+        statusContainer.innerHTML = `
+            <button class="statusText" data-action="loginBtn">
+                <div class="status-indicatorlogin"></div>
+                <span>請點此連結google帳號<br>或使用電子郵件登入</span>
+            </button>`;
     }
     renderDynamicMenu(currentRole, user);
 }

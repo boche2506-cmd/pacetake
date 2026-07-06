@@ -14,11 +14,72 @@
     <link rel="apple-touch-icon" href="png/logo180.png">
     <link rel="stylesheet" href="style.css">
     <style>
+        .history {
+            height: 3%;
+            max-width: 100%;
+            font-size: 6cqw;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.1;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
         .history-list {
-            padding: 20px;
+            height: 55%;
+            max-width: 100%;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 0.5cqw;
+            /* 卡片與卡片之間的間距改用 cqw */
+            padding: 1cqw;
+            /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
+            box-sizing: border-box;
+            /* 隱藏 Firefox 的卷軸 */
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
+            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+        }
+
+        .history-list::-webkit-scrollbar {
+            /* Chrome, Safari 隱藏軸線 */
+            display: none;
+        }
+
+        .history-login {
+            height: 30%;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .submit-order-btn {
+            height: 95%;
+            width: 90%;
+            background-color: var(--brand-blue);
+            color: white;
+            border: none;
+            padding: 4cqw;
+            border-radius: 3.5cqw;
+            font-size: 4cqw;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 1cqw 3cqw rgba(0, 102, 255, 0.15);
+            transition: all 0.15s ease;
+        }
+
+        .loginBtn:active {
+            transform: scale(0.98);
         }
 
         .history-card {
@@ -91,7 +152,6 @@
 </head>
 
 <body>
-
     <div class="phone-wrapper">
         <div id="buyerView" style="display: block;">
             <header class="header">
@@ -117,38 +177,10 @@
                     </div>
                 </div>
             </header>
-
-            <main class="history-list">
-                <!-- 紀錄 1 -->
-                <div class="history-card">
-                    <div class="card-top">
-                        <span class="store-title">池上木盒便當 - 信義店</span>
-                        <span class="order-date">2026/05/22</span>
-                    </div>
-                    <div class="card-mid">
-                        招牌木盒便當 x2、酥炸大雞腿便當 x1
-                    </div>
-                    <div class="card-bottom">
-                        <span class="total-amount">實付金額：$375</span>
-                        <a href="store.html" class="reorder-btn nav-fast">🔁 再點一次</a>
-                    </div>
-                </div>
-
-                <!-- 紀錄 2 -->
-                <div class="history-card">
-                    <div class="card-top">
-                        <span class="store-title">大苑子茶飲 - 數位站</span>
-                        <span class="order-date">2026/05/18</span>
-                    </div>
-                    <div class="card-mid">
-                        高山青茶(去冰微糖) x2、翡翠檸檬 x1
-                    </div>
-                    <div class="card-bottom">
-                        <span class="total-amount">實付金額：$165</span>
-                        <a href="store.html" class="reorder-btn nav-fast">🔁 再點一次</a>
-                    </div>
-                </div>
-            </main>
+            <div class="history"><span>⏳ 歷史訂單</span></div>
+            <main class="history-list" id="historylist"></main>
+            <div class="history-login">
+            </div>
         </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
             <div class="modal-card">
@@ -203,28 +235,116 @@
     </div>
     <script type="module" src="app.js"></script>
     <script type="module">
-        function bindFastClick(element, callback) {
-            if (!element) return;
-            let triggered = false;
-            function trigger(e) {
-                if (!triggered) {
-                    triggered = true;
-                    setTimeout(() => { triggered = false; }, 300);
-                    callback(e);
-                }
-                e.preventDefault();
+        import { getCartData, modifyCartItemQty, areaData, authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from './app.js';
+        let allStores = [];
+        let buyerLat = null;
+        let buyerLng = null;
+        let currentBuyerAddress = "正在獲取定位中...";
+        let finalTotalAmount = 0;
+        let cartData = [];
+        let currentPayType = "";
+        let targetStoreId = "";
+        let currentDiningType = "TAKE_OUT";
+        // 藍新店家動態金鑰配置（預設為空，動態由 Firebase 覆蓋）
+        let currentStoreNewebpay = {
+            MerchantID: "",
+            HashKey: "",
+            HashIV: ""
+        };
+        async function renderHistoryOrders() {
+            const user = await authReady;
+            const historyContainer = document.getElementById('historylist');
+            if (!historyContainer) return;
+            if (!user) {
+                historyContainer.innerHTML = `
+                        <div style="text-align:center; padding: 10cqw;">
+                            <p>您尚未登入</p>
+                            <button onclick="window.location.href='login.html'" style="padding: 2cqw 5cqw;">前往登入/註冊</button>
+                        </div>`;
+                return;
             }
-            element.addEventListener('touchstart', trigger, { passive: false });
-            element.addEventListener('mousedown', trigger);
+            if (user.isAnonymous) {
+                historyContainer.innerHTML = `
+                        <div style="text-align:center; padding: 5cqw; border: 0.2cqw dashed #ccc; border-radius: 4cqw; margin-bottom: 4cqw;">
+                            <p style="font-size: 4cqw; font-weight: bold; margin-bottom: 2cqw;">⚠️ 您目前使用匿名身份</p>
+                            <p style="font-size: 3.5cqw; color: #666; margin-bottom: 4cqw;">
+                                匿名訂單僅在此裝置有效。<br>
+                                建議您<b>綁定帳號</b>以永久保存您的歷史紀錄喔！
+                            </p>
+                            <button class="loginBtn" data-action="loginBtn" 
+                                style="display: block; width: 80%; margin: 0 auto; padding: 3cqw; background: var(--brand-green); color: white; border-radius: 3cqw; border: none; font-size: 4cqw; font-weight: bold; cursor: pointer;">
+                               🔐 立即綁定 / 登入帳號
+                            </button>
+                        </div>
+                        <div id="historyListContainer"></div> `;
+                // 之後再繼續執行 renderHistoryOrders 的列表渲染邏輯...
+            }
+            try {
+                // 1. 抓取該用戶的訂單，按時間排序
+                const q = query(
+                    collection(db, "orders"),
+                    where("buyerUid", "==", user.uid),
+                    orderBy("createdAt", "desc")
+                );
+
+                const snapshot = await getDocs(q);
+
+                if (snapshot.empty) {
+                    historyContainer.innerHTML = '<div style="text-align:center; padding: 5cqw;">📜 目前還沒有歷史訂單紀錄喔！</div>';
+                    return;
+                }
+
+                historyContainer.innerHTML = ""; // 清空容器
+
+                snapshot.forEach((doc) => {
+                    const order = doc.data();
+                    const card = createOrderCard(order, doc.id); // 傳入 doc.id 以便後續導向
+                    historyContainer.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error("讀取歷史訂單失敗:", error);
+                historyContainer.innerHTML = '<p style="text-align:center;">載入失敗，請稍後再試。</p>';
+            }
         }
 
-        const navElements = document.querySelectorAll('.nav-fast');
-        navElements.forEach(elem => {
-            bindFastClick(elem, () => {
-                const dest = elem.getAttribute('href');
-                if (dest && dest !== '#') { window.location.href = dest; }
-            });
+        function createOrderCard(order, orderId) {
+            // 格式化日期
+            const date = order.createdAt ? order.createdAt.toDate().toLocaleDateString('zh-TW') : "未知時間";
+
+            // 狀態處理
+            const statusMap = {
+                "PREPARING": { text: "⏱️ 製作中", color: "#e67e22" },
+                "COMPLETED": { text: "✅ 已完成", color: "#2ecc71" },
+                "PENDING_PAYMENT": { text: "⏳ 待付款", color: "#9b59b6" }
+            };
+            const status = statusMap[order.status] || { text: "未知狀態", color: "#95a5a6" };
+
+            const card = document.createElement('a');
+            // 點擊後跳轉到 orders.html 並帶上訂單 ID
+            card.href = `orders.html?orderId=${orderId}`;
+            card.className = 'history-card';
+            card.style.cssText = "display: block; text-decoration: none; color: inherit; padding: 4cqw; border-bottom: 0.2cqw solid #eee; background: white;";
+
+            card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2cqw;">
+                        <span style="font-weight: 800; font-size: 4.5cqw;">${order.shopName || '未知店家'}</span>
+                        <span style="font-size: 3.5cqw; color: ${status.color}; font-weight: bold;">${status.text}</span>
+                    </div>
+                   <div style="font-size: 3.5cqw; color: #888;">日期：${date} | 編號：#${order.pickupNo || '---'}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2cqw;">
+                        <span style="font-size: 3.5cqw; color: var(--text-muted);">
+                            ${order.items.slice(0, 2).map(i => i.name).join('、')}${order.items.length > 2 ? '...' : ''}
+                        </span>
+                        <span style="font-size: 4cqw; font-weight: bold; color: #ff6b6b;">$${order.totalAmount}</span>
+                    </div>`;
+            return card;
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            renderHistoryOrders();
+            console.log("系統初始化完成");
         });
+
     </script>
 </body>
 

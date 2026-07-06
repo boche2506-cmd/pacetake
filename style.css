@@ -491,6 +491,60 @@ img,
     /* 登出按鈕移過去時顯示淡淡的綠色 */
 }
 
+/* 左側：訂單狀態訊息區塊 */
+.status-msg {
+    height: 65%;
+    max-width: 65%;
+}
+
+.statusText {
+    height: 100%;
+    width: 100%;
+    font-size: 4.5cqw;
+    /* 字體改用 cqw */
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 2cqw;
+    /* 發光圓點與文字的間距 */
+    text-decoration: none;
+    line-height: 1;
+    /* 💡 新增：給予舒適的行高，讓兩行字並存時不擁擠 */
+    transition: transform 0.2s;
+    /* 按下去會有一點點回饋感 */
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.statusText:active {
+    transform: scale(0.95);
+    /* 按下去變小一點，模擬點擊感 */
+}
+
+/* 🔴 預設未啟用狀態的狀態點 */
+.status-indicatorlogin {
+    width: 1.5cqw;
+    /* 改用 cqw，維持漂亮的正圓形比例 */
+    height: 1.5cqw;
+    border-radius: 50%;
+    background-color: #ff4d4f;
+    box-shadow: 0 0 1.5cqw #ff4d4f;
+    /* 陰影發光改用 cqw */
+    flex-shrink: 0;
+    /* 確保圓點絕不被文字擠壓扁掉 */
+}
+
+/* 🟢 進行中（Active）狀態點 */
+.status-indicator {
+    width: 1.5cqw;
+    height: 1.5cqw;
+    border-radius: 50%;
+    background-color: #52c41a;
+    box-shadow: 0 0 1.5cqw #52c41a;
+    flex-shrink: 0;
+}
+
 /* ==========================================================================
    9. 燈箱模態框與通用組件 (Modals & Utilities)
    ========================================================================== */

@@ -242,9 +242,8 @@
             </div>
             <!-- GPS 導航自取大鈕 -->
             <div class="navbtn">
-                <a href="https://google.com" class="nav-btn">📍 導航前往：池上木盒便當 - 信義店</a>
+                <a  class="nav-btn" id="navbtn">📍 準備導航中...</a>
             </div>
-
         </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
             <div class="modal-card">
@@ -384,6 +383,39 @@
             container.innerHTML = html;
             // 4. 更新備註
             document.getElementById('orderRemarkDisplay').textContent = order.remark ? `備註：${order.remark}` : "無特別備註";
+            initNavigationButton(order);
+        }
+        function initNavigationButton(order) {
+            if (!order) return;
+
+            // 1. 抓出店家座標並轉換為數字
+            const sLat = parseFloat(order.shopLat || order.lat);
+            const sLng = parseFloat(order.shopLng || order.lng);
+            const shopName = order.shopName || order.name || '未知店家';
+
+            // 2. 抓取網頁上的按鈕元素 (✅ 修正 1：加上 # 號)
+            const navBtn = document.querySelector('#navbtn');
+
+            // ✅ 修正 2：統一使用大寫的 B (navBtn)
+            if (!navBtn) {
+                console.warn(`[PACE DEBUG] 找不到導航按鈕元素`);
+                return;
+            }
+
+            // 3. 拼裝出 Google Maps 導航連結 (✅ 修正 3：補上 $ 符號，並使用官方推薦的導航網址格式)
+            let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(shopName)}`;
+            if (!isNaN(sLat) && !isNaN(sLng)) {
+                // 使用經緯度直接開啟導航
+                mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${sLat},${sLng}`;
+            }
+
+            // 4. 一氣呵成帶入 HTML
+            navBtn.href = mapUrl;
+            navBtn.target = "_blank";
+            navBtn.rel = "noopener noreferrer";
+            navBtn.innerText = `📍 導航前往：${shopName}`;
+
+            console.log(`[PACE DEBUG] 導航按鈕初始化成功！目標：${shopName}, 網址：${mapUrl}`);
         }
     </script>
 </body>

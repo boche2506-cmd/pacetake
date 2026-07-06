@@ -615,6 +615,11 @@
                 let isDineInAllowed = true;
                 if (storeDoc.exists()) {
                     const storeData = storeDoc.data();
+                    window.currentStoreCheckoutInfo = {
+                        shopName: storeData.shopName || storeData.name || '未知店家',
+                        shopLat: storeData.shopLat || storeData.lat,
+                        shopLng: storeData.shopLng || storeData.lng
+                    };
                     if (storeData.isOnlinePayEnabled !== undefined) isCreditAllowed = storeData.isOnlinePayEnabled;
                     if (storeData.isCashPayEnabled !== undefined) isCashAllowed = storeData.isCashPayEnabled;
                     // 覆蓋動態金鑰
@@ -812,6 +817,10 @@
                             orderId: orderMerchantOrderNo,
                             pickupNo: pickupNo, // 🌟 補上這行！
                             storeId: targetStoreId,
+                            // 🔥 【新增這三行】直接把店家的名字跟座標「拷貝」進訂單裡
+                            shopName: window.currentStoreCheckoutInfo?.shopName || '未知店家',
+                            shopLat: window.currentStoreCheckoutInfo?.shopLat || null,
+                            shopLng: window.currentStoreCheckoutInfo?.shopLng || null,
                             buyerUid: user ? user.uid : "ANONYMOUS",
                             buyerName: buyerName,
                             buyerPhone: buyerPhone,
@@ -876,6 +885,10 @@
                             orderId: orderMerchantOrderNo,
                             pickupNo: pickupNo, // 🌟 補上這行！
                             storeId: targetStoreId,
+                            // 🔥 【新增這三行】直接把店家的名字跟座標「拷貝」進訂單裡
+                            shopName: window.currentStoreCheckoutInfo?.shopName || '未知店家',
+                            shopLat: window.currentStoreCheckoutInfo?.shopLat || null,
+                            shopLng: window.currentStoreCheckoutInfo?.shopLng || null,
                             buyerUid: user ? user.uid : "ANONYMOUS",
                             buyerName: buyerName,
                             buyerPhone: buyerPhone,

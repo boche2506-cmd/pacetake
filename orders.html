@@ -315,11 +315,8 @@
             HashKey: "",
             HashIV: ""
         };
-        import { collection, query, where, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore.js";
-
         // 假設你已經有 auth 和 db 的設定
         const user = auth.currentUser;
-
         if (user) {
             // 監聽該用戶的最新一筆訂單
             const q = query(
@@ -328,22 +325,18 @@
                 orderBy("createdAt", "desc"),
                 limit(1)
             );
-
             onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) return;
                 const order = snapshot.docs[0].data();
                 renderOrder(order);
             });
         }
-
         function renderOrder(order) {
             // 1. 更新號碼牌
             document.getElementById('orderPickupNo').textContent = `#${order.pickupNo}`;
-
             // 2. 更新狀態文字 (根據 status 邏輯)
             const statusEl = document.getElementById('orderStatusTitle');
             const descEl = document.getElementById('orderStatusDesc');
-
             if (order.status === "PREPARING") {
                 statusEl.textContent = "⏱️ 餐點製作中...";
                 descEl.textContent = "店家已接單，正在為您準備餐點。";
@@ -351,16 +344,13 @@
                 statusEl.textContent = "✅ 餐點已完成！";
                 descEl.textContent = "請到櫃檯憑號碼領取。";
             }
-
             // 3. 渲染商品明細
             const container = document.getElementById('cartItemsContainer');
             container.innerHTML = order.items.map(item => `
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-            <span>${item.name} x ${item.quantity}</span>
-            <span>$${item.price * item.quantity}</span>
-        </div>
-    `).join('');
-
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span>${item.name} x ${item.quantity}</span>
+                        <span>$${item.price * item.quantity}</span>
+                    </div>`).join('');
             // 4. 更新備註
             document.getElementById('orderRemarkDisplay').textContent = order.remark ? `備註：${order.remark}` : "無特別備註";
         }

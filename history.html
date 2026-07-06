@@ -28,7 +28,7 @@
         }
 
         .history-list {
-            height: 55%;
+            height: 70%;
             max-width: 100%;
             overflow-y: auto;
             display: flex;
@@ -50,47 +50,15 @@
             display: none;
         }
 
-        .history-login {
-            height: 30%;
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            box-sizing: border-box;
-        }
-
-        .submit-order-btn {
-            height: 95%;
-            width: 90%;
-            background-color: var(--brand-blue);
-            color: white;
-            border: none;
-            padding: 4cqw;
-            border-radius: 3.5cqw;
-            font-size: 4cqw;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 1cqw 3cqw rgba(0, 102, 255, 0.15);
-            transition: all 0.15s ease;
-        }
-
-        .loginBtn:active {
-            transform: scale(0.98);
-        }
-
         .history-card {
             background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 14px;
+            border: 0.2cqw solid var(--border-color);
+            border-radius: 4cqw;
+            padding: 3.5cqw;
             box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 2.5cqw;
         }
 
         .card-top {
@@ -148,6 +116,23 @@
             transform: scale(0.95);
             background-color: rgba(0, 102, 255, 0.05);
         }
+
+        .bottom-bar {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            height: 12%;
+            /* 保留你原本佔外殼的 15% 高度比例 */
+            max-width: 100%;
+            background-color: var(--blur-bg);
+            border-top: 0.3cqw solid var(--border-color);
+            /* 邊框 cqw */
+            padding: 1cqw 2cqw;
+            /* 左右微調內襯，讓留白更好看 */
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 
@@ -179,8 +164,9 @@
             </header>
             <div class="history"><span>⏳ 歷史訂單</span></div>
             <main class="history-list" id="historylist"></main>
-            <div class="history-login">
-            </div>
+            <footer class="bottom-bar">
+                <div class="status-msg" id="statusmsg"></div>
+            </footer>
         </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
             <div class="modal-card">
@@ -253,65 +239,29 @@
         };
         async function renderHistoryOrders() {
             const user = await authReady;
-            const historyContainer = document.getElementById('historylist');
-            if (!historyContainer) return;
-            if (!user) {
-                historyContainer.innerHTML = `
-                        <div style="text-align:center; padding: 10cqw;">
-                            <p>您尚未登入</p>
-                            <button onclick="window.location.href='login.html'" style="padding: 2cqw 5cqw;">前往登入/註冊</button>
-                        </div>`;
+            if (!historylist) return;
+            // 1. 抓取該用戶的訂單，按時間排序
+            const q = query(
+                collection(db, "orders"),
+                where("buyerUid", "==", user.uid),
+                orderBy("createdAt", "desc")
+            );
+            const snapshot = await getDocs(q);
+            if (snapshot.empty) {
+                historylist.innerHTML = '<div style="text-align:center; padding: 5cqw;">📜 目前還沒有歷史訂單紀錄喔！</div>';
                 return;
             }
-            if (user.isAnonymous) {
-                historyContainer.innerHTML = `
-                        <div style="text-align:center; padding: 5cqw; border: 0.2cqw dashed #ccc; border-radius: 4cqw; margin-bottom: 4cqw;">
-                            <p style="font-size: 4cqw; font-weight: bold; margin-bottom: 2cqw;">⚠️ 您目前使用匿名身份</p>
-                            <p style="font-size: 3.5cqw; color: #666; margin-bottom: 4cqw;">
-                                匿名訂單僅在此裝置有效。<br>
-                                建議您<b>綁定帳號</b>以永久保存您的歷史紀錄喔！
-                            </p>
-                            <button class="loginBtn" data-action="loginBtn" 
-                                style="display: block; width: 80%; margin: 0 auto; padding: 3cqw; background: var(--brand-green); color: white; border-radius: 3cqw; border: none; font-size: 4cqw; font-weight: bold; cursor: pointer;">
-                               🔐 立即綁定 / 登入帳號
-                            </button>
-                        </div>
-                        <div id="historyListContainer"></div> `;
-                // 之後再繼續執行 renderHistoryOrders 的列表渲染邏輯...
-            }
-            try {
-                // 1. 抓取該用戶的訂單，按時間排序
-                const q = query(
-                    collection(db, "orders"),
-                    where("buyerUid", "==", user.uid),
-                    orderBy("createdAt", "desc")
-                );
-
-                const snapshot = await getDocs(q);
-
-                if (snapshot.empty) {
-                    historyContainer.innerHTML = '<div style="text-align:center; padding: 5cqw;">📜 目前還沒有歷史訂單紀錄喔！</div>';
-                    return;
-                }
-
-                historyContainer.innerHTML = ""; // 清空容器
-
-                snapshot.forEach((doc) => {
-                    const order = doc.data();
-                    const card = createOrderCard(order, doc.id); // 傳入 doc.id 以便後續導向
-                    historyContainer.appendChild(card);
-                });
-
-            } catch (error) {
-                console.error("讀取歷史訂單失敗:", error);
-                historyContainer.innerHTML = '<p style="text-align:center;">載入失敗，請稍後再試。</p>';
-            }
+            historylist.innerHTML = ""; // 清空容器
+            snapshot.forEach((doc) => {
+                const order = doc.data();
+                const card = createOrderCard(order, doc.id); // 傳入 doc.id 以便後續導向
+                historylist.appendChild(card);
+            });
         }
 
         function createOrderCard(order, orderId) {
             // 格式化日期
             const date = order.createdAt ? order.createdAt.toDate().toLocaleDateString('zh-TW') : "未知時間";
-
             // 狀態處理
             const statusMap = {
                 "PREPARING": { text: "⏱️ 製作中", color: "#e67e22" },
@@ -319,13 +269,11 @@
                 "PENDING_PAYMENT": { text: "⏳ 待付款", color: "#9b59b6" }
             };
             const status = statusMap[order.status] || { text: "未知狀態", color: "#95a5a6" };
-
             const card = document.createElement('a');
             // 點擊後跳轉到 orders.html 並帶上訂單 ID
             card.href = `orders.html?orderId=${orderId}`;
             card.className = 'history-card';
-            card.style.cssText = "display: block; text-decoration: none; color: inherit; padding: 4cqw; border-bottom: 0.2cqw solid #eee; background: white;";
-
+            card.style.cssText = "display: block; text-decoration: none; color: var(--text-main); padding: 4cqw; background-color: var(--card-bg);";
             card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2cqw;">
                         <span style="font-weight: 800; font-size: 4.5cqw;">${order.shopName || '未知店家'}</span>

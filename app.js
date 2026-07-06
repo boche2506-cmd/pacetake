@@ -168,6 +168,9 @@ function updateUIForUser(user, currentRole) {
     const defaultIcon = document.getElementById('defaultIcon');
     const statusContainer = document.getElementById('statusmsg');
     // 角色顯示邏輯// 如果程式執行到這裡，表示 user 一定存在，可以安心讀取資料
+    if (!statusContainer) {
+        return; // 如果沒盒子，就直接跳過，不要繼續往下執行
+    }
     if (userNameDisplay) {
         if (currentRole === "admin") {
             userNameDisplay.innerHTML = `👑 總管`;

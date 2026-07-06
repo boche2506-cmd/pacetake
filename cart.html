@@ -26,7 +26,7 @@
             font-weight: 500;
             outline: none;
             box-sizing: border-box;
-            
+
         }
 
         .ContactInformation {
@@ -150,51 +150,6 @@
             text-align: center;
             line-height: 1.1;
             padding: 2cqw 0;
-        }
-
-        .bill-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5cqw 0;
-            border-bottom: 0.2cqw dashed var(--border-color);
-        }
-
-        .item-name {
-            font-size: 4cqw;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .item-qty {
-            font-size: 4cqw;
-            color: var(--text-muted);
-        }
-
-        .item-price {
-            font-size: 4cqw;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .bill-total-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 2cqw 0;
-            color: var(--text-main);
-        }
-
-        .total-label {
-            font-size: 5cqw;
-            font-weight: 800;
-            color: var(--text-main);
-        }
-
-        .total-amount {
-            font-size: 5cqw;
-            font-weight: 800;
-            color: var(--brand-blue);
         }
 
         .footer-action {
@@ -595,13 +550,13 @@
                 totalQty += itemQty;
                 // 🌟 關鍵修改：加入 + - 按鈕的 UI 結構，並加上美化的排版
                 html += `
-                    <div class="bill-item" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.2cqw solid #eee;">
+                    <div class="bill-item" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.2cqw solid #eee; padding: 0.5cqw 0;">
                         <div style="flex: 1;">
-                            <div class="item-name" style="font-weight: bold; font-size: 4cqw;">${item.name}</div>
+                            <div class="item-name" style="font-weight: bold; font-size: 4cqw; color: var(--text-main);">${item.name}</div>
                         </div>
                         <div class="quantity-control-panel" style="display: flex; align-items: center; gap: 2cqw;">
                             <button class="minus-btn" data-id="${item.id}" style="width: 7cqw; height: 7cqw; border-radius: 1.5cqw; border: 0.2cqw solid #ddd; background: #fff; cursor: pointer;">-</button>
-                            <span class="item-qty" style="width: 5cqw; text-align: center; font-weight: bold;">${itemQty}</span>
+                            <span class="item-qty" style="width: 5cqw; text-align: center; font-weight: bold; font-size: 4cqw; color: var(--text-muted);">${itemQty}</span>
                             <button class="plus-btn" data-id="${item.id}" style="width: 7cqw; height: 7cqw; border-radius: 1.5cqw; border: 0.2cqw solid #ddd; background: #fff; cursor: pointer;">+</button>
                         </div>
                         <div style="width: 17.5cqw; text-align: right; font-weight: bold; color: #ff6b6b;">
@@ -611,9 +566,9 @@
             });
             finalTotalAmount = total;
             html += `
-                            <div class="bill-total-row" style=" border-top: 0.5cqw solid #333;">
-                                <span class="total-label">總計金額</span>
-                                <span class="total-amount" id="totalAmountText" style="font-size: 5cqw; color: #ff6b6b;">$${finalTotalAmount}</span>
+                            <div class="bill-total-row" style=" border-top: 0.5cqw solid #333; display: flex; justify-content: space-between; align-items: center; padding: 2cqw 0; color: var(--text-main);">
+                                <span class="total-label" style=" font-size: 5cqw; font-weight: 800; color: var(--text-main);">總計金額</span>
+                                <span class="total-amount" id="totalAmountText" style="font-size: 5cqw; color: #ff6b6b; font-weight: 800;">$${finalTotalAmount}</span>
                             </div>`;
             container.innerHTML = html;
             if (typeof updateBottomCartBadge === 'function') updateBottomCartBadge(totalQty);
@@ -865,6 +820,7 @@
                             remark: orderRemark,
                             status: "PREPARING",
                             paymentMethod: "CASH",
+                            paymentStatus: "UNPAID",   // 🌟 補上這一行：商家待確認收款
                             diningType: currentDiningType,
                             createdAt: serverTimestamp()
                         });
@@ -881,7 +837,7 @@
                                 localStorage.removeItem('temp_buyer_name');
                                 localStorage.removeItem('temp_buyer_phone');
                                 // 跳轉頁面
-                                window.location.href = "index.html";
+                                window.location.href = "orders.html";
                             }
                         });
                     } catch (cashErr) {
@@ -910,8 +866,8 @@
                         `ANDROIDPAY=1`,
                         `SAMPAY=1`,
                         `VACC=1`,
-                        `CVS=1`
-                            `ReturnURL=https://www.pacetake.tw/index.html`,
+                        `CVS=1`,
+                        `ReturnURL=https://www.pacetake.tw/orders.html`,
                         `NotifyURL=https://你的網站網域.com/api/notify` // 如果你還沒做後端接通知，這行先留著
                     ].join('&');
                     try {
@@ -927,6 +883,7 @@
                             totalAmount: finalTotalAmount,
                             status: "PENDING_PAYMENT",
                             paymentMethod: "CREDIT",
+                            paymentStatus: "UNPAID",   // 🌟 初始也是未付款，直到藍新回傳成功
                             diningType: currentDiningType,
                             createdAt: serverTimestamp()
                         });

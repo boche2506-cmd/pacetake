@@ -316,7 +316,7 @@
             HashIV: ""
         };
         // 假設你已經有 auth 和 db 的設定
-        const user = auth.currentUser;
+        const user = await authReady;
         if (user) {
             // 監聽該用戶的最新一筆訂單
             const q = query(
@@ -344,13 +344,44 @@
                 statusEl.textContent = "✅ 餐點已完成！";
                 descEl.textContent = "請到櫃檯憑號碼領取。";
             }
-            // 3. 渲染商品明細
+            // 3. 渲染商品明細與總計
             const container = document.getElementById('cartItemsContainer');
-            container.innerHTML = order.items.map(item => `
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <span>${item.name} x ${item.quantity}</span>
-                        <span>$${item.price * item.quantity}</span>
-                    </div>`).join('');
+            let html = '';
+            let total = 0;
+
+            order.items.forEach(item => {
+                const itemPrice = parseInt(item.price) || 0;
+                const itemQty = parseInt(item.quantity || item.qty) || 1;
+                const subtotal = itemPrice * itemQty;
+                total += subtotal;
+
+                html += `
+            <div class="bill-item" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.2cqw solid #eee; padding: 0.5cqw 0;">
+                <div style="flex: 1;">
+                    <div class="item-name" style="font-weight: bold; font-size: 4cqw; color: var(--text-main);">${item.name}</div>
+                </div>
+                <div class="quantity-control-panel" style="display: flex; align-items: center; gap: 2cqw; flex-shrink: 0;">
+                    <span class="item-qty" style="min-width: 10cqw; text-align: center; font-weight: bold; font-size: 4cqw; color: var(--text-muted);">x ${itemQty}</span>
+                </div>
+                <div style="width: 17.5cqw; text-align: right; font-weight: bold; color: #ff6b6b;">
+                    $${subtotal}
+                </div>
+            </div>`;
+            });
+            // 加入總計金額行
+            const paymentStatus = order.paymentStatus === "PAID" ? "✅ 已付款" : "⏳ 待付款 (請於取餐時付款)";
+            const statusColor = order.paymentStatus === "PAID" ? "#2ecc71" : "#e67e22";
+            html += `
+                    <div class="bill-total-row" style="border-top: 0.5cqw solid #333; display: flex; justify-content: space-between; align-items: center; padding: 2cqw 0; color: var(--text-main);">
+                        <span class="total-label" style="font-size: 5cqw; font-weight: 800; color: var(--text-main);">總計金額</span>
+                        <span class="total-amount" id="totalAmountText" style="font-size: 5cqw; color: #ff6b6b; font-weight: 800;">$${total}</span>
+                    </div>
+                    <div class="payment-status-row" style="text-align: right; margin-top: 1cqw;">
+                        <span style="font-size: 3.5cqw; color: ${statusColor}; font-weight: bold;">
+                        付款狀態：${paymentStatus}
+                        </span>
+                    </div>`;
+            container.innerHTML = html;
             // 4. 更新備註
             document.getElementById('orderRemarkDisplay').textContent = order.remark ? `備註：${order.remark}` : "無特別備註";
         }

@@ -521,6 +521,9 @@
                 }
             });
         });
+        await updateDoc(doc(db, "orders", orderId), {
+            paymentStatus: "PAID"
+        });
     </script>
 </body>
 

@@ -436,23 +436,12 @@ function mouseslide() {
  * @param {string} fieldName - 要監聽的欄位名稱
  * @param {HTMLElement} element - 要更新的 UI 元件
  */
-export function setupRealtimeListener(collectionName, docId, fieldName, element) {
+export function setupRealtimeListener(collectionName, docId, callback) {
     const docRef = doc(db, collectionName, docId);
-    // 建立監聽器
     return onSnapshot(docRef, (snapshot) => {
         if (!snapshot.exists()) return;
-        const data = snapshot.data();
-        const value = data[fieldName];
-        // 根據欄位類型更新 UI
-        if (element.type === 'checkbox') {
-            element.checked = value; // 更新開關狀態
-        } else {
-            element.innerText = value; // 更新文字顯示
-        }
-        console.log(`${fieldName} 已自動更新為:`, value);
+        callback(snapshot.data()); // 把拿到資料後的邏輯交給外面決定
     });
-    // 將 unsubscribe 回傳出去，讓你在 app.js 可以控制
-    return unsubscribe;
 }
 //Firebase 即時監聽
 function initAppListeners() {

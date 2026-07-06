@@ -220,7 +220,6 @@ img,
         /* 防止滑動到頂部時拖動到整個瀏覽器視窗 */
         Container-type: size;
         Container-name: phone;
-        font-size: 16px;
     }
 }
 

@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .statuscard {
-            height: 15%;
+            height: 17%;
             width: 100%;
             display: flex;
             justify-content: center;
@@ -27,7 +27,7 @@
         .status-card {
             height: 95%;
             width: 95%;
-            padding: 2cqw;
+            padding: 1cqw;
             box-sizing: border-box;
             border-radius: 4cqw;
             text-align: center;
@@ -41,9 +41,13 @@
         }
 
         .status-title {
-            font-size: 8cqw;
-            font-weight: 800;
+            font-size: 7cqw;
+            font-weight: 700;
             color: var(--text-main);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .status-desc {
@@ -93,7 +97,7 @@
         }
 
         .billcardall {
-            height: 45%;
+            height: 43%;
             width: 100%;
             display: flex;
             justify-content: center;
@@ -242,7 +246,7 @@
             </div>
             <!-- GPS 導航自取大鈕 -->
             <div class="navbtn">
-                <a  class="nav-btn" id="navbtn">📍 準備導航中...</a>
+                <a class="nav-btn" id="navbtn">📍 準備導航中...</a>
             </div>
         </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
@@ -343,17 +347,29 @@
                 statusEl.textContent = "✅ 餐點已完成！";
                 descEl.textContent = "請到櫃檯憑號碼領取。";
             }
+            const statusTitle = document.getElementById('orderStatusTitle');
+            const statusDesc = document.getElementById('orderStatusDesc');
+            const storeLinkHtml = `
+                       <div id="storeLinkBtnContainer" style="text-align: center;">
+                           <a href="store.html?storeId=${order.storeId}" 
+                              style="display: inline-flex; align-items: center; gap: 1cqw; padding: 1.25cqw 4cqw; background: var(--theme-color, #ff6b6b); color: white; text-decoration: none; border-radius: 5cqw; font-size: 4cqw; font-weight: bold; box-shadow: 0 0.5cqw 1.25cqw rgba(0,0,0,0.1);">
+                              🏪 返回店家繼續選購
+                           </a>
+                       </div>`;
+            // 3. 檢查按鈕是否已經存在，如果不存在，就插入到 statusTitle 的後面
+            if (!document.getElementById('storeLinkBtnContainer')) {
+                // 使用 insertAdjacentHTML，將按鈕插入在 title 的 "afterend" (即 title 結束後，desc 之前)
+                statusTitle.insertAdjacentHTML('afterend', storeLinkHtml);
+            }
             // 3. 渲染商品明細與總計
             const container = document.getElementById('cartItemsContainer');
             let html = '';
             let total = 0;
-
             order.items.forEach(item => {
                 const itemPrice = parseInt(item.price) || 0;
                 const itemQty = parseInt(item.quantity || item.qty) || 1;
                 const subtotal = itemPrice * itemQty;
                 total += subtotal;
-
                 html += `
             <div class="bill-item" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 0.2cqw solid #eee; padding: 0.5cqw 0;">
                 <div style="flex: 1;">

@@ -53,6 +53,7 @@
             align-items: center;
             line-height: 1.1;
             padding: 0.5cqw;
+            box-sizing: border-box;
         }
 
         .Information {
@@ -80,6 +81,7 @@
             line-height: 1.1;
             font-size: 4cqw;
             font-weight: 700;
+            box-sizing: border-box;
         }
 
         .PhoneInformation input,
@@ -109,6 +111,7 @@
             align-items: center;
             line-height: 1.1;
             color: var(--text-main);
+            box-sizing: border-box;
         }
 
         .bill-card {
@@ -120,6 +123,7 @@
             /* 確保內容依然可以滑動 */
             -ms-overflow-style: none;
             /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+            box-sizing: border-box;
         }
 
         .bill-card::-webkit-scrollbar {
@@ -139,6 +143,7 @@
             line-height: 1.1;
             color: var(--text-main);
             gap: 0.25cqw;
+            box-sizing: border-box;
         }
 
         .Remark input {
@@ -222,6 +227,7 @@
             border: 0.2cqw solid var(--border-color);
             box-shadow: var(--shadow-sm);
             color: var(--text-main);
+            box-sizing: border-box;
         }
 
         .option-option {
@@ -231,6 +237,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            box-sizing: border-box;
         }
 
         .pay-option {
@@ -480,7 +487,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script type="module" src="app.js"></script>
     <script type="module">
-        import { getCartData, modifyCartItemQty, areaData, authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp } from './app.js';
+        import { getCartData, modifyCartItemQty, areaData, authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from './app.js';
         let allStores = [];
         let buyerLat = null;
         let buyerLng = null;

@@ -14,134 +14,179 @@
     <link rel="apple-touch-icon" href="png/logo180.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        .content {
-            padding: 20px;
+        .statuscard {
+            height: 15%;
+            width: 100%;
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
         }
 
         /* 狀態進度燈號 */
         .status-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px;
+            height: 95%;
+            width: 95%;
+            padding: 2cqw;
+            box-sizing: border-box;
+            border-radius: 4cqw;
             text-align: center;
+            background-color: var(--card-bg);
+            border: 0.2cqw solid var(--border-color);
             box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
         }
 
         .status-title {
-            font-size: 22px;
+            font-size: 8cqw;
             font-weight: 800;
-            color: var(--brand-amber);
-            margin-bottom: 6px;
+            color: var(--text-main);
         }
 
         .status-desc {
-            font-size: 13px;
+            font-size: 4cqw;
             color: var(--text-muted);
             font-weight: 500;
+        }
+
+        .numberplate {
+            height: 15%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
         }
 
         /* 巨型自取號碼牌 */
         .number-plate {
+            height: 95%;
+            width: 95%;
+            padding: 2cqw;
+            box-sizing: border-box;
+            border-radius: 4cqw;
             background-color: rgba(0, 102, 255, 0.05);
-            border: 2px dashed var(--brand-blue);
-            border-radius: 16px;
-            padding: 24px;
+            border: 0.2cqw dashed var(--brand-blue);
             text-align: center;
-            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
         }
 
         .number-label {
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 6cqw;
+            font-weight: 600;
             color: var(--brand-blue);
-            letter-spacing: 1px;
+            letter-spacing: 0.2cqw;
             text-transform: uppercase;
         }
 
         .number-code {
-            font-size: 54px;
-            font-weight: 900;
-            color: var(--brand-blue);
-            margin-top: 4px;
-            letter-spacing: -1px;
+            font-size: 10cqw;
+            font-weight: 800;
+            color: var(--brand-red);
+            letter-spacing: 0.2cqw;
         }
 
-        .detail-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
+        .billcardall {
+            height: 45%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .billcard {
+            height: 98%;
+            width: 95%;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: center;
-            font-size: 14px;
+            padding: 2cqw;
+            box-sizing: border-box;
+            background-color: var(--card-bg);
+            border: 0.2cqw solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            border-radius: 4cqw;
         }
 
-        .detail-name {
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .detail-qty {
+        .billcardspan {
+            height: 8%;
+            width: 100%;
+            font-size: 5cqw;
             color: var(--text-muted);
-            font-weight: bold;
-        }
-
-        .detail-price {
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .divider {
-            height: 1px;
-            background-color: var(--border-color);
-        }
-
-        /* 買家自由手打備註欄展示防線 */
-        .note-box {
-            background-color: var(--bg-global);
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 13px;
-            color: var(--text-main);
-            border-left: 4px solid var(--brand-blue);
             font-weight: 500;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.1;
+            box-sizing: border-box;
         }
 
-        .note-title {
-            font-size: 11px;
-            font-weight: 700;
+        .bill-card {
+            height: 77%;
+            width: 100%;
+            padding: 1cqw;
+            overflow-y: auto;
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
+            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+            box-sizing: border-box;
+        }
+
+        .bill-card::-webkit-scrollbar {
+            /* Chrome, Safari 隱藏軸線 */
+            display: none;
+        }
+
+        .Remark {
+            height: 15%;
+            width: 100%;
+            font-size: 5cqw;
             color: var(--text-muted);
-            margin-bottom: 4px;
+            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.1;
+            box-sizing: border-box;
+        }
+
+        .navbtn {
+            height: 10%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
         }
 
         .nav-btn {
+            height: 85%;
+            width: 85%;
+            padding: 1cqw;
+            box-sizing: border-box;
+            border-radius: 4cqw;
             background-color: var(--brand-blue);
             color: white;
             border: none;
-            width: 100%;
-            height: 48px;
-            border-radius: 24px;
-            font-size: 15px;
+            /*清除邊框*/
             font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
             text-decoration: none;
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
+            box-shadow: 0 1cqw 3cqw rgba(0, 102, 255, 0.2);
         }
     </style>
 </head>
@@ -173,53 +218,33 @@
                 </div>
             </header>
 
-            <main class="content">
-                <!-- 狀態進度 -->
+            <!-- 狀態進度 -->
+            <div class="statuscard">
                 <div class="status-card">
-                    <div class="status-title">⏱️ 餐點製作中...</div>
-                    <div class="status-desc">店家已接單，預估 12:30 準時出餐 (剩餘 15 分鐘)</div>
+                    <div class="status-title" id="orderStatusTitle">⏱️ 讀取中...</div>
+                    <div class="status-desc" id="orderStatusDesc">請稍候，正在同步您的訂單狀態...</div>
                 </div>
-
-                <!-- 巨型自取號碼牌 -->
+            </div>
+            <!-- 巨型自取號碼牌 -->
+            <div class="numberplate">
                 <div class="number-plate">
                     <div class="number-label">自取核對代碼</div>
-                    <div class="number-code">#023</div>
+                    <div class="number-code" id="orderPickupNo">#---</div>
                 </div>
-
-                <!-- 明細與備註展示 -->
-                <div class="detail-card">
-                    <div style="font-size: 13px; font-weight: 700; color:var(--text-muted);">明細核對</div>
-
-                    <div class="detail-row">
-                        <span class="detail-name">招牌木盒便當 <span class="detail-qty">x2</span></span>
-                        <span class="detail-price">$240</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-name">酥炸大雞腿便當 <span class="detail-qty">x1</span></span>
-                        <span class="detail-price">$135</span>
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <!-- 🎯 買家自由備註欄展示防線 -->
-                    <div>
-                        <div class="note-title">您的訂單備註：</div>
-                        <div class="note-box">
-                            飯多、大辣、雞腿跟便當分開裝。飲料請幫我做去冰微糖，謝謝老闆！
-                        </div>
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <div class="detail-row" style="padding-top:4px;">
-                        <span style="font-weight: 800; font-size: 15px;">實付金額 (線上已付)</span>
-                        <span style="font-size: 20px; font-weight: 900; color: var(--brand-blue);">$375</span>
-                    </div>
+            </div>
+            <!-- 明細與備註展示 -->
+            <div class="billcardall">
+                <div class="billcard">
+                    <div class="billcardspan"><span>🛍️ 點餐明細</span></div>
+                    <div class="bill-card" id="cartItemsContainer"></div>
+                    <div class="Remark" id="orderRemarkDisplay"></div>
                 </div>
-
-                <!-- GPS 導航自取大鈕 -->
+            </div>
+            <!-- GPS 導航自取大鈕 -->
+            <div class="navbtn">
                 <a href="https://google.com" class="nav-btn">📍 導航前往：池上木盒便當 - 信義店</a>
-            </main>
+            </div>
+
         </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
             <div class="modal-card">
@@ -273,6 +298,73 @@
         </div>
     </div>
     <script type="module" src="app.js"></script>
+    <script type="module">
+        import { getCartData, modifyCartItemQty, areaData, authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from './app.js';
+        let allStores = [];
+        let buyerLat = null;
+        let buyerLng = null;
+        let currentBuyerAddress = "正在獲取定位中...";
+        let finalTotalAmount = 0;
+        let cartData = [];
+        let currentPayType = "";
+        let targetStoreId = "";
+        let currentDiningType = "TAKE_OUT";
+        // 藍新店家動態金鑰配置（預設為空，動態由 Firebase 覆蓋）
+        let currentStoreNewebpay = {
+            MerchantID: "",
+            HashKey: "",
+            HashIV: ""
+        };
+        import { collection, query, where, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore.js";
+
+        // 假設你已經有 auth 和 db 的設定
+        const user = auth.currentUser;
+
+        if (user) {
+            // 監聽該用戶的最新一筆訂單
+            const q = query(
+                collection(db, "orders"),
+                where("buyerUid", "==", user.uid),
+                orderBy("createdAt", "desc"),
+                limit(1)
+            );
+
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) return;
+                const order = snapshot.docs[0].data();
+                renderOrder(order);
+            });
+        }
+
+        function renderOrder(order) {
+            // 1. 更新號碼牌
+            document.getElementById('orderPickupNo').textContent = `#${order.pickupNo}`;
+
+            // 2. 更新狀態文字 (根據 status 邏輯)
+            const statusEl = document.getElementById('orderStatusTitle');
+            const descEl = document.getElementById('orderStatusDesc');
+
+            if (order.status === "PREPARING") {
+                statusEl.textContent = "⏱️ 餐點製作中...";
+                descEl.textContent = "店家已接單，正在為您準備餐點。";
+            } else if (order.status === "COMPLETED") {
+                statusEl.textContent = "✅ 餐點已完成！";
+                descEl.textContent = "請到櫃檯憑號碼領取。";
+            }
+
+            // 3. 渲染商品明細
+            const container = document.getElementById('cartItemsContainer');
+            container.innerHTML = order.items.map(item => `
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+            <span>${item.name} x ${item.quantity}</span>
+            <span>$${item.price * item.quantity}</span>
+        </div>
+    `).join('');
+
+            // 4. 更新備註
+            document.getElementById('orderRemarkDisplay').textContent = order.remark ? `備註：${order.remark}` : "無特別備註";
+        }
+    </script>
 </body>
 
 </html>

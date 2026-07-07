@@ -166,7 +166,7 @@ async function handleUserSyncAndRoleRouting(user) {
             }
             // 統一寫入資料庫
             await setDoc(userRef, initialData);
-            localStorage.setItem('user_name', displayName);
+            localStorage.setItem('user_name', displayName || '');
             localStorage.setItem('is_anonymous', user.isAnonymous);
             localStorage.setItem('user_role', currentRole);
             localStorage.setItem('user_photo', user.photoURL || '');

@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 // 在你的網頁 script 或其他 JS 檔案中：
 // 接下來就可以直接呼叫這些函式了
 // 例如：
@@ -18,15 +18,9 @@ const firebaseConfig = {
 export { signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit };
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
-enableIndexedDbPersistence(db)
-    .catch((err) => {
-        if (err.code === 'failed-precondition') {
-            console.warn("多個頁面開啟，離線功能已啟用");
-        } else if (err.code === 'unimplemented') {
-            console.warn("瀏覽器不支援離線功能");
-        }
-    });
+export const db = initializeFirestore(app, {
+    localCache: persistentLocalCache()
+});
 export const provider = new GoogleAuthProvider();
 export const currentStoreInfo = {
     id: null,

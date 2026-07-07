@@ -54,9 +54,7 @@
 
         .bottom-bar {
             height: 12%;
-            max-width: 100%;
-            bottom: 0;
-            left: 0;
+            width: 100%;
             /* 根據你的需求調整高度 */
             display: flex;
             align-items: center;
@@ -80,13 +78,11 @@
             /* 文字過長時顯示點點點 */
         }
 
-        .action-buttons {
-            display: flex;
-            gap: 2cqw;
-            /* 按鈕之間的間距 */
-        }
-
         .btn {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
             background-color: #007AFF;
             /* Apple 風格的藍色 */
             color: white;
@@ -100,6 +96,65 @@
         .btn:active {
             transform: scale(0.95);
             /* 按下去變小一點，模擬點擊感 */
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1cqw;
+            /* 按鈕之間的間距 */
+            position: relative;
+        }
+
+        #volume-ctrl-box {
+            display: none;
+            /* 預設隱藏，點擊時用 JS 切換顯示 */
+            position: absolute;
+            bottom: 100%;
+            right: 40%;
+            height: 50cqw;
+            width: 20cqw;
+            border-radius: 10cqw;
+            /* 圓角看起來比較現代 */
+            z-index: 200;
+            /* 確保一定在最上層 */
+        }
+
+        /* 2. 拉桿：讓它垂直站立 */
+        #volume-slider {
+            bottom: 100%;
+            height: 80%;
+            width: 100%;
+            writing-mode: vertical-lr;
+            /* 強制文字與元素垂直排列 */
+            direction: rtl;
+            /* 關鍵：將方向反轉，這樣 100% 才會在上面，0% 在下面 */
+            /* 關鍵：強制變垂直 */
+            appearance: slider-horizontal;
+            /* 恢復預設，讓瀏覽器不干預 */
+            cursor: pointer;
+            padding: 0;
+        }
+
+        #volume-slider input {
+            padding: 0;
+        }
+
+        /* 3. 對 Label 和 Span 進行微調 */
+        #volume-ctrl-box label {
+            height: 10%;
+            width: 100%;
+            font-weight: bold;
+            color: var(--brand-red);
+        }
+
+        #volume-value {
+            height: 10%;
+            width: 100%;
+            color: var(--brand-red);
+            font-size: 5cqw;
         }
     </style>
 </head>
@@ -160,7 +215,17 @@
 
                 <div class="action-buttons">
                     <button class="btn" data-action="manage-orders">訂單</button>
-                    <button class="btn" data-action="manage-menu">菜單</button>
+                    <button class="btn" data-action="volume-menu" id="btn-test-sound" type="button">🎵 測試鈴聲</button>
+                    <!-- 預設隱藏的音量控制區塊 -->
+                    <div id="volume-ctrl-box">
+                        <label for="volume-slider">音量</label>
+                        <!-- range 拉桿 -->
+                        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5">
+                        <span id="volume-value">50%</span>
+                    </div>
+                    <audio id="order-bell" preload="auto">
+                        <source src="audio/ringtone.mp3" type="audio/mpeg">
+                    </audio>
                     <button class="btn" data-action="store-settings">⚙️資料修改</button>
                 </div>
             </footer>
@@ -307,8 +372,61 @@
                 qrContainer.innerHTML = '';
             });
         }
+        function volumebox() {
+            const orderBell = document.getElementById("order-bell");
+            const volumeBox = document.getElementById("volume-ctrl-box");
+            const volumeSlider = document.getElementById("volume-slider");
+            const volumeValue = document.getElementById("volume-value");
+
+            // 【初始化】從快取讀取音量設定
+            const savedVolume = localStorage.getItem("orderBellVolume") || 0.5;
+            orderBell.volume = savedVolume;
+            volumeSlider.value = savedVolume;
+            volumeValue.textContent = Math.round(savedVolume * 100) + "%";
+
+            // ==========================================
+            // 1. 點擊事件委派 (處理按鈕點擊)
+            // ==========================================
+            document.addEventListener("click", (e) => {
+                // 尋找帶有 data-action="volume-menu" 的按鈕
+                const targetBtn = e.target.closest('[data-action="volume-menu"]');
+
+                if (targetBtn) {
+                    // A. 切換選單的顯示/隱藏
+                    if (volumeBox.style.display === "none") {
+                        volumeBox.style.display = "inline-block"; // 或 block，視你的排版而定
+                    } else {
+                        volumeBox.style.display = "none";
+                    }
+
+                    // B. 播放/重新播放鈴聲 (同時解鎖瀏覽器音訊限制)
+                    if (!orderBell.paused) {
+                        orderBell.currentTime = 0;
+                    }
+                    orderBell.play().catch(err => console.log("音訊播放被瀏覽器阻擋：", err));
+                }
+            });
+
+            // ==========================================
+            // 2. 輸入事件委派 (處理拉桿滑動)
+            // ==========================================
+            document.addEventListener("input", (e) => {
+                // 判斷是不是音量拉桿在變動
+                if (e.target && e.target.id === "volume-slider") {
+                    const currentVolume = e.target.value;
+
+                    // 變更音量與 UI
+                    orderBell.volume = currentVolume;
+                    volumeValue.textContent = Math.round(currentVolume * 100) + "%";
+
+                    // 儲存到快取，以便 seller.html 同步
+                    localStorage.setItem("orderBellVolume", currentVolume);
+                }
+            });
+        }
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
+            volumebox();
             console.log("系統初始化完成");
         });
     </script>

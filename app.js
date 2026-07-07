@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 // 在你的網頁 script 或其他 JS 檔案中：
 // 接下來就可以直接呼叫這些函式了
 // 例如：
@@ -19,6 +19,14 @@ export { signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signIn
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+enableIndexedDbPersistence(db)
+    .catch((err) => {
+        if (err.code === 'failed-precondition') {
+            console.warn("多個頁面開啟，離線功能已啟用");
+        } else if (err.code === 'unimplemented') {
+            console.warn("瀏覽器不支援離線功能");
+        }
+    });
 export const provider = new GoogleAuthProvider();
 export const currentStoreInfo = {
     id: null,
@@ -167,10 +175,8 @@ function updateUIForUser(user, currentRole) {
     const userAvatarImg = document.getElementById('userAvatarImg');
     const defaultIcon = document.getElementById('defaultIcon');
     const statusContainer = document.getElementById('statusmsg');
-    // 角色顯示邏輯// 如果程式執行到這裡，表示 user 一定存在，可以安心讀取資料
-    if (!statusContainer) {
-        return; // 如果沒盒子，就直接跳過，不要繼續往下執行
-    }
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    // 1. 角色顯示邏輯 (如果有這個元素才執行)
     if (userNameDisplay) {
         if (currentRole === "admin") {
             userNameDisplay.innerHTML = `👑 總管`;
@@ -180,25 +186,33 @@ function updateUIForUser(user, currentRole) {
             userNameDisplay.innerHTML = `<img src="png/logo180.png" class="buyer" alt="買家圖示"> 貴賓`;
         }
     }
-    // 只要有圖就設給 src // 頭像處理邏輯
-    if (!user.isAnonymous && user.photoURL) {
-        userAvatarImg.src = user.photoURL;
-        userAvatarImg.style.display = 'block'; // 顯示圖片
-        defaultIcon.style.display = 'none';    // 隱藏文字
-        statusContainer.innerHTML = `
-            <a class="statusText" href="orders.html">
-                <div class="status-indicator"></div>
-                <span>您好 ${user.displayName || 'PACE用戶'} ~<br>請點此查看訂單狀態！</span>
-            </a>`;
-    } else {
-        userAvatarImg.src = '';                // 清空 src
-        userAvatarImg.style.display = 'none';  // 隱藏圖片
-        defaultIcon.style.display = 'block';   // 顯示文字
-        statusContainer.innerHTML = `
-            <button class="statusText" data-action="loginBtn">
-                <div class="status-indicatorlogin"></div>
-                <span>請點此連結google帳號<br>或使用電子郵件登入</span>
-            </button>`;
+    // 2. 頭像處理邏輯 (加上防呆，避免在沒有頭像的頁面崩潰)
+    if (userAvatarImg && defaultIcon) {
+        if (!user.isAnonymous && user.photoURL) {
+            userAvatarImg.src = user.photoURL;
+            userAvatarImg.style.display = 'block';
+            defaultIcon.style.display = 'none';
+        } else {
+            userAvatarImg.src = '';
+            userAvatarImg.style.display = 'none';
+            defaultIcon.style.display = 'block';
+        }
+    }
+    // 3. 狀態列邏輯 (你原本的邏輯沒問題，加上防呆就很穩)
+    if (statusContainer) {
+        if (!user.isAnonymous) {
+            statusContainer.innerHTML = `
+                <a class="statusText" href="orders.html">
+                    <div class="status-indicator"></div>
+                    <span>您好 ${user.displayName || 'PACE用戶'} ~<br>請點此查看訂單狀態！</span>
+                </a>`;
+        } else {
+            statusContainer.innerHTML = `
+                <button class="statusText" data-action="loginBtn">
+                    <div class="status-indicatorlogin"></div>
+                    <span>請點此連結google帳號<br>或使用電子郵件登入</span>
+                </button>`;
+        }
     }
     renderDynamicMenu(currentRole, user);
 }
@@ -297,9 +311,7 @@ function createStoreCard(store) {
                     <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 線上支付</span>
                     <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用</span>
                 </div>
-            </div>
-        </div>
-    `;
+            </div>`;
     return card;
 };
 // index.html

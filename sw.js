@@ -1,5 +1,13 @@
-// 這個檔案必須獨立存在！它是瀏覽器判斷是否允許捷徑開啟的關鍵。
-self.addEventListener('install', (e) => self.skipWaiting());
-self.addEventListener('activate', (e) => console.log('PWA 啟動'));
-// 攔截請求放行，Chrome / Android 才能順利執行捷徑
-self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));
+self.addEventListener('fetch', (e) => {
+    e.respondWith(
+        caches.match(e.request).then((cachedResponse) => {
+            // 如果快取有，就回傳快取
+            if (cachedResponse) return cachedResponse;
+            // 如果快取沒有，才去網路撈
+            return fetch(e.request).catch(() => {
+                // 如果網路也斷了，就不回傳任何東西（或回傳預設的 offline.html）
+                return null; 
+            });
+        })
+    );
+});

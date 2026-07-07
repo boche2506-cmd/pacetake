@@ -83,6 +83,23 @@ const dropdownMenu = document.getElementById('dropdownMenu');
 const userNameDisplay = document.getElementById('userNameDisplay');
 const loginLightbox = document.getElementById('loginLightbox');
 const emailFormSection = document.getElementById('emailFormSection');
+// 如果有快取，馬上渲染
+function loadFromCache() {
+    const cachedName = localStorage.getItem('user_name');
+    const cachedPhoto = localStorage.getItem('user_photo');
+    const cachedIsAnon = localStorage.getItem('is_anonymous') === 'true';
+    const cachedRole = localStorage.getItem('user_role') || 'guest'; // 記得把 Role 也存進去！
+    if (cachedName) {
+        // 1. 打包成跟 Firebase user 一樣格式的物件
+        const virtualUser = {
+            displayName: cachedName,
+            photoURL: cachedPhoto,
+            isAnonymous: cachedIsAnon
+        };
+        // 2. 傳遞時，維持 (user, role) 的格式
+        updateUIForUser(virtualUser, cachedRole);
+    }
+}
 // 監聽 Firebase 登入狀態
 export const authReady = new Promise((resolve) => {
     onAuthStateChanged(auth, (user) => {
@@ -95,7 +112,14 @@ export const authReady = new Promise((resolve) => {
             handleUserSyncAndRoleRouting(user);
             renderFavoriteStores();
         } else {
+            // --- 這裡就是「關門」的地方 ---
+            // 使用者登出了，必須把所有快取清得乾乾淨淨
             // --- 這裡是「徹底未登入」：觸發匿名登入 ---
+            console.log("使用者登出，清除快取");
+            localStorage.removeItem('user_name');
+            localStorage.removeItem('user_photo');
+            localStorage.removeItem('is_anonymous');
+            localStorage.removeItem('user_role'); // 記得連角色也要清
             console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");
             signInAnonymously(auth).catch((error) => {
                 console.error("匿名登入失敗:", error);
@@ -148,6 +172,10 @@ async function handleUserSyncAndRoleRouting(user) {
             }
             // 統一寫入資料庫
             await setDoc(userRef, initialData);
+            localStorage.setItem('user_name', displayName);
+            localStorage.setItem('is_anonymous', user.isAnonymous);
+            localStorage.setItem('user_role', currentRole);
+            localStorage.setItem('user_photo', user.photoURL || '');
             updateUIForUser(user, "buyer");
         }
     } catch (e) {
@@ -175,8 +203,7 @@ function updateUIForUser(user, currentRole) {
     const userAvatarImg = document.getElementById('userAvatarImg');
     const defaultIcon = document.getElementById('defaultIcon');
     const statusContainer = document.getElementById('statusmsg');
-    const userNameDisplay = document.getElementById('userNameDisplay');
-    // 1. 角色顯示邏輯 (如果有這個元素才執行)
+    // 1. 角色名稱邏輯 (保留你的防禦性檢查)
     if (userNameDisplay) {
         if (currentRole === "admin") {
             userNameDisplay.innerHTML = `👑 總管`;
@@ -186,7 +213,7 @@ function updateUIForUser(user, currentRole) {
             userNameDisplay.innerHTML = `<img src="png/logo180.png" class="buyer" alt="買家圖示"> 貴賓`;
         }
     }
-    // 2. 頭像處理邏輯 (加上防呆，避免在沒有頭像的頁面崩潰)
+    // 2. 頭像區塊 (保留防禦性檢查)
     if (userAvatarImg && defaultIcon) {
         if (!user.isAnonymous && user.photoURL) {
             userAvatarImg.src = user.photoURL;
@@ -198,7 +225,7 @@ function updateUIForUser(user, currentRole) {
             defaultIcon.style.display = 'block';
         }
     }
-    // 3. 狀態列邏輯 (你原本的邏輯沒問題，加上防呆就很穩)
+    // 3. 狀態列區塊 (保留防禦性檢查)
     if (statusContainer) {
         if (!user.isAnonymous) {
             statusContainer.innerHTML = `
@@ -1126,6 +1153,7 @@ export function initCartDOMState() {
 
 // 🚀 初始化區塊
 document.addEventListener('DOMContentLoaded', () => {
+    loadFromCache();// 頁面一載入就立刻執行
     fetchStoresFromFirebase();// 從firebase抓資料
     initThemeSystem();//網頁載入時套用顏色
     mouseslide();

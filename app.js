@@ -167,9 +167,10 @@ async function handleUserSyncAndRoleRouting(user) {
             // 統一寫入資料庫
             await setDoc(userRef, initialData);
             const safeName = user.displayName || '遊客';
+            const userRole = "buyer";
             localStorage.setItem('user_name', safeName);
             localStorage.setItem('is_anonymous', user.isAnonymous);
-            localStorage.setItem('user_role', currentRole);
+            localStorage.setItem('user_role', userRole);
             localStorage.setItem('user_photo', user.photoURL || '');
             updateUIForUser(user, "buyer");
         }

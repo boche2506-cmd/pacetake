@@ -468,24 +468,6 @@ function mouseslide() {
         tabs.scrollLeft = scrollLeft - walk;
     });
 }
-/**
- * 監聽特定欄位的變化並更新 UI的工具
- * @param {string} collectionName - 資料庫集合名稱
- * @param {string} docId - 文件 ID
- * @param {string} fieldName - 要監聽的欄位名稱
- * @param {HTMLElement} element - 要更新的 UI 元件
- */
-export function setupRealtimeListener(collectionName, docId, callback) {
-    const docRef = doc(db, collectionName, docId);
-    return onSnapshot(docRef, (snapshot) => {
-        if (!snapshot.exists()) return;
-        callback(snapshot.data()); // 把拿到資料後的邏輯交給外面決定
-    });
-}
-//Firebase 即時監聽
-function initAppListeners() {
-    // 確保元素真的存在才進行綁定，避免報錯
-}
 // Listener'input'
 document.addEventListener('input', (e) => {
     const target = e.target.closest('[data-action-input]');
@@ -1159,6 +1141,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initStorePage();// 🎯 PACE 專屬：store.html 
     refreshTotalCartUI();//** * 🛒 購物車管理
     initCartDOMState();//回填當前店家購物車的資料
-    initAppListeners();//Firebase 即時監聽
     console.log("系統初始化完成");
 });

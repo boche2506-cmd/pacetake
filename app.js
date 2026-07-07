@@ -163,11 +163,11 @@ async function handleUserSyncAndRoleRouting(user) {
             else {
                 // 如果是匿名，你可以額外註記一個欄位方便後台辨識
                 initialData.isAnonymous = true;
-                initialData.displayName = user.displayName || "遊客";
             }
             // 統一寫入資料庫
             await setDoc(userRef, initialData);
-            localStorage.setItem('user_name', displayName);
+            const safeName = user.displayName || '遊客';
+            localStorage.setItem('user_name', safeName);
             localStorage.setItem('is_anonymous', user.isAnonymous);
             localStorage.setItem('user_role', currentRole);
             localStorage.setItem('user_photo', user.photoURL || '');

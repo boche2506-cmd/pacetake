@@ -253,7 +253,6 @@
     <script type="module" src="app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module">
-
         import { authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from './app.js';
         let allStores = [];
         let buyerLat = null;
@@ -262,7 +261,8 @@
         let currentUserId = null;
         let activeDragItem = null;
         /*<script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">*/
-
+        const orderBell = document.getElementById("orderbell");
+        const volumeBox = document.getElementById("volumectrlbox");
         const urlParams = new URLSearchParams(window.location.search);
         const storeId = urlParams.get('storeId');
         async function initPage() {
@@ -294,6 +294,42 @@
                     // 3. 執行跳轉，帶上 storeId
                     window.location.href = `register.html?storeId=${auth.currentUser.uid}`;
                     break;
+                }
+
+            }
+        });
+        document.addEventListener('click', (e) => {
+            // 1. 先抓出點擊目標
+            const volumeBtn = e.target.closest('[data-action="volumemenu"]');
+            const isInsideVolumeBox = e.target.closest('#volumectrlbox');
+            // 2. 如果點擊的是「音量選單按鈕」
+            if (volumeBtn) {
+                const isVisible = window.getComputedStyle(volumeBox).display !== "none";
+                if (isVisible) {
+                    volumeBox.style.display = "none";
+                    orderBell.pause();
+                    orderBell.currentTime = 0;
+                } else {
+                    volumeBox.style.display = "flex";
+                    orderBell.currentTime = 0;
+                    orderBell.play().catch(err => console.log("播放被阻擋：", err));
+                }
+                return; // 處理完按鈕就結束，不往下執行
+            }
+            // 3. 如果點擊的是「選單外」的任何地方，且選單目前是顯示狀態，就關閉選單
+            // 只要「不是點在按鈕上」且「不是點在選單盒子內」，就關掉選單
+            if (!isInsideVolumeBox) {
+                volumeBox.style.display = "none";
+                // 如果你希望點別處時連音樂也一起停，就加上下面兩行
+                // orderBell.pause();
+                // orderBell.currentTime = 0;
+            }
+            // 4. 處理其他按鈕邏輯 (例如 store settings)
+            const target = e.target.closest('[data-action]');
+            if (target) {
+                const action = target.getAttribute('data-action');
+                if (action === 'storesettings') {
+                    window.location.href = `register.html?storeId=${auth.currentUser.uid}`;
                 }
             }
         });
@@ -342,8 +378,6 @@
             });
         }
         function volumebox() {
-            const orderBell = document.getElementById("orderbell");
-            const volumeBox = document.getElementById("volumectrlbox");
             const volumeSlider = document.getElementById("volumeslider");
             const volumeValue = document.getElementById("volumevalue");
             orderBell.load();
@@ -352,28 +386,7 @@
             orderBell.volume = savedVolume;
             volumeSlider.value = savedVolume;
             volumeValue.textContent = Math.round(savedVolume * 100) + "%";
-            // ==========================================
-            // 1. 點擊事件委派 (處理按鈕點擊)
-            // ==========================================
-            document.addEventListener("click", (e) => {
-                const targetBtn = e.target.closest('[data-action="volumemenu"]');
-                if (targetBtn) {
-                    // 【2. 修正判斷邏輯：使用 getComputedStyle 判斷真實樣式】
-                    const currentDisplay = window.getComputedStyle(volumeBox).display;
-
-                    if (currentDisplay === "none") {
-                        volumeBox.style.display = "flex"; // 展開
-                    } else {
-                        volumeBox.style.display = "none"; // 收合
-                    }
-
-                    // 【播放邏輯】
-                    orderBell.currentTime = 0; // 重置時間
-                    orderBell.play().catch(err => console.log("播放被阻擋：", err));
-                }
-            });
-            // ==========================================
-            // 2. 輸入事件委派 (處理拉桿滑動)
+            // 輸入事件委派 (處理拉桿滑動)
             // ==========================================
             document.addEventListener("input", (e) => {
                 if (e.target.id === "volumeslider") {

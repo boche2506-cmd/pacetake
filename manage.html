@@ -99,14 +99,14 @@
             position: absolute;
             bottom: 100%;
             right: 10%;
-            height: 60cqw;
-            width: 40cqw;
+            height: 30cqw;
+            width: 70cqw;
             /* 圓角看起來比較現代 */
             z-index: 200;
             /* 確保一定在最上層 */
             /* 這是为了標示邊界 */
             border-radius: 5cqw;
-            padding: 1cqw;
+            padding: 2cqw;
             text-align: center;
             appearance: none;
             color: var(--text-main);
@@ -117,15 +117,12 @@
 
         /* 2. 拉桿：讓它垂直站立 */
         #volumeslider {
-            height: 70%;
-            width: 50%;
-            writing-mode: vertical-lr;
-            direction: rtl;
+            height: 40%;
+            width: 100%;
             outline: none;
             z-index: 200;
             user-select: none;
             cursor: default;
-
         }
 
         #volumeslider:focus {
@@ -134,19 +131,20 @@
 
         /* 3. 對 Label 和 Span 進行微調 */
         #volumectrlbox label {
-            height: 10%;
+            height: 20%;
             width: 100%;
             font-weight: bold;
             color: var(--brand-red);
             text-align: center;
             letter-spacing: 2cqw;
+            font-size: 6cqw;
         }
 
         #volumevalue {
-            height: 10%;
+            height: 20%;
             width: 100%;
             color: var(--brand-red);
-            font-size: 5cqw;
+            font-size: 6cqw;
             text-align: center;
         }
     </style>

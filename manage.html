@@ -117,6 +117,18 @@
             cursor: pointer;
         }
 
+        #volumeslider:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            border: none;
+            /* 確保沒有邊框 */
+            box-shadow: none;
+            /* 確保沒有影子 */
+        }
+
         /* 3. 對 Label 和 Span 進行微調 */
         #volumectrlbox label {
             height: 10%;
@@ -368,20 +380,32 @@
             orderBell.load();
             // 【初始化設定】
             const savedVolume = localStorage.getItem("orderBellVolume") || 0.5;
+            console.log("從 LocalStorage 讀到的音量是：", savedVolume); // 看看這裡印出來什麼
             orderBell.volume = savedVolume;
             volumeSlider.value = savedVolume;
             volumeValue.textContent = Math.round(savedVolume * 100) + "%";
             // 輸入事件委派 (處理拉桿滑動)
             // ==========================================
-            document.addEventListener("input", (e) => {
-                if (e.target.id === "volumeslider") {
-                    const currentVolume = e.target.value;
-                    orderBell.volume = currentVolume;
-                    volumeValue.textContent = Math.round(currentVolume * 100) + "%";
-                    localStorage.setItem("orderBellVolume", currentVolume);
-                }
+            volumeSlider.addEventListener("input", (e) => {
+                const val = parseFloat(e.target.value);
+
+                // 1. 同步更新音量
+                orderBell.volume = val;
+
+                // 2. 更新畫面文字
+                volumeValue.textContent = Math.round(val * 100) + "%";
+
+                // 3. 儲存設定
+                localStorage.setItem("orderBellVolume", val);
+
+                // 4. 【重要】在手機上，強制觸發一次強制重繪，讓瀏覽器感知到變化
+                volumeSlider.blur();
+                volumeSlider.focus();
             });
+            orderBell.muted = false; // 強制解鎖靜音
+            orderBell.play().catch(() => { }); // 重新請求播放授權
         }
+
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
             volumebox();

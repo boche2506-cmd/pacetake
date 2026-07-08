@@ -159,6 +159,47 @@
             font-size: 6cqw;
             text-align: center;
         }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .btn-download {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #0066FF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -212,7 +253,16 @@
             </main>
             <footer class="bottom-bar">
                 <button class="btn" data-action="manage-orders">訂單</button>
-                <button class="btn" data-action="manage-orders">訂單</button>
+                <button class="btn" data-action="QRCode">💾<br>QRCode</button>
+                <div id="qrModal" class="modal" style="display: none;">
+                    <div id="qrcode"></div>
+                    <div class="modal-content">
+                        <span class="close-btn" data-action="closeModal">&times;</span>
+                        <h3>商店 QR Code</h3>
+                        <div id="qrDisplayArea"></div>
+                        <button id="downloadBtn" class="btn-download">💾 下載 SVG 檔案</button>
+                    </div>
+                </div>
                 <button class="btn" data-action="storesettings">⚙️<br>資料修改</button>
                 <button class="btn" data-action="volumemenu" type="button">🎵<br>測試鈴聲</button>
                 <!-- 預設隱藏的音量控制區塊 -->
@@ -280,6 +330,7 @@
     </div>
     <script type="module" src="app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="module">
         import { authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from './app.js';
         let allStores = [];
@@ -288,9 +339,9 @@
         let currentBuyerAddress = "正在獲取定位中...";
         let currentUserId = null;
         let activeDragItem = null;
-        /*<script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">*/
         const orderBell = document.getElementById("orderbell");
         const volumeBox = document.getElementById("volumectrlbox");
+        const modal = document.getElementById('qrModal');
         const urlParams = new URLSearchParams(window.location.search);
         const storeId = urlParams.get('storeId');
         async function initPage() {
@@ -312,83 +363,87 @@
             console.log("驗證通過，開始載入管理介面...");
         }
         document.addEventListener('click', (e) => {
-            // 1. 先抓出點擊目標
+            // 2. 先抓目標
             const volumeBtn = e.target.closest('[data-action="volumemenu"]');
             const isInsideVolumeBox = e.target.closest('#volumectrlbox');
-            // 2. 如果點擊的是「音量選單按鈕」
+            const target = e.target.closest('[data-action]');
+
+            // 3. 處理「音量選單」邏輯
             if (volumeBtn) {
-                const isVisible = window.getComputedStyle(volumeBox).display !== "none";
-                if (isVisible) {
+                if (!volumeBox) return; // 防呆
+                const isHidden = window.getComputedStyle(volumeBox).display === "none";
+
+                if (isHidden) {
+                    volumeBox.style.display = "flex";
+                    orderBell.currentTime = 0;
+                    orderBell.play().catch(e => console.log("播放被阻擋", e));
+                } else {
                     volumeBox.style.display = "none";
                     orderBell.pause();
                     orderBell.currentTime = 0;
-                } else {
-                    volumeBox.style.display = "flex";
-                    orderBell.currentTime = 0;
-                    orderBell.play().catch(err => console.log("播放被阻擋：", err));
                 }
-                return; // 處理完按鈕就結束，不往下執行
+                return; // 處理完立刻離開
             }
-            // 3. 如果點擊的是「選單外」的任何地方，且選單目前是顯示狀態，就關閉選單
-            // 只要「不是點在按鈕上」且「不是點在選單盒子內」，就關掉選單
-            if (!isInsideVolumeBox) {
+
+            // 4. 處理「點選單外關閉」
+            if (!isInsideVolumeBox && volumeBox && window.getComputedStyle(volumeBox).display !== "none") {
                 volumeBox.style.display = "none";
-                // 如果你希望點別處時連音樂也一起停，就加上下面兩行
                 orderBell.pause();
                 orderBell.currentTime = 0;
             }
-            // 4. 處理其他按鈕邏輯 (例如 store settings)
-            const target = e.target.closest('[data-action]');
-            if (target) {
-                const action = target.getAttribute('data-action');
-                if (action === 'storesettings') {
-                    window.location.href = `register.html?storeId=${auth.currentUser.uid}`;
-                }
+
+            // 5. 處理「關閉燈箱背景」(檢查 modal 是否存在才執行)
+            if (modal && e.target === modal) {
+                closeQrModal();
+                return;
+            }
+
+            // 6. 處理其他按鈕
+            if (!target) return;
+            const action = target.dataset.action; // 使用 dataset 簡寫
+
+            if (action === 'storesettings') {
+                window.location.href = `register.html?storeId=${auth.currentUser.uid}`;
+            } else if (action === 'QRCode') {
+                showQrModal(storeId);
+            } else if (action === 'closeModal') {
+                closeQrModal();
             }
         });
-        // 💾 QR Code 效能解放優化：即時高速原生 API 生成並下載 SVG
-        // 準備一個隱藏的容器
-        function QRCode() {
-            const qrContainer = document.createElement('div');
-            qrContainer.style.display = 'none';
-            document.body.appendChild(qrContainer);
-            bindFastClick(generateDownloadBtn, async () => {
-                // 1. 設定你的商店網址
-                const storeUrl = `https://www.pacetake.tw/store.html?storeId=${storeId}`;
-                // 2. 使用 QRCode.js 生成 SVG
-                const qrcode = new QRCode(qrContainer, {
-                    text: storeUrl,
-                    width: 200,
-                    height: 200,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-                // 3. 取得生成的 SVG 原始碼
-                const qrSvg = qrContainer.querySelector('svg').outerHTML;
-                // 4. 把這個 SVG 塞進你原本的模板外框裡
-                const svgString = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
-                    <rect width="400" height="500" rx="30" fill="#0066FF"/>
-                    <rect x="20" y="20" width="360" height="460" rx="20" fill="#ffffff"/>
-                    <text x="200" y="70" font-family="sans-serif" font-size="28" font-weight="900" fill="#0066FF" text-anchor="middle">快拿自取街</text>
-                    <g transform="translate(100, 150)">
-                        ${qrSvg}
-                    </g>
-                    <text x="200" y="430" font-family="sans-serif" font-size="16" font-weight="800" fill="#111111" text-anchor="middle">手機掃碼 ‧ 免投 App 點單</text>
-                </svg>
-                `;
-                // 5. 下載流程 (維持不變)
-                const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        // 1. 打開燈箱並生成 QR
+        function showQrModal(storeId) {
+            const modal = document.getElementById('qrModal'); // 燈箱背景
+            const qrContainer = document.getElementById('qrcode'); // 真的要放 QR Code 的那個小 div
+            // 1. 安全檢查：確保元素都有抓到
+            if (!modal || !qrContainer) {
+                console.error("燈箱或 QR Code 容器找不到！");
+                return;
+            }
+            // 2. 清空舊的 QR Code (非常重要！不然會疊在一起)
+            qrContainer.innerHTML = "";
+            // 3. 確保這裡才開始生成，就不會出現 `undefined` 錯誤了
+            new QRCode(qrContainer, {
+                text: "https://www.pacetake.tw/store.html?storeId=" + storeId,
+                width: 128,
+                height: 128
+            });
+            // 4. 最後才顯示燈箱
+            modal.style.display = 'flex';
+            // 2. 下載綁定
+            downloadBtn.onclick = () => {
+                // 這裡放入你原本處理 SVG 字串與 Blob 下載的邏輯
+                const svgString = `...你的SVG樣板內容...`;
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `pacetake-qr-${storeId}.svg`;
+                link.download = `pacetake-${storeId}.svg`;
                 link.click();
-                URL.revokeObjectURL(url);
-                // 清理一下生成的 QR Code
-                qrContainer.innerHTML = '';
-            });
+            };
+        }
+        // 關閉燈箱
+        function closeQrModal() {
+            document.getElementById('qrModal').style.display = 'none';
         }
         function volumebox() {
             const volumeSlider = document.getElementById("volumeslider");

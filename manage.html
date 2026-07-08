@@ -106,6 +106,7 @@
             /* 確保一定在最上層 */
             /* 這是为了標示邊界 */
             text-align: center;
+            appearance: none;
         }
 
         /* 2. 拉桿：讓它垂直站立 */
@@ -115,18 +116,14 @@
             writing-mode: vertical-lr;
             direction: rtl;
             cursor: pointer;
+            outline: none;
+            z-index: 200;
         }
 
         #volumeslider:focus {
             outline: none;
-        }
-
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            border: none;
-            /* 確保沒有邊框 */
-            box-shadow: none;
-            /* 確保沒有影子 */
+            margin: 0;
+            padding: 0;
         }
 
         /* 3. 對 Label 和 Span 進行微調 */

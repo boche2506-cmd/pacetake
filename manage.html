@@ -93,37 +93,43 @@
         #volumectrlbox {
             display: none;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: center;
             /* 預設隱藏，點擊時用 JS 切換顯示 */
             position: absolute;
             bottom: 100%;
             right: 10%;
-            height: 45cqw;
-            width: 15cqw;
+            height: 60cqw;
+            width: 40cqw;
             /* 圓角看起來比較現代 */
             z-index: 200;
             /* 確保一定在最上層 */
             /* 這是为了標示邊界 */
+            border-radius: 5cqw;
+            padding: 1cqw;
             text-align: center;
             appearance: none;
+            color: var(--text-main);
+            background-color: var(--bg-global);
+            user-select: none;
+            gap: 0.5cqw;
         }
 
         /* 2. 拉桿：讓它垂直站立 */
         #volumeslider {
-            height: 80%;
+            height: 70%;
             width: 50%;
             writing-mode: vertical-lr;
             direction: rtl;
-            cursor: pointer;
             outline: none;
             z-index: 200;
+            user-select: none;
+            cursor: default;
+
         }
 
         #volumeslider:focus {
             outline: none;
-            margin: 0;
-            padding: 0;
         }
 
         /* 3. 對 Label 和 Span 進行微調 */
@@ -132,6 +138,8 @@
             width: 100%;
             font-weight: bold;
             color: var(--brand-red);
+            text-align: center;
+            letter-spacing: 2cqw;
         }
 
         #volumevalue {
@@ -139,6 +147,7 @@
             width: 100%;
             color: var(--brand-red);
             font-size: 5cqw;
+            text-align: center;
         }
     </style>
 </head>
@@ -197,7 +206,7 @@
                 <button class="btn" data-action="storesettings">⚙️資料修改</button>
                 <button class="btn" data-action="volumemenu" type="button">🎵 測試鈴聲</button>
                 <!-- 預設隱藏的音量控制區塊 -->
-                <div id="volumectrlbox">
+                <div id="volumectrlbox"><span>部分裝置無法透過此拉桿控制音量</span>
                     <label for="volumeslider">音量</label>
                     <!-- range 拉桿 -->
                     <input type="range" id="volumeslider" min="0" max="1" step="0.1" value="0.5">

@@ -346,7 +346,8 @@
             const volumeBox = document.getElementById("volumectrlbox");
             const volumeSlider = document.getElementById("volumeslider");
             const volumeValue = document.getElementById("volumevalue");
-            // 【初始化】從快取讀取音量設定
+            orderBell.load();
+            // 【初始化設定】
             const savedVolume = localStorage.getItem("orderBellVolume") || 0.5;
             orderBell.volume = savedVolume;
             volumeSlider.value = savedVolume;
@@ -355,33 +356,30 @@
             // 1. 點擊事件委派 (處理按鈕點擊)
             // ==========================================
             document.addEventListener("click", (e) => {
-                // 尋找帶有 data-action="volumemenu" 的按鈕
                 const targetBtn = e.target.closest('[data-action="volumemenu"]');
                 if (targetBtn) {
-                    // A. 切換選單的顯示/隱藏
-                    if (volumeBox.style.display === "none") {
-                        volumeBox.style.display = "flex"; // 或 block，視你的排版而定
+                    // 【2. 修正判斷邏輯：使用 getComputedStyle 判斷真實樣式】
+                    const currentDisplay = window.getComputedStyle(volumeBox).display;
+
+                    if (currentDisplay === "none") {
+                        volumeBox.style.display = "flex"; // 展開
                     } else {
-                        volumeBox.style.display = "none";
+                        volumeBox.style.display = "none"; // 收合
                     }
-                    // B. 播放/重新播放鈴聲 (同時解鎖瀏覽器音訊限制)
-                    if (!orderBell.paused) {
-                        orderBell.currentTime = 0;
-                    }
-                    orderBell.play().catch(err => console.log("音訊播放被瀏覽器阻擋：", err));
+
+                    // 【播放邏輯】
+                    orderBell.currentTime = 0; // 重置時間
+                    orderBell.play().catch(err => console.log("播放被阻擋：", err));
                 }
             });
             // ==========================================
             // 2. 輸入事件委派 (處理拉桿滑動)
             // ==========================================
             document.addEventListener("input", (e) => {
-                // 判斷是不是音量拉桿在變動
-                if (e.target && e.target.id === "volumeslider") {
+                if (e.target.id === "volumeslider") {
                     const currentVolume = e.target.value;
-                    // 變更音量與 UI
                     orderBell.volume = currentVolume;
                     volumeValue.textContent = Math.round(currentVolume * 100) + "%";
-                    // 儲存到快取，以便 seller.html 同步
                     localStorage.setItem("orderBellVolume", currentVolume);
                 }
             });

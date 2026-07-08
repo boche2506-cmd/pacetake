@@ -283,21 +283,6 @@
             // 驗證完全過關，執行你的主程式
             console.log("驗證通過，開始載入管理介面...");
         }
-        // 在 manage.html 的 JS 中加入：
-        document.addEventListener('click', async (e) => {
-            // 1. 判斷點擊的是不是我們設定的按鈕
-            const target = e.target.closest('[data-action]');
-            if (!target) return;
-            const action = target.getAttribute('data-action');
-            switch (action) {
-                case 'storesettings': {
-                    // 3. 執行跳轉，帶上 storeId
-                    window.location.href = `register.html?storeId=${auth.currentUser.uid}`;
-                    break;
-                }
-
-            }
-        });
         document.addEventListener('click', (e) => {
             // 1. 先抓出點擊目標
             const volumeBtn = e.target.closest('[data-action="volumemenu"]');
@@ -321,8 +306,8 @@
             if (!isInsideVolumeBox) {
                 volumeBox.style.display = "none";
                 // 如果你希望點別處時連音樂也一起停，就加上下面兩行
-                // orderBell.pause();
-                // orderBell.currentTime = 0;
+                orderBell.pause();
+                orderBell.currentTime = 0;
             }
             // 4. 處理其他按鈕邏輯 (例如 store settings)
             const target = e.target.closest('[data-action]');

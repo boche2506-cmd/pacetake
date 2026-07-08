@@ -80,7 +80,7 @@
             background-color: #007AFF;
             /* Apple 風格的藍色 */
             color: white;
-            font-weight: 500;
+            font-weight: 600;
             font-size: 3.5cqw;
             padding: 3cqw 4cqw;
             border-radius: 2cqw;
@@ -102,7 +102,7 @@
             position: absolute;
             bottom: 100%;
             right: 10%;
-            height: 30cqw;
+            height: 35cqw;
             width: 70cqw;
             /* 圓角看起來比較現代 */
             z-index: 200;
@@ -115,25 +115,30 @@
             color: var(--text-main);
             background-color: var(--bg-global);
             user-select: none;
-            gap: 0.5cqw;
             font-size: 4cqw;
         }
 
         /* 2. 拉桿：讓它垂直站立 */
         #volumeslider {
-            height: 40%;
+            -webkit-appearance: none;
+            /*去掉網頁原生樣式兩個一起用*/
+            appearance: none;
+            /*去掉網頁原生樣式兩個一起用*/
+            height: 15%;
             width: 100%;
-            outline: none;
-            z-index: 200;
-            user-select: none;
             cursor: default;
+            background: #ddd;
         }
 
-        #volumeslider:focus {
-            outline: none;
+        #volumeslider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 5cqw;
+            height: 5cqw;
+            background: #007bff;
+            border-radius: 50%;
         }
 
-        /* 3. 對 Label 和 Span 進行微調 */
         #volumectrlbox label {
             height: 20%;
             width: 100%;
@@ -386,12 +391,19 @@
             const volumeSlider = document.getElementById("volumeslider");
             const volumeValue = document.getElementById("volumevalue");
             orderBell.load();
+            // 輔助函式：負責更新顏色填滿
+            const updateBackground = (val) => {
+                // 這裡將滑桿填滿顏色與底色寫入 background
+                // val 是 0 到 1 之間的數字，乘上 100 變成百分比
+                volumeSlider.style.background = `linear-gradient(to right, #007bff ${val * 100}%, #ddd ${val * 100}%)`;
+            };
             // 【初始化設定】
-            const savedVolume = localStorage.getItem("orderBellVolume") || 0.5;
-            console.log("從 LocalStorage 讀到的音量是：", savedVolume); // 看看這裡印出來什麼
+            const savedVolume = parseFloat(localStorage.getItem("orderBellVolume")) || 0.5; console.log("從 LocalStorage 讀到的音量是：", savedVolume); // 看看這裡印出來什麼
             orderBell.volume = savedVolume;
             volumeSlider.value = savedVolume;
             volumeValue.textContent = Math.round(savedVolume * 100) + "%";
+            // 初始化時就先更新一次顏色
+            updateBackground(savedVolume);
             // 輸入事件委派 (處理拉桿滑動)
             // ==========================================
             volumeSlider.addEventListener("input", (e) => {
@@ -402,7 +414,9 @@
                 volumeValue.textContent = Math.round(val * 100) + "%";
                 // 3. 儲存設定
                 localStorage.setItem("orderBellVolume", val);
-                // 4. 【重要】在手機上，強制觸發一次強制重繪，讓瀏覽器感知到變化
+                // 4. 【重點】更新顏色填滿
+                updateBackground(val);
+                // 5. 【重要】在手機上，強制觸發一次強制重繪，讓瀏覽器感知到變化
                 volumeSlider.blur();
                 volumeSlider.focus();
             });

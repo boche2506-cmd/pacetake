@@ -127,6 +127,10 @@
             height: 15%;
             width: 100%;
             background: #ddd;
+            /* 1. 強制游標顯示為手指 (或 default，改成箭頭) */
+            cursor: pointer;
+            user-select: none;
+            /* 標準寫法 */
         }
 
         #volumeslider::-webkit-slider-thumb {
@@ -136,10 +140,6 @@
             height: 5cqw;
             background: #007bff;
             border-radius: 50%;
-        }
-
-        input[type=range] {
-            cursor: default;
         }
 
         #volumectrlbox label {

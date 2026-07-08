@@ -388,24 +388,17 @@
             // ==========================================
             volumeSlider.addEventListener("input", (e) => {
                 const val = parseFloat(e.target.value);
-
                 // 1. 同步更新音量
                 orderBell.volume = val;
-
                 // 2. 更新畫面文字
                 volumeValue.textContent = Math.round(val * 100) + "%";
-
                 // 3. 儲存設定
                 localStorage.setItem("orderBellVolume", val);
-
                 // 4. 【重要】在手機上，強制觸發一次強制重繪，讓瀏覽器感知到變化
                 volumeSlider.blur();
                 volumeSlider.focus();
             });
-            orderBell.muted = false; // 強制解鎖靜音
-            orderBell.play().catch(() => { }); // 重新請求播放授權
         }
-
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
             volumebox();

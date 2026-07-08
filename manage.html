@@ -26,8 +26,8 @@
 
         /* 將所有區塊改成卡片式設計 */
         .chart-section,
-        .time-settings,
-        .finance-stats {
+        .finance-stats,
+        .time-settings {
             max-width: 100%;
             color: var(--text-main);
             box-shadow: var(--shadow-sm);
@@ -60,7 +60,7 @@
             flex-direction: row;
             justify-content: space-around;
             align-items: center;
-            padding: 0 1cqw;
+            padding: 1cqw;
             color: var(--text-main);
             box-shadow: var(--shadow-sm);
             background-color: var(--card-bg);
@@ -71,6 +71,8 @@
         }
 
         .btn {
+            height: 15cqw;
+            width: 25cqw;
             display: flex;
             flex-direction: row;
             justify-content: center;
@@ -78,8 +80,9 @@
             background-color: #007AFF;
             /* Apple 風格的藍色 */
             color: white;
-            font-weight: 600;
-            padding: 2cqw 4cqw;
+            font-weight: 500;
+            font-size: 3.5cqw;
+            padding: 3cqw 4cqw;
             border-radius: 2cqw;
             transition: transform 0.2s;
             /* 按下去會有一點點回饋感 */
@@ -202,8 +205,8 @@
             <footer class="bottom-bar">
                 <button class="btn" data-action="manage-orders">訂單</button>
                 <button class="btn" data-action="manage-orders">訂單</button>
-                <button class="btn" data-action="storesettings">⚙️資料修改</button>
-                <button class="btn" data-action="volumemenu" type="button">🎵 測試鈴聲</button>
+                <button class="btn" data-action="storesettings">⚙️<br>資料修改</button>
+                <button class="btn" data-action="volumemenu" type="button">🎵<br>測試鈴聲</button>
                 <!-- 預設隱藏的音量控制區塊 -->
                 <div id="volumectrlbox"><span>部分裝置無法透過此拉桿控制音量</span>
                     <label for="volumeslider">音量</label>

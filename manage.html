@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .dashboard-container {
-            height: 73%;
+            height: 75%;
             max-width: 100%;
             display: flex;
             flex-direction: column;
@@ -27,7 +27,7 @@
         /* 將所有區塊改成卡片式設計 */
         .chart-section,
         .finance-stats {
-            height: 30%;
+            height: 26%;
             width: 100%;
             color: var(--text-main);
             box-shadow: var(--shadow-sm);
@@ -49,7 +49,7 @@
         }
 
         .bottom-bar {
-            height: 12%;
+            height: 10%;
             width: 100%;
             /* 根據你的需求調整高度 */
             display: flex;
@@ -239,6 +239,7 @@
             flex-direction: row;
             justify-content: center;
             align-items: center;
+            padding: 1cqw;
         }
 
         .time-title {
@@ -273,24 +274,58 @@
 
         /* 2. 設定每一行 */
         .day-row {
-            height: 5cqw;
+            height: 6cqw;
             width: 100%;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
             border-bottom: 0.2cqw solid #f0f0f0;
-            font-size: 3.5cqw;
+            font-size: 4cqw;
             line-height: 1.1;
         }
+        
+        /* 3. 星期標籤樣式 */
+        .day-label {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;  
+            align-items: center;
+            height: 5cqw;
+            width: 8cqw;
+            /* 佔容器寬度的 15% */
+            font-weight: 500;
+            color: #333;
+            font-size: 4cqw;
+        }
 
-        /* 去掉最後一行的底線 */
-        .day-row:last-child {
-            border-bottom: none;
+        .toggle {
+            height: 5cqw;
+            width: 5cqw;
+            border: 0.5cqw solid var(--border-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .time-input {
+            height: 5cqw;
+            width: 10cqw;
+            border: 0.5cqw solid var(--border-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            padding: 0.5cqw;
+            letter-spacing:-1cqw;
+            font-size: 4.5cqw;
         }
 
         .status-container {
-            height: 45%;
+            height: 50%;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -298,38 +333,12 @@
             align-items: center;
         }
 
-        /* 3. 星期標籤樣式 */
-        .day-label {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            width: 15cqw;
-            /* 佔容器寬度的 15% */
-            font-weight: 600;
-            color: #333;
-            font-size: 4cqw;
-        }
-
-        /* 4. 時間輸入框樣式 */
-        .time-input {
-            padding: 0.8cqw;
-            border: 0.2cqw solid #ccc;
-            border-radius: 1cqw;
-            font-size: 3.5cqw;
-            /* 自動填滿剩餘空間 */
-            cursor: pointer;
-        }
-
         #status-text {
             line-height: 1.2;
         }
 
         /* 5. 簡單的視覺優化 */
-        .toggle {
-            width: 5cqw;
-            height: 5cqw;
-        }
+
 
         .switch {
             position: relative;
@@ -429,7 +438,7 @@
                     <div class="stat-item"><span>合計</span> <strong>1333</strong></div>
                 </div>
                 <div class="info-section">
-                    <div class="time-title">
+                    <div class="time-title"><span>自動上下線時間設定</span>
                         <div class="dayrow" id="timeRows">
                             <div class="day-row">
                                 <span class="day-label">週一</span>

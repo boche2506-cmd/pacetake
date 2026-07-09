@@ -550,9 +550,9 @@
             console.log("驗證通過，開始載入管理介面...");
             await initStatus(storeId);
         }
-        async function initStatus(shopId) {
+        async function initStatus(storeId) {
             try {
-                const docRef = doc(db, "stores", shopId);
+                const docRef = doc(db, "stores", storeId);
                 const storeDoc = await getDoc(docRef);
 
                 if (storeDoc.exists()) {
@@ -577,7 +577,7 @@
             const newStatus = isChecked ? 'online' : 'offline';
 
             try {
-                await updateDoc(doc(db, "stores", yourShopId), {
+                await updateDoc(doc(db, "stores", storeId), {
                     status: newStatus
                 });
 
@@ -806,7 +806,7 @@
             });
 
             // 寫入 Firebase
-            await updateDoc(doc(db, "shops", currentShopId), { businessHours });
+            await updateDoc(doc(db, "shops", currentstoreId), { businessHours });
             alert("已儲存時間設定！");
         }
         document.addEventListener('DOMContentLoaded', () => {

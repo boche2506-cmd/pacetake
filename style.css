@@ -69,7 +69,7 @@ textarea {
     border-radius: 10cqw;
     background-color: var(--bg-global);
     color: var(--text-main);
-    line-height: 1;
+    line-height: 1.1;
     box-sizing: border-box;
     max-width: 100%;
     object-fit: contain;
@@ -485,11 +485,6 @@ img,
     /* 讓字體大小跟其他選項一致 */
 }
 
-.logoutBtn:hover {
-    background-color: #fff0f0;
-    /* 登出按鈕移過去時顯示淡淡的紅色 */
-}
-
 .dropdown-menu .loginBtn {
     width: 100%;
     /* 覆蓋你寫在行內的 60%，點擊範圍比較大 */
@@ -499,11 +494,6 @@ img,
     /* 跟上面的超連結對齊 */
     font-size: 5cqw;
     /* 讓字體大小跟其他選項一致 */
-}
-
-.loginBtn:hover {
-    background-color: #f3fff0;
-    /* 登出按鈕移過去時顯示淡淡的綠色 */
 }
 
 /* 左側：訂單狀態訊息區塊 */

@@ -273,12 +273,15 @@
 
         /* 2. 設定每一行 */
         .day-row {
+            height: 5cqw;
             width: 100%;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
             border-bottom: 0.2cqw solid #f0f0f0;
+            font-size: 3.5cqw;
+            line-height: 1.1;
         }
 
         /* 去掉最後一行的底線 */
@@ -578,7 +581,7 @@
                     const isOnline = data.status === 'online';
                     if (statusToggle) {
                         statusToggle.checked = isOnline;
-                        statusText.innerText = isOnline ? "目前狀態：營業中" : "目前狀態：休息中";
+                        statusText.innerText = isOnline ? "目前狀態：<br>營業中" : "目前狀態：<br>休息中";
                     }
                 }
             } catch (error) {

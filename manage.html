@@ -163,41 +163,75 @@
         .modal {
             position: fixed;
             top: 0;
-            left: 0;
-            width: 100%;
+            aspect-ratio: 9 / 16;
             height: 100%;
+            margin: 0 auto;
             background: rgba(0, 0, 0, 0.7);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: space-around;
             align-items: center;
-            z-index: 1000;
+            z-index: 999;
         }
 
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
+        .qrcodeinput {
+            height: 25%;
             width: 90%;
-            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 4cqw;
+            text-align: center;
+            background-color: var(--card-bg);
+            border: 0.2cqw solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 1cqw;
+            font-size: 3.5cqw;
+            color: var(--brand-red);
+            letter-spacing: 1px;
+            line-height: 1.1; 
+        }
+
+        #overlayInput {
+            height: 10cqw;
+            width: 90%;
+            /* 對應畫布文字的 Y 座標 */
+            /* 背景透明 */
+            color: var(--text-main);
+            /* 文字顏色 */
+            text-align: center;
+            font: bold 6cqw sans-serif;
+            /* 記得調整字體大小符合預覽比例 */
+            background-color: var(--bg-Container);
+        }
+
+        #qrcode {
+            height: auto;
+            width: 90%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             position: relative;
         }
 
         .close-btn {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
+            top: 2.5cqw;
+            right: 6cqw;
+            font-size: 10cqw;
             cursor: pointer;
+            z-index: 999;
         }
 
         .btn-download {
-            margin-top: 20px;
-            padding: 10px 20px;
+            padding: 2.5cqw 5cqw;
             background: #0066FF;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 1cqw;
             cursor: pointer;
         }
     </style>
@@ -255,13 +289,12 @@
                 <button class="btn" data-action="manage-orders">訂單</button>
                 <button class="btn" data-action="QRCode">💾<br>QRCode</button>
                 <div id="qrModal" class="modal" style="display: none;">
-                    <div id="qrcode"></div>
-                    <div class="modal-content">
-                        <span class="close-btn" data-action="closeModal">&times;</span>
-                        <h3>商店 QR Code</h3>
-                        <div id="qrDisplayArea"></div>
-                        <button id="downloadBtn" class="btn-download">💾 下載 SVG 檔案</button>
+                    <div class="qrcodeinput"><span>此QR Code為您的商店專屬，<br>掃描後會連結至您在派思的商店頁。<br>請在下方輸入你的標題，<br>會覆蓋在QR
+                            Code上方藍色區域顯示。<br>下載後至7-11以「按原尺寸列印」或<br>「不縮放」列印較為方便使用。</span><input type="text" id="overlayInput" placeholder="輸入標題...Sample text ✨">
                     </div>
+                    <div id="qrcode"></div>
+                    <span class="close-btn" data-action="closeModal">&times;</span>
+                    <button id="downloadBtn" class="btn-download">💾 下載 QR Code</button>
                 </div>
                 <button class="btn" data-action="storesettings">⚙️<br>資料修改</button>
                 <button class="btn" data-action="volumemenu" type="button">🎵<br>測試鈴聲</button>
@@ -328,17 +361,20 @@
             </div>
         </div>
     </div>
+    <script type="importmap"> { "imports": { "qr-code-styling": "https://esm.sh/qr-code-styling@1.6.0" }  }</script>
     <script type="module" src="app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="module">
         import { authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from './app.js';
+        // 在你的 app.js 或 <script type="module"> 裡面修改為：
+        import QRCodeStyling from 'qr-code-styling';
         let allStores = [];
         let buyerLat = null;
         let buyerLng = null;
         let currentBuyerAddress = "正在獲取定位中...";
         let currentUserId = null;
         let activeDragItem = null;
+        let cachedQrCanvas = null;
         const orderBell = document.getElementById("orderbell");
         const volumeBox = document.getElementById("volumectrlbox");
         const modal = document.getElementById('qrModal');
@@ -367,12 +403,10 @@
             const volumeBtn = e.target.closest('[data-action="volumemenu"]');
             const isInsideVolumeBox = e.target.closest('#volumectrlbox');
             const target = e.target.closest('[data-action]');
-
             // 3. 處理「音量選單」邏輯
             if (volumeBtn) {
                 if (!volumeBox) return; // 防呆
                 const isHidden = window.getComputedStyle(volumeBox).display === "none";
-
                 if (isHidden) {
                     volumeBox.style.display = "flex";
                     orderBell.currentTime = 0;
@@ -384,24 +418,20 @@
                 }
                 return; // 處理完立刻離開
             }
-
             // 4. 處理「點選單外關閉」
             if (!isInsideVolumeBox && volumeBox && window.getComputedStyle(volumeBox).display !== "none") {
                 volumeBox.style.display = "none";
                 orderBell.pause();
                 orderBell.currentTime = 0;
             }
-
             // 5. 處理「關閉燈箱背景」(檢查 modal 是否存在才執行)
             if (modal && e.target === modal) {
                 closeQrModal();
                 return;
             }
-
             // 6. 處理其他按鈕
             if (!target) return;
             const action = target.dataset.action; // 使用 dataset 簡寫
-
             if (action === 'storesettings') {
                 window.location.href = `register.html?storeId=${auth.currentUser.uid}`;
             } else if (action === 'QRCode') {
@@ -411,33 +441,95 @@
             }
         });
         // 1. 打開燈箱並生成 QR
-        function showQrModal(storeId) {
-            const modal = document.getElementById('qrModal'); // 燈箱背景
-            const qrContainer = document.getElementById('qrcode'); // 真的要放 QR Code 的那個小 div
-            // 1. 安全檢查：確保元素都有抓到
-            if (!modal || !qrContainer) {
-                console.error("燈箱或 QR Code 容器找不到！");
-                return;
-            }
-            // 2. 清空舊的 QR Code (非常重要！不然會疊在一起)
-            qrContainer.innerHTML = "";
-            // 3. 確保這裡才開始生成，就不會出現 `undefined` 錯誤了
-            new QRCode(qrContainer, {
-                text: "https://www.pacetake.tw/store.html?storeId=" + storeId,
-                width: 128,
-                height: 128
-            });
-            // 4. 最後才顯示燈箱
+        async function showQrModal(storeId) {
+            const modal = document.getElementById('qrModal');
+            const qrContainer = document.getElementById('qrcode');
+            const input = document.getElementById('overlayInput'); // 確保這 ID 正確
+            if (!modal || !qrContainer) return;
             modal.style.display = 'flex';
-            // 2. 下載綁定
-            downloadBtn.onclick = () => {
-                // 這裡放入你原本處理 SVG 字串與 Blob 下載的邏輯
-                const svgString = `...你的SVG樣板內容...`;
-                const blob = new Blob([svgString], { type: 'image/svg+xml' });
-                const url = URL.createObjectURL(blob);
+            qrContainer.innerHTML = "";
+            // 1. 先產生 QR Code (隱藏在背景產生)
+            const tempQrDiv = document.createElement('div');
+            const qrCodeStyling = new QRCodeStyling({
+                width: 850,       // 自動適應容器寬度
+                height: 850,      // 自動適應容器高度
+                type: "canvas",
+                data: "https://www.pacetake.tw/store.html?storeId=" + storeId,
+                dotsOptions: {
+                    color: "#0047FF", // 藍色碼體
+                    type: "rounded"   // 圓滑資料點
+                },
+                backgroundOptions: {
+                    color: "#E2E5E9"  // 灰白色內底色
+                },
+                cornersSquareOptions: {
+                    color: "#0047FF",
+                    type: "extra-rounded" // 定位點大圓角外框
+                },
+                cornersDotOptions: {
+                    color: "#0047FF",
+                    type: "dot"           // 定位點圓角心
+                }
+            });
+            qrCodeStyling.append(tempQrDiv);
+            // 等待 QR Code 渲染完成
+            await new Promise(resolve => setTimeout(resolve, 300));
+            const rawQrCanvas = tempQrDiv.querySelector('canvas');
+            // 2. 建立最終合成的 Canvas (設定好 1024x1150)
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = 1024;
+            finalCanvas.height = 1150;
+            const ctx = finalCanvas.getContext('2d');
+            /* A. 繪製最外層的漸層藍色大圓角卡片 */
+            // 建立垂直漸層
+            const gradient = ctx.createLinearGradient(0, 0, 0, finalCanvas.height);
+            gradient.addColorStop(0, '#3A7BD5'); // 亮藍
+            gradient.addColorStop(1, '#0047FF'); // 深藍
+            ctx.fillStyle = gradient;
+            // 繪製大圓角矩形外框
+            const radius = 80; // 外框圓角半徑
+            ctx.beginPath();
+            ctx.roundRect(0, 0, finalCanvas.width, finalCanvas.height, radius);
+            ctx.fill();
+            /* C. 繪製灰白色的內圓角底座 */
+            const innerMarginX = 50;  // 左右留白
+            const innerMarginY = 200; // 避開頂部文字的上方留白
+            const innerWidth = finalCanvas.width - (innerMarginX * 2);
+            const innerHeight = finalCanvas.height - innerMarginY - 50; // 下方留白 50px
+            const innerRadius = 60;   // 內底座圓角
+            ctx.fillStyle = "#E2E5E9"; // 灰白色背景
+            ctx.beginPath();
+            ctx.roundRect(innerMarginX, innerMarginY, innerWidth, innerHeight, innerRadius);
+            ctx.fill();
+            /* D. 把產出的 QR Code 本體疊加進來 */
+            // 取得 qr-code-styling 產出的原始畫布物件
+            if (rawQrCanvas) {
+                // 計算 QR Code 置中在內底座的位置
+                const qrX = innerMarginX + (innerWidth - 850) / 2;
+                const qrY = innerMarginY + (innerHeight - 850) / 2;
+                // 將 QR 繪製到最終畫布上
+                ctx.drawImage(rawQrCanvas, qrX, qrY, 850, 850);
+            }
+            // 3. 把最終 Canvas 放進 HTML
+            finalCanvas.style.maxWidth = "100%";
+            finalCanvas.style.height = "auto";
+            qrContainer.appendChild(finalCanvas);
+            // 4. 下載按鈕邏輯：直接利用已經畫好的 finalCanvas
+            const downloadBtn = document.getElementById('downloadBtn');
+            document.getElementById('downloadBtn').onclick = () => {
+                // 抓取目前的輸入文字
+                const userText = input.value || "Sample text ✨";
+                // 重新繪製文字
+                ctx.fillStyle = "#FFFFFF";
+                ctx.font = "bold 20cqw sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(userText, 1024 / 2, 100);
+                // 執行下載
+                const dataUrl = finalCanvas.toDataURL('image/png');
                 const link = document.createElement('a');
-                link.href = url;
-                link.download = `pacetake-${storeId}.svg`;
+                link.href = dataUrl;
+                link.download = `pacetake-${storeId}.png`;
                 link.click();
             };
         }

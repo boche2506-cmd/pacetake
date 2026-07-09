@@ -223,6 +223,19 @@ img,
         Container-type: size;
         Container-name: phone;
     }
+
+    #overlayInput {
+        height: 10cqw;
+        width: 90%;
+        /* 對應畫布文字的 Y 座標 */
+        /* 背景透明 */
+        color: var(--text-main);
+        /* 文字顏色 */
+        text-align: center;
+        font: bold 6cqw sans-serif;
+        /* 記得調整字體大小符合預覽比例 */
+        background-color: var(--bg-Container);
+    }
 }
 
 #buyerView,
@@ -472,7 +485,7 @@ img,
     /* 讓字體大小跟其他選項一致 */
 }
 
-.dropdown-menu .logoutBtn:hover {
+.logoutBtn:hover {
     background-color: #fff0f0;
     /* 登出按鈕移過去時顯示淡淡的紅色 */
 }
@@ -488,7 +501,7 @@ img,
     /* 讓字體大小跟其他選項一致 */
 }
 
-.dropdown-menu .loginBtn:hover {
+.loginBtn:hover {
     background-color: #f3fff0;
     /* 登出按鈕移過去時顯示淡淡的綠色 */
 }

@@ -1091,7 +1091,7 @@
                 newTabBtn.setAttribute('data-target', uniqueStoredId); // 🎯 精準對齊
                 newTabBtn.innerHTML = `
             <span>${catObj.category}</span>
-            <span class="tab-del-x" data-action="deletecategory" style="margin-left: 8px; cursor: pointer; color: #ff4d4d;">❌</span>
+            <span class="tab-del-x" data-action="deletecategory" style="margin-left: 2cqw; cursor: pointer; color: #ff4d4d;">❌</span>
         `;
 
                 if (addCategoryBox) {
@@ -1159,7 +1159,6 @@
             document.getElementById('shopAddress').value = data.detailAddress || '';
             document.getElementById('shopLat').value = data.shopLat || '';
             document.getElementById('shopLng').value = data.shopLng || '';
-            /*document.getElementById('shopStatus').value = data.status || 'online';*/
             document.getElementById('prepareTimeInput').value = data.prepareTime || 15;
             document.getElementById('merchantIdInput').value = data.MerchantID || '';
             document.getElementById('hashKeyInput').value = data.HashKey || '';
@@ -1190,7 +1189,6 @@
                 detailAddress: document.getElementById('shopAddress')?.value.trim(),
                 lat: document.getElementById('shopLat')?.value.trim() || '',
                 lng: document.getElementById('shopLng')?.value.trim() || '',
-                status: document.getElementById('shopStatus')?.value || 'online',
                 prepareTime: parseInt(document.getElementById('prepareTimeInput')?.value) || 15,
                 merchantIdValue: document.getElementById('merchantIdInput')?.value.trim() || '',
                 hashKeyValue: document.getElementById('hashKeyInput')?.value.trim() || '',
@@ -1212,7 +1210,7 @@
                 shopLat: ShopFormData.lat,
                 shopLng: ShopFormData.lng,
                 inviteCode: inviteCode,
-                status: ShopFormData.status,
+                status: online,
                 shopLogo: shopLogoData,
                 prepareTime: ShopFormData.prepareTime,
                 isOnlinePayEnabled: ShopFormData.isOnlinePayEnabled,
@@ -1398,7 +1396,7 @@
             if (e.cancelable) e.preventDefault();
             activeDragItem = row;
             row.style.transform = 'scale(1.02)'; // 微放大
-            row.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)'; // 浮起來的陰影
+            row.style.boxShadow = '0 2.5cqw 5cqw rgba(0,0,0,0.2)'; // 浮起來的陰影
             row.style.zIndex = '500';
             row.style.transition = 'transform 0.2s, box-shadow 0.2s'; // 平滑動畫
             row.style.border = '0.2cqw dashed var(--brand-blue)';
@@ -1553,7 +1551,7 @@
             if (!target) return;
             target.contentEditable = true;
             target.focus();
-            target.style.outline = "2px dashed #ff9800"; // 提示正在編輯
+            target.style.outline = "0.2cqw dashed #ff9800"; // 提示正在編輯
         });
         // 🎯 2. 全域離開監聽：滑鼠點到別的地方，立刻鎖定文字
         // 💡 小知識：因為 'blur' 事件不會冒泡，全域抓不到，所以要改用會冒泡的 'focusout'！
@@ -1655,7 +1653,7 @@
                 // 🎯 關鍵修改：用一個 span 包住字，並在旁邊塞一個帶有 data-action="deletecategory" 的 ❌
                 newTabBtn.innerHTML = `
                     <span>${categoryName}</span>
-                    <span class="tab-del-x" data-action="deletecategory" style="margin-left: 8px; cursor: pointer; color: #ff4d4d;">❌</span>
+                    <span class="tab-del-x" data-action="deletecategory" style="margin-left: 2cqw; cursor: pointer; color: #ff4d4d;">❌</span>
                             `;
                 // 🎯【核心改動】：不找 tabsWrapper 了！直接把按鈕塞進 header，且放在「輸入框」的前面
                 const addCategoryBox = header.querySelector('.add-category'); // 抓到輸入框的外層盒子

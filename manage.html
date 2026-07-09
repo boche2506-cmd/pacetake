@@ -26,19 +26,15 @@
 
         /* 將所有區塊改成卡片式設計 */
         .chart-section,
-        .finance-stats,
-        .time-settings {
-            max-width: 100%;
+        .finance-stats {
+            height: 30%;
+            width: 100%;
             color: var(--text-main);
             box-shadow: var(--shadow-sm);
             background-color: var(--card-bg);
-            border: 0.3cqw solid var(--border-color);
+            border: 0.2cqw solid var(--border-color);
             border: none;
-            padding: 3cqw;
             border-radius: 5cqw;
-            /* 大圓角更現代 */
-            flex: 1;
-            /* 平分空間 */
         }
 
         .stat-item {
@@ -62,17 +58,14 @@
             align-items: center;
             padding: 1cqw;
             color: var(--text-main);
-            box-shadow: var(--shadow-sm);
-            background-color: var(--card-bg);
-            border: 0.2cqw solid var(--border-color);
             border-radius: 5cqw;
             gap: 1cqw;
             position: relative;
         }
 
         .btn {
-            height: 15cqw;
-            width: 25cqw;
+            height: 13cqw;
+            width: 22cqw;
             display: flex;
             flex-direction: row;
             justify-content: center;
@@ -82,7 +75,7 @@
             color: white;
             font-weight: 600;
             font-size: 3.5cqw;
-            padding: 3cqw 4cqw;
+            padding: 2cqw 3cqw;
             border-radius: 2cqw;
             transition: transform 0.2s;
             /* 按下去會有一點點回饋感 */
@@ -190,7 +183,7 @@
             font-size: 3.5cqw;
             color: var(--brand-red);
             letter-spacing: 1px;
-            line-height: 1.1; 
+            line-height: 1.1;
         }
 
         #overlayInput {
@@ -233,6 +226,150 @@
             border: none;
             border-radius: 1cqw;
             cursor: pointer;
+        }
+
+        /* 設定時間 */
+        .info-section {
+            height: 40%;
+            width: 100%;
+            color: var(--text-main);
+            border-radius: 5cqw;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .time-title {
+            height: 100%;
+            width: 75%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .save-section {
+            height: 100%;
+            width: 25%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            padding: 1cqw;
+            font-weight: 500;
+            font-size: 3.5cqw;
+        }
+
+        #timeRows {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        /* 2. 設定每一行 */
+        .day-row {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 0.2cqw solid #f0f0f0;
+            flex: 1;
+        }
+
+        /* 去掉最後一行的底線 */
+        .day-row:last-child {
+            border-bottom: none;
+        }
+
+        .status-container {
+            height: 45%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        /* 3. 星期標籤樣式 */
+        .day-label {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 15cqw;
+            /* 佔容器寬度的 15% */
+            font-weight: 600;
+            color: #333;
+            font-size: 4cqw;
+        }
+
+        /* 4. 時間輸入框樣式 */
+        .time-input {
+            padding: 0.8cqw;
+            border: 1px solid #ccc;
+            border-radius: 1cqw;
+            font-size: 3.5cqw;
+            flex: 1;
+            /* 自動填滿剩餘空間 */
+            cursor: pointer;
+        }
+        #status-text {
+            line-height: 1.2;  
+        }
+
+        /* 5. 簡單的視覺優化 */
+        .toggle {
+            width: 5cqw;
+            height: 5cqw;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 90%;
+            height: 8.5cqw;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #2196F3;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
         }
     </style>
 </head>
@@ -277,10 +414,23 @@
                     <div class="stat-item"><span>合計</span> <strong>1333</strong></div>
                 </div>
                 <div class="info-section">
-                    <div class="time-settings">
-                        <h3 class="section-title">營業時間設定</h3>
-                        <div id="timeRows">
-                            <p>週一 ~ 週日 (00:00)~(00:00)</p>
+                    <div class="time-title">
+                        <div class="day-row" id="timeRows">
+                            <span class="day-label">週一</span>
+                            <input type="checkbox" class="toggle">
+                            <input type="time" class="time-input">
+                            <span class="separator">至</span>
+                            <input type="time" class="time-input">
+                        </div>
+                    </div>
+                    <div class="save-section"><span>營業時間設定</span>
+                        <button class="btn" data-action=saveBusinessHours>儲存時間設定</button>
+                        <div class="status-container">
+                            <label class="switch">
+                                <input type="checkbox" id="status-toggle" data-action="toggle-status">
+                                <span class="slider"></span>
+                            </label>
+                            <span id="status-text">目前狀態：<br>讀取中...</span>
                         </div>
                     </div>
                 </div>
@@ -290,7 +440,8 @@
                 <button class="btn" data-action="QRCode">💾<br>QRCode</button>
                 <div id="qrModal" class="modal" style="display: none;">
                     <div class="qrcodeinput"><span>此QR Code為您的商店專屬，<br>掃描後會連結至您在派思的商店頁。<br>請在下方輸入你的標題，<br>會覆蓋在QR
-                            Code上方藍色區域顯示。<br>下載後至7-11以「按原尺寸列印」或<br>「不縮放」列印較為方便使用。</span><input type="text" id="overlayInput" placeholder="輸入標題...Sample text ✨">
+                            Code上方藍色區域顯示。<br>下載後至7-11以「按原尺寸列印」或<br>「不縮放」列印較為方便使用。</span><input type="text"
+                            id="overlayInput" placeholder="輸入標題...Sample text ✨">
                     </div>
                     <div id="qrcode"></div>
                     <span class="close-btn" data-action="closeModal">&times;</span>
@@ -397,6 +548,48 @@
               }*/
             // 驗證完全過關，執行你的主程式
             console.log("驗證通過，開始載入管理介面...");
+            await initStatus(storeId);
+        }
+        async function initStatus(shopId) {
+            try {
+                const docRef = doc(db, "stores", shopId);
+                const storeDoc = await getDoc(docRef);
+
+                if (storeDoc.exists()) {
+                    const data = storeDoc.data();
+                    const statusToggle = document.getElementById('status-toggle');
+                    const statusText = document.getElementById('status-text');
+
+                    // 根據資料庫的狀態更新開關
+                    const isOnline = data.status === 'online';
+                    if (statusToggle) {
+                        statusToggle.checked = isOnline;
+                        statusText.innerText = isOnline ? "目前狀態：營業中" : "目前狀態：休息中";
+                    }
+                }
+            } catch (error) {
+                console.error("載入狀態失敗:", error);
+            }
+        }
+        // 2. 點擊開關時：立即更新 Firebase
+        async function toggleStatus(event) {
+            const isChecked = event.target.checked;
+            const newStatus = isChecked ? 'online' : 'offline';
+
+            try {
+                await updateDoc(doc(db, "stores", yourShopId), {
+                    status: newStatus
+                });
+
+                // 更新文字提示
+                document.getElementById('status-text').innerText = isChecked ? "目前狀態：營業中" : "目前狀態：休息中";
+                console.log("狀態已更新為:", newStatus);
+            } catch (error) {
+                console.error("更新失敗:", error);
+                // 失敗時把開關切回來
+                event.target.checked = !isChecked;
+                alert("更新失敗，請檢查網路");
+            }
         }
         document.addEventListener('click', (e) => {
             // 2. 先抓目標
@@ -419,18 +612,18 @@
                 return; // 處理完立刻離開
             }
             // 4. 處理「點選單外關閉」
-            if (!isInsideVolumeBox && volumeBox && window.getComputedStyle(volumeBox).display !== "none") {
+            else if (!isInsideVolumeBox && volumeBox && window.getComputedStyle(volumeBox).display !== "none") {
                 volumeBox.style.display = "none";
                 orderBell.pause();
                 orderBell.currentTime = 0;
             }
             // 5. 處理「關閉燈箱背景」(檢查 modal 是否存在才執行)
-            if (modal && e.target === modal) {
+            else if (modal && e.target === modal) {
                 closeQrModal();
                 return;
             }
             // 6. 處理其他按鈕
-            if (!target) return;
+            else if (!target) return;
             const action = target.dataset.action; // 使用 dataset 簡寫
             if (action === 'storesettings') {
                 window.location.href = `register.html?storeId=${auth.currentUser.uid}`;
@@ -438,6 +631,10 @@
                 showQrModal(storeId);
             } else if (action === 'closeModal') {
                 closeQrModal();
+            } else if (action === 'saveBusinessHours') {
+                saveBusinessHours();
+            } else if (action === 'toggle-status') {
+                toggleStatus(event);
             }
         });
         // 1. 打開燈箱並生成 QR
@@ -571,9 +768,51 @@
                 volumeSlider.focus();
             });
         }
+        const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+        const dayNames = ['週一', '週二', '週三', '週四', '週五', '週六', '週日'];
+
+        // 1. 初始化頁面：產生 UI
+        function renderTimeInputs(data = {}) {
+            const container = document.getElementById('timeRows');
+            container.innerHTML = "";
+
+            days.forEach((day, index) => {
+                const dayData = data[day] || { isOpen: false, open: "09:00", close: "18:00" };
+
+                const row = document.createElement('div');
+                row.className = 'day-row';
+                row.innerHTML = `
+            <label>
+                <input type="checkbox" id="${day}-check" ${dayData.isOpen ? 'checked' : ''}>
+                ${dayNames[index]}
+            </label>
+            <input type="time" id="${day}-open" value="${dayData.open}">
+            <span>至</span>
+            <input type="time" id="${day}-close" value="${dayData.close}">
+        `;
+                container.appendChild(row);
+            });
+        }
+
+        // 2. 儲存邏輯
+        async function saveBusinessHours() {
+            let businessHours = {};
+            days.forEach(day => {
+                businessHours[day] = {
+                    isOpen: document.getElementById(`${day}-check`).checked,
+                    open: document.getElementById(`${day}-open`).value,
+                    close: document.getElementById(`${day}-close`).value
+                };
+            });
+
+            // 寫入 Firebase
+            await updateDoc(doc(db, "shops", currentShopId), { businessHours });
+            alert("已儲存時間設定！");
+        }
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
             volumebox();
+            renderTimeInputs();
             console.log("系統初始化完成");
         });
     </script>

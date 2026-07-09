@@ -806,7 +806,7 @@
             });
 
             // 寫入 Firebase
-            await updateDoc(doc(db, "shops", currentstoreId), { businessHours });
+            await updateDoc(doc(db, "shops", storeId), { businessHours });
             alert("已儲存時間設定！");
         }
         document.addEventListener('DOMContentLoaded', () => {

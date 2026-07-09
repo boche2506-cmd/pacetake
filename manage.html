@@ -261,7 +261,8 @@
             font-size: 3.5cqw;
         }
 
-        #timeRows {
+        .dayrow {
+            height: 100%;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -310,15 +311,16 @@
         /* 4. 時間輸入框樣式 */
         .time-input {
             padding: 0.8cqw;
-            border: 1px solid #ccc;
+            border: 0.2cqw solid #ccc;
             border-radius: 1cqw;
             font-size: 3.5cqw;
             flex: 1;
             /* 自動填滿剩餘空間 */
             cursor: pointer;
         }
+
         #status-text {
-            line-height: 1.2;  
+            line-height: 1.2;
         }
 
         /* 5. 簡單的視覺優化 */
@@ -330,14 +332,16 @@
         .switch {
             position: relative;
             display: inline-block;
-            width: 90%;
-            height: 8.5cqw;
+            width: 18cqw;
+            height: 7cqw;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
         }
 
         .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
+            display: none;
         }
 
         .slider {
@@ -347,27 +351,38 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 8cqw;
+            background-color: #ff4d4f;
+            /* 綠色 */
+            border-radius: 7cqw;
+            transition: 0.4s;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3.25cqw;
+            font-weight: bold;
         }
 
         .slider:before {
             position: absolute;
             content: "";
-            height: 8.5cqw;
-            width: 8.5cqw;
+            height: 5cqw;
+            width: 5cqw;
+            right: 1.25cqw;
+            /* 圓圈初始在左邊 */
+            bottom: 1cqw;
             background-color: white;
-            transition: .4s;
             border-radius: 50%;
+            transition: 0.4s;
         }
 
         input:checked+.slider {
-            background-color: #2196F3;
+            background-color: #52c41a;
         }
 
         input:checked+.slider:before {
-            transform: translateX(8.5cqw);
+            transform: translateX(-10.5cqw);
         }
     </style>
 </head>
@@ -413,12 +428,14 @@
                 </div>
                 <div class="info-section">
                     <div class="time-title">
-                        <div class="day-row" id="timeRows">
-                            <span class="day-label">週一</span>
-                            <input type="checkbox" class="toggle">
-                            <input type="time" class="time-input">
-                            <span class="separator">至</span>
-                            <input type="time" class="time-input">
+                        <div class="dayrow" id="timeRows">
+                            <div class="day-row">
+                                <span class="day-label">週一</span>
+                                <input type="checkbox" class="toggle">
+                                <input type="time" class="time-input">
+                                <span class="separator">至</span>
+                                <input type="time" class="time-input">
+                            </div>
                         </div>
                     </div>
                     <div class="save-section"><span>營業時間設定</span>

@@ -2,11 +2,11 @@ const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-exports.autoUpdateStoreStatus = onSchedule("every 1 minutes", async (event) => {
+exports.autoUpdateStoreStatus = onSchedule("every 5 minutes", async (event) => {
     const db = admin.firestore();
     const storesSnapshot = await db.collection('stores').get();
 
-    // 強制轉換為台灣時間 (UTC+8)
+    // 取得台灣時間 (UTC+8)
     const now = new Date();
     const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
     const taipeiTime = new Date(utc + (3600000 * 8));
@@ -15,8 +15,15 @@ exports.autoUpdateStoreStatus = onSchedule("every 1 minutes", async (event) => {
     const currentDay = dayNames[taipeiTime.getDay()];
     const currentTimeMinutes = taipeiTime.getHours() * 60 + taipeiTime.getMinutes();
 
+    console.log(`執行時間: ${taipeiTime.toLocaleString()}, 星期: ${currentDay}, 分鐘: ${currentTimeMinutes}`);
+
     for (const doc of storesSnapshot.docs) {
         const store = doc.data();
+        // 如果 isAutoMode 明確設定為 false，機器人直接跳過這間店
+        if (store.isAutoMode === false) {
+            console.log(`商店 ${doc.id} 為手動模式，跳過自動更新。`);
+            continue;
+        }
         const hours = store.businessHours ? store.businessHours[currentDay] : null;
 
         if (hours && hours.isOpen) {

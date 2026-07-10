@@ -280,13 +280,44 @@
             line-height: 1.2;
         }
 
-        .save-section span {
-            height: 20%;
+        .AutoMode {
+            height: 12.5%;
             width: 100%;
             font-weight: 600;
             font-size: 3.75cqw;
             text-align: center;
             line-height: 1.2;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .AutoMode span {
+            height: 100%;
+            width: 25%;
+            font-weight: 600;
+            font-size: 3.75cqw;
+            text-align: center;
+            line-height: 1.2;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #AutoMode-text {
+            height: 100%;
+            width: 55%;
+            font-weight: 600;
+            font-size: 3.75cqw;
+            text-align: center;
+            line-height: 1.2;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
         }
 
         #timeRows {
@@ -371,6 +402,15 @@
             color: var(--text-main);
         }
 
+        .save-section span {
+            height: 20%;
+            width: 100%;
+            font-weight: 600;
+            font-size: 3.75cqw;
+            text-align: center;
+            line-height: 1.2;
+        }
+
         .save-section button {
             height: 25%;
             width: 90%;
@@ -415,8 +455,6 @@
             white-space: pre-wrap;
         }
 
-
-
         /* 5. 簡單的視覺優化 */
         .status-container label {
             position: relative;
@@ -429,7 +467,19 @@
             align-items: center;
         }
 
-        .status-container label input {
+        .AutoMode label {
+            position: relative;
+            display: inline-block;
+            height: 95%;
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .status-container label input,
+        .AutoMode label input {
             display: none;
         }
 
@@ -455,6 +505,28 @@
             font-weight: bold;
         }
 
+        .AutoMode label span {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ff4d4f;
+            /* 綠色 */
+            border-radius: 7cqw;
+            transition: 0.4s;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3.25cqw;
+            font-weight: bold;
+        }
+
         .slider:before {
             position: absolute;
             content: "";
@@ -473,6 +545,9 @@
 
         input:checked+.slider:before {
             transform: translateX(-10cqw);
+        }
+        .AutoMode input:checked+.slider:before {
+            transform: translateX(-7.75cqw);
         }
     </style>
 </head>
@@ -517,7 +592,16 @@
                     <div class="stat-item"><span>合計</span> <strong>1333</strong></div>
                 </div>
                 <div class="info-section">
-                    <div class="time-title"><span>自動上下線時間設定</span>
+                    <div class="time-title">
+
+                        <div class="AutoMode"><span>排程開關</span>
+                            <label class="switch">
+                                <input type="checkbox" id="AutoModetoggle" data-action="AutoModetoggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span id="AutoMode-text">自動排程：讀取中...</span>
+                        </div>
+
                         <div class="day-row" id="timeRows"></div>
                     </div>
                     <div class="save-section"><span>營業<br>時間設定</span>

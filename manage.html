@@ -359,6 +359,12 @@
             font-size: 3.5cqw;
         }
 
+        .day-row input::-webkit-calendar-picker-indicator {
+            padding: 0;
+            margin: 0;
+            /* 讓它保持原始圖示寬度，避免消失 */
+        }
+
         .day-row input:not(:placeholder-shown) {
             background-color: var(--bg-Container);
             color: var(--text-main);

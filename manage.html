@@ -411,6 +411,7 @@
             justify-content: center;
             align-items: center;
             letter-spacing: 0.5cqw;
+            white-space: pre-wrap;
         }
 
 
@@ -659,7 +660,7 @@
                     const isOnline = data.status === 'online';
                     if (statusToggle) {
                         statusToggle.checked = isOnline;
-                        statusText.innerText = isOnline ? "目前狀態：<br>營業中" : "目前狀態：<br>休息中";
+                        statusText.innerText = isOnline ? "目前狀態：\n營業中" : "目前狀態：\n休息中";
                     }
                 }
             } catch (error) {
@@ -677,7 +678,7 @@
                 });
 
                 // 更新文字提示
-                document.getElementById('status-text').innerText = isChecked ? "目前狀態：<br>營業中" : "目前狀態：<br>休息中";
+                document.getElementById('status-text').innerText = isChecked ? "目前狀態：\n營業中" : "目前狀態：\n休息中";
                 console.log("狀態已更新為:", newStatus);
             } catch (error) {
                 console.error("更新失敗:", error);

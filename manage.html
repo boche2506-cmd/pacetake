@@ -546,6 +546,7 @@
         input:checked+.slider:before {
             transform: translateX(-10cqw);
         }
+
         .AutoMode input:checked+.slider:before {
             transform: translateX(-7.75cqw);
         }
@@ -747,12 +748,18 @@
                     const data = storeDoc.data();
                     const statusToggle = document.getElementById('status-toggle');
                     const statusText = document.getElementById('status-text');
-
+                    const AutoModetoggle = document.getElementById('AutoModetoggle');
+                    const AutoModetext = document.getElementById('AutoMode-text');
                     // 根據資料庫的狀態更新開關
-                    const isOnline = data.status === 'online';
+                    const isOnline = data.status === true;
                     if (statusToggle) {
                         statusToggle.checked = isOnline;
                         statusText.innerText = isOnline ? "目前狀態：\n營業中" : "目前狀態：\n休息中";
+                    }
+                    const isAutoMode = data.isAutoMode !== true;
+                    if (AutoModetoggle) {
+                        AutoModetoggle.checked = isAutoMode;
+                        AutoModetext.innerText = isAutoMode ? "自動排程：開" : "自動排程：關";
                     }
                     renderTimeInputs(data.businessHours || {});
                 }
@@ -763,7 +770,7 @@
         // 2. 點擊開關時：立即更新 Firebase
         async function toggleStatus(event) {
             const isChecked = event.target.checked;
-            const newStatus = isChecked ? 'online' : 'offline';
+            const newStatus = isChecked;
 
             try {
                 await updateDoc(doc(db, "stores", storeId), {
@@ -776,6 +783,22 @@
             } catch (error) {
                 console.error("更新失敗:", error);
                 // 失敗時把開關切回來
+                event.target.checked = !isChecked;
+                alert("更新失敗，請檢查網路");
+            }
+        }
+        async function AutoModetoggle(event) {
+            const isChecked = event.target.checked;
+            const newMode = isChecked;
+            try {
+                await updateDoc(doc(db, "stores", storeId), {
+                    isAutoMode: newMode
+                });
+                // 更新文字提示
+                document.getElementById('AutoMode-text').innerText = isChecked ? "自動排程：開" : "自動排程：關";
+                console.log("自動模式已更新為:", newMode);
+            } catch (error) {
+                console.error("更新失敗:", error);
                 event.target.checked = !isChecked;
                 alert("更新失敗，請檢查網路");
             }
@@ -824,6 +847,8 @@
                 saveBusinessHours();
             } else if (action === 'toggle-status') {
                 toggleStatus(event);
+            } else if (action === 'AutoModetoggle') {
+                AutoModetoggle(event);
             }
         });
         // 1. 打開燈箱並生成 QR

@@ -363,6 +363,7 @@
             padding: 0;
             margin: 0;
             /* 讓它保持原始圖示寬度，避免消失 */
+            color: var(--text-main);
         }
 
         .day-row input:not(:placeholder-shown) {
@@ -637,11 +638,18 @@
             }
             console.log("網址抓到的 ID:", storeId);
             console.log("登入的 UID:", auth.currentUser.uid);
-            /*if (!storeId || storeId !== user.uid) {
-                  alert("存取權限不足！您無權管理此商店，將為您導回首頁。");
-                  window.location.href = "index.html";
-                  return; // 務必保留 return，斷開後續渲染
-              }*/
+            /*if (!storeId) {
+                alert("找不到商店 ID，請確認網址是否正確。");
+                window.location.href = "index.html";
+                return;
+            }
+
+            // 權限檢查：登入的 UID 必須跟網址的 storeId 一致
+            if (storeId !== user.uid) {
+                alert("存取權限不足！您無權管理此商店。");
+                window.location.href = "index.html";
+                return;
+            }*/
             // 驗證完全過關，執行你的主程式
             console.log("驗證通過，開始載入管理介面...");
             await initStatus(storeId);
@@ -662,6 +670,7 @@
                         statusToggle.checked = isOnline;
                         statusText.innerText = isOnline ? "目前狀態：\n營業中" : "目前狀態：\n休息中";
                     }
+                    renderTimeInputs(data.businessHours || {});
                 }
             } catch (error) {
                 console.error("載入狀態失敗:", error);

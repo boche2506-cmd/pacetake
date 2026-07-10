@@ -248,7 +248,7 @@
             );
             const snapshot = await getDocs(q);
             if (snapshot.empty) {
-                historylist.innerHTML = '<div style="text-align:center; padding: 5cqw;">📜 目前還沒有歷史訂單紀錄喔！</div>';
+                historylist.innerHTML = '<div style="text-align:center; padding: 5cqw; color: var(--text-main);">📜 目前還沒有歷史訂單紀錄喔！</div>';
                 return;
             }
             historylist.innerHTML = ""; // 清空容器

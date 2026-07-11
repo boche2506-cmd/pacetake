@@ -2,7 +2,7 @@ const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-exports.autoUpdateStoreStatus = onSchedule("every 5 minutes", async (event) => {
+exports.autoUpdateStoreStatus = onSchedule("every 10 minutes", async (event) => {
     const db = admin.firestore();
     const storesSnapshot = await db.collection('stores').get();
 

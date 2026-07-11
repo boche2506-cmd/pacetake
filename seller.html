@@ -14,57 +14,13 @@
     <link rel="apple-touch-icon" href="png/logo180.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 最左側：巨型盲操營業開關 */
-        .status-toggle-btn {
-            background-color: rgba(16, 185, 129, 0.1);
-            border: 1px solid var(--brand-green);
-            color: var(--brand-green);
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.1s ease;
-        }
-
-        .status-toggle-btn.close-shop {
-            background-color: rgba(239, 68, 68, 0.1);
-            border-color: var(--brand-red);
-            color: var(--brand-red);
-        }
-
-        /* 中間與右側功能鈕與同步日夜切換 */
-        .nav-right-group {
+        .seller {
+            height: 70%;
+            width: 100%;
             display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-btn {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .theme-toggle {
-            background: none;
-            border: 1px solid var(--border-color);
-            font-size: 14px;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-            background-color: var(--card-bg);
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: stretch;
         }
 
         /* 橫向滑動列訂單編號 */
@@ -239,19 +195,138 @@
 
         /* 模擬資料滑動切換載體動畫 */
         .slide-animate {
-            animation: slideInEffect 0.15s ease-out;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        @keyframes slideInEffect {
-            from {
-                opacity: 0;
-                transform: scale(0.98);
-            }
+        .slide-out {
+            transform: translateX(-5cqw);
+            opacity: 0;
+        }
 
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        .bottom-bar {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            height: 15%;
+            width: 100%;
+            background-color: var(--blur-bg);
+            border-top: 0.3cqw solid var(--border-color);
+            padding: 1cqw 2cqw;
+            box-sizing: border-box;
+        }
+
+        .time-display {
+            color: var(--text-main);
+        }
+
+        /* 最左側：巨型盲操營業開關 */
+        .status-toggle-btn {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 0.2cqw solid var(--brand-green);
+            color: var(--brand-green);
+            padding: 2cqw 3cqw;
+            border-radius: 5cqw;
+            font-size: 4cqw;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        .status-toggle-btn.close-shop {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: var(--brand-red);
+            color: var(--brand-red);
+        }
+
+        .btn {
+            height: 13cqw;
+            width: 22cqw;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            background-color: #007AFF;
+            /* Apple 風格的藍色 */
+            color: white;
+            font-weight: 600;
+            font-size: 3.5cqw;
+            padding: 2cqw 3cqw;
+            border-radius: 2cqw;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
+        }
+
+        #volumectrlbox {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            /* 預設隱藏，點擊時用 JS 切換顯示 */
+            position: absolute;
+            bottom: 100%;
+            right: 10%;
+            height: 35cqw;
+            width: 70cqw;
+            /* 圓角看起來比較現代 */
+            z-index: 200;
+            /* 確保一定在最上層 */
+            /* 這是为了標示邊界 */
+            border-radius: 5cqw;
+            padding: 2cqw;
+            text-align: center;
+            appearance: none;
+            color: var(--text-main);
+            background-color: var(--bg-global);
+            user-select: none;
+            font-size: 4cqw;
+        }
+
+        /* 2. 拉桿：讓它垂直站立 */
+        #volumeslider {
+            -webkit-appearance: none;
+            /*去掉網頁原生樣式兩個一起用*/
+            appearance: none;
+            /*去掉網頁原生樣式兩個一起用*/
+            height: 15%;
+            width: 100%;
+            background: #ddd;
+            /* 1. 強制游標顯示為手指 (或 default，改成箭頭) */
+            cursor: pointer;
+            user-select: none;
+            /* 標準寫法 */
+        }
+
+        #volumeslider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 5cqw;
+            height: 5cqw;
+            background: #007bff;
+            border-radius: 50%;
+        }
+
+        #volumectrlbox label {
+            height: 20%;
+            width: 100%;
+            font-weight: bold;
+            color: var(--brand-red);
+            text-align: center;
+            letter-spacing: 2cqw;
+            font-size: 6cqw;
+        }
+
+        #volumevalue {
+            height: 20%;
+            width: 100%;
+            color: var(--brand-red);
+            font-size: 6cqw;
+            text-align: center;
         }
     </style>
 </head>
@@ -283,63 +358,74 @@
                     </div>
                 </div>
             </header>
-            <button class="status-toggle-btn" id="shopStatusToggle">🟢 營業中</button>
-            <!-- 橫向滑動列：訂單編號常亮 -->
-            <div class="order-tabs-scroll" id="orderTabsContainer">
-                <div class="order-tab active" id="tab_023">#023</div>
-                <div class="order-tab" id="tab_022">#022</div>
-                <div class="order-tab" id="tab_021">#021</div>
-            </div>
-
-            <!-- 核心工作區區塊 -->
-            <div class="workspace-layout">
-
-                <!-- 左側連動亮燈區 -->
-                <aside class="lights-sidebar">
-                    <!-- 金流狀態燈 -->
-                    <div class="light-indicator-card">
-                        <span class="light-title">金流防線</span>
-                        <span class="light-badge badge-green" id="light_pay">線上已付</span>
-                    </div>
-
-                    <!-- 預約取餐時間燈 -->
-                    <div class="light-indicator-card">
-                        <span class="light-title">預約取餐</span>
-                        <span class="light-badge badge-amber" id="light_time">12:30</span>
-                        <span class="time-countdown" id="light_countdown">剩 20 分</span>
-                    </div>
-
-                    <!-- 用餐方式燈 -->
-                    <div class="light-indicator-card">
-                        <span class="light-title">用餐方式</span>
-                        <span class="light-badge badge-purple" id="light_type">外帶自取</span>
-                    </div>
-                </aside>
-
-                <!-- 右側巨型廚房大字明細與全螢幕手勢工作區 -->
-                <main class="gesture-main-board" id="gestureTouchBoard">
-                    <div>
-                        <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer">
-                            <!-- 由 JS 依照訂單自動動態渲染商品、單價與數量 -->
+            <seller class="seller">
+                <!-- 橫向滑動列：訂單編號常亮 -->
+                <div class="order-tabs-scroll" id="orderTabsContainer">
+                </div>
+                <!-- 核心工作區區塊 -->
+                <div class="workspace-layout">
+                    <!-- 左側連動亮燈區 -->
+                    <aside class="lights-sidebar">
+                        <!-- 金流狀態燈 -->
+                        <div class="light-indicator-card">
+                            <span class="light-title">金流防線</span>
+                            <span class="light-badge badge-green" id="light_pay">線上已付</span>
                         </div>
-
-                        <!-- 🎯 廚房一秒對帳：巨型實付總金額防線 -->
-                        <div
-                            style="margin-top: 24px; padding-top: 16px; border-top: 2px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 16px; font-weight: 800; color: var(--text-muted);">本單實付合計</span>
-                            <span style="font-size: 38px; font-weight: 900; color: var(--brand-blue);"
-                                id="kitchenOrderTotal">$0</span>
+                        <!-- 預約取餐時間燈 -->
+                        <div class="light-indicator-card">
+                            <span class="light-title">預約取餐</span>
+                            <span class="light-badge badge-amber" id="light_time">12:30</span>
+                            <span class="time-countdown" id="light_countdown">剩 20 分</span>
                         </div>
+                        <!-- 用餐方式燈 -->
+                        <div class="light-indicator-card">
+                            <span class="light-title">用餐方式</span>
+                            <span class="light-badge badge-purple" id="light_type">外帶自取</span>
+                        </div>
+                    </aside>
+                    <!-- 右側巨型廚房大字明細與全螢幕手勢工作區 -->
+                    <main class="gesture-main-board" id="gestureTouchBoard">
+                        <div>
+                            <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer">
+                                <!-- 由 JS 依照訂單自動動態渲染商品、單價與數量 -->
+                            </div>
+                            <!-- 🎯 廚房一秒對帳：巨型實付總金額防線 -->
+                            <div
+                                style="margin-top: 24px; padding-top: 16px; border-top: 2px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 16px; font-weight: 800; color: var(--text-muted);">本單實付合計</span>
+                                <span style="font-size: 38px; font-weight: 900; color: var(--brand-blue);"
+                                    id="kitchenOrderTotal">$0</span>
+                            </div>
+                        </div>
+                        <!-- 底部手勢手感提示 -->
+                        <div class="gesture-hint-footer">
+                            <span>👈 左滑下一單</span>
+                            <span>•</span>
+                            <span>右滑前一單 👉</span>
+                        </div>
+                    </main>
+                </div>
+            </seller>
+            <footer class="bottom-bar">
+                <div class="time-display">
+                    目前時間：<span id="clock">讀取中...</span>
+                </div>
+                <div class="status-display" id="shopStatusDisplay">🟢 營業中</div>
+                <button class="btn" data-action="volumemenu" type="button">🎵<br>測試鈴聲</button>
+                <!-- 預設隱藏的音量控制區塊 -->
+                <div id="volumectrlbox"><span>部分裝置無法透過此拉桿控制音量</span>
+                    <div class="audio-controls">
+                        <label for="volumeslider">音量</label>
+                        <!-- range 拉桿 -->
+                        <input type="range" id="volumeslider" min="0" max="1" step="0.1" value="0.5">
+                        <span id="volumevalue">50%</span>
+                        <button id="muteBtn" type="button">🔊 聲音開啟</button>
                     </div>
-
-                    <!-- 底部手勢手感提示 -->
-                    <div class="gesture-hint-footer">
-                        <span>👈 左滑下一單</span>
-                        <span>•</span>
-                        <span>右滑前一單 👉</span>
-                    </div>
-                </main>
-            </div>
+                    <audio id="orderbell" preload="auto">
+                        <source src="audio/ringtone.mp3" type="audio/mpeg">
+                    </audio>
+                </div>
+            </footer>
         </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
             <div class="modal-card">
@@ -394,135 +480,293 @@
     </div>
     <script type="module" src="app.js"></script>
     <script type="module">
-
-        // 🟢 🔴 最左側巨型營業狀態切換防線
-        const shopStatusToggle = document.getElementById('shopStatusToggle');
-        bindFastClick(shopStatusToggle, () => {
-            if (shopStatusToggle.classList.contains('close-shop')) {
-                shopStatusToggle.classList.remove('close-shop');
-                shopStatusToggle.innerText = '🟢 營業中';
+        import { authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from './app.js';
+        let allStores = [];
+        let buyerLat = null;
+        let buyerLng = null;
+        let currentBuyerAddress = "正在獲取定位中...";
+        let currentUserId = null;
+        let activeDragItem = null;
+        let cachedQrCanvas = null;
+        let orders = []; // 存儲從 Firebase 撈回的訂單
+        let currentIndex = 0; // 當前正在顯示的訂單索引
+        const volumeBox = document.getElementById("volumectrlbox");
+        const orderBell = document.getElementById("orderbell");
+        // 🚩 開發時設為 true，上線前請務必改回 false！
+        const IS_DEBUG_MODE = true;// 🚩 開發時設為 true，上線前請務必改回 false！
+        const MOCK_USER_ID = "56TND0b1QBaj994IUmB9gwtYAWF2";// 🚩 開發時設為 true，上線前請務必改回 false！
+        async function initPage() {
+            let user;
+            if (IS_DEBUG_MODE) {
+                console.warn("⚠️ 目前處於開發模式，已自動模擬登入");
+                user = { uid: MOCK_USER_ID }; // 偽造一個使用者物件
             } else {
-                shopStatusToggle.classList.add('close-shop');
-                shopStatusToggle.innerText = '🔴 休息中';
+                user = await authReady; // 真實登入檢查
+                if (!user) {
+                    alert("尚未登入，請先前往登入頁面。");
+                    window.location.href = "index.html";
+                    return;
+                }
             }
-        });
-
-        // 🧑‍🍳 廚房實戰假資料庫（加入單價與總計防線）
-        const ordersDatabase = {
-            "023": {
-                items: [{ name: "木盒便當", price: 120, qty: "x2" }, { name: "大雞腿", price: 65, qty: "x1" }],
-                total: "$305",
-                pay: { text: "線上已付", cls: "badge-green" },
-                time: "12:30", countdown: "剩 20 分", timeCls: "badge-amber",
-                type: "外帶自取", typeCls: "badge-purple"
-            },
-            "022": {
-                items: [{ name: "大排骨", price: 85, qty: "x2" }],
-                total: "$170",
-                pay: { text: "現場付現", cls: "badge-red" },
-                time: "12:45", countdown: "剩 35 分", timeCls: "badge-amber",
-                type: "內用/05桌", typeCls: "badge-purple"
-            },
-            "021": {
-                items: [{ name: "鯖魚便當", price: 95, qty: "x1" }, { name: "經典手搖", price: 40, qty: "x1" }],
-                total: "$135",
-                pay: { text: "線上已付", cls: "badge-green" },
-                time: "13:00", countdown: "剩 50 分", timeCls: "badge-amber",
-                type: "外帶自取", typeCls: "badge-purple"
+            // 取得網址參數 (記得在網址手動加上 ?storeId=你的ID)
+            const params = new URLSearchParams(window.location.search);
+            const storeId = params.get('storeId') || MOCK_USER_ID;
+            // 權限檢查 (開發模式下我們可以直接跳過，或者也讓他跑)
+            if (!IS_DEBUG_MODE && storeId !== user.uid) {
+                alert("存取權限不足！");
+                window.location.href = "index.html";
+                return;
             }
-        };
-
-        const orderIds = ["023", "022", "021"];
-        let currentOrderIndex = 0;
-
-        const kitchenBillContainer = document.getElementById('kitchenBillContainer');
-        const kitchenOrderTotal = document.getElementById('kitchenOrderTotal');
-        const lightPay = document.getElementById('light_pay');
-        const lightTime = document.getElementById('light_time');
-        const lightCountdown = document.getElementById('light_countdown');
-        const lightType = document.getElementById('light_type');
-
-        function renderOrder(id) {
-            const data = ordersDatabase[id];
-
-            document.querySelectorAll('.order-tab').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(`tab_${id}`).classList.add('active');
-
-            lightPay.className = `light-badge ${data.pay.cls}`;
-            lightPay.innerText = data.pay.text;
-
-            lightTime.innerText = data.time;
-            lightCountdown.innerText = data.countdown;
-
-            lightType.innerText = data.type;
-
-            // 連動更新本單巨型合計金額
-            kitchenOrderTotal.innerText = data.total;
-
-            // 渲染右側三倍巨型大字商品項目（內置單價顯示）
-            kitchenBillContainer.innerHTML = '';
-            data.items.forEach(item => {
-                const row = document.createElement('div');
-                row.className = 'kitchen-row';
-                row.innerHTML = `
-                    <div style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
-                        <span class="kitchen-food-name">${item.name}</span>
-                        <span style="font-size: 14px; font-weight: 700; color: var(--text-muted);">單價: $${item.price}</span>
-                    </div>
-                    <span class="kitchen-food-qty">${item.qty}</span>
-                `;
-                kitchenBillContainer.appendChild(row);
-            });
-
-            kitchenBillContainer.classList.remove('slide-animate');
-            void kitchenBillContainer.offsetWidth;
-            kitchenBillContainer.classList.add('slide-animate');
+            console.log("驗證通過，開始載入...");
+            listenToStoreStatus(storeId);
+            initOrderListener(storeId);
+            /*const user = await authReady;
+            if (!user) {
+                alert("尚未登入，請先前往登入頁面。");
+                window.location.href = "index.html";
+                return;
+            }
+            const params = new URLSearchParams(window.location.search);
+            const storeId = params.get('storeId');
+            // 權限檢查 (取消註解)
+            if (storeId !== user.uid) {
+                alert("存取權限不足！您無權管理此商店。");
+                window.location.href = "index.html";
+                return;
+            }
+            console.log("驗證通過，開始載入管理介面...");
+            // 1. 初始化狀態監聽 (營業/休息)
+            listenToStoreStatus(storeId);
+            // 2. 初始化訂單監聽
+            initOrderListener(storeId);*/
         }
-
-        // 👈 👉 盲操全螢幕手勢滑動偵測外掛
+        // 訂單監聽函數
+        function listenToStoreStatus(storeId) {
+            const statusRef = doc(db, "stores", storeId);
+            // 直接監聽該商店文件的 status 欄位變化
+            onSnapshot(statusRef, (doc) => {
+                if (doc.exists()) {
+                    const data = doc.data();
+                    const statusDisplay = document.getElementById('shopStatusDisplay');
+                    // 根據布林值更新 UI
+                    // true -> 營業中, false -> 休息中
+                    if (data.status === true) {
+                        statusDisplay.innerText = '🟢 營業中';
+                        statusDisplay.classList.remove('close-shop');
+                    } else {
+                        statusDisplay.innerText = '🔴 休息中';
+                        statusDisplay.classList.add('close-shop');
+                    }
+                }
+            });
+        }
+        function updateUI(index) {
+            if (index < 0 || index >= orders.length) return; // 防呆機制
+            currentIndex = index;
+            // A. 重新渲染 Tab 列表 (為了亮起 active)
+            renderTabs();
+            // B. 重新渲染主區塊 (顯示該索引的訂單)
+            renderOrderToWorkspace(orders[currentIndex]);
+        }
+        // 3. 訂單監聽 (資料變更時)
+        function initOrderListener(storeId) {
+            const q = query(
+                collection(db, "orders"),
+                where("storeId", "==", storeId),
+                orderBy("createdAt", "desc")
+            );
+            onSnapshot(q, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        const newOrder = { id: change.doc.id, ...change.doc.data() };
+                        orders.unshift(newOrder);
+                        updateUI(0); // 有新訂單，自動跳轉到最新那筆 (第0筆)
+                        AudioController.play();
+                    }
+                });
+            });
+        }
+        // 4. 渲染 Tab (直接用全域的 orders 和 currentIndex)
+        function renderTabs() {
+            const container = document.getElementById('orderTabsContainer');
+            container.innerHTML = '';
+            orders.forEach((order, index) => {
+                const tab = document.createElement('div');
+                tab.className = `order-tab ${index === currentIndex ? 'active' : ''}`;
+                tab.innerText = `#${order.id.slice(-3)}`;
+                tab.onclick = () => updateUI(index); // 點擊直接觸發 updateUI
+                container.appendChild(tab);
+            });
+        }
+        // 1. 初始化 Tab 點擊監聽 (使用事件代理)
+        document.getElementById('orderTabsContainer').addEventListener('click', (e) => {
+            const tab = e.target.closest('.order-tab');
+            if (!tab) return;
+            // 取得點擊的 index
+            const index = parseInt(tab.dataset.index);
+            switchOrder(index);
+        });
+        // 2. 切換訂單的核心函式
+        function switchOrder(index) {
+            if (index < 0 || index >= orders.length) return;
+            currentIndex = index;
+            // 更新 Tab 樣式
+            document.querySelectorAll('.order-tab').forEach((t, i) => {
+                t.classList.toggle('active', i === index);
+            });
+            // 渲染資料進工作區
+            renderOrderToWorkspace(orders[index]);
+        }
+        // 3. 渲染資料到畫面
+        function renderOrderToWorkspace(order) {
+            // 更新左側燈號
+            document.getElementById('light_pay').innerText = order.paymentMethod === 'CREDIT' ? '線上已付' : '現場付現';
+            document.getElementById('light_time').innerText = order.pickupTime;
+            document.getElementById('light_type').innerText = order.diningType;
+            // 更新右側主看板
+            document.getElementById('kitchenOrderTotal').innerText = `$${order.totalAmount}`;
+            // 渲染商品明細 (假設 order.items 是陣列)
+            const billContainer = document.getElementById('kitchenBillContainer');
+            billContainer.innerHTML = order.items.map(item => `
+                    <div class="bill-item">
+                        <span>${item.name} x ${item.quantity}</span>
+                        <span>$${item.price * item.quantity}</span>
+                    </div>  `).join('');
+        }
         const gestureTouchBoard = document.getElementById('gestureTouchBoard');
         let touchStartX = 0;
         let touchEndX = 0;
-
         gestureTouchBoard.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches.screenX;
+            // 關鍵修正：必須加上 [0]
+            touchStartX = e.changedTouches[0].clientX;
         }, { passive: true });
-
         gestureTouchBoard.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches.screenX;
+            // 關鍵修正：必須加上 [0]
+            touchEndX = e.changedTouches[0].clientX;
             handleSwipeGesture();
         }, { passive: true });
-
         function handleSwipeGesture() {
-            const threshold = 50;
-            if (touchStartX - touchEndX > threshold) {
-                if (currentOrderIndex < orderIds.length - 1) {
-                    currentOrderIndex++;
-                    renderOrder(orderIds[currentOrderIndex]);
-                }
-            } else if (touchEndX - touchStartX > threshold) {
-                if (currentOrderIndex > 0) {
-                    currentOrderIndex--;
-                    renderOrder(orderIds[currentOrderIndex]);
-                }
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) < 50) return;
+            if (diff > 0) { // 左滑 -> 顯示下一筆 (index 加 1)
+                updateUI(currentIndex + 1);
+            } else {        // 右滑 -> 顯示上一筆 (index 減 1)
+                updateUI(currentIndex - 1);
             }
         }
-
         // 初始渲染
-        renderOrder(orderIds[currentOrderIndex]);
+        function updateClock() {
+            const now = new Date();
+            // 格式化時間 (顯示 時:分:秒)
+            const timeString = now.toLocaleTimeString('zh-TW', { hour12: false });
+            // 將時間填入剛剛定義的 span 中
+            document.getElementById('clock').innerText = timeString;
+        }
+        const AudioController = {
+            bell: document.getElementById('orderbell'),
+            isMuted: localStorage.getItem("isMuted") === "true",
 
-        // 全局相對路徑跳轉無縫對接
-        const navElements = document.querySelectorAll('.nav-fast');
-        navElements.forEach(elem => {
-            bindFastClick(elem, () => {
-                const dest = elem.getAttribute('href');
-                if (dest && dest !== '#') {
-                    window.location.href = dest;
+            init() {
+                if (!this.bell) return; // 防呆
+
+                // 恢復音量
+                const savedVolume = parseFloat(localStorage.getItem("orderBellVolume")) || 0.5;
+                this.bell.volume = savedVolume;
+
+                // 恢復靜音狀態
+                const muteBtn = document.getElementById('muteBtn');
+                if (muteBtn) {
+                    muteBtn.innerText = this.isMuted ? "🔇 已靜音" : "🔊 聲音開啟";
                 }
-            });
+            },
+
+            play() {
+                if (this.isMuted) {
+                    console.log("目前靜音中，不播放通知音");
+                    return;
+                }
+                this.bell.currentTime = 0;
+                this.bell.play().catch(e => console.warn("自動播放被瀏覽器阻擋", e));
+            },
+
+            // 【修正 1】：補回 stop 函式，專門用來中斷測試音
+            stop() {
+                if (!this.bell) return;
+                this.bell.pause();
+                this.bell.currentTime = 0;
+            },
+
+            toggleMute() {
+                this.isMuted = !this.isMuted;
+                localStorage.setItem("isMuted", this.isMuted);
+                const muteBtn = document.getElementById('muteBtn');
+                if (muteBtn) {
+                    muteBtn.innerText = this.isMuted ? "🔇 已靜音" : "🔊 聲音開啟";
+                }
+            }
+        };
+        // --- 綁定事件 ---
+        document.getElementById('muteBtn').addEventListener('click', () => {
+            AudioController.toggleMute();
         });
-        await updateDoc(doc(db, "orders", orderId), {
-            paymentStatus: "PAID"
+        const volumeSlider = document.getElementById("volumeslider");
+        const volumeValue = document.getElementById("volumevalue");
+        volumeSlider.addEventListener("input", (e) => {
+            const val = parseFloat(e.target.value);
+            AudioController.bell.volume = val;
+            volumeValue.textContent = Math.round(val * 100) + "%";
+            localStorage.setItem("orderBellVolume", val);
+
+            // 滑動時自動解除靜音
+            if (AudioController.isMuted) AudioController.toggleMute();
+
+            // 更新背景顏色
+            volumeSlider.style.background = `linear-gradient(to right, #007bff ${val * 100}%, #ddd ${val * 100}%)`;
+        });
+        document.addEventListener('click', (e) => {
+            const volumeBtn = e.target.closest('[data-action="volumemenu"]');
+            const isInsideVolumeBox = e.target.closest('#volumectrlbox');
+            const target = e.target.closest('[data-action]');
+
+            const volumeBox = document.getElementById('volumectrlbox');
+
+            // 處理「音量選單」邏輯
+            if (volumeBtn) {
+                if (!volumeBox) return;
+                const isHidden = window.getComputedStyle(volumeBox).display === "none";
+
+                if (isHidden) {
+                    volumeBox.style.display = "flex";
+                    AudioController.play(); // 播放測試音
+                } else {
+                    volumeBox.style.display = "none";
+                    // 【修正 3】：關閉選單是停止聲音 (stop)，不能用 toggleMute (靜音)
+                    AudioController.stop();
+                }
+                return;
+            }
+
+            // 處理「點選單外關閉」
+            else if (!isInsideVolumeBox && volumeBox && window.getComputedStyle(volumeBox).display !== "none") {
+                volumeBox.style.display = "none";
+                // 【修正 3】：點外面關閉也是停止聲音
+                AudioController.stop();
+            }
+
+            // 處理其他按鈕
+            else if (!target) return;
+            const action = target.dataset.action;
+            // ... 其他你的按鈕邏輯
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            initPage();
+            // 頁面載入時先執行一次
+            updateClock();
+            // 每 1000 毫秒（即 1 秒）執行一次更新
+            setInterval(updateClock, 1000);
+            handleSwipeGesture();
+            AudioController.init();
+            console.log("系統初始化完成");
         });
     </script>
 </body>

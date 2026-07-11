@@ -360,7 +360,7 @@ function filterAndRenderStores() {
     // 4. 清空畫面並開始渲染卡片
     storeContainer.innerHTML = "";
     filtered.forEach(store => {
-        if (store.status === "offline") return;
+        if (store.status === false) return;
         // 生成卡片
         const card = createStoreCard(store);
         storeContainer.appendChild(card);

@@ -33,11 +33,11 @@ exports.autoUpdateStoreStatus = onSchedule("every 5 minutes", async (event) => {
             const closeTime = closeH * 60 + closeM;
 
             const shouldBeOnline = currentTimeMinutes >= openTime && currentTimeMinutes < closeTime;
-            const newStatus = shouldBeOnline ? 'online' : 'offline';
+            const newStatus = shouldBeOnline;
 
             if (store.status !== newStatus) {
                 await doc.ref.update({ status: newStatus });
-                console.log(`商店 ${doc.id} 狀態更新為: ${newStatus}`);
+                console.log(`商店 ${doc.id} 狀態更新為: ${newStatus ? '營業中' : '休息中'}`);
             }
         }
     }

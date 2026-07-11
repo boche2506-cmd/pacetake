@@ -1021,7 +1021,7 @@
 
             // 寫入 Firebase
             await updateDoc(doc(db, "stores", storeId), { businessHours });
-            alert("已儲存時間設定！");
+            alert("已儲存時間設定！(自動排程為每十分鐘更新一次)");
         }
         document.addEventListener('DOMContentLoaded', () => {
             initPage();

@@ -751,12 +751,12 @@
                     const AutoModetoggle = document.getElementById('AutoModetoggle');
                     const AutoModetext = document.getElementById('AutoMode-text');
                     // 根據資料庫的狀態更新開關
-                    const isOnline = data.status !== true;
+                    const isOnline = data.status === true;
                     if (statusToggle) {
                         statusToggle.checked = isOnline;
                         statusText.innerText = isOnline ? "目前狀態：\n營業中" : "目前狀態：\n休息中";
                     }
-                    const isAutoMode = data.isAutoMode !== true;
+                    const isAutoMode = data.isAutoMode === true;
                     if (AutoModetoggle) {
                         AutoModetoggle.checked = isAutoMode;
                         AutoModetext.innerText = isAutoMode ? "自動排程：開" : "自動排程：關";

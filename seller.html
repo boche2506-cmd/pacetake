@@ -213,6 +213,7 @@
             border-top: 0.3cqw solid var(--border-color);
             color: var(--text-main);
             box-sizing: border-box;
+            position: relative;
         }
 
         .time-display {
@@ -264,7 +265,7 @@
         }
 
         #volumectrlbox {
-            display: none;
+            display: flex;
             flex-direction: column;
             justify-content: space-around;
             align-items: center;
@@ -290,9 +291,9 @@
 
         /* 2. 拉桿：讓它垂直站立 */
         #volumeslider {
-            -webkit-appearance: none;
+            /*-webkit-appearance: none;*/
             /*去掉網頁原生樣式兩個一起用*/
-            appearance: none;
+            /* appearance: none;*/
             /*去掉網頁原生樣式兩個一起用*/
             height: 15%;
             width: 100%;
@@ -304,8 +305,8 @@
         }
 
         #volumeslider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
+            /*-webkit-appearance: none;
+            appearance: none;*/
             width: 5cqw;
             height: 5cqw;
             background: #007bff;
@@ -342,7 +343,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
+            z-index: 999;
             /* 確保在最上層 */
         }
 
@@ -510,19 +511,19 @@
                 <div class="status-display" id="shopStatusDisplay">🟢 營業中</div>
                 <button class="btn" data-action="volumemenu" type="button">🎵<br>測試鈴聲</button>
                 <!-- 預設隱藏的音量控制區塊 -->
-                <div id="volumectrlbox"><span>部分裝置無法透過此拉桿控制音量</span>
-                    <div class="audio-controls">
-                        <label for="volumeslider">音量</label>
-                        <!-- range 拉桿 -->
-                        <input type="range" id="volumeslider" min="0" max="1" step="0.1" value="0.5">
-                        <span id="volumevalue">50%</span>
-                        <button id="muteBtn" type="button">🔊 聲音開啟</button>
-                    </div>
-                    <audio id="orderbell" preload="auto">
-                        <source src="audio/ringtone.mp3" type="audio/mpeg">
-                    </audio>
-                </div>
             </footer>
+        </div>
+        <div id="volumectrlbox"><span>部分裝置無法透過此拉桿控制音量</span>
+            <div class="audio-controls">
+                <label for="volumeslider">音量</label>
+                <!-- range 拉桿 -->
+                <input type="range" id="volumeslider" min="0" max="1" step="0.1" value="0.5">
+                <span id="volumevalue">50%</span>
+                <button id="muteBtn" type="button">🔊 聲音開啟</button>
+            </div>
+            <audio id="orderbell" preload="auto">
+                <source src="audio/ringtone.mp3" type="audio/mpeg">
+            </audio>
         </div>
         <div id="cancelOrderModal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
@@ -544,7 +545,7 @@
                 </div>
             </div>
         </div>
-        <div class="lightbox-modal" id="loginLightbox" style="display: none;">
+        <div class="lightbox-modal" id="loginLightbox">
             <div class="modal-card">
                 <div class="modal-title" style=" font-weight: 600; color: var(--text-main);">加入PACE 派思</div>
                 <button class="modal-btn google" data-action="googleLogin"
@@ -609,8 +610,6 @@
         let currentIndex = 0; // 當前正在顯示的訂單索引
         let currentOrderToCancel = null;
         let isInitialLoad = true;
-        const volumeBox = document.getElementById("volumectrlbox");
-        const orderBell = document.getElementById("orderbell");
         // 🚩 開發時設為 true，上線前請務必改回 false！
         const IS_DEBUG_MODE = true;// 🚩 開發時設為 true，上線前請務必改回 false！
         const MOCK_USER_ID = "56TND0b1QBaj994IUmB9gwtYAWF2";// 🚩 開發時設為 true，上線前請務必改回 false！
@@ -694,13 +693,11 @@
                 where("storeId", "==", storeId),
                 orderBy("createdAt", "desc")
             );
-
             onSnapshot(q, (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
                     if (change.type === "added") {
                         const newOrder = { id: change.doc.id, ...change.doc.data() };
                         orders.unshift(newOrder); // 把訂單塞進陣列
-
                         // 🌟 2. 判斷：只有在「非首次載入」時（也就是真正新進來的單），才發出聲音並強制跳轉畫面
                         if (!isInitialLoad) {
                             updateUI(0);
@@ -708,7 +705,6 @@
                         }
                     }
                 });
-
                 // 🌟 3. 第一次載入的收尾動作
                 if (isInitialLoad) {
                     // 歷史訂單全部跑完迴圈後，我們「統一更新一次畫面」就好，效能大幅提升！
@@ -799,32 +795,32 @@
         const AudioController = {
             bell: document.getElementById('orderbell'),
             isMuted: localStorage.getItem("isMuted") === "true",
-
             init() {
                 if (!this.bell) return; // 防呆
-
                 // 1. 恢復音量
                 const savedVolume = parseFloat(localStorage.getItem("orderBellVolume")) || 0.5;
                 this.bell.volume = savedVolume;
-
                 // 2. 恢復靜音按鈕狀態
                 const muteBtn = document.getElementById('muteBtn');
                 if (muteBtn) {
                     muteBtn.innerText = this.isMuted ? "🔇 已靜音" : "🔊 聲音開啟";
                 }
-
                 // 🌟 3. 新增：初始化拉桿的 UI 狀態 (解決拉桿怪異/顏色出不來的問題)
                 const volumeSlider = document.getElementById("volumeslider");
                 const volumeValue = document.getElementById("volumevalue");
                 if (volumeSlider) {
-                    volumeSlider.value = savedVolume;
-                    volumeSlider.style.background = `linear-gradient(to right, #007bff ${savedVolume * 100}%, #ddd ${savedVolume * 100}%)`;
-                }
-                if (volumeValue) {
-                    volumeValue.textContent = Math.round(savedVolume * 100) + "%";
+                    volumeSlider.addEventListener("input", (e) => {
+                        const val = parseFloat(e.target.value);
+                        AudioController.bell.volume = val;
+                        if (volumeValue) volumeValue.textContent = Math.round(val * 100) + "%";
+                        localStorage.setItem("orderBellVolume", val);
+                        // 滑動時自動解除靜音
+                        if (AudioController.isMuted) AudioController.toggleMute();
+                        // 更新拉桿顏色
+                        volumeSlider.style.background = `linear-gradient(to right, #007bff ${val * 100}%, #ddd ${val * 100}%)`;
+                    });
                 }
             },
-
             play() {
                 if (this.isMuted || !this.bell) {
                     console.log("目前靜音中或找不到音檔，不播放通知音");
@@ -833,13 +829,11 @@
                 this.bell.currentTime = 0;
                 this.bell.play().catch(e => console.warn("自動播放被瀏覽器阻擋", e));
             },
-
             stop() {
                 if (!this.bell) return;
                 this.bell.pause();
                 this.bell.currentTime = 0;
             },
-
             toggleMute() {
                 this.isMuted = !this.isMuted;
                 localStorage.setItem("isMuted", this.isMuted);
@@ -849,48 +843,21 @@
                 }
             }
         };
-
-        // ==========================================
-        // 🌟 重新整理過的事件綁定區 (解開衝突)
-        // ==========================================
-
-        // 1. 拉桿滑動事件 (使用 input 讓拖拉過程即時反應)
-        const volumeSlider = document.getElementById("volumeslider");
-        const volumeValue = document.getElementById("volumevalue");
-        if (volumeSlider) {
-            volumeSlider.addEventListener("input", (e) => {
-                const val = parseFloat(e.target.value);
-                AudioController.bell.volume = val;
-
-                if (volumeValue) volumeValue.textContent = Math.round(val * 100) + "%";
-                localStorage.setItem("orderBellVolume", val);
-
-                // 滑動時自動解除靜音
-                if (AudioController.isMuted) AudioController.toggleMute();
-
-                // 更新拉桿顏色
-                volumeSlider.style.background = `linear-gradient(to right, #007bff ${val * 100}%, #ddd ${val * 100}%)`;
-            });
-        }
-
-        // 2. 全域點擊事件 (負責開關選單、點擊停止音效)
+        //  全域點擊事件 (負責開關選單、點擊停止音效)
         document.addEventListener('click', (e) => {
             // 🔥 【新增功能】：只要聲音正在播，點擊螢幕任何地方就會立刻停止！
             if (AudioController.bell && !AudioController.bell.paused) {
                 AudioController.stop();
                 // 這裡不加上 return，讓使用者點擊畫面的原本動作（例如切換分頁）可以繼續執行
             }
-
             // 處理靜音按鈕 (獨立出來，避免跟下面打架)
             if (e.target.closest('#muteBtn')) {
                 AudioController.toggleMute();
                 return;
             }
-
             const volumeBtn = e.target.closest('[data-action="volumemenu"]');
             const isInsideVolumeBox = e.target.closest('#volumectrlbox');
             const volumeBox = document.getElementById('volumectrlbox');
-
             // 處理「點擊音量按鈕」開關邏輯
             if (volumeBtn) {
                 if (!volumeBox) return;
@@ -905,14 +872,12 @@
                 }
                 return; // 🛑 點了按鈕就結束判斷，不要往下跑
             }
-
             // 處理「點擊選單外部」自動關閉
             if (!isInsideVolumeBox && volumeBox && window.getComputedStyle(volumeBox).display !== "none") {
                 volumeBox.style.display = "none";
                 AudioController.stop();
             }
             // 處理其他按鈕
-
             const target = e.target.closest('[data-action]');
             if (!target) return;
             const action = target.dataset.action;
@@ -925,70 +890,55 @@
         });
         function handleCancelOrder(orders) {
             currentOrderToCancel = orders; // 把訂單資料存起來
-
             const modal = document.getElementById('cancelOrderModal');
             const warningMsg = document.getElementById('cancelWarningMsg');
             const reasonInput = document.getElementById('cancelReasonInput');
-
             // 每次打開前先清空輸入框
             reasonInput.value = '';
-
             // 🌟 核心邏輯：判斷是否為線上付款，決定要不要顯示警告
             if (orders.paymentMethod === 'CREDIT' || orders.paymentStatus === 'PAID') {
                 warningMsg.style.display = 'block';
             } else {
                 warningMsg.style.display = 'none';
             }
-
             // 顯示燈箱
             modal.style.display = 'flex';
         }
-
         // 2. 綁定燈箱內的「返回/放棄」按鈕
         document.getElementById('btnCancelModal').addEventListener('click', () => {
             document.getElementById('cancelOrderModal').style.display = 'none';
             currentOrderToCancel = null; // 清除暫存
         });
-
         // 3. 綁定燈箱內的「確認取消訂單」按鈕
         document.getElementById('btnConfirmCancel').addEventListener('click', async () => {
             if (!currentOrderToCancel) return;
-
             const reason = document.getElementById('cancelReasonInput').value.trim();
-
             // 防呆機制：沒有寫原因不給過
             if (!reason) {
                 alert('請務必填寫取消原因，以便後續查帳與管理！');
                 document.getElementById('cancelReasonInput').focus();
                 return;
             }
-
             const confirmBtn = document.getElementById('btnConfirmCancel');
-
             try {
                 // 鎖定按鈕，防止店家連點
                 confirmBtn.innerText = '處理中...';
                 confirmBtn.disabled = true;
-
                 // 🔥 執行 Firestore 更新
                 // (假設 currentOrderToCancel.id 是該筆訂單在 Firestore 的 Document ID)
                 const orderRef = doc(db, "orders", currentOrderToCancel.id);
-
                 await updateDoc(orderRef, {
                     status: "CANCELLED",
                     cancelReason: reason,
                     cancelledAt: serverTimestamp() // 記錄取消時間
                 });
-
                 // 成功後的收尾動作
                 alert("訂單已成功取消！");
                 document.getElementById('cancelOrderModal').style.display = 'none';
                 currentOrderToCancel = null;
-
                 // 🌟🌟🌟 這裡超級重要：記得重新渲染畫面！
                 // 可能是呼叫你原本寫的 fetchOrders() 或是 renderTabs() 之類的，
                 // 把這筆被取消的訂單從畫面上移走。
-
             } catch (error) {
                 console.error("取消訂單失敗:", error);
                 alert("系統發生錯誤，取消失敗。請檢查網路或稍後再試。");

@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .seller {
-            height: 70%;
+            height: 65%;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -23,36 +23,39 @@
             align-items: stretch;
         }
 
-        /* 橫向滑動列訂單編號 */
-        .order-tabs-scroll {
+        .tabs-container {
+            height: 10%;
+            width: 100%;
             display: flex;
+            flex-direction: row;
+            justify-content: start;
+            align-items: center;
             overflow-x: auto;
-            background-color: var(--tab-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 10px 16px;
-            gap: 8px;
-            scrollbar-width: none;
-        }
-
-        .order-tabs-scroll::-webkit-scrollbar {
-            display: none;
+            color: var(--text-main);
+            gap: 0.5cqw;
+            cursor: pointer;
+            white-space: nowrap;
         }
 
         .order-tab {
+            display: flex;
+            flex-direction: row;
+            justify-content: start;
+            align-items: center;
+            color: var(--text-main);
             flex-shrink: 0;
             background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
+            border: 0.2cqw solid var(--border-color);
+            padding: 1cqw 3cqw;
+            border-radius: 3cqw;
+            font-size: 4cqw;
+            font-weight: 600;
         }
 
         .order-tab.active {
             background-color: var(--brand-blue);
-            color: #FFFFFF;
             border-color: var(--brand-blue);
+            color: #FFFFFF;
         }
 
         /* 核心盲操主工作區 */
@@ -204,24 +207,26 @@
         }
 
         .bottom-bar {
+            height: 10%;
+            width: 100%;
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: center;
-            height: 15%;
-            width: 100%;
             background-color: var(--blur-bg);
             border-top: 0.3cqw solid var(--border-color);
-            padding: 1cqw 2cqw;
+            color: var(--text-main);
             box-sizing: border-box;
         }
 
         .time-display {
             color: var(--text-main);
+            line-height: 1.2;
+            font-size: 4cqw;
+            font-weight: 700;
         }
 
-        /* 最左側：巨型盲操營業開關 */
-        .status-toggle-btn {
+        .status-display {
             background-color: rgba(16, 185, 129, 0.1);
             border: 0.2cqw solid var(--brand-green);
             color: var(--brand-green);
@@ -229,11 +234,10 @@
             border-radius: 5cqw;
             font-size: 4cqw;
             font-weight: 800;
-            cursor: pointer;
             transition: all 0.1s ease;
         }
 
-        .status-toggle-btn.close-shop {
+        .status-display.close-shop {
             background-color: rgba(239, 68, 68, 0.1);
             border-color: var(--brand-red);
             color: var(--brand-red);
@@ -360,8 +364,7 @@
             </header>
             <seller class="seller">
                 <!-- 橫向滑動列：訂單編號常亮 -->
-                <div class="order-tabs-scroll" id="orderTabsContainer">
-                </div>
+                <div class="tabs-container" id="orderTabsContainer"></div>
                 <!-- 核心工作區區塊 -->
                 <div class="workspace-layout">
                     <!-- 左側連動亮燈區 -->
@@ -381,6 +384,9 @@
                         <div class="light-indicator-card">
                             <span class="light-title">用餐方式</span>
                             <span class="light-badge badge-purple" id="light_type">外帶自取</span>
+                        </div>
+                        <div class="time-display">
+                            目前時間：<br><span id="clock">讀取中...</span>
                         </div>
                     </aside>
                     <!-- 右側巨型廚房大字明細與全螢幕手勢工作區 -->
@@ -407,9 +413,7 @@
                 </div>
             </seller>
             <footer class="bottom-bar">
-                <div class="time-display">
-                    目前時間：<span id="clock">讀取中...</span>
-                </div>
+                <button class="btn" data-action="storemanage">🏪<br>前往後台</button>
                 <div class="status-display" id="shopStatusDisplay">🟢 營業中</div>
                 <button class="btn" data-action="volumemenu" type="button">🎵<br>測試鈴聲</button>
                 <!-- 預設隱藏的音量控制區塊 -->
@@ -495,6 +499,9 @@
         // 🚩 開發時設為 true，上線前請務必改回 false！
         const IS_DEBUG_MODE = true;// 🚩 開發時設為 true，上線前請務必改回 false！
         const MOCK_USER_ID = "56TND0b1QBaj994IUmB9gwtYAWF2";// 🚩 開發時設為 true，上線前請務必改回 false！
+        // 取得網址參數 (記得在網址手動加上 ?storeId=你的ID)
+        const params = new URLSearchParams(window.location.search);
+        const storeId = params.get('storeId') || MOCK_USER_ID;
         async function initPage() {
             let user;
             if (IS_DEBUG_MODE) {
@@ -508,9 +515,6 @@
                     return;
                 }
             }
-            // 取得網址參數 (記得在網址手動加上 ?storeId=你的ID)
-            const params = new URLSearchParams(window.location.search);
-            const storeId = params.get('storeId') || MOCK_USER_ID;
             // 權限檢查 (開發模式下我們可以直接跳過，或者也讓他跑)
             if (!IS_DEBUG_MODE && storeId !== user.uid) {
                 alert("存取權限不足！");
@@ -593,8 +597,10 @@
             orders.forEach((order, index) => {
                 const tab = document.createElement('div');
                 tab.className = `order-tab ${index === currentIndex ? 'active' : ''}`;
-                tab.innerText = `#${order.id.slice(-3)}`;
-                tab.onclick = () => updateUI(index); // 點擊直接觸發 updateUI
+                tab.innerText = `#${order.orderId.slice(-3)}`;
+                // 【修正重點】必須要把 index 綁在 HTML 標籤上，底下的事件委派才抓得到！
+                tab.dataset.index = index;
+                // 刪除原本的 tab.onclick，統一交給下方的事件委派處理
                 container.appendChild(tab);
             });
         }
@@ -602,7 +608,7 @@
         document.getElementById('orderTabsContainer').addEventListener('click', (e) => {
             const tab = e.target.closest('.order-tab');
             if (!tab) return;
-            // 取得點擊的 index
+            // 現在這裡就能成功抓到剛才設定的 dataset.index 了
             const index = parseInt(tab.dataset.index);
             switchOrder(index);
         });
@@ -665,21 +671,17 @@
         const AudioController = {
             bell: document.getElementById('orderbell'),
             isMuted: localStorage.getItem("isMuted") === "true",
-
             init() {
                 if (!this.bell) return; // 防呆
-
                 // 恢復音量
                 const savedVolume = parseFloat(localStorage.getItem("orderBellVolume")) || 0.5;
                 this.bell.volume = savedVolume;
-
                 // 恢復靜音狀態
                 const muteBtn = document.getElementById('muteBtn');
                 if (muteBtn) {
                     muteBtn.innerText = this.isMuted ? "🔇 已靜音" : "🔊 聲音開啟";
                 }
             },
-
             play() {
                 if (this.isMuted) {
                     console.log("目前靜音中，不播放通知音");
@@ -688,14 +690,12 @@
                 this.bell.currentTime = 0;
                 this.bell.play().catch(e => console.warn("自動播放被瀏覽器阻擋", e));
             },
-
             // 【修正 1】：補回 stop 函式，專門用來中斷測試音
             stop() {
                 if (!this.bell) return;
                 this.bell.pause();
                 this.bell.currentTime = 0;
             },
-
             toggleMute() {
                 this.isMuted = !this.isMuted;
                 localStorage.setItem("isMuted", this.isMuted);
@@ -716,10 +716,8 @@
             AudioController.bell.volume = val;
             volumeValue.textContent = Math.round(val * 100) + "%";
             localStorage.setItem("orderBellVolume", val);
-
             // 滑動時自動解除靜音
             if (AudioController.isMuted) AudioController.toggleMute();
-
             // 更新背景顏色
             volumeSlider.style.background = `linear-gradient(to right, #007bff ${val * 100}%, #ddd ${val * 100}%)`;
         });
@@ -727,14 +725,11 @@
             const volumeBtn = e.target.closest('[data-action="volumemenu"]');
             const isInsideVolumeBox = e.target.closest('#volumectrlbox');
             const target = e.target.closest('[data-action]');
-
             const volumeBox = document.getElementById('volumectrlbox');
-
             // 處理「音量選單」邏輯
             if (volumeBtn) {
                 if (!volumeBox) return;
                 const isHidden = window.getComputedStyle(volumeBox).display === "none";
-
                 if (isHidden) {
                     volumeBox.style.display = "flex";
                     AudioController.play(); // 播放測試音
@@ -745,18 +740,18 @@
                 }
                 return;
             }
-
             // 處理「點選單外關閉」
             else if (!isInsideVolumeBox && volumeBox && window.getComputedStyle(volumeBox).display !== "none") {
                 volumeBox.style.display = "none";
                 // 【修正 3】：點外面關閉也是停止聲音
                 AudioController.stop();
             }
-
             // 處理其他按鈕
             else if (!target) return;
             const action = target.dataset.action;
-            // ... 其他你的按鈕邏輯
+            if (action === 'storemanage') {
+                window.location.href = `manage.html?storeId=${storeId}`;
+            }
         });
         document.addEventListener('DOMContentLoaded', () => {
             initPage();

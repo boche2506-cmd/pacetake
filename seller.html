@@ -608,6 +608,7 @@
         let orders = []; // 存儲從 Firebase 撈回的訂單
         let currentIndex = 0; // 當前正在顯示的訂單索引
         let currentOrderToCancel = null;
+        let isInitialLoad = true;
         const volumeBox = document.getElementById("volumectrlbox");
         const orderBell = document.getElementById("orderbell");
         // 🚩 開發時設為 true，上線前請務必改回 false！
@@ -693,15 +694,28 @@
                 where("storeId", "==", storeId),
                 orderBy("createdAt", "desc")
             );
+
             onSnapshot(q, (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
                     if (change.type === "added") {
                         const newOrder = { id: change.doc.id, ...change.doc.data() };
-                        orders.unshift(newOrder);
-                        updateUI(0); // 有新訂單，自動跳轉到最新那筆 (第0筆)
-                        AudioController.play();
+                        orders.unshift(newOrder); // 把訂單塞進陣列
+
+                        // 🌟 2. 判斷：只有在「非首次載入」時（也就是真正新進來的單），才發出聲音並強制跳轉畫面
+                        if (!isInitialLoad) {
+                            updateUI(0);
+                            AudioController.play();
+                        }
                     }
                 });
+
+                // 🌟 3. 第一次載入的收尾動作
+                if (isInitialLoad) {
+                    // 歷史訂單全部跑完迴圈後，我們「統一更新一次畫面」就好，效能大幅提升！
+                    updateUI(0);
+                    // 關閉防護罩，之後再觸發 added 就代表真的是新訂單了
+                    isInitialLoad = false;
+                }
             });
         }
         // 4. 渲染 Tab (直接用全域的 orders 和 currentIndex)
@@ -785,31 +799,47 @@
         const AudioController = {
             bell: document.getElementById('orderbell'),
             isMuted: localStorage.getItem("isMuted") === "true",
+
             init() {
                 if (!this.bell) return; // 防呆
-                // 恢復音量
+
+                // 1. 恢復音量
                 const savedVolume = parseFloat(localStorage.getItem("orderBellVolume")) || 0.5;
                 this.bell.volume = savedVolume;
-                // 恢復靜音狀態
+
+                // 2. 恢復靜音按鈕狀態
                 const muteBtn = document.getElementById('muteBtn');
                 if (muteBtn) {
                     muteBtn.innerText = this.isMuted ? "🔇 已靜音" : "🔊 聲音開啟";
                 }
+
+                // 🌟 3. 新增：初始化拉桿的 UI 狀態 (解決拉桿怪異/顏色出不來的問題)
+                const volumeSlider = document.getElementById("volumeslider");
+                const volumeValue = document.getElementById("volumevalue");
+                if (volumeSlider) {
+                    volumeSlider.value = savedVolume;
+                    volumeSlider.style.background = `linear-gradient(to right, #007bff ${savedVolume * 100}%, #ddd ${savedVolume * 100}%)`;
+                }
+                if (volumeValue) {
+                    volumeValue.textContent = Math.round(savedVolume * 100) + "%";
+                }
             },
+
             play() {
-                if (this.isMuted) {
-                    console.log("目前靜音中，不播放通知音");
+                if (this.isMuted || !this.bell) {
+                    console.log("目前靜音中或找不到音檔，不播放通知音");
                     return;
                 }
                 this.bell.currentTime = 0;
                 this.bell.play().catch(e => console.warn("自動播放被瀏覽器阻擋", e));
             },
-            // 【修正 1】：補回 stop 函式，專門用來中斷測試音
+
             stop() {
                 if (!this.bell) return;
                 this.bell.pause();
                 this.bell.currentTime = 0;
             },
+
             toggleMute() {
                 this.isMuted = !this.isMuted;
                 localStorage.setItem("isMuted", this.isMuted);
@@ -819,45 +849,66 @@
                 }
             }
         };
-        // --- 綁定事件 ---
-        document.getElementById('muteBtn').addEventListener('click', () => {
-            AudioController.toggleMute();
-        });
+
+        // ==========================================
+        // 🌟 重新整理過的事件綁定區 (解開衝突)
+        // ==========================================
+
+        // 1. 拉桿滑動事件 (使用 input 讓拖拉過程即時反應)
         const volumeSlider = document.getElementById("volumeslider");
         const volumeValue = document.getElementById("volumevalue");
-        volumeSlider.addEventListener("input", (e) => {
-            const val = parseFloat(e.target.value);
-            AudioController.bell.volume = val;
-            volumeValue.textContent = Math.round(val * 100) + "%";
-            localStorage.setItem("orderBellVolume", val);
-            // 滑動時自動解除靜音
-            if (AudioController.isMuted) AudioController.toggleMute();
-            // 更新背景顏色
-            volumeSlider.style.background = `linear-gradient(to right, #007bff ${val * 100}%, #ddd ${val * 100}%)`;
-        });
+        if (volumeSlider) {
+            volumeSlider.addEventListener("input", (e) => {
+                const val = parseFloat(e.target.value);
+                AudioController.bell.volume = val;
+
+                if (volumeValue) volumeValue.textContent = Math.round(val * 100) + "%";
+                localStorage.setItem("orderBellVolume", val);
+
+                // 滑動時自動解除靜音
+                if (AudioController.isMuted) AudioController.toggleMute();
+
+                // 更新拉桿顏色
+                volumeSlider.style.background = `linear-gradient(to right, #007bff ${val * 100}%, #ddd ${val * 100}%)`;
+            });
+        }
+
+        // 2. 全域點擊事件 (負責開關選單、點擊停止音效)
         document.addEventListener('click', (e) => {
+            // 🔥 【新增功能】：只要聲音正在播，點擊螢幕任何地方就會立刻停止！
+            if (AudioController.bell && !AudioController.bell.paused) {
+                AudioController.stop();
+                // 這裡不加上 return，讓使用者點擊畫面的原本動作（例如切換分頁）可以繼續執行
+            }
+
+            // 處理靜音按鈕 (獨立出來，避免跟下面打架)
+            if (e.target.closest('#muteBtn')) {
+                AudioController.toggleMute();
+                return;
+            }
+
             const volumeBtn = e.target.closest('[data-action="volumemenu"]');
             const isInsideVolumeBox = e.target.closest('#volumectrlbox');
-            const target = e.target.closest('[data-action]');
             const volumeBox = document.getElementById('volumectrlbox');
-            // 處理「音量選單」邏輯
+            const target = e.target.closest('[data-action]');
+            // 處理「點擊音量按鈕」開關邏輯
             if (volumeBtn) {
                 if (!volumeBox) return;
                 const isHidden = window.getComputedStyle(volumeBox).display === "none";
+
                 if (isHidden) {
                     volumeBox.style.display = "flex";
-                    AudioController.play(); // 播放測試音
+                    AudioController.play(); // 打開時播放測試音
                 } else {
                     volumeBox.style.display = "none";
-                    // 【修正 3】：關閉選單是停止聲音 (stop)，不能用 toggleMute (靜音)
-                    AudioController.stop();
+                    AudioController.stop(); // 關閉時停止
                 }
-                return;
+                return; // 🛑 點了按鈕就結束判斷，不要往下跑
             }
-            // 處理「點選單外關閉」
-            else if (!isInsideVolumeBox && volumeBox && window.getComputedStyle(volumeBox).display !== "none") {
+
+            // 處理「點擊選單外部」自動關閉
+            if (!isInsideVolumeBox && volumeBox && window.getComputedStyle(volumeBox).display !== "none") {
                 volumeBox.style.display = "none";
-                // 【修正 3】：點外面關閉也是停止聲音
                 AudioController.stop();
             }
             // 處理其他按鈕

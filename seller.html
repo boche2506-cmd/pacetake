@@ -528,12 +528,10 @@
         <div id="cancelOrderModal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h3>❌ 取消訂單</h3>
-
                 <div id="cancelWarningMsg" class="warning-msg" style="display: none;">
                     <strong>⚠️ 提醒：此為線上付款訂單！</strong><br>
                     取消後，請務必至「藍新後台」執行退款，並至系統總後台標記為「已退款」。
                 </div>
-
                 <div class="input-group">
                     <label for="cancelReasonInput">請輸入取消原因 <span class="required">*</span></label>
                     <textarea id="cancelReasonInput" rows="3" placeholder="例如：餐點售完、顧客來電要求..."></textarea>
@@ -678,14 +676,6 @@
                 }
             });
         }
-        function updateUI(index) {
-            if (index < 0 || index >= orders.length) return; // 防呆機制
-            currentIndex = index;
-            // A. 重新渲染 Tab 列表 (為了亮起 active)
-            renderTabs();
-            // B. 重新渲染主區塊 (顯示該索引的訂單)
-            renderOrderToWorkspace(orders[currentIndex]);
-        }
         // 3. 訂單監聽 (資料變更時)
         function initOrderListener(storeId) {
             const q = query(
@@ -714,38 +704,36 @@
                 }
             });
         }
-        // 4. 渲染 Tab (直接用全域的 orders 和 currentIndex)
-        function renderTabs() {
-            const container = document.getElementById('orderTabsContainer');
-            container.innerHTML = '';
-            orders.forEach((order, index) => {
-                const tab = document.createElement('div');
-                tab.className = `order-tab ${index === currentIndex ? 'active' : ''}`;
-                tab.innerText = `#${order.orderId.slice(-3)}`;
-                // 【修正重點】必須要把 index 綁在 HTML 標籤上，底下的事件委派才抓得到！
-                tab.dataset.index = index;
-                // 刪除原本的 tab.onclick，統一交給下方的事件委派處理
-                container.appendChild(tab);
-            });
-        }
         // 1. 初始化 Tab 點擊監聽 (使用事件代理)
         document.getElementById('orderTabsContainer').addEventListener('click', (e) => {
             const tab = e.target.closest('.order-tab');
             if (!tab) return;
             // 現在這裡就能成功抓到剛才設定的 dataset.index 了
             const index = parseInt(tab.dataset.index);
-            switchOrder(index);
+            updateUI(index);
         });
         // 2. 切換訂單的核心函式
-        function switchOrder(index) {
-            if (index < 0 || index >= orders.length) return;
+        function updateUI(index) {
+            if (index < 0 || index >= orders.length) return; // 防呆機制
             currentIndex = index;
-            // 更新 Tab 樣式
-            document.querySelectorAll('.order-tab').forEach((t, i) => {
-                t.classList.toggle('active', i === index);
+            // A. 重新渲染 Tab 列表 (為了亮起 active)
+            renderTabs();
+            // B. 重新渲染主區塊 (顯示該索引的訂單)
+            renderOrderToWorkspace(orders[currentIndex]);
+        }
+        // 4. 渲染 Tab (直接用全域的 orders 和 currentIndex)
+        function renderTabs() {
+            const container = document.getElementById('orderTabsContainer');
+            container.innerHTML = '';
+            orders.forEach((orders, index) => {
+                const tab = document.createElement('div');
+                tab.className = `order-tab ${index === currentIndex ? 'active' : ''}`;
+                tab.innerText = `#${orders.orderId.slice(-3)}`;
+                // 【修正重點】必須要把 index 綁在 HTML 標籤上，底下的事件委派才抓得到！
+                tab.dataset.index = index;
+                // 刪除原本的 tab.onclick，統一交給下方的事件委派處理
+                container.appendChild(tab);
             });
-            // 渲染資料進工作區
-            renderOrderToWorkspace(orders[index]);
         }
         // 3. 渲染資料到畫面
         function renderOrderToWorkspace(order) {
@@ -885,11 +873,13 @@
                 window.location.href = `manage.html?storeId=${storeId}`;
             }
             else if (action === 'cancelReason') {
-                handleCancelOrder(orders);
+                const index = currentIndex;
+                const order = orders[index];
+                handleCancelOrder(order);
             }
         });
-        function handleCancelOrder(orders) {
-            currentOrderToCancel = orders; // 把訂單資料存起來
+        function handleCancelOrder(order) {
+            currentOrderToCancel = order; // 把訂單資料存起來
             const modal = document.getElementById('cancelOrderModal');
             const warningMsg = document.getElementById('cancelWarningMsg');
             const reasonInput = document.getElementById('cancelReasonInput');
@@ -903,6 +893,8 @@
             }
             // 顯示燈箱
             modal.style.display = 'flex';
+            console.log("傳入的訂單物件是:", currentOrderToCancel);
+            console.log("訂單 ID 是:", currentOrderToCancel.id); // 這一行最重要！
         }
         // 2. 綁定燈箱內的「返回/放棄」按鈕
         document.getElementById('btnCancelModal').addEventListener('click', () => {
@@ -936,10 +928,10 @@
                 alert("訂單已成功取消！");
                 document.getElementById('cancelOrderModal').style.display = 'none';
                 currentOrderToCancel = null;
-                renderTabs();
                 // 🌟🌟🌟 這裡超級重要：記得重新渲染畫面！
                 // 可能是呼叫你原本寫的 fetchOrders() 或是 renderTabs() 之類的，
                 // 把這筆被取消的訂單從畫面上移走。
+                updateUI(0);
             } catch (error) {
                 console.error("取消訂單失敗:", error);
                 alert("系統發生錯誤，取消失敗。請檢查網路或稍後再試。");

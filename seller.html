@@ -715,7 +715,7 @@
                 // 【修正重點】必須要把 index 綁在 HTML 標籤上，底下的事件委派才抓得到！
                 tab.dataset.index = index;
                 // 刪除原本的 tab.onclick，統一交給下方的事件委派處理
-                container.appendChild(tab);
+                container.prepend(tab);
             });
         }
         // 1. 初始化 Tab 點擊監聽 (使用事件代理)
@@ -866,12 +866,12 @@
             if (action === 'storemanage') {
                 window.location.href = `manage.html?storeId=${storeId}`;
             }
-            else if (action === 'cancelReasonif') {
-                handleCancelOrder(order);
+            else if (action === 'cancelReason') {
+                handleCancelOrder(orders);
             }
         });
-        function handleCancelOrder(order) {
-            currentOrderToCancel = order; // 把訂單資料存起來
+        function handleCancelOrder(orders) {
+            currentOrderToCancel = orders; // 把訂單資料存起來
 
             const modal = document.getElementById('cancelOrderModal');
             const warningMsg = document.getElementById('cancelWarningMsg');
@@ -881,7 +881,7 @@
             reasonInput.value = '';
 
             // 🌟 核心邏輯：判斷是否為線上付款，決定要不要顯示警告
-            if (order.paymentMethod === 'CREDIT' || order.paymentStatus === 'PAID') {
+            if (orders.paymentMethod === 'CREDIT' || orders.paymentStatus === 'PAID') {
                 warningMsg.style.display = 'block';
             } else {
                 warningMsg.style.display = 'none';

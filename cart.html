@@ -806,6 +806,7 @@
         const submitOrderBtn = document.getElementById('submitOrderBtn');
         if (submitOrderBtn) {
             submitOrderBtn.addEventListener('click', async () => {
+                // 1. 基本資料與購物車驗證 (保留你的原貌)
                 const buyerName = buyerNameInput.value.trim();
                 const buyerPhone = buyerPhoneInput.value.trim();
                 const phoneRegex = /^09\d{8}$/;
@@ -817,6 +818,25 @@
                     alert("您的購物車是空的，無法為您建立任何付款連線。");
                     return;
                 }
+                // ==========================================
+                // 🌟 新增防呆：在這裡跳出確認燈箱
+                // ==========================================
+                const confirmResult = await Swal.fire({
+                    title: '確認送出訂單？',
+                    text: '請確認餐點內容與金額無誤，送出後店家就會開始準備囉！',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '確認送出',
+                    cancelButtonText: '我再想想',
+                    reverseButtons: true
+                });
+                // 如果客人沒有按「確認送出」（例如按了取消或點旁邊關閉），就直接中斷，不要往下跑
+                if (!confirmResult.isConfirmed) {
+                    return;
+                }
+                // 2. 以下完全是你的原本邏輯，我一行都沒改！
                 // 🌟 【免登入/匿名無痛結帳升級】：完全拔除未登入攔截與強制跳轉
                 const user = auth.currentUser;
                 // 本地快取記錄，方便下次自動帶入
@@ -845,9 +865,8 @@
                     try {
                         await addDoc(collection(db, "orders"), {
                             orderId: orderMerchantOrderNo,
-                            pickupNo: pickupNo, // 🌟 補上這行！
+                            pickupNo: pickupNo,
                             storeId: targetStoreId,
-                            // 🔥 【新增這三行】直接把店家的名字跟座標「拷貝」進訂單裡
                             shopName: window.currentStoreCheckoutInfo?.shopName || '未知店家',
                             shopLat: window.currentStoreCheckoutInfo?.shopLat || null,
                             shopLng: window.currentStoreCheckoutInfo?.shopLng || null,
@@ -859,14 +878,15 @@
                             remark: orderRemark,
                             status: "PREPARING",
                             paymentMethod: "CASH",
-                            paymentStatus: "UNPAID",   // 🌟 補上這一行：商家待確認收款
+                            paymentStatus: "UNPAID",
                             diningType: currentDiningType,
                             table: tableRemark,
-                            cancelReason: "",      // 取消原因 (例如："缺貨", "客訴")
-                            cancelledAt: null,     // 記錄取消的時間 (做稽核用)
-                            refundedAt: null,      // 記錄確認退款的時間 (做帳用)
+                            cancelReason: "",
+                            cancelledAt: null,
+                            refundedAt: null,
                             createdAt: serverTimestamp()
                         });
+                        // 這是你本來就做好的漂亮成功燈箱
                         Swal.fire({
                             title: '🎉 訂單送出成功！',
                             html: `您的取餐號碼為：<br><h1 style="color: #ff6b6b;">🔥 ${pickupNo} 🔥</h1><br>請憑此號碼到店取餐。`,
@@ -874,7 +894,8 @@
                             confirmButtonText: '收到',
                             confirmButtonColor: '#3085d6'
                         }).then((result) => {
-                            if (result.isConfirmed) {// 清空購物車
+                            if (result.isConfirmed) {
+                                // 清空購物車
                                 localStorage.removeItem('cart');
                                 localStorage.removeItem('pacetake_cart');
                                 localStorage.removeItem('temp_buyer_name');
@@ -893,13 +914,12 @@
                         return;
                     }
                     const itemNames = cartData.map(i => i.name).join('、');
-                    // ⚠️ 確保 timeStamp 是「秒」為單位的 10 碼數字 (非常重要)
                     const timeStamp = Math.round(Date.now() / 1000);
                     const originalParameters = [
                         `MerchantID=${currentStoreNewebpay.MerchantID}`,
                         `RespondType=JSON`,
                         `TimeStamp=${timeStamp}`,
-                        `Version=2.0`, // 👈 這裡一定要有！
+                        `Version=2.0`,
                         `MerchantOrderNo=${orderMerchantOrderNo}`,
                         `Amt=${finalTotalAmount}`,
                         `ItemDesc=派思點餐:${itemNames.substring(0, 20)}`,
@@ -911,15 +931,13 @@
                         `VACC=1`,
                         `CVS=1`,
                         `ReturnURL=https://www.pacetake.tw/orders.html`,
-                        `NotifyURL=https://你的網站網域.com/api/notify` // 如果你還沒做後端接通知，這行先留著
+                        `NotifyURL=https://你的網站網域.com/api/notify`
                     ].join('&');
                     try {
-                        // 先寫入待付款單到雲端
                         await addDoc(collection(db, "orders"), {
                             orderId: orderMerchantOrderNo,
-                            pickupNo: pickupNo, // 🌟 補上這行！
+                            pickupNo: pickupNo,
                             storeId: targetStoreId,
-                            // 🔥 【新增這三行】直接把店家的名字跟座標「拷貝」進訂單裡
                             shopName: window.currentStoreCheckoutInfo?.shopName || '未知店家',
                             shopLat: window.currentStoreCheckoutInfo?.shopLat || null,
                             shopLng: window.currentStoreCheckoutInfo?.shopLng || null,
@@ -931,12 +949,12 @@
                             remark: orderRemark,
                             status: "PENDING_PAYMENT",
                             paymentMethod: "CREDIT",
-                            paymentStatus: "UNPAID",   // 🌟 初始也是未付款，直到藍新回傳成功
+                            paymentStatus: "UNPAID",
                             diningType: currentDiningType,
                             table: tableRemark,
-                            cancelReason: "",      // 取消原因 (例如："缺貨", "客訴")
-                            cancelledAt: null,     // 記錄取消的時間 (做稽核用)
-                            refundedAt: null,      // 記錄確認退款的時間 (做帳用)
+                            cancelReason: "",
+                            cancelledAt: null,
+                            refundedAt: null,
                             createdAt: serverTimestamp()
                         });
                         // 清空購物車
@@ -955,7 +973,6 @@
                             currentStoreNewebpay.HashKey,
                             currentStoreNewebpay.HashIV
                         );
-                        // 🌟 正宗賦值，各司其職
                         document.getElementById('formMerchantID').value = currentStoreNewebpay.MerchantID;
                         document.getElementById('formTradeInfo').value = tradeInfo;
                         document.getElementById('formTradeSha').value = tradeSha;

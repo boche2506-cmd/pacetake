@@ -729,7 +729,7 @@
                 // 【修正重點】必須要把 index 綁在 HTML 標籤上，底下的事件委派才抓得到！
                 tab.dataset.index = index;
                 // 刪除原本的 tab.onclick，統一交給下方的事件委派處理
-                container.prepend(tab);
+                container.appendChild(tab);
             });
         }
         // 1. 初始化 Tab 點擊監聽 (使用事件代理)
@@ -890,7 +890,7 @@
             const volumeBtn = e.target.closest('[data-action="volumemenu"]');
             const isInsideVolumeBox = e.target.closest('#volumectrlbox');
             const volumeBox = document.getElementById('volumectrlbox');
-            const target = e.target.closest('[data-action]');
+
             // 處理「點擊音量按鈕」開關邏輯
             if (volumeBtn) {
                 if (!volumeBox) return;
@@ -912,7 +912,9 @@
                 AudioController.stop();
             }
             // 處理其他按鈕
-            else if (!target) return;
+
+            const target = e.target.closest('[data-action]');
+            if (!target) return;
             const action = target.dataset.action;
             if (action === 'storemanage') {
                 window.location.href = `manage.html?storeId=${storeId}`;

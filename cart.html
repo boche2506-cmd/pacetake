@@ -209,16 +209,43 @@
 
         .pay-info {
             height: 100%;
-            width: 80%;
+            width: 90%;
             display: flex;
             align-items: center;
             font-size: 4cqw;
             font-weight: 700;
+            gap: 1cqw;
         }
 
         .pay-info img {
             height: 50%;
             aspect-ratio: 1 / 1;
+        }
+
+        #dineInTable {
+            border: 0.2cqw solid var(--border-color);
+            border-radius: 3cqw;
+            background-color: var(--bg-global);
+            color: var(--text-main);
+            line-height: 1.1;
+            box-sizing: border-box;
+            height: 70%;
+            width: 35%;
+            font-size: 3.5cqw;
+            font-weight: 500;
+            object-fit: contain;
+            user-select: text;
+            cursor: text;
+            background-color: #f0f0f0;
+            /* 你原本的灰色 */
+            transition: background-color 0.3s ease;
+            /* 讓顏色變換有平滑的過場效果 */
+            text-align: center;
+        }
+
+        #dineInTable:not(:placeholder-shown) {
+            background-color: var(--bg-Container);
+            color: var(--text-main);
         }
 
         .pay-check-dot {
@@ -334,6 +361,7 @@
                             <div class="pay-info">
                                 <span>🪑</span>
                                 <span id="dineInText">店內內用</span>
+                                <input type="text" id="dineInTable" class="input-style" placeholder="桌號">
                             </div>
                             <div class="pay-check-dot" id="dineInCheckDot">
                             </div>
@@ -808,7 +836,9 @@
                 }
                 const pickupNo = orderMerchantOrderNo.slice(-3);
                 const remarkElement = document.getElementById('Remarkinput');
+                const tableNumber = document.getElementById('dineInTable');
                 const orderRemark = remarkElement ? remarkElement.value.trim() : "";
+                const tableRemark = tableNumber ? tableNumber.value.trim() : "";
                 // --- 🛡️ 雙軌分流核心 ---
                 if (currentPayType === "CASH") {
                     // 💵 A 分支：現場付現流程
@@ -827,6 +857,7 @@
                             items: cartData,
                             totalAmount: finalTotalAmount,
                             remark: orderRemark,
+                            table: tableRemark,
                             status: "PREPARING",
                             paymentMethod: "CASH",
                             paymentStatus: "UNPAID",   // 🌟 補上這一行：商家待確認收款
@@ -894,6 +925,8 @@
                             buyerPhone: buyerPhone,
                             items: cartData,
                             totalAmount: finalTotalAmount,
+                            remark: orderRemark,
+                            table: tableRemark,
                             status: "PENDING_PAYMENT",
                             paymentMethod: "CREDIT",
                             paymentStatus: "UNPAID",   // 🌟 初始也是未付款，直到藍新回傳成功

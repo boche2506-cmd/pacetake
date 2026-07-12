@@ -14,17 +14,8 @@
     <link rel="apple-touch-icon" href="png/logo180.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        .seller {
-            height: 65%;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: stretch;
-        }
-
         .tabs-container {
-            height: 10%;
+            height: 7%;
             width: 100%;
             display: flex;
             flex-direction: row;
@@ -32,9 +23,10 @@
             align-items: center;
             overflow-x: auto;
             color: var(--text-main);
-            gap: 0.5cqw;
+            gap: 1cqw;
             cursor: pointer;
             white-space: nowrap;
+            border-bottom: 0.3cqw solid var(--border-color);
         }
 
         .order-tab {
@@ -60,20 +52,24 @@
 
         /* 核心盲操主工作區 */
         .workspace-layout {
+            height: 68%;
+            width: 100%;
             display: flex;
-            flex-grow: 1;
-            position: relative;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
         }
 
         /* 左側連動狀態亮燈區 */
         .lights-sidebar {
-            width: 100px;
-            border-right: 1px solid var(--border-color);
+            height: 100%;
+            width: 25%;
+            border-right: 0.2cqw solid var(--border-color);
             background-color: var(--sidebar-bg);
             display: flex;
             flex-direction: column;
-            padding: 12px 6px;
-            gap: 12px;
+            justify-content: space-around;
+            align-items: center;
         }
 
         .light-indicator-card {
@@ -138,13 +134,14 @@
 
         /* 右側巨型廚房字體與手勢工作區 */
         .gesture-main-board {
-            flex-grow: 1;
-            padding: 24px 16px;
+            height: 100%;
+            width: 75%;
+            border-right: 0.2cqw solid var(--border-color);
+            background-color: var(--sidebar-bg);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            background-color: var(--bg-container);
-            position: relative;
+            justify-content: space-around;
+            align-items: center;
         }
 
         /* 巨型廚房大字明細區 */
@@ -224,6 +221,7 @@
             line-height: 1.2;
             font-size: 4cqw;
             font-weight: 700;
+            text-align: center;   
         }
 
         .status-display {
@@ -362,9 +360,9 @@
                     </div>
                 </div>
             </header>
+            <!-- 橫向滑動列：訂單編號常亮 -->
+            <div class="tabs-container" id="orderTabsContainer"></div>
             <seller class="seller">
-                <!-- 橫向滑動列：訂單編號常亮 -->
-                <div class="tabs-container" id="orderTabsContainer"></div>
                 <!-- 核心工作區區塊 -->
                 <div class="workspace-layout">
                     <!-- 左側連動亮燈區 -->
@@ -386,7 +384,7 @@
                             <span class="light-badge badge-purple" id="light_type">外帶自取</span>
                         </div>
                         <div class="time-display">
-                            目前時間：<br><span id="clock">讀取中...</span>
+                            目前時間<br>：<br><span id="clock">讀取中...</span>
                         </div>
                     </aside>
                     <!-- 右側巨型廚房大字明細與全螢幕手勢工作區 -->

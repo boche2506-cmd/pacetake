@@ -936,6 +936,7 @@
                 alert("訂單已成功取消！");
                 document.getElementById('cancelOrderModal').style.display = 'none';
                 currentOrderToCancel = null;
+                renderTabs();
                 // 🌟🌟🌟 這裡超級重要：記得重新渲染畫面！
                 // 可能是呼叫你原本寫的 fetchOrders() 或是 renderTabs() 之類的，
                 // 把這筆被取消的訂單從畫面上移走。

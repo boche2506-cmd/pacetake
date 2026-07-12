@@ -857,11 +857,14 @@
                             items: cartData,
                             totalAmount: finalTotalAmount,
                             remark: orderRemark,
-                            table: tableRemark,
                             status: "PREPARING",
                             paymentMethod: "CASH",
                             paymentStatus: "UNPAID",   // 🌟 補上這一行：商家待確認收款
                             diningType: currentDiningType,
+                            table: tableRemark,
+                            cancelReason: "",      // 取消原因 (例如："缺貨", "客訴")
+                            cancelledAt: null,     // 記錄取消的時間 (做稽核用)
+                            refundedAt: null,      // 記錄確認退款的時間 (做帳用)
                             createdAt: serverTimestamp()
                         });
                         Swal.fire({
@@ -926,11 +929,14 @@
                             items: cartData,
                             totalAmount: finalTotalAmount,
                             remark: orderRemark,
-                            table: tableRemark,
                             status: "PENDING_PAYMENT",
                             paymentMethod: "CREDIT",
                             paymentStatus: "UNPAID",   // 🌟 初始也是未付款，直到藍新回傳成功
                             diningType: currentDiningType,
+                            table: tableRemark,
+                            cancelReason: "",      // 取消原因 (例如："缺貨", "客訴")
+                            cancelledAt: null,     // 記錄取消的時間 (做稽核用)
+                            refundedAt: null,      // 記錄確認退款的時間 (做帳用)
                             createdAt: serverTimestamp()
                         });
                         // 清空購物車

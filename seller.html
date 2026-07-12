@@ -72,6 +72,17 @@
             align-items: center;
         }
 
+        /* 右側巨型廚房字體與手勢工作區 */
+        .gesture-main-board {
+            height: 100%;
+            width: 75%;
+            background-color: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+        }
+
         .light-indicator-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -130,18 +141,6 @@
             color: var(--brand-amber);
             font-weight: 700;
             margin-top: 2px;
-        }
-
-        /* 右側巨型廚房字體與手勢工作區 */
-        .gesture-main-board {
-            height: 100%;
-            width: 75%;
-            border-right: 0.2cqw solid var(--border-color);
-            background-color: var(--sidebar-bg);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            align-items: center;
         }
 
         /* 巨型廚房大字明細區 */
@@ -221,7 +220,7 @@
             line-height: 1.2;
             font-size: 4cqw;
             font-weight: 700;
-            text-align: center;   
+            text-align: center;
         }
 
         .status-display {
@@ -330,6 +329,103 @@
             font-size: 6cqw;
             text-align: center;
         }
+
+        /* 燈箱外層遮罩 (覆蓋全螢幕) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            /* 半透明黑底 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            /* 確保在最上層 */
+        }
+
+        /* 燈箱主體 */
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-content h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        /* 警告區塊樣式 */
+        .warning-msg {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-left: 4px solid #ffeeba;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* 輸入框樣式 */
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .input-group .required {
+            color: red;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            resize: none;
+            /* 禁止拖拉大小 */
+            box-sizing: border-box;
+        }
+
+        /* 按鈕區塊 */
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-danger:disabled {
+            background: #f5c6cb;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -362,54 +458,53 @@
             </header>
             <!-- 橫向滑動列：訂單編號常亮 -->
             <div class="tabs-container" id="orderTabsContainer"></div>
-            <seller class="seller">
-                <!-- 核心工作區區塊 -->
-                <div class="workspace-layout">
-                    <!-- 左側連動亮燈區 -->
-                    <aside class="lights-sidebar">
-                        <!-- 金流狀態燈 -->
-                        <div class="light-indicator-card">
-                            <span class="light-title">金流防線</span>
-                            <span class="light-badge badge-green" id="light_pay">線上已付</span>
+            <!-- 核心工作區區塊 -->
+            <div class="workspace-layout">
+                <!-- 左側連動亮燈區 -->
+                <aside class="lights-sidebar">
+                    <!-- 金流狀態燈 -->
+                    <div class="light-indicator-card">
+                        <span class="light-title">付款方式</span>
+                        <span class="light-badge badge-green" id="light_pay">線上已付</span>
+                    </div>
+                    <!-- 預約取餐時間燈 -->
+                    <div class="light-indicator-card">
+                        <span class="light-title">接單時間</span>
+                        <span class="light-badge badge-amber" id="light_time">12:30</span>
+                        <span class="time-countdown" id="light_countdown">剩 20 分</span>
+                    </div>
+                    <!-- 用餐方式燈 -->
+                    <div class="light-indicator-card">
+                        <span class="light-title">用餐方式</span>
+                        <span class="light-badge badge-purple" id="light_type">外帶自取</span>
+                    </div>
+                    <button class="btn" data-action="cancelReason">❌<br>取消訂單</button>
+                    <div class="time-display">
+                        目前時間<br>：<br><span id="clock">讀取中...</span>
+                    </div>
+                </aside>
+                <!-- 右側巨型廚房大字明細與全螢幕手勢工作區 -->
+                <main class="gesture-main-board" id="gestureTouchBoard">
+                    <div>
+                        <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer">
+                            <!-- 由 JS 依照訂單自動動態渲染商品、單價與數量 -->
                         </div>
-                        <!-- 預約取餐時間燈 -->
-                        <div class="light-indicator-card">
-                            <span class="light-title">預約取餐</span>
-                            <span class="light-badge badge-amber" id="light_time">12:30</span>
-                            <span class="time-countdown" id="light_countdown">剩 20 分</span>
+                        <!-- 🎯 廚房一秒對帳：巨型實付總金額防線 -->
+                        <div
+                            style="margin-top: 24px; padding-top: 16px; border-top: 2px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 16px; font-weight: 800; color: var(--text-muted);">本單實付合計</span>
+                            <span style="font-size: 38px; font-weight: 900; color: var(--brand-blue);"
+                                id="kitchenOrderTotal">$0</span>
                         </div>
-                        <!-- 用餐方式燈 -->
-                        <div class="light-indicator-card">
-                            <span class="light-title">用餐方式</span>
-                            <span class="light-badge badge-purple" id="light_type">外帶自取</span>
-                        </div>
-                        <div class="time-display">
-                            目前時間<br>：<br><span id="clock">讀取中...</span>
-                        </div>
-                    </aside>
-                    <!-- 右側巨型廚房大字明細與全螢幕手勢工作區 -->
-                    <main class="gesture-main-board" id="gestureTouchBoard">
-                        <div>
-                            <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer">
-                                <!-- 由 JS 依照訂單自動動態渲染商品、單價與數量 -->
-                            </div>
-                            <!-- 🎯 廚房一秒對帳：巨型實付總金額防線 -->
-                            <div
-                                style="margin-top: 24px; padding-top: 16px; border-top: 2px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-size: 16px; font-weight: 800; color: var(--text-muted);">本單實付合計</span>
-                                <span style="font-size: 38px; font-weight: 900; color: var(--brand-blue);"
-                                    id="kitchenOrderTotal">$0</span>
-                            </div>
-                        </div>
-                        <!-- 底部手勢手感提示 -->
-                        <div class="gesture-hint-footer">
-                            <span>👈 左滑下一單</span>
-                            <span>•</span>
-                            <span>右滑前一單 👉</span>
-                        </div>
-                    </main>
-                </div>
-            </seller>
+                    </div>
+                    <!-- 底部手勢手感提示 -->
+                    <div class="gesture-hint-footer">
+                        <span>👈 左滑下一單</span>
+                        <span>•</span>
+                        <span>右滑前一單 👉</span>
+                    </div>
+                </main>
+            </div>
             <footer class="bottom-bar">
                 <button class="btn" data-action="storemanage">🏪<br>前往後台</button>
                 <div class="status-display" id="shopStatusDisplay">🟢 營業中</div>
@@ -428,6 +523,26 @@
                     </audio>
                 </div>
             </footer>
+        </div>
+        <div id="cancelOrderModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h3>❌ 取消訂單</h3>
+
+                <div id="cancelWarningMsg" class="warning-msg" style="display: none;">
+                    <strong>⚠️ 提醒：此為線上付款訂單！</strong><br>
+                    取消後，請務必至「藍新後台」執行退款，並至系統總後台標記為「已退款」。
+                </div>
+
+                <div class="input-group">
+                    <label for="cancelReasonInput">請輸入取消原因 <span class="required">*</span></label>
+                    <textarea id="cancelReasonInput" rows="3" placeholder="例如：餐點售完、顧客來電要求..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button id="btnCancelModal" class="btn-cancel">保留訂單 (返回)</button>
+                    <button id="btnConfirmCancel" class="btn-danger">確認取消訂單</button>
+                </div>
+            </div>
         </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
             <div class="modal-card">
@@ -492,6 +607,7 @@
         let cachedQrCanvas = null;
         let orders = []; // 存儲從 Firebase 撈回的訂單
         let currentIndex = 0; // 當前正在顯示的訂單索引
+        let currentOrderToCancel = null;
         const volumeBox = document.getElementById("volumectrlbox");
         const orderBell = document.getElementById("orderbell");
         // 🚩 開發時設為 true，上線前請務必改回 false！
@@ -749,6 +865,84 @@
             const action = target.dataset.action;
             if (action === 'storemanage') {
                 window.location.href = `manage.html?storeId=${storeId}`;
+            }
+            else if (action === 'cancelReasonif') {
+                handleCancelOrder(order);
+            }
+        });
+        function handleCancelOrder(order) {
+            currentOrderToCancel = order; // 把訂單資料存起來
+
+            const modal = document.getElementById('cancelOrderModal');
+            const warningMsg = document.getElementById('cancelWarningMsg');
+            const reasonInput = document.getElementById('cancelReasonInput');
+
+            // 每次打開前先清空輸入框
+            reasonInput.value = '';
+
+            // 🌟 核心邏輯：判斷是否為線上付款，決定要不要顯示警告
+            if (order.paymentMethod === 'CREDIT' || order.paymentStatus === 'PAID') {
+                warningMsg.style.display = 'block';
+            } else {
+                warningMsg.style.display = 'none';
+            }
+
+            // 顯示燈箱
+            modal.style.display = 'flex';
+        }
+
+        // 2. 綁定燈箱內的「返回/放棄」按鈕
+        document.getElementById('btnCancelModal').addEventListener('click', () => {
+            document.getElementById('cancelOrderModal').style.display = 'none';
+            currentOrderToCancel = null; // 清除暫存
+        });
+
+        // 3. 綁定燈箱內的「確認取消訂單」按鈕
+        document.getElementById('btnConfirmCancel').addEventListener('click', async () => {
+            if (!currentOrderToCancel) return;
+
+            const reason = document.getElementById('cancelReasonInput').value.trim();
+
+            // 防呆機制：沒有寫原因不給過
+            if (!reason) {
+                alert('請務必填寫取消原因，以便後續查帳與管理！');
+                document.getElementById('cancelReasonInput').focus();
+                return;
+            }
+
+            const confirmBtn = document.getElementById('btnConfirmCancel');
+
+            try {
+                // 鎖定按鈕，防止店家連點
+                confirmBtn.innerText = '處理中...';
+                confirmBtn.disabled = true;
+
+                // 🔥 執行 Firestore 更新
+                // (假設 currentOrderToCancel.id 是該筆訂單在 Firestore 的 Document ID)
+                const orderRef = doc(db, "orders", currentOrderToCancel.id);
+
+                await updateDoc(orderRef, {
+                    status: "CANCELLED",
+                    cancelReason: reason,
+                    cancelledAt: serverTimestamp() // 記錄取消時間
+                });
+
+                // 成功後的收尾動作
+                alert("訂單已成功取消！");
+                document.getElementById('cancelOrderModal').style.display = 'none';
+                currentOrderToCancel = null;
+
+                // 🌟🌟🌟 這裡超級重要：記得重新渲染畫面！
+                // 可能是呼叫你原本寫的 fetchOrders() 或是 renderTabs() 之類的，
+                // 把這筆被取消的訂單從畫面上移走。
+
+            } catch (error) {
+                console.error("取消訂單失敗:", error);
+                alert("系統發生錯誤，取消失敗。請檢查網路或稍後再試。");
+            } finally {
+                // 無論成功失敗，按鈕狀態恢復原狀
+                confirmBtn.innerText = '確認取消訂單';
+                confirmBtn.disabled = false;
             }
         });
         document.addEventListener('DOMContentLoaded', () => {

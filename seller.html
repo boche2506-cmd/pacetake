@@ -84,63 +84,56 @@
         }
 
         .light-indicator-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 8px 4px;
+            height: 18%;
+            width: 100%;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
         }
 
         .light-title {
-            font-size: 10px;
-            color: var(--text-muted);
-            font-weight: bold;
-        }
-
-        .light-badge {
-            font-size: 11px;
-            font-weight: 800;
-            padding: 4px 2px;
-            border-radius: 6px;
-            width: 90%;
+            color: var(--text-main);
+            line-height: 1.2;
+            font-size: 4cqw;
+            font-weight: 700;
             text-align: center;
         }
 
-        /* 狀態色彩防線 (在明暗模式下皆保持高亮易讀) */
-        .badge-red {
-            background-color: var(--brand-red);
-            color: white;
-        }
-
-        .badge-green {
-            background-color: var(--brand-green);
-            color: #FFFFFF;
-        }
-
-        [data-theme="light"] .badge-green {
-            color: #111111;
-        }
-
-        .badge-amber {
-            background-color: var(--brand-amber);
-            color: white;
-        }
-
-        .badge-purple {
-            background-color: var(--brand-purple);
-            color: white;
-        }
-
-        .time-countdown {
-            font-size: 10px;
-            color: var(--brand-amber);
+        .light-badge {
+            color: var(--text-main);
+            line-height: 1.2;
+            font-size: 4cqw;
             font-weight: 700;
-            margin-top: 2px;
+            text-align: center;
+        }
+
+        .lightpay {
+            height: 28%;
+            width: 100%;
+            color: var(--brand-green);
+            box-shadow: var(--shadow-sm);
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 0.2cqw solid var(--brand-green);
+            border-radius: 5cqw;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .lightpay:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
+        }
+
+        .lightpay.pending {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: var(--brand-red);
+            color: var(--brand-red);
         }
 
         /* 巨型廚房大字明細區 */
@@ -464,9 +457,15 @@
                 <!-- 左側連動亮燈區 -->
                 <aside class="lights-sidebar">
                     <!-- 金流狀態燈 -->
+                    <div class="lightpay" data-action="lightpay" id="payContainer">
+                        <span class="light-badge badge-green" id="light_pay">讀取中...</span>
+                        <span class="light-badge" id="paymentStatus">讀取中...</span>
+                        <span>點擊可變更<br>收款狀態</span>
+                    </div>
+                    <!-- 用餐方式燈 -->
                     <div class="light-indicator-card">
-                        <span class="light-title">付款方式</span>
-                        <span class="light-badge badge-green" id="light_pay">線上已付</span>
+                        <span class="light-title">用餐方式</span>
+                        <span class="light-badge badge-purple" id="light_type">外帶自取</span>
                     </div>
                     <!-- 預約取餐時間燈 -->
                     <div class="light-indicator-card">
@@ -474,14 +473,13 @@
                         <span class="light-badge badge-amber" id="light_time">12:30</span>
                         <span class="time-countdown" id="light_countdown">剩 20 分</span>
                     </div>
-                    <!-- 用餐方式燈 -->
                     <div class="light-indicator-card">
-                        <span class="light-title">用餐方式</span>
-                        <span class="light-badge badge-purple" id="light_type">外帶自取</span>
+                        <button class="btn" data-action="cancelReason">❌<br>取消訂單</button>
                     </div>
-                    <button class="btn" data-action="cancelReason">❌<br>取消訂單</button>
-                    <div class="time-display">
-                        目前時間<br>：<br><span id="clock">讀取中...</span>
+                    <div class="light-indicator-card">
+                        <div class="time-display">
+                            目前時間<br>：<br><span id="clock">讀取中...</span>
+                        </div>
                     </div>
                 </aside>
                 <!-- 右側巨型廚房大字明細與全螢幕手勢工作區 -->
@@ -536,7 +534,6 @@
                     <label for="cancelReasonInput">請輸入取消原因 <span class="required">*</span></label>
                     <textarea id="cancelReasonInput" rows="3" placeholder="例如：餐點售完、顧客來電要求..."></textarea>
                 </div>
-
                 <div class="modal-actions">
                     <button id="btnCancelModal" class="btn-cancel">保留訂單 (返回)</button>
                     <button id="btnConfirmCancel" class="btn-danger">確認取消訂單</button>
@@ -694,6 +691,22 @@
                             AudioController.play();
                         }
                     }
+                    if (change.type === "modified") {
+                        const updatedData = { id: change.doc.id, ...change.doc.data() };
+                        // 找到該訂單在陣列中的位置
+                        const index = orders.findIndex(o => o.id === updatedData.id);
+                        if (index !== -1) {
+                            // 更新陣列中的資料
+                            orders[index] = updatedData;
+                            // 如果這筆訂單剛好是你目前正在看的 (currentIndex)，強制重新渲染畫面
+                            if (currentIndex === index) {
+                                renderOrderToWorkspace(orders[currentIndex]);
+                            }
+                            // 如果你想讓 Tab 上面也更新（例如狀態變了要重新 sort 或換 icon），就呼叫 renderTabs
+                            renderTabs();
+                            console.log("訂單已更新:", updatedData.id);
+                        }
+                    }
                 });
                 // 🌟 3. 第一次載入的收尾動作
                 if (isInitialLoad) {
@@ -738,7 +751,11 @@
         // 3. 渲染資料到畫面
         function renderOrderToWorkspace(order) {
             // 更新左側燈號
-            document.getElementById('light_pay').innerText = order.paymentMethod === 'CREDIT' ? '線上已付' : '現場付現';
+            const paymentStatusEl = document.getElementById('paymentStatus');
+            const payContainer = document.getElementById('payContainer');
+            paymentStatusEl.innerText = (order.paymentStatus === 'UNPAID') ? '未付款' : '已付款';
+            payContainer.classList.toggle('pending', order.paymentStatus === 'UNPAID');
+            document.getElementById('light_pay').innerText = order.paymentMethod === 'CREDIT' ? '線上支付' : '現場付款';
             document.getElementById('light_time').innerText = order.pickupTime;
             document.getElementById('light_type').innerText = order.diningType;
             // 更新右側主看板
@@ -832,7 +849,7 @@
             }
         };
         //  全域點擊事件 (負責開關選單、點擊停止音效)
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', async (e) => {
             // 🔥 【新增功能】：只要聲音正在播，點擊螢幕任何地方就會立刻停止！
             if (AudioController.bell && !AudioController.bell.paused) {
                 AudioController.stop();
@@ -877,6 +894,37 @@
                 const order = orders[index];
                 handleCancelOrder(order);
             }
+            else if (action === 'lightpay') {
+                const order = orders[currentIndex];
+                if (!order) return;
+
+                // 1. 計算切換後的目標狀態
+                const isCurrentlyUnpaid = order.paymentStatus === 'UNPAID';
+                const newStatus = isCurrentlyUnpaid ? 'PAID' : 'UNPAID';
+                const newPaidAt = isCurrentlyUnpaid ? serverTimestamp() : null;
+
+                // 2. 防呆確認 (這很重要，避免誤觸)
+                const confirmMsg = isCurrentlyUnpaid
+                    ? "確定要將此筆訂單標記為「已付款」嗎？"
+                    : "確定要將此筆訂單改回「未付款」嗎？";
+
+                if (!confirm(confirmMsg)) return;
+
+                // 3. 執行 Firebase 更新
+                try {
+                    const orderRef = doc(db, "orders", order.id);
+                    await updateDoc(orderRef, {
+                        paymentStatus: newStatus,
+                        paidAt: newPaidAt
+                    });
+                    // 成功後不需要額外寫 render，因為 onSnapshot 會自動偵測變更並重繪畫面
+                    console.log("收款狀態已切換為:", newStatus);
+
+                } catch (error) {
+                    console.error("更新狀態失敗:", error);
+                    alert("操作失敗，請檢查網路連線。");
+                }
+            }
         });
         function handleCancelOrder(order) {
             currentOrderToCancel = order; // 把訂單資料存起來
@@ -894,7 +942,6 @@
             // 顯示燈箱
             modal.style.display = 'flex';
             console.log("傳入的訂單物件是:", currentOrderToCancel);
-            console.log("訂單 ID 是:", currentOrderToCancel.id); // 這一行最重要！
         }
         // 2. 綁定燈箱內的「返回/放棄」按鈕
         document.getElementById('btnCancelModal').addEventListener('click', () => {
@@ -931,7 +978,6 @@
                 // 🌟🌟🌟 這裡超級重要：記得重新渲染畫面！
                 // 可能是呼叫你原本寫的 fetchOrders() 或是 renderTabs() 之類的，
                 // 把這筆被取消的訂單從畫面上移走。
-                updateUI(0);
             } catch (error) {
                 console.error("取消訂單失敗:", error);
                 alert("系統發生錯誤，取消失敗。請檢查網路或稍後再試。");

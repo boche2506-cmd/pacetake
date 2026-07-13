@@ -807,6 +807,7 @@
         if (submitOrderBtn) {
             submitOrderBtn.addEventListener('click', async () => {
                 // 1. 基本資料與購物車驗證 (保留你的原貌)
+                const freshCartData = getCartData();
                 const buyerName = buyerNameInput.value.trim();
                 const buyerPhone = buyerPhoneInput.value.trim();
                 const phoneRegex = /^09\d{8}$/;
@@ -873,7 +874,7 @@
                             buyerUid: user ? user.uid : "ANONYMOUS",
                             buyerName: buyerName,
                             buyerPhone: buyerPhone,
-                            items: cartData,
+                            items: freshCartData,
                             totalAmount: finalTotalAmount,
                             remark: orderRemark,
                             status: "PREPARING",
@@ -913,7 +914,7 @@
                         alert("⚠️ 系統提示：該店家尚未配置線上金流參數，請聯繫店家或改用現場付現。");
                         return;
                     }
-                    const itemNames = cartData.map(i => i.name).join('、');
+                    const itemNames = freshCartData.map(i => i.name).join('、');
                     const timeStamp = Math.round(Date.now() / 1000);
                     const originalParameters = [
                         `MerchantID=${currentStoreNewebpay.MerchantID}`,
@@ -931,7 +932,7 @@
                         `VACC=1`,
                         `CVS=1`,
                         `ReturnURL=https://www.pacetake.tw/orders.html`,
-                        `NotifyURL=https://你的網站網域.com/api/notify`
+                        `NotifyURL=https://us-central1-pacetake-c6e1e.cloudfunctions.net/newebpayNotify`
                     ].join('&');
                     try {
                         await addDoc(collection(db, "orders"), {
@@ -944,7 +945,7 @@
                             buyerUid: user ? user.uid : "ANONYMOUS",
                             buyerName: buyerName,
                             buyerPhone: buyerPhone,
-                            items: cartData,
+                            items: freshCartData,
                             totalAmount: finalTotalAmount,
                             remark: orderRemark,
                             status: "PENDING_PAYMENT",

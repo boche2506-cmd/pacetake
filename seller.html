@@ -177,8 +177,17 @@
             white-space: pre-line;
         }
 
-        .kitchen-bill-area {
+        .kitchen-remark {
             height: 70%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .kitchen-bill-area {
+            height: 90%;
             width: 100%;
             overflow-y: auto;
             display: flex;
@@ -213,6 +222,20 @@
             font-size: 5cqw;
             font-weight: 700;
             color: var(--text-main);
+        }
+
+        .buyer-remark {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            height: 10%;
+            width: 100%;
+            line-height: 1.2;
+            font-size: 4cqw;
+            font-weight: 600;
+            color: var(--text-main);
+            padding: 0 3cqw;
         }
 
         .kitchenOrderTotal {
@@ -603,7 +626,9 @@
                     </div>
                 </aside>
                 <main class="gesture-main-board" id="gestureTouchBoard">
-                    <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer">
+                    <div class="kitchen-remark">
+                        <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer"></div>
+                        <div class="buyer-remark">備註:<span id="remark">讀取中...</span></div>
                     </div>
                     <div class="kitchenOrderTotal">
                         <span style="font-size: 6cqw; font-weight: 800; color: var(--text-muted);">本單合計</span>
@@ -810,7 +835,6 @@
                         hasNewOrder = true;
                     }
                 });
-                // 🌟 2. 破案關鍵：直接用 Firebase 排好的資料重建陣列！
                 // 這樣 100% 貼齊 desc 排序，絕對不會再亂掉
                 orders.length = 0; // 清空舊陣列 (保留記憶體參考)
                 snapshot.docs.forEach(doc => {
@@ -823,13 +847,20 @@
                     }
                     isInitialLoad = false;
                 } else {
+                    // 🌟 關鍵修改點：
                     if (hasNewOrder) {
                         AudioController.play(); // 播音效
-                    }
-                    // 如果你目前正在看的訂單內容被更新了(例如付款狀態改變)，立刻刷新主畫面
-                    const currentOrder = orders.find(o => o.id === activeOrderId);
-                    if (currentOrder) {
-                        renderOrderToWorkspace(currentOrder);
+                        if (orders.length > 0) {
+                            console.log("🔔 偵測到新訂單！自動跳轉到最新單：", orders[0].id);
+                            updateUI(orders[0].id); // 🚀 核心優化：直接跳轉到最新進來的那張單！
+                        }
+                    } else {
+                        // 如果「沒有」新單，代表只是舊訂單的內容被修改（例如藍新 Notify 成功，未付款變已付款）
+                        // 這時候保持在原本這張單，並直接刷新工作區內容就好，不要打斷老闆目前的瀏覽
+                        const currentOrder = orders.find(o => o.id === activeOrderId);
+                        if (currentOrder) {
+                            renderOrderToWorkspace(currentOrder);
+                        }
                     }
                 }
                 // 4. 最後統一重繪 Tab，順序保證正確 [0, 1, 2...]
@@ -906,6 +937,7 @@
             // 更新聯絡人與電話 (如果沒有資料，就顯示 '未提供')
             document.getElementById('buyername').innerText = order.buyerName || '未提供';
             document.getElementById('buyerphone').innerText = order.buyerPhone || '未提供';
+            document.getElementById('remark').innerText = order.remark || '無備註';
         }
         const gestureTouchBoard = document.getElementById('gestureTouchBoard');
         let touchStartX = 0;
@@ -1012,19 +1044,23 @@
         };
         //  全域點擊事件 (負責開關選單、點擊停止音效)
         document.addEventListener('click', async (e) => {
-            // 🔥 【新增功能】：只要聲音正在播，點擊螢幕任何地方就會立刻停止！
-            if (AudioController.bell && !AudioController.bell.paused) {
+            // 🌟 關鍵修改：先把判斷位置的變數挪到最上方
+            const volumeBtn = e.target.closest('[data-action="volumemenu"]');
+            const isInsideVolumeBox = e.target.closest('#volumectrlbox');
+            const volumeBox = document.getElementById('volumectrlbox');
+
+            // 🔥 【優化功能】：只要聲音正在播，且點擊的地方「不是」音量控制盒、也「不是」音量按鈕，才立刻停止！
+            if (AudioController.bell && !AudioController.bell.paused && !isInsideVolumeBox && !volumeBtn) {
                 AudioController.stop();
-                // 這裡不加上 return，讓使用者點擊畫面的原本動作（例如切換分頁）可以繼續執行
+                // 這裡不加上 return，讓使用者點擊畫面的原本動作可以繼續執行
             }
+
             // 處理靜音按鈕 (獨立出來，避免跟下面打架)
             if (e.target.closest('#muteBtn')) {
                 AudioController.toggleMute();
                 return;
             }
-            const volumeBtn = e.target.closest('[data-action="volumemenu"]');
-            const isInsideVolumeBox = e.target.closest('#volumectrlbox');
-            const volumeBox = document.getElementById('volumectrlbox');
+
             // 處理「點擊音量按鈕」開關邏輯
             if (volumeBtn) {
                 if (!volumeBox) return;
@@ -1038,10 +1074,11 @@
                 }
                 return; // 🛑 點了按鈕就結束判斷，不要往下跑
             }
-            // 處理「點擊選單外部」自動關閉
+
+            // 處理「點擊選單外部」自動關閉（修正尾端未完結的程式碼）
             if (!isInsideVolumeBox && volumeBox && window.getComputedStyle(volumeBox).display !== "none") {
                 volumeBox.style.display = "none";
-                AudioController.stop();
+                AudioController.stop(); // 🌟 補齊原本斷掉的地方
             }
             // 處理其他按鈕
             const target = e.target.closest('[data-action]');

@@ -260,7 +260,7 @@
             /* 按下去變小一點，模擬點擊感 */
         }
 
-        .kitchenOrderTotal.PREPARING {
+        .kitchenOrderTotal.preparing {
             background-color: rgba(239, 68, 68, 0.1);
             border-color: var(--brand-red);
             color: var(--brand-red);
@@ -657,7 +657,7 @@
                         <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer"></div>
                         <div class="buyer-remark">備註:<span id="remark">讀取中...</span></div>
                     </div>
-                    <div class="kitchenOrderTotal" data-action="PREPARING" id="statusContainer">
+                    <div class="kitchenOrderTotal" data-action="statusPREPARING" id="statusContainer">
                         <div class="kitchenOrder">
                             <span style="font-size: 6cqw; font-weight: 800; color: var(--text-muted);">本單合計</span>
                             <span style="font-size: 7cqw; font-weight: 900; color: var(--brand-blue);"
@@ -866,9 +866,9 @@
                     // 🌟 核心修正：用你的雙軌欄位做精準定義！
                     // 滿足以下任一條件才是店家要處理的「有效訂單」：
                     // 條件 A：它是現場付現單 (CASH)
-                    // 條件 B：它是線上刷卡單 (CREDIT) 且 狀態已經不是「等待付款(PENDING_PAYMENT)」了
+                    // 條件 B：它是線上刷卡單 (CREDIT) 且 狀態已經不是「等待付款(UNPAID)」了
                     const isValidOrder = (data.paymentMethod === "CASH") ||
-                        (data.paymentMethod === "CREDIT" && data.paymentStatus !== "PENDING_PAYMENT");
+                        (data.paymentMethod === "CREDIT" && data.paymentStatus !== "UNPAID");
                     if (isValidOrder && !isInitialLoad) {
                         // 檢查這張單是不是本來就在店家的畫面上
                         const isAlreadyOnScreen = orders.some(o => o.id === change.doc.id);
@@ -990,7 +990,7 @@
             document.getElementById('remark').innerText = order.remark || '無備註';
             const statusContainer = document.getElementById('statusContainer');
             const statusEl = document.getElementById('status');
-            statusContainer.classList.toggle('PREPARING', order.Status === 'PREPARING');
+            statusContainer.classList.toggle('preparing', order.Status === 'PREPARING');
             statusEl.innerText = (order.Status === 'PREPARING') ? '#餐點製作完成請點選此處以通知顧客' : '已完成';
         }
         const gestureTouchBoard = document.getElementById('gestureTouchBoard');
@@ -1181,7 +1181,7 @@
                     alert("操作失敗，請檢查網路連線。");
                 }
             }
-            else if (action === 'PREPARING') {
+            else if (action === 'statusPREPARING') {
                 const order = orders[currentIndex];
                 if (!order) return;
                 // 1. 計算切換後的目標狀態

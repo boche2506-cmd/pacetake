@@ -858,7 +858,7 @@
                         }, { merge: true });
                     } catch (e) { console.error("同步會員姓名失敗", e); }
                 }
-                const pickupNo = orderMerchantOrderNo.slice(-3);
+                const pickupNo = orderMerchantOrderNo.slice(-5);
                 const remarkElement = document.getElementById('Remarkinput');
                 const tableNumber = document.getElementById('dineInTable');
                 const orderRemark = remarkElement ? remarkElement.value.trim() : "";
@@ -934,6 +934,7 @@
                         `SAMPAY=1`,
                         `VACC=1`,
                         `CVS=1`,
+                        // 修改這一段
                         `ClientBackURL=https://www.pacetake.tw/orders.html`,
                         `NotifyURL=https://newebpaynotify-zyqaicumra-uc.a.run.app`
                     ].join('&');
@@ -981,6 +982,7 @@
                         document.getElementById('formTradeInfo').value = tradeInfo;
                         document.getElementById('formTradeSha').value = tradeSha;
                         alert(`🛒 安全連線建立成功！\n即將為您導向藍新加密金流，請於頁面完成付款。`);
+                        console.log("送往藍新的原始參數字串:", originalParameters);
                         document.getElementById('newebpayForm').submit();
                     } catch (err) {
                         alert("藍新安全加密防線建立失敗：" + err.message);

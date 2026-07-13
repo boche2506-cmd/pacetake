@@ -352,7 +352,6 @@
             border-radius: 5cqw;
             padding: 2cqw;
             text-align: center;
-            appearance: none;
             color: var(--text-main);
             background-color: var(--bg-global);
             user-select: none;
@@ -360,6 +359,8 @@
         }
 
         #volumeslider {
+            -webkit-appearance: none;
+            appearance: none;
             height: 15%;
             width: 100%;
             background: #ddd;
@@ -392,6 +393,62 @@
             color: var(--brand-red);
             font-size: 6cqw;
             text-align: center;
+        }
+
+        #muteBtn {
+            -webkit-appearance: none;
+            appearance: none;
+            border: none;
+
+            /* 尺寸與佈局：配合外層 flexbox */
+            width: 90%;
+            height: 22%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            /* 質感外觀：圓角膠囊感與內建主題色反轉 */
+            border-radius: 2.5cqw;
+            background-color: var(--text-main);
+            /* 預設用主文字顏色當背景 */
+            color: var(--bg-global);
+            /* 文字用全域背景色反轉，對比強烈 */
+
+            /* 字體設定 */
+            font-size: 4.5cqw;
+            font-weight: bold;
+            letter-spacing: 0.3cqw;
+            cursor: pointer;
+
+            /* 陰影與動畫過渡 */
+            box-shadow: 0 0.6cqw 1.5cqw rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        /* 滑鼠懸停 / 靈敏觸控反饋 */
+        #muteBtn:hover {
+            opacity: 0.9;
+            transform: translateY(-0.3cqw);
+            /* 微微浮起感 */
+            box-shadow: 0 0.8cqw 2cqw rgba(0, 0, 0, 0.2);
+        }
+
+        /* 點擊壓下去的超爽回饋 */
+        #muteBtn:active {
+            transform: translateY(0.2cqw);
+            /* 壓下去 */
+            box-shadow: 0 0.2cqw 0.5cqw rgba(0, 0, 0, 0.1);
+        }
+
+        /* 🌟 靜音狀態下的特殊樣式 (選用，搭配下方 JS 效果炸裂) */
+        #muteBtn.muted {
+            background-color: #6c757d;
+            /* 變成沉穩的灰色 */
+            color: #fff;
+            /* 如果你想用你的品牌紅，也可以改成這樣：
+            background-color: var(--brand-red); 
+            color: #fff; */
         }
 
         /* 燈箱外層遮罩 (覆蓋全螢幕) */
@@ -572,20 +629,21 @@
                 <div class="status-display" id="shopStatusDisplay">🟢 營業中</div>
                 <button class="btn" data-action="volumemenu" type="button">🎵<br>測試鈴聲</button>
                 <!-- 預設隱藏的音量控制區塊 -->
+                <div id="volumectrlbox"><span>部分裝置無法透過此拉桿控制音量</span>
+                    <div class="audio-controls">
+                        <label for="volumeslider">音量</label>
+                        <!-- range 拉桿 -->
+                        <input type="range" id="volumeslider" min="0" max="1" step="0.1" value="0.5">
+                        <span id="volumevalue">50%</span>
+                        <button id="muteBtn" type="button">🔊 聲音開啟</button>
+                    </div>
+                    <audio id="orderbell" preload="auto">
+                        <source src="audio/ringtone.mp3" type="audio/mpeg">
+                    </audio>
+                </div>
             </footer>
         </div>
-        <div id="volumectrlbox"><span>部分裝置無法透過此拉桿控制音量</span>
-            <div class="audio-controls">
-                <label for="volumeslider">音量</label>
-                <!-- range 拉桿 -->
-                <input type="range" id="volumeslider" min="0" max="1" step="0.1" value="0.5">
-                <span id="volumevalue">50%</span>
-                <button id="muteBtn" type="button">🔊 聲音開啟</button>
-            </div>
-            <audio id="orderbell" preload="auto">
-                <source src="audio/ringtone.mp3" type="audio/mpeg">
-            </audio>
-        </div>
+
         <div id="cancelOrderModal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h3>❌ 取消訂單</h3>
@@ -905,11 +963,17 @@
                 const muteBtn = document.getElementById('muteBtn');
                 if (muteBtn) {
                     muteBtn.innerText = this.isMuted ? "🔇 已靜音" : "🔊 聲音開啟";
+                    // 🌟 新增這行：初始化時如果已經是靜音，就加上 .muted 樣式
+                    muteBtn.classList.toggle('muted', this.isMuted);
                 }
                 // 🌟 3. 新增：初始化拉桿的 UI 狀態 (解決拉桿怪異/顏色出不來的問題)
                 const volumeSlider = document.getElementById("volumeslider");
                 const volumeValue = document.getElementById("volumevalue");
                 if (volumeSlider) {
+                    // 🔥 【關鍵修正】：網頁一載入，就先幫拉桿設定預設值與顏色！
+                    volumeSlider.value = savedVolume;
+                    if (volumeValue) volumeValue.textContent = Math.round(savedVolume * 100) + "%";
+                    volumeSlider.style.background = `linear-gradient(to right, #007bff ${savedVolume * 100}%, #ddd ${savedVolume * 100}%)`;
                     volumeSlider.addEventListener("input", (e) => {
                         const val = parseFloat(e.target.value);
                         AudioController.bell.volume = val;
@@ -941,6 +1005,8 @@
                 const muteBtn = document.getElementById('muteBtn');
                 if (muteBtn) {
                     muteBtn.innerText = this.isMuted ? "🔇 已靜音" : "🔊 聲音開啟";
+                    // 🌟 新增這行：切換時自動開關 .muted 樣式
+                    muteBtn.classList.toggle('muted', this.isMuted);
                 }
             }
         };

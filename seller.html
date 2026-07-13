@@ -830,16 +830,41 @@
             onSnapshot(q, (snapshot) => {
                 // 1. 先判斷這次更新有沒有「真正的新進訂單」(用來決定要不要播音效)
                 let hasNewOrder = false;
+
                 snapshot.docChanges().forEach((change) => {
-                    if (change.type === "added" && !isInitialLoad) {
-                        hasNewOrder = true;
+                    const data = change.doc.data();
+
+                    // 🌟 核心修正：用你的雙軌欄位做精準定義！
+                    // 滿足以下任一條件才是店家要處理的「有效訂單」：
+                    // 條件 A：它是現場付現單 (CASH)
+                    // 條件 B：它是線上刷卡單 (CREDIT) 且 狀態已經不是「等待付款(PENDING_PAYMENT)」了
+                    const isValidOrder = (data.paymentMethod === "CASH") ||
+                        (data.paymentMethod === "CREDIT" && data.status !== "PENDING_PAYMENT");
+
+                    if (isValidOrder && !isInitialLoad) {
+                        // 檢查這張單是不是本來就在店家的畫面上
+                        const isAlreadyOnScreen = orders.some(o => o.id === change.doc.id);
+                        // 如果是新單，或者是線上單剛付完款（原本不在畫面上），才觸發新訂單通知
+                        if (!isAlreadyOnScreen) {
+                            hasNewOrder = true;
+                        }
                     }
                 });
+
                 // 這樣 100% 貼齊 desc 排序，絕對不會再亂掉
                 orders.length = 0; // 清空舊陣列 (保留記憶體參考)
+
                 snapshot.docs.forEach(doc => {
-                    orders.push({ id: doc.id, ...doc.data() });
+                    const data = doc.data();
+                    // 🌟 核心修正：撈取列表時，同步過濾掉還沒付錢的線上刷卡單
+                    const isValidOrder = (data.paymentMethod === "CASH") ||
+                        (data.paymentMethod === "CREDIT" && data.status !== "PENDING_PAYMENT");
+
+                    if (isValidOrder) {
+                        orders.push({ id: doc.id, ...data });
+                    }
                 });
+
                 // 3. 處理畫面與音效
                 if (isInitialLoad) {
                     if (orders.length > 0) {
@@ -852,10 +877,10 @@
                         AudioController.play(); // 播音效
                         if (orders.length > 0) {
                             console.log("🔔 偵測到新訂單！自動跳轉到最新單：", orders[0].id);
-                            updateUI(orders[0].id); // 🚀 核心優化：直接跳轉到最新進來的那張單！
+                            updateUI(orders[0].id); // 🚀 直接跳轉到最新進來的那張單！
                         }
                     } else {
-                        // 如果「沒有」新單，代表只是舊訂單的內容被修改（例如藍新 Notify 成功，未付款變已付款）
+                        // 如果「沒有」新單，代表只是舊訂單的內容被修改（例如店家自己按了接單、出餐等）
                         // 這時候保持在原本這張單，並直接刷新工作區內容就好，不要打斷老闆目前的瀏覽
                         const currentOrder = orders.find(o => o.id === activeOrderId);
                         if (currentOrder) {

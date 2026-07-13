@@ -239,21 +239,48 @@
         }
 
         .kitchenOrderTotal {
+            height: 15%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 5cqw;
+            line-height: 1.2;
+            border-top: 0.2cqw dashed var(--border-color);
+            color: var(--brand-green);
+            box-shadow: var(--shadow-sm);
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 0.2cqw solid var(--brand-green);
+            transition: transform 0.2s;
+        }
+
+        .kitchenOrderTotal:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
+        }
+
+        .kitchenOrderTotal.PREPARING {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: var(--brand-red);
+            color: var(--brand-red);
+        }
+
+        .kitchenOrder {
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            height: 10%;
+            height: 80%;
             width: 100%;
             line-height: 1.2;
             font-size: 5cqw;
             font-weight: 700;
-            border-top: 0.2cqw dashed var(--border-color);
             padding: 0 3cqw;
         }
 
         .namephone {
-            height: 20%;
+            height: 15%;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -630,10 +657,14 @@
                         <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer"></div>
                         <div class="buyer-remark">備註:<span id="remark">讀取中...</span></div>
                     </div>
-                    <div class="kitchenOrderTotal">
-                        <span style="font-size: 6cqw; font-weight: 800; color: var(--text-muted);">本單合計</span>
-                        <span style="font-size: 7cqw; font-weight: 900; color: var(--brand-blue);"
-                            id="kitchenOrderTotal">$0</span>
+                    <div class="kitchenOrderTotal" data-action="PREPARING" id="statusContainer">
+                        <div class="kitchenOrder">
+                            <span style="font-size: 6cqw; font-weight: 800; color: var(--text-muted);">本單合計</span>
+                            <span style="font-size: 7cqw; font-weight: 900; color: var(--brand-blue);"
+                                id="kitchenOrderTotal">$0</span>
+                        </div>
+                        <span id="status"
+                            style="font-size: 3.5cqw; font-weight: 500; color: var(--text-main);">讀取中...</span>
                     </div>
                     <!-- 底部手勢手感提示 -->
                     <div class="namephone">
@@ -837,7 +868,7 @@
                     // 條件 A：它是現場付現單 (CASH)
                     // 條件 B：它是線上刷卡單 (CREDIT) 且 狀態已經不是「等待付款(PENDING_PAYMENT)」了
                     const isValidOrder = (data.paymentMethod === "CASH") ||
-                        (data.paymentMethod === "CREDIT" && data.status !== "PENDING_PAYMENT");
+                        (data.paymentMethod === "CREDIT" && data.paymentStatus !== "PENDING_PAYMENT");
                     if (isValidOrder && !isInitialLoad) {
                         // 檢查這張單是不是本來就在店家的畫面上
                         const isAlreadyOnScreen = orders.some(o => o.id === change.doc.id);
@@ -853,7 +884,7 @@
                     const data = doc.data();
                     // 🌟 核心修正：撈取列表時，同步過濾掉還沒付錢的線上刷卡單
                     const isValidOrder = (data.paymentMethod === "CASH") ||
-                        (data.paymentMethod === "CREDIT" && data.status !== "PENDING_PAYMENT");
+                        (data.paymentMethod === "CREDIT" && data.paymentStatus !== "UNPAID");
 
                     if (isValidOrder) {
                         orders.push({ id: doc.id, ...data });
@@ -957,6 +988,10 @@
             document.getElementById('buyername').innerText = order.buyerName || '未提供';
             document.getElementById('buyerphone').innerText = order.buyerPhone || '未提供';
             document.getElementById('remark').innerText = order.remark || '無備註';
+            const statusContainer = document.getElementById('statusContainer');
+            const statusEl = document.getElementById('status');
+            statusContainer.classList.toggle('PREPARING', order.Status === 'PREPARING');
+            statusEl.innerText = (order.Status === 'PREPARING') ? '#餐點製作完成請點選此處以通知顧客' : '已完成';
         }
         const gestureTouchBoard = document.getElementById('gestureTouchBoard');
         let touchStartX = 0;
@@ -1140,6 +1175,33 @@
                     });
                     // 成功後不需要額外寫 render，因為 onSnapshot 會自動偵測變更並重繪畫面
                     console.log("收款狀態已切換為:", newStatus);
+
+                } catch (error) {
+                    console.error("更新狀態失敗:", error);
+                    alert("操作失敗，請檢查網路連線。");
+                }
+            }
+            else if (action === 'PREPARING') {
+                const order = orders[currentIndex];
+                if (!order) return;
+                // 1. 計算切換後的目標狀態
+                const isCurrentlyUnpaid = order.Status === 'PREPARING';
+                const newStatus = isCurrentlyUnpaid ? 'COMPLETED' : 'PREPARING';
+                const newStatusAt = isCurrentlyUnpaid ? serverTimestamp() : null;
+                // 2. 防呆確認 (這很重要，避免誤觸)
+                const confirmMsg = isCurrentlyUnpaid
+                    ? "確定要將此筆訂單標記為「完成」嗎？"
+                    : "確定要將此筆訂單改回「未完成」嗎？";
+                if (!confirm(confirmMsg)) return;
+                // 3. 執行 Firebase 更新
+                try {
+                    const orderRef = doc(db, "orders", order.id);
+                    await updateDoc(orderRef, {
+                        Status: newStatus,
+                        StatusAt: newStatusAt
+                    });
+                    // 成功後不需要額外寫 render，因為 onSnapshot 會自動偵測變更並重繪畫面
+                    console.log("製作狀態已切換為:", newStatus);
 
                 } catch (error) {
                     console.error("更新狀態失敗:", error);

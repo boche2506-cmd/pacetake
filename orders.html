@@ -347,8 +347,6 @@
                 statusEl.textContent = "✅ 餐點已完成！";
                 descEl.textContent = "請到櫃檯憑號碼領取。";
             }
-            const statusTitle = document.getElementById('orderStatusTitle');
-            const statusDesc = document.getElementById('orderStatusDesc');
             const storeLinkHtml = `
                        <div id="storeLinkBtnContainer" style="text-align: center;">
                            <a href="store.html?storeId=${order.storeId}" 
@@ -359,7 +357,7 @@
             // 3. 檢查按鈕是否已經存在，如果不存在，就插入到 statusTitle 的後面
             if (!document.getElementById('storeLinkBtnContainer')) {
                 // 使用 insertAdjacentHTML，將按鈕插入在 title 的 "afterend" (即 title 結束後，desc 之前)
-                statusTitle.insertAdjacentHTML('afterend', storeLinkHtml);
+                statusEl.insertAdjacentHTML('afterend', storeLinkHtml);
             }
             // 3. 渲染商品明細與總計
             const container = document.getElementById('cartItemsContainer');

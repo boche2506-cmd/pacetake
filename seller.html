@@ -988,6 +988,9 @@
             isMuted: localStorage.getItem("isMuted") === "true",
             init() {
                 if (!this.bell) return; // 防呆
+                // 🌟 新增：強制設定音效為「循環播放」
+                // 這樣打開 volumectrlbox 或是新訂單進來呼叫 play() 時，音效就會一直逼逼叫
+                this.bell.loop = true;
                 // 1. 恢復音量
                 const savedVolume = parseFloat(localStorage.getItem("orderBellVolume")) || 0.5;
                 this.bell.volume = savedVolume;
@@ -995,14 +998,12 @@
                 const muteBtn = document.getElementById('muteBtn');
                 if (muteBtn) {
                     muteBtn.innerText = this.isMuted ? "🔇 已靜音" : "🔊 聲音開啟";
-                    // 🌟 新增這行：初始化時如果已經是靜音，就加上 .muted 樣式
                     muteBtn.classList.toggle('muted', this.isMuted);
                 }
-                // 🌟 3. 新增：初始化拉桿的 UI 狀態 (解決拉桿怪異/顏色出不來的問題)
+                // 3. 初始化拉桿的 UI 狀態
                 const volumeSlider = document.getElementById("volumeslider");
                 const volumeValue = document.getElementById("volumevalue");
                 if (volumeSlider) {
-                    // 🔥 【關鍵修正】：網頁一載入，就先幫拉桿設定預設值與顏色！
                     volumeSlider.value = savedVolume;
                     if (volumeValue) volumeValue.textContent = Math.round(savedVolume * 100) + "%";
                     volumeSlider.style.background = `linear-gradient(to right, #007bff ${savedVolume * 100}%, #ddd ${savedVolume * 100}%)`;
@@ -1019,10 +1020,12 @@
                 }
             },
             play() {
-                if (this.isMuted || !this.bell) {
-                    console.log("目前靜音中或找不到音檔，不播放通知音");
-                    return;
-                }
+                if (!this.bell) return;
+                // 🌟 關鍵修改：不再用 return 擋住播放！
+                // 改用原生 .muted 屬性同步狀態。如果是靜音，它會在背景「無聲循環播放」
+                // 這樣好處是：當使用者拉動音量桿解除靜音時，聲音能一瞬間從背景冒出來，體驗極佳！
+                this.bell.muted = this.isMuted;
+
                 this.bell.currentTime = 0;
                 this.bell.play().catch(e => console.warn("自動播放被瀏覽器阻擋", e));
             },
@@ -1034,10 +1037,15 @@
             toggleMute() {
                 this.isMuted = !this.isMuted;
                 localStorage.setItem("isMuted", this.isMuted);
+
+                // 🌟 關鍵修改：讓當下「正在播放」的音效，立刻同步最新的靜音狀態！
+                // 點擊靜音的瞬間，聲音會立刻消失；再次點擊，聲音會立刻原地恢復
+                if (this.bell) {
+                    this.bell.muted = this.isMuted;
+                }
                 const muteBtn = document.getElementById('muteBtn');
                 if (muteBtn) {
                     muteBtn.innerText = this.isMuted ? "🔇 已靜音" : "🔊 聲音開啟";
-                    // 🌟 新增這行：切換時自動開關 .muted 樣式
                     muteBtn.classList.toggle('muted', this.isMuted);
                 }
             }

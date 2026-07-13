@@ -846,7 +846,8 @@
                 localStorage.setItem('pace_buyer_name', buyerName);
                 localStorage.setItem('pace_buyer_phone', buyerPhone);
                 const timeStamp = Math.floor(Date.now() / 1000);
-                const orderMerchantOrderNo = "PACE_" + timeStamp;
+                const randomSuffix = Math.floor(Math.random() * 1000);
+                const orderMerchantOrderNo = "PACE_" + timeStamp + "_" + randomSuffix;
                 // 如果使用者存在且非匿名，才將資料回寫雲端 users 集合
                 if (user && !user.isAnonymous) {
                     try {
@@ -879,9 +880,9 @@
                             items: freshCartData,
                             totalAmount: finalTotalAmount,
                             remark: orderRemark,
-                            status: "PREPARING",
+                            status: "PREPARING",//餐點製作狀態
                             paymentMethod: "CASH",
-                            paymentStatus: "UNPAID",
+                            paymentStatus: "UNPAID",//付款狀態
                             diningType: currentDiningType,
                             table: tableRemark,
                             cancelReason: "",
@@ -933,7 +934,7 @@
                         `SAMPAY=1`,
                         `VACC=1`,
                         `CVS=1`,
-                        `ReturnURL=https://us-central1-pacetake-c6e1e.cloudfunctions.net/newebpayReturn`,
+                        `ClientBackURL=https://www.pacetake.tw/orders.html`,
                         `NotifyURL=https://newebpaynotify-zyqaicumra-uc.a.run.app`
                     ].join('&');
                     try {
@@ -950,9 +951,9 @@
                             items: freshCartData,
                             totalAmount: finalTotalAmount,
                             remark: orderRemark,
-                            status: "PREPARING",
+                            status: "PREPARING",//餐點製作狀態
                             paymentMethod: "CREDIT",
-                            paymentStatus: "UNPAID",
+                            paymentStatus: "UNPAID",//付款狀態
                             diningType: currentDiningType,
                             table: tableRemark,
                             cancelReason: "",

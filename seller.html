@@ -657,13 +657,13 @@
                         <div class="kitchen-bill-area slide-animate" id="kitchenBillContainer"></div>
                         <div class="buyer-remark">備註:<span id="remark">讀取中...</span></div>
                     </div>
-                    <div class="kitchenOrderTotal" data-action="statusPREPARING" id="statusContainer">
+                    <div class="kitchenOrderTotal" data-action="kitchenOrderTotal" id="statusContainer">
                         <div class="kitchenOrder">
                             <span style="font-size: 6cqw; font-weight: 800; color: var(--text-muted);">本單合計</span>
                             <span style="font-size: 7cqw; font-weight: 900; color: var(--brand-blue);"
                                 id="kitchenOrderTotal">$0</span>
                         </div>
-                        <span id="status"
+                        <span id="statusTotal"
                             style="font-size: 3.5cqw; font-weight: 500; color: var(--text-main);">讀取中...</span>
                     </div>
                     <!-- 底部手勢手感提示 -->
@@ -989,9 +989,9 @@
             document.getElementById('buyerphone').innerText = order.buyerPhone || '未提供';
             document.getElementById('remark').innerText = order.remark || '無備註';
             const statusContainer = document.getElementById('statusContainer');
-            const statusEl = document.getElementById('status');
+            const statusTotalEl = document.getElementById('statusTotal');
             statusContainer.classList.toggle('preparing', order.Status === 'PREPARING');
-            statusEl.innerText = (order.Status === 'PREPARING') ? '#餐點製作完成請點選此處以通知顧客' : '已完成';
+            statusTotalEl.innerText = (order.Status === 'PREPARING') ? '#餐點製作完成請點選此處以通知顧客' : '已完成';
         }
         const gestureTouchBoard = document.getElementById('gestureTouchBoard');
         let touchStartX = 0;
@@ -1181,7 +1181,7 @@
                     alert("操作失敗，請檢查網路連線。");
                 }
             }
-            else if (action === 'statusPREPARING') {
+            else if (action === 'kitchenOrderTotal') {
                 const order = orders[currentIndex];
                 if (!order) return;
                 // 1. 計算切換後的目標狀態

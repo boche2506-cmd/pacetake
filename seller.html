@@ -990,8 +990,8 @@
             document.getElementById('remark').innerText = order.remark || '無備註';
             const statusContainer = document.getElementById('statusContainer');
             const statusTotalEl = document.getElementById('statusTotal');
-            statusContainer.classList.toggle('preparing', order.Status === 'PREPARING');
-            statusTotalEl.innerText = (order.Status === 'PREPARING') ? '#餐點製作完成請點選此處以通知顧客' : '已完成';
+            statusContainer.classList.toggle('preparing', order.status === 'PREPARING');
+            statusTotalEl.innerText = (order.status === 'PREPARING') ? '#餐點製作完成請點選此處以通知顧客' : '已完成';
         }
         const gestureTouchBoard = document.getElementById('gestureTouchBoard');
         let touchStartX = 0;

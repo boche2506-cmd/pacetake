@@ -847,7 +847,7 @@
                 localStorage.setItem('pace_buyer_phone', buyerPhone);
                 const timeStamp = Math.floor(Date.now() / 1000);
                 const randomSuffix = Math.floor(Math.random() * 1000);
-                const orderMerchantOrderNo = "PACE_" + timeStamp + "_" + randomSuffix;
+                const orderMerchantOrderNo = "PACE" + timeStamp + randomSuffix;
                 // 如果使用者存在且非匿名，才將資料回寫雲端 users 集合
                 if (user && !user.isAnonymous) {
                     try {

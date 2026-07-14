@@ -260,11 +260,12 @@ exports.newebpayRefund = onCall({
             throw new HttpsError('aborted', result.Message || '退款失敗');
         }
     } catch (error) {
-        console.error('退款錯誤詳細資訊:');
+        console.error('=== 退款完整錯誤 ===');
+        console.error('錯誤名稱:', error.name);
+        console.error('錯誤訊息:', error.message);
         if (error.response) {
-            console.error('Status:', error.response.status);
-            console.error('藍新回應資料:', error.response.data);
-            console.error('藍新回應標頭:', error.response.headers);
+            console.error('藍新回應狀態:', error.response.status);
+            console.error('藍新回應內容:', error.response.data);
         } else if (error.request) {
             console.error('沒有收到藍新回應:', error.request);
         } else {

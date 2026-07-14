@@ -8,7 +8,6 @@ const crypto = require('crypto');
 if (admin.apps.length === 0) {
     admin.initializeApp();
 }
-const NEWEBPAY_BASE_URL = 'https://ccore.newebpay.com'; // 正式環境，測試請改 ccore.newebpay.com
 const REGION = "asia-east1";
 // ============================================================
 // 🌐 新增：接收藍新付款成功通知的 HTTP 網址 (Webhook)
@@ -171,18 +170,18 @@ exports.newebpayRefund = onCall({
                 MerchantOrderNo: order.orderId || orderId,
                 TimeStamp: timestamp,
                 IndexType: 1,
-                CloseType: 2,
+                CloseType: 1,
             };
             const aesString = encryptAES(JSON.stringify(postData), HashKey, HashIV);
             console.log("準備呼叫藍新信用卡退款...");
             console.log("MerchantID:", MerchantID);
             console.log("PostData 長度:", aesString.length);
-            const res = await axios.post(`${NEWEBPAY_BASE_URL}/API/CreditCard/CloseAction`,
-                `MerchantID_=${MerchantID}&PostData_=${aesString}`,
+            const res = await axios.post('https://ccore.newebpay.com/API/CreditCard/CloseAction',
+                postDataString, `MerchantID_=${MerchantID}&PostData_=${aesString}`,
                 {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
-                        // 關鍵修改：偽裝成一般瀏覽器
+                        // 加上這行，偽裝成瀏覽器請求
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
                     }
                 }
@@ -201,9 +200,15 @@ exports.newebpayRefund = onCall({
                 Amt: Math.round(refundAmount),
             };
             const aesString = encryptAES(JSON.stringify(postData), HashKey, HashIV);
-            const res = await axios.post(`${NEWEBPAY_BASE_URL}/API/EWallet/Refund`,
-                `MerchantID_=${MerchantID}&PostData_=${aesString}`,
-                { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+            const res = await axios.post('https://ccore.newebpay.com/API/CreditCard/CloseAction',
+                postDataString, `MerchantID_=${MerchantID}&PostData_=${aesString}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        // 加上這行，偽裝成瀏覽器請求
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                    }
+                }
             );
             result = res.data;
         }

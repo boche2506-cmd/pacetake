@@ -10,44 +10,8 @@ if (admin.apps.length === 0) {
 }
 const NEWEBPAY_BASE_URL = 'https://ccore.newebpay.com'; // 正式環境，測試請改 ccore.newebpay.com
 const REGION = "asia-east1";
-exports.autoUpdateStoreStatus = onSchedule({
-    schedule: "every 10 minutes",
-    region: REGION
-}, async (event) => {
-    const db = admin.firestore();
-    const storesSnapshot = await db.collection('stores').get();
-    // 取得台灣時間 (UTC+8)
-    const now = new Date();
-    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const taipeiTime = new Date(utc + (3600000 * 8));
-    const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-    const currentDay = dayNames[taipeiTime.getDay()];
-    const currentTimeMinutes = taipeiTime.getHours() * 60 + taipeiTime.getMinutes();
-    console.log(`執行時間: ${taipeiTime.toLocaleString()}, 星期: ${currentDay}, 分鐘: ${currentTimeMinutes}`);
-    for (const doc of storesSnapshot.docs) {
-        const store = doc.data();
-        // 如果 isAutoMode 明確設定為 false，機器人直接跳過這間店
-        if (store.isAutoMode === false) {
-            console.log(`商店 ${doc.id} 為手動模式，跳過自動更新。`);
-            continue;
-        }
-        const hours = store.businessHours ? store.businessHours[currentDay] : null;
-        if (hours && hours.isOpen) {
-            const [openH, openM] = hours.open.split(':').map(Number);
-            const [closeH, closeM] = hours.close.split(':').map(Number);
-            const openTime = openH * 60 + openM;
-            const closeTime = closeH * 60 + closeM;
-            const shouldBeOnline = currentTimeMinutes >= openTime && currentTimeMinutes < closeTime;
-            const newStatus = shouldBeOnline;
-            if (store.status !== newStatus) {
-                await doc.ref.update({ status: newStatus });
-                console.log(`商店 ${doc.id} 狀態更新為: ${newStatus ? '營業中' : '休息中'}`);
-            }
-        }
-    }
-});
 // ============================================================
-// 🌐 2. 新增：接收藍新付款成功通知的 HTTP 網址 (Webhook)
+// 🌐 新增：接收藍新付款成功通知的 HTTP 網址 (Webhook)
 // ============================================================
 // 💡 藍新解密專用函式
 function decryptTradeInfo(tradeInfo, hashKey, hashIV) {
@@ -213,11 +177,13 @@ exports.newebpayRefund = onCall({
             console.log("準備呼叫藍新信用卡退款...");
             console.log("MerchantID:", MerchantID);
             console.log("PostData 長度:", aesString.length);
-            const res = await axios.post(`${NEWEBPAY_BASE_URL}/API/CreditCard/Close`,
+            const res = await axios.post(`${NEWEBPAY_BASE_URL}/API/CreditCard/CloseAction`,
                 `MerchantID_=${MerchantID}&PostData_=${aesString}`,
                 {
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        // 關鍵修改：偽裝成一般瀏覽器
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
                     }
                 }
             );
@@ -273,5 +239,42 @@ exports.newebpayRefund = onCall({
         }
 
         throw new HttpsError('internal', error.message || '退款處理失敗');
+    }
+});
+
+exports.autoUpdateStoreStatus = onSchedule({
+    schedule: "every 10 minutes",
+    region: REGION
+}, async (event) => {
+    const db = admin.firestore();
+    const storesSnapshot = await db.collection('stores').get();
+    // 取得台灣時間 (UTC+8)
+    const now = new Date();
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const taipeiTime = new Date(utc + (3600000 * 8));
+    const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    const currentDay = dayNames[taipeiTime.getDay()];
+    const currentTimeMinutes = taipeiTime.getHours() * 60 + taipeiTime.getMinutes();
+    console.log(`執行時間: ${taipeiTime.toLocaleString()}, 星期: ${currentDay}, 分鐘: ${currentTimeMinutes}`);
+    for (const doc of storesSnapshot.docs) {
+        const store = doc.data();
+        // 如果 isAutoMode 明確設定為 false，機器人直接跳過這間店
+        if (store.isAutoMode === false) {
+            console.log(`商店 ${doc.id} 為手動模式，跳過自動更新。`);
+            continue;
+        }
+        const hours = store.businessHours ? store.businessHours[currentDay] : null;
+        if (hours && hours.isOpen) {
+            const [openH, openM] = hours.open.split(':').map(Number);
+            const [closeH, closeM] = hours.close.split(':').map(Number);
+            const openTime = openH * 60 + openM;
+            const closeTime = closeH * 60 + closeM;
+            const shouldBeOnline = currentTimeMinutes >= openTime && currentTimeMinutes < closeTime;
+            const newStatus = shouldBeOnline;
+            if (store.status !== newStatus) {
+                await doc.ref.update({ status: newStatus });
+                console.log(`商店 ${doc.id} 狀態更新為: ${newStatus ? '營業中' : '休息中'}`);
+            }
+        }
     }
 });

@@ -780,6 +780,9 @@
     <script type="module" src="app.js"></script>
     <script type="module">
         import { authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from './app.js';
+        import { getFunctions, httpsCallable } from "firebase/functions";
+        const functions = getFunctions(app, 'asia-east1');   // 注意地區
+        const newebpayRefund = httpsCallable(functions, 'newebpayRefund');
         let allStores = [];
         let buyerLat = null;
         let buyerLng = null;
@@ -1312,6 +1315,72 @@
                 btn.innerHTML = '❌<br>取消訂單';
                 btn.onclick = () => handleCancelOrder(order); // 呼叫你的取消函式
                 container.appendChild(btn);
+            }
+        }
+        // ====================== 退款處理函式 ======================
+        async function handleRefund(order) {
+            if (!order || !order.id) {
+                Swal.fire('錯誤', '訂單資料異常', 'error');
+                return;
+            }
+
+            // 防呆：確認是已付款的信用卡訂單
+            if (order.paymentStatus !== 'PAID' || order.paymentMethod !== 'CREDIT') {
+                Swal.fire('無法退款', '此訂單無法執行退款', 'warning');
+                return;
+            }
+
+            const confirmResult = await Swal.fire({
+                title: '⚠️ 確認執行退款？',
+                html: `確定要對訂單 <strong>#${order.pickupNo || order.orderId}</strong><br>退款 NT$${order.totalAmount} 嗎？<br><br><small>此動作無法復原</small>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '是的，執行退款',
+                cancelButtonText: '取消',
+                confirmButtonColor: '#d33'
+            });
+
+            if (!confirmResult.isConfirmed) return;
+
+            try {
+                Swal.fire({
+                    title: '退款處理中...',
+                    text: '正在連接藍新金流',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                // 呼叫後端的退款 Cloud Function
+                const result = await newebpayRefund({
+                    orderId: order.id,           // 注意：要傳 order.id 而不是 order.orderId
+                    refundAmount: order.totalAmount,   // 全額退款
+                    reason: '商家取消訂單'
+                });
+
+                Swal.fire({
+                    title: '✅ 退款成功',
+                    text: result.data.message || '退款已提交至藍新金流',
+                    icon: 'success',
+                    timer: 2500
+                });
+
+                // 重新載入訂單列表
+                if (typeof loadOrders === 'function') {
+                    loadOrders();
+                }
+
+            } catch (error) {
+                console.error('退款失敗:', error);
+
+                let errorMsg = '退款失敗，請稍後再試';
+
+                if (error.code === 'permission-denied') {
+                    errorMsg = '您沒有權限執行此退款';
+                } else if (error.message) {
+                    errorMsg = error.message;
+                }
+
+                Swal.fire('退款失敗', errorMsg, 'error');
             }
         }
         document.addEventListener('DOMContentLoaded', () => {

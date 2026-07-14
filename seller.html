@@ -1185,7 +1185,7 @@
                 const order = orders[currentIndex];
                 if (!order) return;
                 // 1. 計算切換後的目標狀態
-                const isCurrentlyUnpaid = order.Status === 'PREPARING';
+                const isCurrentlyUnpaid = order.status === 'PREPARING';
                 const newStatus = isCurrentlyUnpaid ? 'COMPLETED' : 'PREPARING';
                 const newStatusAt = isCurrentlyUnpaid ? serverTimestamp() : null;
                 // 2. 防呆確認 (這很重要，避免誤觸)
@@ -1197,8 +1197,8 @@
                 try {
                     const orderRef = doc(db, "orders", order.id);
                     await updateDoc(orderRef, {
-                        Status: newStatus,
-                        StatusAt: newStatusAt
+                        status: newStatus,
+                        statusAt: newStatusAt
                     });
                     // 成功後不需要額外寫 render，因為 onSnapshot 會自動偵測變更並重繪畫面
                     console.log("製作狀態已切換為:", newStatus);

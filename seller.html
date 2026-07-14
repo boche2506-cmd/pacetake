@@ -248,10 +248,7 @@
             border-radius: 5cqw;
             line-height: 1.2;
             border-top: 0.2cqw dashed var(--border-color);
-            color: var(--brand-green);
             box-shadow: var(--shadow-sm);
-            background-color: rgba(16, 185, 129, 0.1);
-            border: 0.2cqw solid var(--brand-green);
             transition: transform 0.2s;
         }
 
@@ -260,10 +257,22 @@
             /* 按下去變小一點，模擬點擊感 */
         }
 
+        .statusOrderTotal.completed {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 0.2cqw solid var(--brand-green);
+            color: var(--brand-green);
+        }
+
         .statusOrderTotal.preparing {
             background-color: rgba(239, 68, 68, 0.1);
             border: 0.2cqw solid var(--brand-red);
             color: var(--brand-red);
+        }
+
+        .statusOrderTotal.cancelled {
+            background-color: rgba(239, 230, 68, 0.1);
+            border: 0.2cqw solid var(--brand-yellow);
+            color: var(--brand-yellow);
         }
 
         .kitchenOrder {
@@ -644,7 +653,7 @@
                         <div class="lighttime">接單時間<br>：<br><span id="light_time">讀取中...</span>
                         </div>
                     </div>
-                    <div class="light-indicator-card">
+                    <div class="light-indicator-card" id="action-container">
                         <button class="btn" data-action="cancelReason">❌<br>取消訂單</button>
                     </div>
                     <div class="light-indicator-card">
@@ -990,8 +999,22 @@
             document.getElementById('remark').innerText = order.remark || '無備註';
             const statusContainer = document.getElementById('statusContainer');
             const statusTotalEl = document.getElementById('statusTotal');
-            statusContainer.classList.toggle('preparing', order.status === 'PREPARING');
-            statusTotalEl.innerText = (order.status === 'PREPARING') ? '#餐點製作完成請點選此處以通知顧客' : '已完成';
+            statusContainer.classList.remove('preparing', 'cancelled', 'completed');
+            if (order.status === 'CANCELLED') {
+                statusContainer.classList.add('cancelled');
+                statusTotalEl.innerText = '❌ 訂單已取消';
+            } else if (order.status === 'PREPARING') {
+                statusContainer.classList.add('preparing');
+                statusTotalEl.innerText = '#餐點製作完成請點選此處以通知顧客';
+            } else if (order.status === 'COMPLETED') {
+                statusContainer.classList.add('completed');
+                statusTotalEl.innerText = '✅ 訂單已完成';
+
+            } else {
+                // 預設狀態（例如 NEW / PENDING）
+                statusTotalEl.innerText = '新訂單待處理';
+            }
+            renderActionButton(order);
         }
         const gestureTouchBoard = document.getElementById('gestureTouchBoard');
         let touchStartX = 0;
@@ -1079,7 +1102,6 @@
                 // 改用原生 .muted 屬性同步狀態。如果是靜音，它會在背景「無聲循環播放」
                 // 這樣好處是：當使用者拉動音量桿解除靜音時，聲音能一瞬間從背景冒出來，體驗極佳！
                 this.bell.muted = this.isMuted;
-
                 this.bell.currentTime = 0;
                 this.bell.play().catch(e => console.warn("自動播放被瀏覽器阻擋", e));
             },
@@ -1091,7 +1113,6 @@
             toggleMute() {
                 this.isMuted = !this.isMuted;
                 localStorage.setItem("isMuted", this.isMuted);
-
                 // 🌟 關鍵修改：讓當下「正在播放」的音效，立刻同步最新的靜音狀態！
                 // 點擊靜音的瞬間，聲音會立刻消失；再次點擊，聲音會立刻原地恢復
                 if (this.bell) {
@@ -1110,19 +1131,16 @@
             const volumeBtn = e.target.closest('[data-action="volumemenu"]');
             const isInsideVolumeBox = e.target.closest('#volumectrlbox');
             const volumeBox = document.getElementById('volumectrlbox');
-
             // 🔥 【優化功能】：只要聲音正在播，且點擊的地方「不是」音量控制盒、也「不是」音量按鈕，才立刻停止！
             if (AudioController.bell && !AudioController.bell.paused && !isInsideVolumeBox && !volumeBtn) {
                 AudioController.stop();
                 // 這裡不加上 return，讓使用者點擊畫面的原本動作可以繼續執行
             }
-
             // 處理靜音按鈕 (獨立出來，避免跟下面打架)
             if (e.target.closest('#muteBtn')) {
                 AudioController.toggleMute();
                 return;
             }
-
             // 處理「點擊音量按鈕」開關邏輯
             if (volumeBtn) {
                 if (!volumeBox) return;
@@ -1136,7 +1154,6 @@
                 }
                 return; // 🛑 點了按鈕就結束判斷，不要往下跑
             }
-
             // 處理「點擊選單外部」自動關閉（修正尾端未完結的程式碼）
             if (!isInsideVolumeBox && volumeBox && window.getComputedStyle(volumeBox).display !== "none") {
                 volumeBox.style.display = "none";
@@ -1202,7 +1219,6 @@
                     });
                     // 成功後不需要額外寫 render，因為 onSnapshot 會自動偵測變更並重繪畫面
                     console.log("製作狀態已切換為:", newStatus);
-
                 } catch (error) {
                     console.error("更新狀態失敗:", error);
                     alert("操作失敗，請檢查網路連線。");
@@ -1217,14 +1233,18 @@
             // 每次打開前先清空輸入框
             reasonInput.value = '';
             // 🌟 核心邏輯：判斷是否為線上付款，決定要不要顯示警告
-            if (orders.paymentMethod === 'CREDIT' || orders.paymentStatus === 'PAID') {
+            const isNewebpayPaid = order.confirmedBy === 'newebpay' ||
+                (order.paymentMethod === 'CREDIT' && order.paymentStatus === 'PAID');
+            if (isNewebpayPaid) {
+                warningMsg.innerHTML = `⚠️ 此訂單已由<strong>藍新金流</strong>確認付款<br>取消後必須處理退款，請務必填寫完整取消原因！`;
+                warningMsg.style.display = 'block';
+            } else if (order.paymentStatus === 'PAID') {
+                warningMsg.innerHTML = `⚠️ 此訂單為已付款狀態，取消後可能需要手動退款。`;
                 warningMsg.style.display = 'block';
             } else {
                 warningMsg.style.display = 'none';
             }
-            // 顯示燈箱
             modal.style.display = 'flex';
-            console.log("傳入的訂單物件是:", currentOrderToCancel);
         }
         // 2. 綁定燈箱內的「返回/放棄」按鈕
         document.getElementById('btnCancelModal').addEventListener('click', () => {
@@ -1237,39 +1257,63 @@
             const reason = document.getElementById('cancelReasonInput').value.trim();
             // 防呆機制：沒有寫原因不給過
             if (!reason) {
-                alert('請務必填寫取消原因，以便後續查帳與管理！');
+                alert('請務必填寫取消原因！');
                 document.getElementById('cancelReasonInput').focus();
                 return;
             }
             const confirmBtn = document.getElementById('btnConfirmCancel');
+            confirmBtn.disabled = true;
+            confirmBtn.innerText = '處理中...';
             try {
-                // 鎖定按鈕，防止店家連點
-                confirmBtn.innerText = '處理中...';
-                confirmBtn.disabled = true;
-                // 🔥 執行 Firestore 更新
-                // (假設 currentOrderToCancel.id 是該筆訂單在 Firestore 的 Document ID)
                 const orderRef = doc(db, "orders", currentOrderToCancel.id);
-                await updateDoc(orderRef, {
+
+                const updateData = {
                     status: "CANCELLED",
                     cancelReason: reason,
-                    cancelledAt: serverTimestamp() // 記錄取消時間
-                });
-                // 成功後的收尾動作
+                    cancelledAt: serverTimestamp(),
+                    cancelledBy: "manual"
+                };
+                // 如果是已付款訂單，標記退款狀態
+                if (currentOrderToCancel.paymentStatus === 'PAID') {
+                    updateData.refundStatus = 'PENDING';
+                    updateData.refundAmount = currentOrderToCancel.totalAmount || 0;
+                    updateData.newebpayRefundNeeded = currentOrderToCancel.confirmedBy === 'newebpay';
+                }
+                await updateDoc(orderRef, updateData);
                 alert("訂單已成功取消！");
                 document.getElementById('cancelOrderModal').style.display = 'none';
                 currentOrderToCancel = null;
-                // 🌟🌟🌟 這裡超級重要：記得重新渲染畫面！
-                // 可能是呼叫你原本寫的 fetchOrders() 或是 renderTabs() 之類的，
-                // 把這筆被取消的訂單從畫面上移走。
             } catch (error) {
                 console.error("取消訂單失敗:", error);
-                alert("系統發生錯誤，取消失敗。請檢查網路或稍後再試。");
+                alert("取消失敗，請稍後再試。");
             } finally {
-                // 無論成功失敗，按鈕狀態恢復原狀
-                confirmBtn.innerText = '確認取消訂單';
                 confirmBtn.disabled = false;
+                confirmBtn.innerText = '確認取消訂單';
             }
         });
+        function renderActionButton(order) {
+            const container = document.getElementById('action-container');
+            // 1. 先清空原本的內容
+            container.innerHTML = '';
+            // 2. 判斷邏輯
+            // 如果是「已取消」且「使用信用卡支付」且「狀態為已付款」 -> 顯示退款按鈕
+            if (order.status === 'CANCELLED' && order.paymentMethod === 'CREDIT' && order.paymentStatus === 'PAID') {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.style.backgroundColor = '#4CAF50'; // 建議換個綠色區分
+                btn.innerHTML = '💰<br>執行退款';
+                btn.onclick = () => handleRefund(order); // 呼叫你的退款 API 函式
+                container.appendChild(btn);
+            }
+            // 如果還沒取消且還沒退款 -> 顯示取消按鈕
+            else if (order.status !== 'CANCELLED' && order.status !== 'REFUNDED') {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.innerHTML = '❌<br>取消訂單';
+                btn.onclick = () => handleCancelOrder(order); // 呼叫你的取消函式
+                container.appendChild(btn);
+            }
+        }
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
             // 頁面載入時先執行一次

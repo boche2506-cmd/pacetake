@@ -934,9 +934,8 @@
                         `SAMPAY=1`,
                         `VACC=1`,
                         `CVS=1`,
-                        // 修改這一段
                         `ClientBackURL=https://www.pacetake.tw/orders.html`,
-                        `NotifyURL=https://newebpaynotify-zyqaicumra-uc.a.run.app`
+                        `NotifyURL=https://asia-east1-pacetake-c6e1e.cloudfunctions.net/newebpayNotify`
                     ].join('&');
                     try {
                         await addDoc(collection(db, "orders"), {

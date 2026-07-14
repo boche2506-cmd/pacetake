@@ -157,9 +157,6 @@ exports.newebpayNotify = onRequest({ cors: true }, async (req, res) => {
             status: "PREPARING",
             paidAt: admin.firestore.FieldValue.serverTimestamp(),
             confirmedBy: "newebpay",           // 新增：標記是由金流確認
-            newebpayTradeNo: Result.TradeNo,
-            paymentType: Result.PaymentType,
-            amount: Result.Amt
         });
 
         console.log(`✅ 訂單 ${orderId} 已更新為已付款！`);

@@ -234,6 +234,9 @@ exports.newebpayRefund = onCall({
             );
             result = res.data;
         }
+        console.log('藍新退款完整回應:', JSON.stringify(result, null, 2));
+        console.log('藍新回傳 Status:', result.Status);
+        console.log('藍新回傳 Message:', result.Message);
         if (result.Status === 'SUCCESS' || result.Status === '1000') {
             await orderDoc.ref.update({
                 refundStatus: "REFUNDED",

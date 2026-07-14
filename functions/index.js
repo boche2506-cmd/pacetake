@@ -123,21 +123,15 @@ exports.newebpayNotify = onRequest({ cors: true }, async (req, res) => {
         // 3. 解密 TradeInfo
         const decryptedData = decryptTradeInfo(TradeInfo, HashKey, HashIV);
 
-        const { Status, Message, Result } = decryptedData;
-
-        console.log(`🔐 解密成功 - Status: ${Status}, Order: ${Result?.MerchantOrderNo}`);
+        const { Status, Result } = decryptedData;
 
         if (Status !== 'SUCCESS') {
-            console.error(`❌ 付款未成功: ${Message || 'Unknown error'}`);
-            return res.status(200).send('FAIL'); // 藍新要求回傳 200
+            return res.status(200).send('FAIL');
         }
 
         // 4. 更新訂單狀態
         const orderId = Result.MerchantOrderNo;
-        if (!orderId) {
-            console.error('❌ 解密後缺少 MerchantOrderNo');
-            return res.status(400).send('Missing Order ID');
-        }
+        if (!orderId) return res.status(400).send('Missing Order ID');
 
         const orderQuery = await db.collection('orders')
             .where('orderId', '==', orderId)
@@ -145,27 +139,34 @@ exports.newebpayNotify = onRequest({ cors: true }, async (req, res) => {
             .get();
 
         if (orderQuery.empty) {
-            console.error(`❌ 找不到對應訂單: ${orderId}`);
+            console.error(`❌ 找不到訂單: ${orderId}`);
             return res.status(404).send('Order Not Found');
         }
 
-        await orderQuery.docs[0].ref.update({
+        const orderDoc = orderQuery.docs[0];
+        const order = orderDoc.data();
+
+        // 🌟 重點保護：如果已經是 PAID，就不要再重複更新
+        if (order.paymentStatus === 'PAID') {
+            console.log(`📌 訂單 ${orderId} 已經是 PAID 狀態，跳過更新`);
+            return res.status(200).send('SUCCESS');
+        }
+
+        await orderDoc.ref.update({
             paymentStatus: "PAID",
             status: "PREPARING",
             paidAt: admin.firestore.FieldValue.serverTimestamp(),
-            // 可選：記錄更多藍新資訊
+            confirmedBy: "newebpay",           // 新增：標記是由金流確認
             newebpayTradeNo: Result.TradeNo,
             paymentType: Result.PaymentType,
             amount: Result.Amt
         });
 
         console.log(`✅ 訂單 ${orderId} 已更新為已付款！`);
-        return res.status(200).send('SUCCESS'); // 必須回傳 SUCCESS 給藍新
+        return res.status(200).send('SUCCESS');
 
     } catch (error) {
         console.error("🚨 藍新 Webhook 錯誤:", error);
-
-        // 建議在正式環境不要把詳細錯誤回傳給藍新
         return res.status(200).send('FAIL');
     }
 });

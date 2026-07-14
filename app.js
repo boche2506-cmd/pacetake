@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
+import { getFunctions, httpsCallable } from "firebase/functions";
 const firebaseConfig = {
     apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
     authDomain: "pacetake-c6e1e.firebaseapp.com",
@@ -18,7 +18,8 @@ export const auth = getAuth(app);
 export const db = initializeFirestore(app, {
     localCache: persistentLocalCache()
 });
-export const functions = getFunctions(app, 'asia-east1');
+export const functions = getFunctions();
+export const newebpayRefund = httpsCallable(functions, 'newebpayRefund');
 export const provider = new GoogleAuthProvider();
 export const currentStoreInfo = {
     id: null,

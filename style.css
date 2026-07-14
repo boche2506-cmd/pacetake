@@ -8,6 +8,7 @@
     --brand-blue: #0062FF;
     --brand-green: #10B981;
     --brand-red: #EF4444;
+    --brand-yellow: #efe444;
     /* 微弱陰影：用於小型卡片，看起來比較輕盈 */
     --shadow-sm: 0 0.5cqw 2cqw rgba(0, 0, 0, 0.08);
     /* 標準陰影：用於你的 .phone-wrapper，更有穩定感 */
@@ -28,6 +29,7 @@
     --brand-blue: #2F80ED;
     --brand-green: #34D399;
     --brand-red: #F87171;
+    --brand-yellow: #f8f871;
     /* 微弱陰影：用於小型卡片，看起來比較輕盈 */
     --shadow-sm: 0 0.5cqw 2cqw rgba(0, 0, 0, 0.08);
     /* 標準陰影：用於你的 .phone-wrapper，更有穩定感 */

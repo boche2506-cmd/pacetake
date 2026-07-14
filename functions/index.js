@@ -210,9 +210,16 @@ exports.newebpayRefund = onCall({
                 CloseType: 2,
             };
             const aesString = encryptAES(JSON.stringify(postData), HashKey, HashIV);
+            console.log("準備呼叫藍新信用卡退款...");
+            console.log("MerchantID:", MerchantID);
+            console.log("PostData 長度:", aesString.length);
             const res = await axios.post(`${NEWEBPAY_BASE_URL}/API/CreditCard/Close`,
                 `MerchantID_=${MerchantID}&PostData_=${aesString}`,
-                { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }
             );
             result = res.data;
         } else {
@@ -234,9 +241,7 @@ exports.newebpayRefund = onCall({
             );
             result = res.data;
         }
-        console.log('藍新退款完整回應:', JSON.stringify(result, null, 2));
-        console.log('藍新回傳 Status:', result.Status);
-        console.log('藍新回傳 Message:', result.Message);
+
         if (result.Status === 'SUCCESS' || result.Status === '1000') {
             await orderDoc.ref.update({
                 refundStatus: "REFUNDED",
@@ -249,10 +254,23 @@ exports.newebpayRefund = onCall({
             });
             return { success: true, message: "退款申請成功" };
         } else {
+            console.log('藍新退款完整回應:', JSON.stringify(result, null, 2));
+            console.log('藍新回傳 Status:', result.Status);
+            console.log('藍新回傳 Message:', result.Message);
             throw new HttpsError('aborted', result.Message || '退款失敗');
         }
     } catch (error) {
-        console.error('退款錯誤:', error);
+        console.error('退款錯誤詳細資訊:');
+        if (error.response) {
+            console.error('Status:', error.response.status);
+            console.error('藍新回應資料:', error.response.data);
+            console.error('藍新回應標頭:', error.response.headers);
+        } else if (error.request) {
+            console.error('沒有收到藍新回應:', error.request);
+        } else {
+            console.error('錯誤訊息:', error.message);
+        }
+
         throw new HttpsError('internal', error.message || '退款處理失敗');
     }
 });

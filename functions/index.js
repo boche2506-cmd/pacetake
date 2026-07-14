@@ -51,70 +51,121 @@ exports.autoUpdateStoreStatus = onSchedule("every 10 minutes", async (event) => 
 // ============================================================
 // 💡 藍新解密專用函式
 function decryptTradeInfo(tradeInfo, hashKey, hashIV) {
-    const decipher = crypto.createDecipheriv('aes-256-cbc', hashKey, hashIV);
-    decipher.setAutoPadding(true);
-    let decrypted = decipher.update(tradeInfo, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
+    try {
+        const encrypted = Buffer.from(tradeInfo, 'hex');
 
-    // 移除藍新填充的特殊字元並轉為物件
-    const result = JSON.parse(decrypted.replace(/[\x00-\x1F\x7F]/g, ''));
-    return result;
+        const decipher = crypto.createDecipheriv('aes-256-cbc', hashKey, hashIV);
+        decipher.setAutoPadding(false);   // 自己處理 padding 較穩定
+
+        let decrypted = decipher.update(encrypted);
+        decrypted = Buffer.concat([decrypted, decipher.final()]);
+
+        // 移除 PKCS7 padding
+        const paddingLength = decrypted[decrypted.length - 1];
+        decrypted = decrypted.slice(0, decrypted.length - paddingLength);
+
+        const decryptedStr = decrypted.toString('utf8').trim();
+
+        return JSON.parse(decryptedStr);
+    } catch (err) {
+        console.error('❌ 解密過程失敗:', err.message);
+        throw new Error(`解密失敗: ${err.message}`);
+    }
 }
 
 exports.newebpayNotify = onRequest({ cors: true }, async (req, res) => {
     const db = admin.firestore();
 
     try {
-        if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+        if (req.method !== 'POST') {
+            return res.status(405).send('Method Not Allowed');
+        }
 
-        const { MerchantID, TradeInfo } = req.body;
-        if (!TradeInfo) return res.status(400).send('Missing TradeInfo');
+        const { MerchantID, TradeInfo, TradeSha } = req.body;
 
-        // 1. 從 Firestore 撈出該店家的 HashKey 和 HashIV
+        if (!MerchantID || !TradeInfo || !TradeSha) {
+            console.error('❌ 缺少必要參數:', { MerchantID, hasTradeInfo: !!TradeInfo, hasTradeSha: !!TradeSha });
+            return res.status(400).send('Missing required parameters');
+        }
+
+        // 1. 從 Firestore 取得商店設定
         const storesQuery = await db.collection('stores')
-            .where('MerchantID', '==', MerchantID) // 用欄位比對
+            .where('MerchantID', '==', MerchantID)
             .limit(1)
             .get();
 
         if (storesQuery.empty) {
-            console.error(`❌ 找不到該 MerchantID 的店家設定: ${MerchantID}`);
+            console.error(`❌ 找不到 MerchantID: ${MerchantID}`);
             return res.status(404).send('Merchant Not Found');
         }
-        const storeData = storesQuery.docs[0].data();
+
+        const storeDoc = storesQuery.docs[0];
+        const storeData = storeDoc.data();
         const { HashKey, HashIV } = storeData;
 
-        // 2. 使用 AES-256-CBC 解密
-        const decryptedData = decryptTradeInfo(TradeInfo, HashKey, HashIV);
-        const { Status, Result } = decryptedData;
-
-        // 3. 檢查解密後的 Status 是否為 "SUCCESS"
-        if (Status !== 'SUCCESS') {
-            console.error(`❌ 付款失敗: ${Result.Message}`);
-            return res.status(200).send('FAIL'); // 回傳給藍新
+        if (!HashKey || !HashIV) {
+            console.error(`❌ 商店 ${MerchantID} 未設定 HashKey 或 HashIV`);
+            return res.status(500).send('Merchant configuration error');
         }
 
-        // 4. 抓出解密後的 MerchantOrderNo
-        const orderId = Result.MerchantOrderNo;
-        console.log(`🎯 收到有效付款通知，單號: ${orderId}`);
+        // 2. 驗證 TradeSha（防止偽造請求）
+        const expectedSha = crypto
+            .createHash('sha256')
+            .update(`HashKey=${HashKey}&${TradeInfo}&HashIV=${HashIV}`)
+            .digest('hex')
+            .toUpperCase();
 
-        // 5. 去 Firestore 搜尋並更新訂單
-        const orderQuery = await db.collection('orders').where('orderId', '==', orderId).limit(1).get();
+        if (expectedSha !== TradeSha) {
+            console.error('❌ TradeSha 驗證失敗！可能有安全風險');
+            return res.status(403).send('Invalid TradeSha');
+        }
+
+        // 3. 解密 TradeInfo
+        const decryptedData = decryptTradeInfo(TradeInfo, HashKey, HashIV);
+
+        const { Status, Message, Result } = decryptedData;
+
+        console.log(`🔐 解密成功 - Status: ${Status}, Order: ${Result?.MerchantOrderNo}`);
+
+        if (Status !== 'SUCCESS') {
+            console.error(`❌ 付款未成功: ${Message || 'Unknown error'}`);
+            return res.status(200).send('FAIL'); // 藍新要求回傳 200
+        }
+
+        // 4. 更新訂單狀態
+        const orderId = Result.MerchantOrderNo;
+        if (!orderId) {
+            console.error('❌ 解密後缺少 MerchantOrderNo');
+            return res.status(400).send('Missing Order ID');
+        }
+
+        const orderQuery = await db.collection('orders')
+            .where('orderId', '==', orderId)
+            .limit(1)
+            .get();
+
         if (orderQuery.empty) {
-            console.error(`❌ 找不到訂單: ${orderId}`);
+            console.error(`❌ 找不到對應訂單: ${orderId}`);
             return res.status(404).send('Order Not Found');
         }
 
         await orderQuery.docs[0].ref.update({
             paymentStatus: "PAID",
             status: "PREPARING",
-            paidAt: admin.firestore.FieldValue.serverTimestamp()
+            paidAt: admin.firestore.FieldValue.serverTimestamp(),
+            // 可選：記錄更多藍新資訊
+            newebpayTradeNo: Result.TradeNo,
+            paymentType: Result.PaymentType,
+            amount: Result.Amt
         });
 
-        console.log(`✅ 訂單 ${orderId} 狀態已成功更新！`);
-        return res.status(200).send('SUCCESS'); // 🚨 必須回傳 SUCCESS 給藍新
+        console.log(`✅ 訂單 ${orderId} 已更新為已付款！`);
+        return res.status(200).send('SUCCESS'); // 必須回傳 SUCCESS 給藍新
 
     } catch (error) {
         console.error("🚨 藍新 Webhook 錯誤:", error);
-        return res.status(500).send('Internal Server Error');
+
+        // 建議在正式環境不要把詳細錯誤回傳給藍新
+        return res.status(200).send('FAIL');
     }
 });

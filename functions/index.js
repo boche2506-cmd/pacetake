@@ -177,7 +177,7 @@ exports.newebpayRefund = onCall({
             console.log("MerchantID:", MerchantID);
             console.log("PostData 長度:", aesString.length);
             const res = await axios.post('https://ccore.newebpay.com/API/CreditCard/CloseAction',
-                postDataString, `MerchantID_=${MerchantID}&PostData_=${aesString}`,
+                `MerchantID_=${MerchantID}&PostData_=${aesString}`,
                 {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -201,7 +201,7 @@ exports.newebpayRefund = onCall({
             };
             const aesString = encryptAES(JSON.stringify(postData), HashKey, HashIV);
             const res = await axios.post('https://ccore.newebpay.com/API/CreditCard/CloseAction',
-                postDataString, `MerchantID_=${MerchantID}&PostData_=${aesString}`,
+                `MerchantID_=${MerchantID}&PostData_=${aesString}`,
                 {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',

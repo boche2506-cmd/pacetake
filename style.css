@@ -364,7 +364,7 @@ img,
     cursor: pointer;
     box-sizing: border-box;
     position: relative;
-    z-index: 500;
+    z-index: 999;
     display: flex;
     justify-content: center;
     align-items: center;

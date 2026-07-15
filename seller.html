@@ -950,7 +950,7 @@
                 // 🌟 關鍵：比較的是 order.id (Firestore ID)
                 tab.className = `order-tab ${order.id === activeOrderId ? 'active' : ''}`;
                 // 顯示的是 order.orderId (你的業務單號)
-                tab.innerText = `#${order.orderId ? order.orderId.slice(-3) : '???'}`;
+                tab.innerText = `#${order.orderId ? order.orderId.slice(-5) : '???'}`;
                 tab.dataset.id = order.id; // 綁定 ID
                 container.appendChild(tab);
             });
@@ -1094,9 +1094,6 @@
             },
             play() {
                 if (!this.bell) return;
-                // 🌟 關鍵修改：不再用 return 擋住播放！
-                // 改用原生 .muted 屬性同步狀態。如果是靜音，它會在背景「無聲循環播放」
-                // 這樣好處是：當使用者拉動音量桿解除靜音時，聲音能一瞬間從背景冒出來，體驗極佳！
                 this.bell.muted = this.isMuted;
                 this.bell.currentTime = 0;
                 this.bell.play().catch(e => console.warn("自動播放被瀏覽器阻擋", e));
@@ -1109,8 +1106,6 @@
             toggleMute() {
                 this.isMuted = !this.isMuted;
                 localStorage.setItem("isMuted", this.isMuted);
-                // 🌟 關鍵修改：讓當下「正在播放」的音效，立刻同步最新的靜音狀態！
-                // 點擊靜音的瞬間，聲音會立刻消失；再次點擊，聲音會立刻原地恢復
                 if (this.bell) {
                     this.bell.muted = this.isMuted;
                 }
@@ -1300,7 +1295,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'btn';
                 btn.style.backgroundColor = '#4CAF50'; // 建議換個綠色區分
-                link.innerHTML = '💰<br>前往藍新後台退款';
+                link.innerHTML = '💰<br>前往退款';
                 container.appendChild(link);
             }
             // 如果還沒取消且還沒退款 -> 顯示取消按鈕

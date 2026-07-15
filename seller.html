@@ -871,14 +871,9 @@
                 orderBy("createdAt", "desc") // 最新訂單在前
             );
             onSnapshot(q, (snapshot) => {
-                // 1. 先判斷這次更新有沒有「真正的新進訂單」(用來決定要不要播音效)
                 let hasNewOrder = false;
                 snapshot.docChanges().forEach((change) => {
                     const data = change.doc.data();
-                    // 🌟 核心修正：用你的雙軌欄位做精準定義！
-                    // 滿足以下任一條件才是店家要處理的「有效訂單」：
-                    // 條件 A：它是現場付現單 (CASH)
-                    // 條件 B：它是線上刷卡單 (CREDIT) 且 狀態已經不是「等待付款(UNPAID)」了
                     const isValidOrder = (data.paymentMethod === "CASH") ||
                         (data.paymentMethod === "CREDIT" && data.paymentStatus !== "UNPAID");
                     if (isValidOrder && !isInitialLoad) {

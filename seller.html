@@ -373,7 +373,8 @@
             color: var(--brand-red);
         }
 
-        .btn {
+        .btn,
+        .light-indicator-card a {
             height: 13cqw;
             width: 22cqw;
             display: flex;
@@ -391,7 +392,8 @@
             /* 按下去會有一點點回饋感 */
         }
 
-        .btn:active {
+        .btn:active,
+        .light-indicator-card a:active {
             transform: scale(0.95);
             /* 按下去變小一點，模擬點擊感 */
         }
@@ -780,8 +782,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="module" src="app.js"></script>
     <script type="module">
-        import { authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit,functions, httpsCallable } from './app.js';
-        const newebpayRefund = httpsCallable(functions, 'newebpayRefund');
+        import { getCartData, modifyCartItemQty, areaData, authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit, } from './app.js';
         let allStores = [];
         let buyerLat = null;
         let buyerLng = null;
@@ -896,7 +897,6 @@
                     // 🌟 核心修正：撈取列表時，同步過濾掉還沒付錢的線上刷卡單
                     const isValidOrder = (data.paymentMethod === "CASH") ||
                         (data.paymentMethod === "CREDIT" && data.paymentStatus !== "UNPAID");
-
                     if (isValidOrder) {
                         orders.push({ id: doc.id, ...data });
                     }
@@ -1011,7 +1011,6 @@
             } else if (order.status === 'COMPLETED') {
                 statusContainer.classList.add('completed');
                 statusTotalEl.innerText = '✅ 訂單已完成';
-
             } else {
                 // 預設狀態（例如 NEW / PENDING）
                 statusTotalEl.innerText = '新訂單待處理';
@@ -1300,12 +1299,14 @@
             // 2. 判斷邏輯
             // 如果是「已取消」且「使用信用卡支付」且「狀態為已付款」 -> 顯示退款按鈕
             if (order.status === 'CANCELLED' && order.paymentMethod === 'CREDIT' && order.paymentStatus === 'PAID') {
+                const link = document.createElement('a');
+                link.href = 'https://www.newebpay.com/sale/Sell_center/search_transaction';
+                link.target = '_blank'; // 設定為新視窗開啟
                 const btn = document.createElement('button');
                 btn.className = 'btn';
                 btn.style.backgroundColor = '#4CAF50'; // 建議換個綠色區分
-                btn.innerHTML = '💰<br>執行退款';
-                btn.onclick = () => handleRefund(order); // 呼叫你的退款 API 函式
-                container.appendChild(btn);
+                link.innerHTML = '💰<br>前往藍新後台退款';
+                container.appendChild(link);
             }
             // 如果還沒取消且還沒退款 -> 顯示取消按鈕
             else if (order.status !== 'CANCELLED' && order.status !== 'REFUNDED') {
@@ -1316,72 +1317,7 @@
                 container.appendChild(btn);
             }
         }
-        // ====================== 退款處理函式 ======================
-        async function handleRefund(order) {
-            if (!order || !order.id) {
-                Swal.fire('錯誤', '訂單資料異常', 'error');
-                return;
-            }
 
-            // 防呆：確認是已付款的信用卡訂單
-            if (order.paymentStatus !== 'PAID' || order.paymentMethod !== 'CREDIT') {
-                Swal.fire('無法退款', '此訂單無法執行退款', 'warning');
-                return;
-            }
-
-            const confirmResult = await Swal.fire({
-                title: '⚠️ 確認執行退款？',
-                html: `確定要對訂單 <strong>#${order.pickupNo || order.orderId}</strong><br>退款 NT$${order.totalAmount} 嗎？<br><br><small>此動作無法復原</small>`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: '是的，執行退款',
-                cancelButtonText: '取消',
-                confirmButtonColor: '#d33'
-            });
-
-            if (!confirmResult.isConfirmed) return;
-
-            try {
-                Swal.fire({
-                    title: '退款處理中...',
-                    text: '正在連接藍新金流',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                // 呼叫後端的退款 Cloud Function
-                const result = await newebpayRefund({
-                    orderId: order.id,           // 注意：要傳 order.id 而不是 order.orderId
-                    refundAmount: order.totalAmount,   // 全額退款
-                    reason: '商家取消訂單'
-                });
-
-                Swal.fire({
-                    title: '✅ 退款成功',
-                    text: result.data.message || '退款已提交至藍新金流',
-                    icon: 'success',
-                    timer: 2500
-                });
-
-                // 重新載入訂單列表
-                if (typeof loadOrders === 'function') {
-                    loadOrders();
-                }
-
-            } catch (error) {
-                console.error('退款失敗:', error);
-
-                let errorMsg = '退款失敗，請稍後再試';
-
-                if (error.code === 'permission-denied') {
-                    errorMsg = '您沒有權限執行此退款';
-                } else if (error.message) {
-                    errorMsg = error.message;
-                }
-
-                Swal.fire('退款失敗', errorMsg, 'error');
-            }
-        }
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
             // 頁面載入時先執行一次

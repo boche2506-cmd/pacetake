@@ -957,12 +957,20 @@
         }
         // 3. 渲染資料到畫面
         function renderOrderToWorkspace(order) {
-            // 更新左側燈號
+            // 更新左側燈號 - 付款狀態
             const payContainer = document.getElementById('payContainer');
             const paymentStatusEl = document.getElementById('paymentStatus');
             payContainer.classList.toggle('pending', order.paymentStatus === 'UNPAID');
-            paymentStatusEl.innerText = (order.paymentStatus === 'UNPAID') ? '未付款' : '已付款';
+            // 付款狀態顯示（加強藍新金流辨識）
+            if (order.confirmedBy === 'newebpay') {
+                paymentStatusEl.innerText = '已付款 (藍新金流)';
+                paymentStatusEl.style.color = '#15803d';
+            } else {
+                paymentStatusEl.innerText = (order.paymentStatus === 'UNPAID') ? '未付款' : '已付款';
+                paymentStatusEl.style.color = '';
+            }
             document.getElementById('light_pay').innerText = order.paymentMethod === 'CREDIT' ? '線上支付' : '現場付款';
+
             const displayType = (order.diningType === 'DINE_IN')
                 ? `內用桌號:\n(${order.table})`
                 : '外帶自取';
@@ -981,14 +989,15 @@
             }
             document.getElementById('light_time').innerText = timeString;
             // 更新右側主看板
-            document.getElementById('kitchenOrderTotal').innerText = `$${order.totalAmount}`;
+            document.getElementById('kitchenOrderTotal').innerText = `$${order.totalAmount || 0}`;
             // 渲染商品明細 (假設 order.items 是陣列)
             const billContainer = document.getElementById('kitchenBillContainer');
-            billContainer.innerHTML = order.items.map(item => `
+            billContainer.innerHTML = (order.items || []).map(item => `
                     <div class="bill-item">
                         <span>${item.name} x ${item.qty}</span>
                         <span>$${item.price * item.qty}</span>
-                    </div>  `).join('');
+                    </div>
+                `).join('');
             // 如果你的資料庫存的是 name 和 phone：
             // 更新聯絡人與電話 (如果沒有資料，就顯示 '未提供')
             document.getElementById('buyername').innerText = order.buyerName || '未提供';
@@ -996,7 +1005,9 @@
             document.getElementById('remark').innerText = order.remark || '無備註';
             const statusContainer = document.getElementById('statusContainer');
             const statusTotalEl = document.getElementById('statusTotal');
+            // 先清除所有狀態 class
             statusContainer.classList.remove('preparing', 'cancelled', 'completed');
+            // 根據 status 設定不同顯示
             if (order.status === 'CANCELLED') {
                 statusContainer.classList.add('cancelled');
                 statusTotalEl.innerText = '❌ 訂單已取消';
@@ -1007,7 +1018,7 @@
                 statusContainer.classList.add('completed');
                 statusTotalEl.innerText = '✅ 訂單已完成';
             } else {
-                // 預設狀態（例如 NEW / PENDING）
+                // 預設狀態（新訂單、待處理等）
                 statusTotalEl.innerText = '新訂單待處理';
             }
             renderActionButton(order);

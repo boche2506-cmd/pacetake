@@ -28,10 +28,7 @@ function decryptTradeInfo(tradeInfo, hashKey, hashIV) {
     }
 }
 
-exports.newebpayNotify = onRequest({
-    cors: true,
-    region: REGION
-}, async (req, res) => {
+exports.newebpayNotify = onRequest({ cors: true, region: REGION }, async (req, res) => {
     const db = admin.firestore();
     try {
         if (req.method !== 'POST') {
@@ -93,7 +90,7 @@ exports.newebpayNotify = onRequest({
             return res.status(200).send('SUCCESS');
         }
         if (order.status === 'CANCELLED') {
-            console.warn(`⚠️ 訂單 ${orderId} 狀態為 ${order.status}，拒絕更新為 PAID`);
+            console.log(`📌 訂單 ${orderId} 狀態為 ${order.status}，拒絕更新為 PAID`);
             // 這裡通常回傳 SUCCESS 即可，因為藍新已經收到錢，你不需要它重試
             return res.status(200).send('SUCCESS');
         }

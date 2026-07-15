@@ -126,6 +126,7 @@
             justify-content: space-around;
             align-items: center;
             transition: transform 0.2s;
+            white-space: pre-wrap;
         }
 
         .lightpay:active {
@@ -373,8 +374,7 @@
             color: var(--brand-red);
         }
 
-        .btn,
-        .light-indicator-card a {
+        .btn {
             height: 13cqw;
             width: 22cqw;
             display: flex;
@@ -392,8 +392,7 @@
             /* 按下去會有一點點回饋感 */
         }
 
-        .btn:active,
-        .light-indicator-card a:active {
+        .btn:active {
             transform: scale(0.95);
             /* 按下去變小一點，模擬點擊感 */
         }
@@ -656,7 +655,6 @@
                         </div>
                     </div>
                     <div class="light-indicator-card" id="action-container">
-                        <button class="btn" data-action="cancelReason">❌<br>取消訂單</button>
                     </div>
                     <div class="light-indicator-card">
                         <div class="time-display">目前時間<br>：<br><span id="clock">讀取中...</span>
@@ -960,14 +958,19 @@
             // 更新左側燈號 - 付款狀態
             const payContainer = document.getElementById('payContainer');
             const paymentStatusEl = document.getElementById('paymentStatus');
-            payContainer.classList.toggle('pending', order.paymentStatus === 'UNPAID');
-            // 付款狀態顯示（加強藍新金流辨識）
-            if (order.confirmedBy === 'newebpay') {
-                paymentStatusEl.innerText = '已付款 (藍新金流)';
-                paymentStatusEl.style.color = '#15803d';
+            payContainer.classList.remove('pending');
+            if (order.paymentStatus === 'UNPAID' && order.confirmedBy === 'newebpay') {
+                payContainer.classList.add('pending');
+                paymentStatusEl.innerText = '已退款\n(藍新金流)';
+                // 付款狀態顯示（加強藍新金流辨識）
+            } else if 
+                (order.paymentStatus === 'UNPAID') {
+                payContainer.classList.add('pending');
+                paymentStatusEl.innerText = '未付款';
+            } else if (order.confirmedBy === 'newebpay') {
+                paymentStatusEl.innerText = '已付款\n(藍新金流)';
             } else {
-                paymentStatusEl.innerText = (order.paymentStatus === 'UNPAID') ? '未付款' : '已付款';
-                paymentStatusEl.style.color = '';
+                paymentStatusEl.innerText = '已付款';
             }
             document.getElementById('light_pay').innerText = order.paymentMethod === 'CREDIT' ? '線上支付' : '現場付款';
 
@@ -1023,40 +1026,28 @@
             }
             renderActionButton(order);
         }
-        const gestureTouchBoard = document.getElementById('gestureTouchBoard');
-        let touchStartX = 0;
-        let touchEndX = 0;
-        gestureTouchBoard.addEventListener('touchstart', (e) => {
-            // 關鍵修正：必須加上 [0]
-            touchStartX = e.changedTouches[0].clientX;
-        }, { passive: true });
-        gestureTouchBoard.addEventListener('touchend', (e) => {
-            // 關鍵修正：必須加上 [0]
-            touchEndX = e.changedTouches[0].clientX;
-            handleSwipeGesture();
-        }, { passive: true });
-        function handleSwipeGesture() {
-            const diff = touchStartX - touchEndX;
-            // 增加一個靈敏度設定，避免太微小的誤觸
-            if (Math.abs(diff) < 50) return;
-            // 1. 先從 orders 陣列中，根據當前的 activeOrderId 找到它在陣列中的位置
-            const currentIndex = orders.findIndex(o => o.id === activeOrderId);
-            // 如果因為某些原因找不到 (例如 activeOrderId 是 null)，直接跳出
-            if (currentIndex === -1) return;
-            let newIndex;
-            if (diff > 0) {
-                // 左滑 (diff > 0) -> 試著去下一筆 (因為新單在前面，index 0 是最新的，所以「下一筆」其實是 index + 1)
-                newIndex = currentIndex + 1;
-            } else {
-                // 右滑 (diff < 0) -> 試著去上一筆 (index - 1)
-                newIndex = currentIndex - 1;
+        function renderActionButton(order) {
+            const container = document.getElementById('action-container');
+            // 1. 先清空原本的內容
+            container.innerHTML = '';
+            // 如果是「已取消」且「使用信用卡支付」且「狀態為已付款」 -> 顯示退款按鈕
+            if (order.status === 'CANCELLED' && order.paymentMethod === 'CREDIT' && order.paymentStatus === 'PAID') {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.setAttribute('data-action', 'Refund');
+                btn.innerHTML = '💰<br>前往退款';
+                btn.style.backgroundColor = 'rgba(239, 230, 68, 0.1)';
+                btn.style.color = 'var(--text-main)';
+                btn.style.border = '0.2cqw solid var(--brand-yellow)';
+                container.appendChild(btn);
             }
-            // 2. 防呆：檢查 newIndex 是否在合法的陣列範圍內
-            if (newIndex >= 0 && newIndex < orders.length) {
-                // 3. 成功計算出新的 ID，呼叫我們封裝好的 updateUI(id)
-                updateUI(orders[newIndex].id);
-            } else {
-                console.log("已經滑到底了，無法再切換");
+            // 如果還沒取消且還沒退款 -> 顯示取消按鈕
+            else {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.setAttribute('data-action', 'cancelReason');
+                btn.innerHTML = '❌<br>取消訂單';
+                container.appendChild(btn);
             }
         }
         // 初始渲染
@@ -1226,6 +1217,9 @@
                     alert("操作失敗，請檢查網路連線。");
                 }
             }
+            else if (action === 'Refund') {
+                window.location.href = `https://www.newebpay.com/sale/Sell_center/search_transaction`;
+            }
         });
         function handleCancelOrder(order) {
             currentOrderToCancel = order; // 把訂單資料存起來
@@ -1293,39 +1287,48 @@
                 confirmBtn.innerText = '確認取消訂單';
             }
         });
-        function renderActionButton(order) {
-            const container = document.getElementById('action-container');
-            // 1. 先清空原本的內容
-            container.innerHTML = '';
-            // 2. 判斷邏輯
-            // 如果是「已取消」且「使用信用卡支付」且「狀態為已付款」 -> 顯示退款按鈕
-            if (order.status === 'CANCELLED' && order.paymentMethod === 'CREDIT' && order.paymentStatus === 'PAID') {
-                const link = document.createElement('a');
-                link.href = 'https://www.newebpay.com/sale/Sell_center/search_transaction';
-                link.target = '_blank'; // 設定為新視窗開啟
-                const btn = document.createElement('button');
-                btn.className = 'btn';
-                btn.style.backgroundColor = '#4CAF50'; // 建議換個綠色區分
-                link.innerHTML = '💰<br>前往退款';
-                container.appendChild(link);
+        const gestureTouchBoard = document.getElementById('gestureTouchBoard');
+        let touchStartX = 0;
+        let touchEndX = 0;
+        gestureTouchBoard.addEventListener('touchstart', (e) => {
+            // 關鍵修正：必須加上 [0]
+            touchStartX = e.changedTouches[0].clientX;
+        }, { passive: true });
+        gestureTouchBoard.addEventListener('touchend', (e) => {
+            // 關鍵修正：必須加上 [0]
+            touchEndX = e.changedTouches[0].clientX;
+            handleSwipeGesture();
+        }, { passive: true });
+        function handleSwipeGesture() {
+            const diff = touchStartX - touchEndX;
+            // 增加一個靈敏度設定，避免太微小的誤觸
+            if (Math.abs(diff) < 50) return;
+            // 1. 先從 orders 陣列中，根據當前的 activeOrderId 找到它在陣列中的位置
+            const currentIndex = orders.findIndex(o => o.id === activeOrderId);
+            // 如果因為某些原因找不到 (例如 activeOrderId 是 null)，直接跳出
+            if (currentIndex === -1) return;
+            let newIndex;
+            if (diff > 0) {
+                // 左滑 (diff > 0) -> 試著去下一筆 (因為新單在前面，index 0 是最新的，所以「下一筆」其實是 index + 1)
+                newIndex = currentIndex + 1;
+            } else {
+                // 右滑 (diff < 0) -> 試著去上一筆 (index - 1)
+                newIndex = currentIndex - 1;
             }
-            // 如果還沒取消且還沒退款 -> 顯示取消按鈕
-            else if (order.status !== 'CANCELLED' && order.status !== 'REFUNDED') {
-                const btn = document.createElement('button');
-                btn.className = 'btn';
-                btn.innerHTML = '❌<br>取消訂單';
-                btn.onclick = () => handleCancelOrder(order); // 呼叫你的取消函式
-                container.appendChild(btn);
+            // 2. 防呆：檢查 newIndex 是否在合法的陣列範圍內
+            if (newIndex >= 0 && newIndex < orders.length) {
+                // 3. 成功計算出新的 ID，呼叫我們封裝好的 updateUI(id)
+                updateUI(orders[newIndex].id);
+            } else {
+                console.log("已經滑到底了，無法再切換");
             }
         }
-
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
             // 頁面載入時先執行一次
             updateClock();
             // 每 1000 毫秒（即 1 秒）執行一次更新
             setInterval(updateClock, 1000);
-            handleSwipeGesture();
             AudioController.init();
             console.log("系統初始化完成");
         });

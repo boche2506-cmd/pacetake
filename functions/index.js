@@ -1,15 +1,11 @@
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onRequest } = require("firebase-functions/v2/https");
-const { onCall } = require("firebase-functions/v2/https");
-const { HttpsError } = require("firebase-functions/v2/https");
 const admin = require('firebase-admin');
-const axios = require('axios');
 const crypto = require('crypto');
 if (admin.apps.length === 0) {
     admin.initializeApp();
 }
 const REGION = "asia-east1";
-const NEWEBPAY_BASE_URL = 'https://ccore.newebpay.com';
 // ============================================================
 // 🌐 新增：接收藍新付款成功通知的 HTTP 網址 (Webhook)
 // ============================================================
@@ -110,152 +106,6 @@ exports.newebpayNotify = onRequest({
     } catch (error) {
         console.error("🚨 藍新 Webhook 錯誤:", error);
         return res.status(200).send('FAIL');
-    }
-});
-
-function encryptAES(plainText, key, iv) {
-    const cryptoKey = Buffer.from(key, 'utf8');
-    const cryptoIv = Buffer.from(iv, 'utf8');
-    const cipher = crypto.createCipheriv('aes-256-cbc', cryptoKey, cryptoIv);
-    let encrypted = cipher.update(plainText, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return encrypted.toUpperCase();   // 建議改成大寫
-}
-// ====================== 商家退款 Function ======================
-exports.newebpayRefund = onCall({
-    region: REGION,
-    timeoutSeconds: 60,
-}, async (request) => {
-    const uid = request.auth?.uid;
-    if (!uid) {
-        throw new HttpsError('unauthenticated', '請先登入');
-    }
-
-    const { orderId, refundAmount, reason = '商家取消訂單' } = request.data || {};
-    if (!orderId || !refundAmount || refundAmount <= 0) {
-        throw new HttpsError('invalid-argument', '參數錯誤');
-    }
-
-    try {
-        const db = admin.firestore();
-        const orderDoc = await db.collection('orders').doc(orderId).get();
-        if (!orderDoc.exists) throw new HttpsError('not-found', '找不到訂單');
-
-        const order = orderDoc.data();
-        if (order.paymentStatus !== 'PAID') {
-            throw new HttpsError('failed-precondition', '此訂單尚未付款，無法退款');
-        }
-        if (!order.storeId) {
-            throw new HttpsError('permission-denied', '訂單資料不完整');
-        }
-
-        const storeDoc = await db.collection('stores').doc(order.storeId).get();
-        if (!storeDoc.exists) throw new HttpsError('not-found', '找不到商店資料');
-
-        const store = storeDoc.data();
-        if (store.sellerUid !== uid) {
-            throw new HttpsError('permission-denied', '你沒有權限操作此商店的退款');
-        }
-
-        const { MerchantID, HashKey, HashIV } = store;
-        if (!HashKey || !HashIV || !MerchantID) {
-            throw new HttpsError('internal', '商店金流設定不完整');
-        }
-
-        const timestamp = Math.floor(Date.now() / 1000);
-        let result;
-
-        const paymentType = (order.paymentType || order.paymentMethod || '').toUpperCase();
-        const isCredit = ['CREDIT', 'ANDROIDPAY', 'SAMPAY'].includes(paymentType);
-
-        if (isCredit) {
-            // ==================== 信用卡退款 ====================
-            if (!order.newebpayTradeNo) {
-                throw new HttpsError('invalid-argument', '訂單缺少藍新交易序號 (newebpayTradeNo)');
-            }
-
-            const postData = {
-                RespondType: "JSON",
-                Version: "1.1",
-                Amt: Math.round(refundAmount),
-                MerchantOrderNo: order.orderId || orderId,
-                TimeStamp: timestamp,
-                IndexType: 2,                    // 改成 2
-                TradeNo: order.newebpayTradeNo,  // 一定要帶
-                CloseType: 2,
-            };
-
-            const aesString = encryptAES(JSON.stringify(postData), HashKey, HashIV);
-
-            console.log("🔵 信用卡退款請求");
-            console.log("MerchantID:", MerchantID);
-            console.log("PostData:", postData);
-
-            const res = await axios.post(
-                `${NEWEBPAY_BASE_URL}/API/CreditCard/Close`,
-                `MerchantID_=${encodeURIComponent(MerchantID)}&PostData_=${encodeURIComponent(aesString)}`,
-                {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                }
-            );
-
-            result = res.data;
-        } else {
-            // ==================== 電子錢包退款 ====================
-            if (!order.newebpayTradeNo) {
-                throw new HttpsError('invalid-argument', '此訂單缺少 newebpayTradeNo');
-            }
-
-            const postData = {
-                RespondType: "JSON",
-                Version: "1.0",
-                TimeStamp: timestamp,
-                TradeNo: order.newebpayTradeNo,
-                MerchantOrderNo: order.orderId || orderId,
-                Amt: Math.round(refundAmount),
-            };
-
-            const aesString = encryptAES(JSON.stringify(postData), HashKey, HashIV);
-
-            const res = await axios.post(`${NEWEBPAY_BASE_URL}/API/EWallet/Refund`,
-                `MerchantID_=${MerchantID}&PostData_=${aesString}`,
-                { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-            );
-
-            result = res.data;
-        }
-
-        // ==================== 處理藍新回應 ====================
-        console.log("藍新完整回應:", JSON.stringify(result, null, 2));
-
-        if (result.Status === 'SUCCESS' || result.Status === '1000' || result.Status === 1000) {
-            await orderDoc.ref.update({
-                refundStatus: "REFUNDED",
-                refundAmount: admin.firestore.FieldValue.increment(Math.round(refundAmount)),
-                refundedAt: admin.firestore.FieldValue.serverTimestamp(),
-                refundReason: reason,
-                status: "CANCELLED",
-                cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
-                cancelReason: reason,
-            });
-            return { success: true, message: "退款申請成功" };
-        } else {
-            throw new HttpsError('aborted', result.Message || result.status_msg || '退款失敗');
-        }
-
-    } catch (error) {
-        console.error('=== 退款完整錯誤 ===');
-        console.error('錯誤名稱:', error.name);
-        console.error('錯誤訊息:', error.message);
-
-        if (error.response) {
-            console.error('藍新狀態碼:', error.response.status);
-            console.error('藍新回應內容:', JSON.stringify(error.response.data, null, 2));
-        }
-
-        throw new HttpsError('internal', error.message || '退款處理失敗');
     }
 });
 

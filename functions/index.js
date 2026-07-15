@@ -92,7 +92,7 @@ exports.newebpayNotify = onRequest({
             console.log(`📌 訂單 ${orderId} 已經是 PAID 狀態，跳過更新`);
             return res.status(200).send('SUCCESS');
         }
-        if (order.status === 'CANCELLED' || order.status === 'REFUNDED') {
+        if (order.status === 'CANCELLED') {
             console.warn(`⚠️ 訂單 ${orderId} 狀態為 ${order.status}，拒絕更新為 PAID`);
             // 這裡通常回傳 SUCCESS 即可，因為藍新已經收到錢，你不需要它重試
             return res.status(200).send('SUCCESS');

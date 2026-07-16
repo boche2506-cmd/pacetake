@@ -289,12 +289,12 @@
             padding: 0 3cqw;
         }
 
-        .namephone {
+        .nameandphone {
             height: 15%;
             width: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
             color: var(--text-main);
         }
@@ -312,17 +312,51 @@
             align-items: center;
         }
 
-        .nameandphone {
+        .namephone {
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            height: 20%;
+            height: 60%;
             width: 100%;
             line-height: 1.2;
             font-size: 3.5cqw;
             font-weight: 500;
             padding: 0 3cqw;
+        }
+
+        .buyernamephone {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 50%;
+            line-height: 1.2;
+            font-size: 3.5cqw;
+            font-weight: 500;
+        }
+
+        .buyerphone {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            color: var(--brand-blue);
+            box-shadow: var(--shadow-sm);
+            background-color: rgba(16, 38, 185, 0.1);
+            border: 0.2cqw solid var(--brand-blue);
+            font-weight: 400;
+            font-size: 3cqw;
+            border-radius: 2cqw;
+            transition: transform 0.2s;
+        }
+
+        .buyerphone:active {
+            transform: scale(0.95);
+            /* 按下去變小一點，模擬點擊感 */
         }
 
         /* 模擬資料滑動切換載體動畫 */
@@ -676,15 +710,15 @@
                             style="font-size: 3.5cqw; font-weight: 500; color: var(--text-main);">讀取中...</span>
                     </div>
                     <!-- 底部手勢手感提示 -->
-                    <div class="namephone">
+                    <div class="nameandphone">
                         <div class="gesture-hint-footer">
                             <span>👈 左滑下一單</span>
                             <span>•</span>
                             <span>右滑前一單 👉</span>
                         </div>
-                        <div class="nameandphone">
-                            <div class="buyername">聯絡人:<span id="buyername">讀取中...</span></div>
-                            <div class="buyerphone">連絡電話:<span id="buyerphone">讀取中...</span></div>
+                        <div class="namephone">
+                            <div class="buyernamephone">聯絡人:<span id="buyername">讀取中...</span></div>
+                            <div class="buyernamephone" id="buyerphone"></div>
                         </div>
                     </div>
                 </main>
@@ -980,7 +1014,6 @@
             // 如果你的資料庫存的是 name 和 phone：
             // 更新聯絡人與電話 (如果沒有資料，就顯示 '未提供')
             document.getElementById('buyername').innerText = order.buyerName || '未提供';
-            document.getElementById('buyerphone').innerText = order.buyerPhone || '未提供';
             document.getElementById('remark').innerText = order.remark || '無備註';
             const statusContainer = document.getElementById('statusContainer');
             const statusTotalEl = document.getElementById('statusTotal');
@@ -1001,14 +1034,15 @@
                 statusTotalEl.innerText = '新訂單待處理';
             }
             renderActionButton(order);
+            buyerphoneButton(order);
         }
         function renderActionButton(order) {
             const container = document.getElementById('action-container');
+            const btn = document.createElement('button');
             // 1. 先清空原本的內容
             container.innerHTML = '';
             // 如果是「已取消」且「使用信用卡支付」且「狀態為已付款」 -> 顯示退款按鈕
             if (order.status === 'CANCELLED' && order.paymentMethod === 'CREDIT' && order.paymentStatus === 'PAID') {
-                const btn = document.createElement('button');
                 btn.className = 'btn';
                 btn.setAttribute('data-action', 'Refund');
                 btn.innerHTML = '💰<br>前往退款';
@@ -1019,10 +1053,26 @@
             }
             // 如果還沒取消且還沒退款 -> 顯示取消按鈕
             else {
-                const btn = document.createElement('button');
                 btn.className = 'btn';
                 btn.setAttribute('data-action', 'cancelReason');
                 btn.innerHTML = '❌<br>取消訂單';
+                container.appendChild(btn);
+            }
+        }
+        function buyerphoneButton(order) {
+            const container = document.getElementById('buyerphone');
+            const btn = document.createElement('button');
+            container.innerHTML = '';
+            if (order.phoneAccessStatus === 'granted') {
+                container.innerText = order.buyerPhone;
+            }
+            else if (order.phoneAccessStatus === 'requested') {
+                container.innerText = "已發送請求，等待買家同意...";
+            }
+            else {
+                btn.className = 'buyerphone';
+                btn.setAttribute('data-action', 'buyerphone');
+                btn.innerHTML = '📋聯絡電話需按此處<br>詢問對方是否同意顯示';
                 container.appendChild(btn);
             }
         }
@@ -1205,9 +1255,33 @@
                 }
             }
             else if (action === 'Refund') {
+                if (!confirm("確定要前往藍新金流進行退款嗎？")) {
+                    return;
+                }
                 window.location.href = `https://www.newebpay.com/sale/Sell_center/search_transaction`;
             }
+            else if (action === 'buyerphone') {
+                const order = orders.find(o => o.id === activeOrderId);
+                // 防呆檢查：確保真的有找到訂單 (以防訂單剛好被刪除)
+                if (!confirm("是否向對方發起要求顯示電話號碼？")) {
+                    return;
+                }
+                // 執行邏輯
+                handleRequestPhone(order);
+            }
         });
+        async function handleRequestPhone(order) {
+            const orderRef = doc(db, "orders", order.id);
+            // 透過 Firebase 修改該筆訂單的狀態為 'requested'
+            try {
+                await updateDoc(orderRef, {
+                    phoneAccessStatus: 'requested'
+                });
+                console.log("請求已發送！");
+            } catch (error) {
+                console.error("發送請求失敗", error);
+            }
+        }
         function handleCancelOrder(order) {
             currentOrderToCancel = order; // 把訂單資料存起來
             const modal = document.getElementById('cancelOrderModal');

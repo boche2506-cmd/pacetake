@@ -249,6 +249,13 @@
                 <a class="nav-btn" id="navbtn">📍 準備導航中...</a>
             </div>
         </div>
+        <div id="phone-request-modal"
+            style="display: none; position: fixed; top: 30%; left: 10%; width: 80%; background: white; padding: 20px; border: 1px solid #ccc; z-index: 1000;">
+            <h3>商家請求與您聯繫</h3>
+            <p>商家希望能取得您的電話號碼以便聯繫，是否同意？</p>
+            <button data-action="btn-acceptYes">同意分享</button>
+            <button data-action="btn-acceptNo">稍後再說</button>
+        </div>
         <div class="lightbox-modal" id="loginLightbox" style="display: none;">
             <div class="modal-card">
                 <div class="modal-title" style=" font-weight: 600; color: var(--text-main);">加入PACE 派思</div>
@@ -330,8 +337,15 @@
             );
             onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) return;
-                const order = snapshot.docs[0].data();
+                const doc = snapshot.docs[0];
+                const order = { id: doc.id, ...doc.data() };
                 renderOrder(order);
+                const modal = document.getElementById('phone-request-modal');
+                if (order.phoneAccessStatus === 'requested') {
+                    modal.style.display = 'block'; // 彈出燈箱
+                } else {
+                    modal.style.display = 'none';  // 隱藏燈箱
+                }
             });
         }
         function renderOrder(order) {
@@ -399,36 +413,49 @@
             document.getElementById('orderRemarkDisplay').textContent = order.remark ? `備註：${order.remark}` : "無特別備註";
             initNavigationButton(order);
         }
+        document.addEventListener('click', async (e) => {
+            const target = e.target.closest('[data-action]');
+            if (!target) return;
+            const action = target.getAttribute('data-action');
+            if (action === 'btn-acceptYes') {
+                try {
+                    await updateDoc(doc(db, "orders", orderId), {
+                        phoneAccessStatus: 'granted'
+                    });
+                    document.getElementById('phone-request-modal').style.display = 'none';
+                    alert("已授權商家撥打電話！");
+                } catch (error) {
+                    console.error("更新狀態失敗:", error);
+                }
+            }
+            if (action === 'btn-acceptNo') {
+                document.getElementById('phone-request-modal').style.display = 'none';
+            }
+        });
         function initNavigationButton(order) {
             if (!order) return;
-
             // 1. 抓出店家座標並轉換為數字
             const sLat = parseFloat(order.shopLat || order.lat);
             const sLng = parseFloat(order.shopLng || order.lng);
             const shopName = order.shopName || order.name || '未知店家';
-
             // 2. 抓取網頁上的按鈕元素 (✅ 修正 1：加上 # 號)
             const navBtn = document.querySelector('#navbtn');
-
             // ✅ 修正 2：統一使用大寫的 B (navBtn)
             if (!navBtn) {
                 console.warn(`[PACE DEBUG] 找不到導航按鈕元素`);
                 return;
             }
-
             // 3. 拼裝出 Google Maps 導航連結 (✅ 修正 3：補上 $ 符號，並使用官方推薦的導航網址格式)
             let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(shopName)}`;
             if (!isNaN(sLat) && !isNaN(sLng)) {
                 // 使用經緯度直接開啟導航
                 mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${sLat},${sLng}`;
             }
-
             // 4. 一氣呵成帶入 HTML
             navBtn.href = mapUrl;
             navBtn.target = "_blank";
             navBtn.rel = "noopener noreferrer";
             navBtn.innerText = `📍 導航前往：${shopName}`;
-
             console.log(`[PACE DEBUG] 導航按鈕初始化成功！目標：${shopName}, 網址：${mapUrl}`);
         }
     </script>

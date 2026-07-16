@@ -45,17 +45,33 @@
             border: 0.2cqw solid var(--border-color);
             border: none;
             border-radius: 5cqw;
-        }
-
-        .stat-item {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 2cqw;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2cqw 5cqw;
+
         }
 
         .section-title {
+            height: 20%;
+            width: 100%;
             font-size: 4cqw;
-            margin-top: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stat-item {
+            height: 20%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 3.5cqw;
+            border-top: 0.3cqw solid var(--border-color);
         }
 
         .bottom-bar {
@@ -520,7 +536,6 @@
                     <div class="stat-item"><span>接單數</span> <strong id="stat-orders">55</strong></div>
                     <div class="stat-item"><span>線上收入</span> <strong id="stat-online">222</strong></div>
                     <div class="stat-item"><span>現金收入</span> <strong id="stat-cash">1111</strong></div>
-                    <hr>
                     <div class="stat-item"><span>合計</span> <strong id="stat-total">1333</strong></div>
                 </div>
                 <div class="info-section">
@@ -626,20 +641,40 @@
         let currentUserId = null;
         let activeDragItem = null;
         let cachedQrCanvas = null;
-
+        const IS_DEBUG_MODE = true;// 🚩 開發時設為 true，上線前請務必改回 false！
+        const MOCK_USER_ID = "56TND0b1QBaj994IUmB9gwtYAWF2";// 🚩 開發時設為 true，上線前請務必改回 false！
+        // 取得網址參數 (記得在網址手動加上 ?storeId=你的ID)
         const modal = document.getElementById('qrModal');
         const urlParams = new URLSearchParams(window.location.search);
-        const storeId = urlParams.get('storeId');
+        const storeId = urlParams.get('storeId') || MOCK_USER_ID;
         async function initPage() {
+            let user;
+            if (IS_DEBUG_MODE) {
+                console.warn("⚠️ 目前處於開發模式，已自動模擬登入");
+                user = { uid: MOCK_USER_ID }; // 偽造一個使用者物件
+            } else {
+                user = await authReady; // 真實登入檢查
+                if (!user) {
+                    alert("尚未登入，請先前往登入頁面。");
+                    window.location.href = "index.html";
+                    return;
+                }
+            }
+            // 權限檢查 (開發模式下我們可以直接跳過，或者也讓他跑)
+            if (!IS_DEBUG_MODE && storeId !== user.uid) {
+                alert("存取權限不足！");
+                window.location.href = "index.html";
+                return;
+            }
             // 這裡會暫停，直到 authReady 被 resolve，也就是 Firebase 說「好，我知道是誰了」
-            const user = await authReady;
+            /*const user = await authReady;
             if (!user) {
                 alert("尚未登入，請先前往登入頁面。");
                 window.location.href = "index.html";
                 return;
             }
             console.log("網址抓到的 ID:", storeId);
-            console.log("登入的 UID:", auth.currentUser.uid);
+            console.log("登入的 UID:", auth.currentUser.uid);*/
             /*if (!storeId) {
                 alert("找不到商店 ID，請確認網址是否正確。");
                 window.location.href = "index.html";

@@ -983,7 +983,6 @@
                 paymentStatusEl.innerText = '已付款';
             }
             document.getElementById('light_pay').innerText = order.paymentMethod === 'CREDIT' ? '線上支付' : '現場付款';
-
             const displayType = (order.diningType === 'DINE_IN')
                 ? `內用桌號:\n(${order.table})`
                 : '外帶自取';
@@ -1013,7 +1012,9 @@
                 `).join('');
             // 如果你的資料庫存的是 name 和 phone：
             // 更新聯絡人與電話 (如果沒有資料，就顯示 '未提供')
-            document.getElementById('buyername').innerText = order.buyerName || '未提供';
+            const nameElement = document.getElementById('buyername');
+            const rawName = order.buyerName;
+            nameElement.innerText = maskName(rawName);
             document.getElementById('remark').innerText = order.remark || '無備註';
             const statusContainer = document.getElementById('statusContainer');
             const statusTotalEl = document.getElementById('statusTotal');
@@ -1088,6 +1089,13 @@
             else {
                 container.innerText = "已發送請求，等待買家同意...";
             }
+        }
+        function maskName(name) {
+            if (!name) return "無備註"; // 如果沒名字，顯示無備註
+            if (name.length <= 1) return name; // 只有一個字不遮
+            // 如果名字超過 3 個字，就只顯示 3 個星號，否則按字數顯示
+            const stars = name.length > 3 ? '***' : '*'.repeat(name.length - 1);
+            return name.charAt(0) + stars;
         }
         // 初始渲染
         function updateClock() {

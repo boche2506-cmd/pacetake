@@ -1062,32 +1062,27 @@
         function buyerphoneButton(order) {
             const container = document.getElementById('buyerphone');
             container.innerHTML = '';
-
             // --- 這裡定義什麼時候顯示按鈕 ---
             const now = Date.now();
             const requestTime = order.phoneAccessAt?.toMillis();
             const tenMinutes = 10 * 60 * 1000;
-
+            const isTimeOver = (order.phoneAccessStatus === 'granted') &&
+                (requestTime && (now - requestTime > tenMinutes));
             // 判斷是否「請求中」但「已經過期」
             const isExpired = (order.phoneAccessStatus === 'requested') &&
                 (requestTime && (now - requestTime > tenMinutes));
-
             // 判斷是否為「初始狀態」(沒有這個欄位，或是明確的 'wait')
             // !order.phoneAccessStatus 就是檢查有沒有該欄位，沒有的話就會是 true
             const isInitial = !order.phoneAccessStatus || order.phoneAccessStatus === 'wait';
-
-            // --------------------------
-
-            if (order.phoneAccessStatus === 'granted') {
-                container.innerText = order.buyerPhone;
-            }
             // 只要是過期、初始、或明確的等待狀態，都顯示按鈕
-            else if (isExpired || isInitial) {
+            if (isExpired || isInitial || isTimeOver) {
                 const btn = document.createElement('button');
                 btn.className = 'buyerphone';
                 btn.setAttribute('data-action', 'buyerphone');
                 btn.innerHTML = '📋聯絡電話需按此處<br>詢問對方是否同意顯示';
                 container.appendChild(btn);
+            } else if (order.phoneAccessStatus === 'granted') {
+                container.innerText = order.buyerPhone;
             }
             // 只有在明確的「請求中」且沒過期時，才顯示等待訊息
             else {

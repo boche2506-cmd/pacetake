@@ -73,23 +73,6 @@ const dropdownMenu = document.getElementById('dropdownMenu');
 const userNameDisplay = document.getElementById('userNameDisplay');
 const loginLightbox = document.getElementById('loginLightbox');
 const emailFormSection = document.getElementById('emailFormSection');
-// 如果有快取，馬上渲染
-function loadFromCache() {
-    const cachedName = localStorage.getItem('user_name');
-    const cachedPhoto = localStorage.getItem('user_photo');
-    const cachedIsAnon = localStorage.getItem('is_anonymous') === 'true';
-    const cachedRole = localStorage.getItem('user_role') || 'guest'; // 記得把 Role 也存進去！
-    if (cachedName) {
-        // 1. 打包成跟 Firebase user 一樣格式的物件
-        const virtualUser = {
-            displayName: cachedName,
-            photoURL: cachedPhoto,
-            isAnonymous: cachedIsAnon
-        };
-        // 2. 傳遞時，維持 (user, role) 的格式
-        updateUIForUser(virtualUser, cachedRole);
-    }
-}
 // 監聽 Firebase 登入狀態
 export const authReady = new Promise((resolve) => {
     onAuthStateChanged(auth, (user) => {
@@ -105,11 +88,6 @@ export const authReady = new Promise((resolve) => {
             // --- 這裡就是「關門」的地方 ---
             // 使用者登出了，必須把所有快取清得乾乾淨淨
             // --- 這裡是「徹底未登入」：觸發匿名登入 ---
-            console.log("使用者登出，清除快取");
-            localStorage.removeItem('user_name');
-            localStorage.removeItem('user_photo');
-            localStorage.removeItem('is_anonymous');
-            localStorage.removeItem('user_role'); // 記得連角色也要清
             console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");
             signInAnonymously(auth).catch((error) => {
                 console.error("匿名登入失敗:", error);
@@ -164,10 +142,6 @@ async function handleUserSyncAndRoleRouting(user) {
             await setDoc(userRef, initialData);
             const safeName = user.displayName || '遊客';
             const userRole = "buyer";
-            localStorage.setItem('user_name', safeName);
-            localStorage.setItem('is_anonymous', user.isAnonymous);
-            localStorage.setItem('user_role', userRole);
-            localStorage.setItem('user_photo', user.photoURL || '');
             updateUIForUser(user, "buyer");
         }
     } catch (e) {
@@ -1128,7 +1102,6 @@ export function initCartDOMState() {
 
 // 🚀 初始化區塊
 document.addEventListener('DOMContentLoaded', () => {
-    loadFromCache();// 頁面一載入就立刻執行
     fetchStoresFromFirebase();// 從firebase抓資料
     initThemeSystem();//網頁載入時套用顏色
     mouseslide();

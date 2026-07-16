@@ -3,7 +3,6 @@ self.addEventListener('fetch', (e) => {
         caches.match(e.request).then((cachedResponse) => {
             // 如果快取有，就回傳快取
             if (cachedResponse) return cachedResponse;
-
             // 如果快取沒有，去網路撈
             return fetch(e.request).catch(() => {
                 // 如果網路也斷了，回傳一個自訂的 Response

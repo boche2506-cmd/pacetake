@@ -76,14 +76,14 @@
         }
 
         .store-header-info {
-            height: 65%;
+            height: 55%;
             max-width: 100%;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
             box-sizing: border-box;
-            padding-left: 2cqw;
+            padding-left: 1cqw;
         }
 
         .fav-icon {
@@ -118,13 +118,19 @@
             color: var(--text-main);
         }
 
+        .storephone {
+            font-size: 3cqw;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
         .store-meta {
-            height: 35%;
+            height: 45%;
             max-width: 100%;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             justify-content: space-between;
-            align-items: center;
+            align-items: start;
             box-sizing: border-box;
             line-height: 1.1;
             color: var(--text-main);
@@ -443,13 +449,14 @@
                 <div class="store-logo">
                     <div class="store-header-info">
                         <h1 id="storeNameText">載入中...</h1>
+                        <div class="storephone">電話:<span id="storephone">讀取中...</span></div>
                         <button data-action="favorite-btn" class="fav-icon" aria-label="加入最愛">
                             <span id="heart-icon">🤍</span>
                         </button>
                     </div>
                     <div class="store-meta">
-                        <a class="storeAddressText" id="storeAddressText">📍 載入中...</a>
                         <span id="storeDistanceText">⚡ 計算中...</span>
+                        <a class="storeAddressText" id="storeAddressText">📍 載入中...</a>
                     </div>
                 </div>
             </div>

@@ -778,6 +778,7 @@ async function initStorePage() {
         const address = storeData.shopAddress || storeData.address || '地址未提供';
         // 3. 把算出來的結果填入 HTML
         document.getElementById('storeNameText').innerText = storeData.shopName || storeData.name || '未命名店家';
+        document.getElementById('storephone').innerText = storeData.shopPhone || storeData.Phone || '未提供';
         document.getElementById('storeAddressText').innerHTML = `
         <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
         📍 ${address}</a>`;

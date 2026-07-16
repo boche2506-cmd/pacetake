@@ -822,10 +822,10 @@
         let currentUserId = null;
         let activeDragItem = null;
         let cachedQrCanvas = null;
-        let orders = []; // 存儲從 Firebase 撈回的訂單
         let currentIndex = 0; // 當前正在顯示的訂單索引
         let currentOrderToCancel = null;
         let isInitialLoad = true;
+        let orders = [];// 存儲從 Firebase 撈回的訂單
         let activeOrderId = null; // 全域變數
         // 🚩 開發時設為 true，上線前請務必改回 false！
         const IS_DEBUG_MODE = true;// 🚩 開發時設為 true，上線前請務必改回 false！

@@ -325,6 +325,9 @@
             HashKey: "",
             HashIV: ""
         };
+        let orders = [];// 存儲從 Firebase 撈回的訂單
+        let activeOrderId = null; // 全域變數
+        let currentOrderData = null;
         // 假設你已經有 auth 和 db 的設定
         const user = await authReady;
         if (user) {
@@ -338,6 +341,7 @@
             onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) return;
                 const doc = snapshot.docs[0];
+                currentOrderData = { id: doc.id, ...doc.data() };
                 const order = { id: doc.id, ...doc.data() };
                 renderOrder(order);
                 const modal = document.getElementById('phone-request-modal');
@@ -413,33 +417,6 @@
             document.getElementById('orderRemarkDisplay').textContent = order.remark ? `備註：${order.remark}` : "無特別備註";
             initNavigationButton(order);
         }
-        document.addEventListener('click', async (e) => {
-            const target = e.target.closest('[data-action]');
-            if (!target) return;
-            const action = target.getAttribute('data-action');
-            if (action === 'btn-acceptYes') {
-                try {
-                    await updateDoc(doc(db, "orders", orderId), {
-                        phoneAccessStatus: 'granted'
-                    });
-                    document.getElementById('phone-request-modal').style.display = 'none';
-                    alert("已授權商家撥打電話！");
-                } catch (error) {
-                    console.error("更新狀態失敗:", error);
-                }
-            }
-            if (action === 'btn-acceptNo') {
-                try {
-                    await updateDoc(doc(db, "orders", orderId), {
-                        phoneAccessStatus: 'wait'
-                    });
-                    document.getElementById('phone-request-modal').style.display = 'none';
-                    alert("已不同意顯示電話！");
-                } catch (error) {
-                    console.error("更新狀態失敗:", error);
-                }
-            }
-        });
         function initNavigationButton(order) {
             if (!order) return;
             // 1. 抓出店家座標並轉換為數字
@@ -465,6 +442,51 @@
             navBtn.rel = "noopener noreferrer";
             navBtn.innerText = `📍 導航前往：${shopName}`;
             console.log(`[PACE DEBUG] 導航按鈕初始化成功！目標：${shopName}, 網址：${mapUrl}`);
+        }
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('[data-action]');
+            if (!target) return;
+            const action = target.getAttribute('data-action');
+            if (action === 'btn-acceptYes') {
+                if (currentOrderData) {
+                    btnacceptYes(currentOrderData); // 把剛剛存好的全域資料傳進去
+                } else {
+                    console.error("目前沒有訂單資料");
+                }
+            }
+            else if (action === 'btn-acceptNo') {
+                if (currentOrderData) {
+                    btnacceptNo(currentOrderData);
+                }
+            }
+        });
+        async function btnacceptYes(order) {
+            const orderRef = doc(db, "orders", order.id);
+            try {
+                await updateDoc(orderRef, {
+                    phoneAccessStatus: 'granted',
+                });
+                // 成功才關閉燈箱
+                document.getElementById('phone-request-modal').style.display = 'none';
+                alert("已授權商家撥打電話！");
+            } catch (error) {
+                console.error("更新失敗", error);
+                alert("操作失敗，請檢查網路後再試一次");
+            }
+        }
+        async function btnacceptNo(order) {
+            const orderRef = doc(db, "orders", order.id);
+            try {
+                await updateDoc(orderRef, {
+                    phoneAccessStatus: 'wait',
+                });
+                document.getElementById('phone-request-modal').style.display = 'none';
+                // 💡 修正這裡：改為拒絕的提示訊息
+                alert("已拒絕授權顯示電話號碼。");
+            } catch (error) {
+                console.error("更新失敗", error);
+                alert("操作失敗，請檢查網路後再試一次");
+            }
         }
     </script>
 </body>

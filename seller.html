@@ -866,60 +866,36 @@
             const q = query(
                 collection(db, "orders"),
                 where("storeId", "==", storeId),
-                orderBy("createdAt", "desc") // 最新訂單在前
+                orderBy("createdAt", "desc")
             );
             onSnapshot(q, (snapshot) => {
-                let hasNewOrder = false;
-                snapshot.docChanges().forEach((change) => {
-                    const data = change.doc.data();
-                    const isValidOrder = (data.paymentMethod === "CASH") ||
-                        (data.paymentMethod === "CREDIT" && data.paymentStatus !== "UNPAID");
-                    if (isValidOrder && !isInitialLoad) {
-                        // 檢查這張單是不是本來就在店家的畫面上
-                        const isAlreadyOnScreen = orders.some(o => o.id === change.doc.id);
-                        // 如果是新單，或者是線上單剛付完款（原本不在畫面上），才觸發新訂單通知
-                        if (!isAlreadyOnScreen) {
-                            hasNewOrder = true;
-                        }
-                    }
-                });
-                // 這樣 100% 貼齊 desc 排序，絕對不會再亂掉
-                orders.length = 0; // 清空舊陣列 (保留記憶體參考)
-                snapshot.docs.forEach(doc => {
-                    const data = doc.data();
-                    // 🌟 核心修正：撈取列表時，同步過濾掉還沒付錢的線上刷卡單
-                    const isValidOrder = (data.paymentMethod === "CASH") ||
-                        (data.paymentMethod === "CREDIT" && data.paymentStatus !== "UNPAID");
-                    if (isValidOrder) {
-                        orders.push({ id: doc.id, ...data });
-                    }
-                });
-                // 3. 處理畫面與音效
+                // 1. 整理最新資料
+                const newOrdersList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const hasNewOrder = !isInitialLoad && snapshot.docChanges().some(change =>
+                    change.type === 'added' && isValidOrder(change.doc.data())
+                );
+                orders.length = 0;
+                orders.push(...newOrdersList);
+                // 4. 根據狀態執行 UI 行為
                 if (isInitialLoad) {
-                    if (orders.length > 0) {
-                        updateUI(orders[0].id); // 載入最新的第一張單
-                    }
+                    if (orders.length > 0) updateUI(orders[0].id);
                     isInitialLoad = false;
-                } else {
-                    // 🌟 關鍵修改點：
-                    if (hasNewOrder) {
-                        AudioController.play(); // 播音效
-                        if (orders.length > 0) {
-                            console.log("🔔 偵測到新訂單！自動跳轉到最新單：", orders[0].id);
-                            updateUI(orders[0].id); // 🚀 直接跳轉到最新進來的那張單！
-                        }
-                    } else {
-                        // 如果「沒有」新單，代表只是舊訂單的內容被修改（例如店家自己按了接單、出餐等）
-                        // 這時候保持在原本這張單，並直接刷新工作區內容就好，不要打斷老闆目前的瀏覽
-                        const currentOrder = orders.find(o => o.id === activeOrderId);
-                        if (currentOrder) {
-                            renderOrderToWorkspace(currentOrder);
-                        }
-                    }
                 }
-                // 4. 最後統一重繪 Tab，順序保證正確 [0, 1, 2...]
-                renderTabs();
+                else if (hasNewOrder) {
+                    // 情況：有新訂單 -> 播放音效 + 強制跳轉到最新單
+                    AudioController.play();
+                    if (orders.length > 0) updateUI(orders[0].id);
+                }
+                else {
+                    // 情況：沒有新單 (可能是舊單狀態改變) -> 只更新當前活躍的 UI
+                    const currentOrder = orders.find(o => o.id === activeOrderId);
+                    if (currentOrder) renderOrderToWorkspace(currentOrder);
+                    renderTabs();
+                }
             });
+        }
+        function isValidOrder(data) {
+            return (data.paymentMethod === "CASH") || (data.paymentMethod === "CREDIT");
         }
         // 1. 初始化 Tab 點擊監聽 (使用事件代理)
         document.getElementById('orderTabsContainer').addEventListener('click', (e) => {
@@ -963,7 +939,7 @@
                 payContainer.classList.add('pending');
                 paymentStatusEl.innerText = '已退款\n(藍新金流)';
                 // 付款狀態顯示（加強藍新金流辨識）
-            } else if 
+            } else if
                 (order.paymentStatus === 'UNPAID') {
                 payContainer.classList.add('pending');
                 paymentStatusEl.innerText = '未付款';
@@ -1160,13 +1136,21 @@
                 window.location.href = `manage.html?storeId=${storeId}`;
             }
             else if (action === 'cancelReason') {
-                const index = currentIndex;
-                const order = orders[index];
+                const order = orders.find(o => o.id === activeOrderId);
+                // 防呆檢查：確保真的有找到訂單 (以防訂單剛好被刪除)
+                if (!order) {
+                    console.error("找不到當前訂單，無法執行取消");
+                    return;
+                }
+                // 執行邏輯
                 handleCancelOrder(order);
             }
             else if (action === 'lightpay') {
-                const order = orders[currentIndex];
-                if (!order) return;
+                const order = orders.find(o => o.id === activeOrderId);
+                if (!order) {
+                    console.error("找不到當前訂單，無法執行取消");
+                    return;
+                }
                 // 1. 計算切換後的目標狀態
                 const isCurrentlyUnpaid = order.paymentStatus === 'UNPAID';
                 const newStatus = isCurrentlyUnpaid ? 'PAID' : 'UNPAID';
@@ -1192,8 +1176,11 @@
                 }
             }
             else if (action === 'statusOrderTotal') {
-                const order = orders[currentIndex];
-                if (!order) return;
+                const order = orders.find(o => o.id === activeOrderId);
+                if (!order) {
+                    console.error("找不到當前訂單，無法執行取消");
+                    return;
+                }
                 // 1. 計算切換後的目標狀態
                 const isCurrentlyUnpaid = order.status === 'PREPARING';
                 const newStatus = isCurrentlyUnpaid ? 'COMPLETED' : 'PREPARING';

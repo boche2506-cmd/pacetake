@@ -329,26 +329,48 @@
         let activeOrderId = null; // 全域變數
         let currentOrderData = null;
         // 假設你已經有 auth 和 db 的設定
-        const user = await authReady;
-        if (user) {
-            // 監聽該用戶的最新一筆訂單
-            const q = query(
-                collection(db, "orders"),
-                where("buyerUid", "==", user.uid),
-                orderBy("createdAt", "desc"),
-                limit(1)
-            );
-            onSnapshot(q, (snapshot) => {
-                if (snapshot.empty) return;
-                const doc = snapshot.docs[0];
-                currentOrderData = { id: doc.id, ...doc.data() };
-                const order = { id: doc.id, ...doc.data() };
-                renderOrder(order);
-                const modal = document.getElementById('phone-request-modal');
-                if (order.phoneAccessStatus === 'requested') {
-                    modal.style.display = 'block'; // 彈出燈箱
+        async function initPage() {
+            const user = await authReady;
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetOrderId = urlParams.get('orderId');
+            if (targetOrderId) {
+                console.log("正在載入特定訂單：", targetOrderId);
+                loadSingleOrder(targetOrderId);
+            } else {
+                // 監聽該用戶的最新一筆訂單
+                const q = query(
+                    collection(db, "orders"),
+                    where("buyerUid", "==", user.uid),
+                    orderBy("createdAt", "desc"),
+                    limit(1)
+                );
+                onSnapshot(q, (snapshot) => {
+                    if (snapshot.empty) return;
+                    const doc = snapshot.docs[0];
+                    currentOrderData = { id: doc.id, ...doc.data() };
+                    const order = { id: doc.id, ...doc.data() };
+                    renderOrder(order);
+                    const modal = document.getElementById('phone-request-modal');
+                    if (order.phoneAccessStatus === 'requested') {
+                        modal.style.display = 'block'; // 彈出燈箱
+                    } else {
+                        modal.style.display = 'none';  // 隱藏燈箱
+                    }
+                });
+            }
+        }
+        async function loadSingleOrder(orderId) {
+            const docRef = doc(db, "orders", orderId);
+            // 使用 onSnapshot 監聽這張單子就好
+            onSnapshot(docRef, (doc) => {
+                if (doc.exists()) {
+                    const order = { id: doc.id, ...doc.data() };
+                    // 把資料存入你的全域變數 (例如之前的 currentOrderData)
+                    currentOrderData = order;
+                    // 直接渲染這張單
+                    renderOrder(order);
                 } else {
-                    modal.style.display = 'none';  // 隱藏燈箱
+                    console.error("找不到該訂單");
                 }
             });
         }
@@ -488,6 +510,10 @@
                 alert("操作失敗，請檢查網路後再試一次");
             }
         }
+        document.addEventListener('DOMContentLoaded', () => {
+            initPage();
+            console.log("系統初始化完成");
+        });
     </script>
 </body>
 

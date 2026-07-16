@@ -1061,19 +1061,37 @@
         }
         function buyerphoneButton(order) {
             const container = document.getElementById('buyerphone');
-            const btn = document.createElement('button');
             container.innerHTML = '';
+
+            // --- 這裡定義什麼時候顯示按鈕 ---
+            const now = Date.now();
+            const requestTime = order.phoneAccessAt?.toMillis();
+            const tenMinutes = 10 * 60 * 1000;
+
+            // 判斷是否「請求中」但「已經過期」
+            const isExpired = (order.phoneAccessStatus === 'requested') &&
+                (requestTime && (now - requestTime > tenMinutes));
+
+            // 判斷是否為「初始狀態」(沒有這個欄位，或是明確的 'wait')
+            // !order.phoneAccessStatus 就是檢查有沒有該欄位，沒有的話就會是 true
+            const isInitial = !order.phoneAccessStatus || order.phoneAccessStatus === 'wait';
+
+            // --------------------------
+
             if (order.phoneAccessStatus === 'granted') {
                 container.innerText = order.buyerPhone;
             }
-            else if (order.phoneAccessStatus === 'requested') {
-                container.innerText = "已發送請求，等待買家同意...";
-            }
-            else {
+            // 只要是過期、初始、或明確的等待狀態，都顯示按鈕
+            else if (isExpired || isInitial) {
+                const btn = document.createElement('button');
                 btn.className = 'buyerphone';
                 btn.setAttribute('data-action', 'buyerphone');
                 btn.innerHTML = '📋聯絡電話需按此處<br>詢問對方是否同意顯示';
                 container.appendChild(btn);
+            }
+            // 只有在明確的「請求中」且沒過期時，才顯示等待訊息
+            else {
+                container.innerText = "已發送請求，等待買家同意...";
             }
         }
         // 初始渲染
@@ -1273,14 +1291,10 @@
         async function handleRequestPhone(order) {
             const orderRef = doc(db, "orders", order.id);
             // 透過 Firebase 修改該筆訂單的狀態為 'requested'
-            try {
-                await updateDoc(orderRef, {
-                    phoneAccessStatus: 'requested'
-                });
-                console.log("請求已發送！");
-            } catch (error) {
-                console.error("發送請求失敗", error);
-            }
+            await updateDoc(orderRef, {
+                phoneAccessStatus: 'requested',
+                phoneAccessAt: serverTimestamp() // 這裡存入發送請求的時間
+            });
         }
         function handleCancelOrder(order) {
             currentOrderToCancel = order; // 把訂單資料存起來

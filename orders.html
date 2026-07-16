@@ -325,6 +325,7 @@
             HashKey: "",
             HashIV: ""
         };
+        let activeOrderId = null;
         // 假設你已經有 auth 和 db 的設定
         const user = await authReady;
         if (user) {
@@ -412,14 +413,16 @@
             // 4. 更新備註
             document.getElementById('orderRemarkDisplay').textContent = order.remark ? `備註：${order.remark}` : "無特別備註";
             initNavigationButton(order);
+            activeOrderId = orderId;
         }
         document.addEventListener('click', async (e) => {
             const target = e.target.closest('[data-action]');
             if (!target) return;
             const action = target.getAttribute('data-action');
             if (action === 'btn-acceptYes') {
+                const order = orders.find(o => o.id === activeOrderId);
                 try {
-                    await updateDoc(doc(db, "orders", orderId), {
+                    await updateDoc(doc(db, "orders", order.id), {
                         phoneAccessStatus: 'granted'
                     });
                     document.getElementById('phone-request-modal').style.display = 'none';
@@ -429,7 +432,16 @@
                 }
             }
             if (action === 'btn-acceptNo') {
-                document.getElementById('phone-request-modal').style.display = 'none';
+                const order = orders.find(o => o.id === activeOrderId);
+                try {
+                    await updateDoc(doc(db, "orders", order.id), {
+                        phoneAccessStatus: 'wait'
+                    });
+                    document.getElementById('phone-request-modal').style.display = 'none';
+                    alert("已不同意顯示電話！");
+                } catch (error) {
+                    console.error("更新狀態失敗:", error);
+                }
             }
         });
         function initNavigationButton(order) {

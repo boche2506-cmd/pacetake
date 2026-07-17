@@ -10,28 +10,17 @@ const firebaseConfig = {
     appId: "1:1052980235056:web:6a06e4ac9b48f1e74896f5",
     measurementId: "G-888XL8JTHW",
 };
-// 在 app.js 的最後一行
 export { signInAnonymously, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit };
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+export const provider = new GoogleAuthProvider();
 export const db = initializeFirestore(app, {
     localCache: persistentLocalCache()
 });
-export const provider = new GoogleAuthProvider();
 export const currentStoreInfo = {
     id: null,
     name: null
 };
-// ==========================================
-// 2. 全域核心變數與資料
-// ==========================================
-let allStores = [];
-let buyerLat = null;
-let buyerLng = null;
-let currentBuyerAddress = "正在獲取定位中...";
-let currentUserId = null;
-let activeDragItem = null;
-
 export const areaData = {
     "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
     "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "土城區", "蘆洲區", "汐止區", "樹林區", "鶯歌區", "三峽區", "淡水區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
@@ -56,6 +45,13 @@ export const areaData = {
     "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
     "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
 };
+//  全域核心變數與資料
+let allStores = [];
+let buyerLat = null;
+let buyerLng = null;
+let currentBuyerAddress = "正在獲取定位中...";
+let currentUserId = null;
+let activeDragItem = null;
 // 統一管理頁面上的所有元件
 const storeContainer = document.getElementById('store-Container');
 const citySelect = document.getElementById('citySelect');
@@ -83,27 +79,9 @@ export const authReady = new Promise((resolve) => {
             console.log("是否為匿名:", user.isAnonymous);
             // 開始進行點餐或載入購物車
             handleUserSyncAndRoleRouting(user);
-            renderFavoriteStores();
-        } else {
-            // --- 這裡就是「關門」的地方 ---
-            // 使用者登出了，必須把所有快取清得乾乾淨淨
-            // --- 這裡是「徹底未登入」：觸發匿名登入 ---
-            console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");
-            signInAnonymously(auth).catch((error) => {
-                console.error("匿名登入失敗:", error);
-                // 如果匿名失敗，才退回到你原本的「訪客」UI 顯示
-                showGuestUI();
-            });
         }
     });
 });
-// 這裡是「徹底未登入」：觸發匿名登入 
-function showGuestUI() {
-    console.log("[PACE DEBUG] 進入訪客模式 (無法取得任何身分)");
-    if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
-    renderDynamicMenu('guest');
-    fetchStoresFromFirebase();
-}
 
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
@@ -147,24 +125,8 @@ async function handleUserSyncAndRoleRouting(user) {
     } catch (e) {
         console.error("Role routing error:", e);
     }
-    fetchStoresFromFirebase();
 }
-// 從firebase抓資料
-async function fetchStoresFromFirebase() {
-    try {
-        console.log("[PACE DEBUG] Fetching stores (limited).");
-        const q = query(collection(db, "stores"), limit(20));
-        const querySnapshot = await getDocs(q); // 改用 q 查詢
-        allStores = [];
-        querySnapshot.forEach((doc) => {
-            allStores.push({ id: doc.id, ...doc.data() });
-        });
-        filterAndRenderStores();
-    } catch (error) {
-        console.error("讀取店家失敗：", error);
-        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 無法取得雲端店家資料</div>';
-    }
-}
+
 
 function updateUIForUser(user, currentRole) {
     const userAvatarImg = document.getElementById('userAvatarImg');
@@ -255,60 +217,80 @@ function renderDynamicMenu(role, user) {
         <button class="logoutBtn" data-action="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>`;
     }
     dropdownMenu.innerHTML = personalLinks + registerLink + shopLinks + adminLink + authActionLink;
+    getBrowserLocation();
 }
-
-function initThemeSystem() {
-    // 1. 初始化：網頁載入時套用顏色
-    const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    if (toggleBtn) {
-        toggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-        // 2. 綁定事件：只有當按鈕存在時，才註冊點擊事件
-        toggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('pacetake-theme', newTheme);
-            toggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+function getBrowserLocation() {
+    const path = window.location.pathname;
+    if (path === '/' || path.includes('index.html')) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    buyerLat = position.coords.latitude;
+                    buyerLng = position.coords.longitude;
+                    const currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
+                    // 關鍵修改：拿到座標，立刻去抓該區資料
+                    fetchNearbyStores(buyerLat, buyerLng);
+                    // UI 更新
+                    if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
+                    if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
+                },
+                (error) => {
+                    const errorMsg = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
+                    if (gpsPinBtn) gpsPinBtn.innerText = "📍 無法定位";
+                    if (modalAddressText) modalAddressText.innerText = errorMsg;
+                }
+            );
+        } else {
+            if (modalAddressText) modalAddressText.innerText = "您的裝置不支援 GPS 定位裝置。";
+        }
+    }
+}
+// 從firebase抓資料
+async function fetchNearbyStores(lat, lng) {
+    console.log("[PACE] 正在執行區域化精準查詢...");
+    // 1. 取得目標 9 宮格區域 ID
+    const searchZones = getNearbyZones(lat, lng);
+    try {
+        // 2. 核心優化：只抓這 9 個區內的店家
+        const q = query(
+            collection(db, "stores"),
+            where("zone_id", "in", searchZones) // 這行是省錢關鍵！
+        );
+        const querySnapshot = await getDocs(q);
+        // 3. 更新全域資料
+        allStores = [];
+        querySnapshot.forEach((doc) => {
+            allStores.push({ id: doc.id, ...doc.data() });
         });
+        console.log(`[PACE] 成功獲取附近店家共 ${allStores.length} 間`);
+        // 4. 資料到手後，執行篩選與渲染
+        filterAndRenderStores();
+    } catch (error) {
+        console.error("讀取店家失敗：", error);
+        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 讀取附近店家失敗</div>';
     }
 }
-// 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
-function createStoreCard(store) {
-    const finalName = store.shopName || store.name || '未命名店家';
-    const finalAddress = store.shopAddress || store.address || '';
-    const takeoutSupported = store.isCashPayEnabled !== false;
-    const paySupported = store.isOnlinePayEnabled !== false;
-    const seatingSupported = store.hasSeating !== false;
-    const logoData = store.shopLogo || '🏪';
-    const sLat = parseFloat(store.shopLat || store.lat);
-    const sLng = parseFloat(store.shopLng || store.lng);
-    // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
-    let distanceHtml = "<span>⚡ 距離未知</span>";
-    if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
-        const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
-        distanceHtml = dist.toFixed(1) + ' km';
+/**
+ * 取得使用者周圍的 9 宮格區域陣列
+ */
+function getNearbyZones(lat, lng) {
+    const LAT_MIN = 21.8, LAT_MAX = 25.7;
+    const LNG_MIN = 119.3, LNG_MAX = 122.0;
+    const ROW_COUNT = 39, COL_COUNT = 27;
+    const row = Math.floor(((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * ROW_COUNT);
+    const col = Math.floor(((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * COL_COUNT);
+    let zones = [];
+    // 抓取中心點與周圍 8 格
+    for (let r = row - 1; r <= row + 1; r++) {
+        for (let c = col - 1; c <= col + 1; c++) {
+            // 確保網格沒有超出 0~38 和 0~26 的範圍
+            if (r >= 0 && r < ROW_COUNT && c >= 0 && c < COL_COUNT) {
+                zones.push(`zone_${r}_${c}`);
+            }
+        }
     }
-    let finalLogoHtml = logoData;
-    if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
-        finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
-    }
-    const card = document.createElement('a');
-    card.href = `store.html?storeId=${store.sellerUid}`;
-    card.className = 'store-card';
-    card.innerHTML = `
-        <div class="store-img">${finalLogoHtml}</div>
-        <div class="store-info">
-                <div class="store-name">${finalName}</div>
-                <div class="store-meta">📍 ${finalAddress} <br>⚡ 距離 ${distanceHtml}</div>
-                <div class="store-tags">
-                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金付款</span>
-                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 線上支付</span>
-                    <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用</span>
-                </div>
-            </div>`;
-    return card;
-};
+    return zones; // 把這個陣列丟給 Firebase 的 where("zone_id", "in", zones) 即可！
+}
 // index.html
 function filterAndRenderStores() {
     if (!storeContainer) return;
@@ -366,80 +348,44 @@ async function renderFavoriteStores() {
         console.error("讀取收藏失敗:", error);
     }
 }
-
-function getBrowserLocation() {
-    // 🛡️ 守護：如果不是首頁，直接離開
-    const path = window.location.pathname;
-    if (path === '/' || path.includes('index.html')) {
-        // 這裡是你的首頁邏輯
-        console.log("[PACE DEBUG] 獲取GPS...");
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    buyerLat = position.coords.latitude;
-                    buyerLng = position.coords.longitude;
-                    const currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
-                    if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
-                    if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
-                    // 確認函數存在再呼叫
-                    if (typeof filterAndRenderStores === 'function') {
-                        filterAndRenderStores();
-                    }
-                },
-                (error) => {
-                    const errorMsg = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
-                    if (gpsPinBtn) gpsPinBtn.innerText = "📍 無法定位";
-                    if (modalAddressText) modalAddressText.innerText = errorMsg;
-                }
-            );
-        } else {
-            if (modalAddressText) modalAddressText.innerText = "您的裝置不支援 GPS 定位裝置。";
-        }
+// 這個函數接收一個 store 物件，回傳卡片的 HTML 字串
+function createStoreCard(store) {
+    const finalName = store.shopName || store.name || '未命名店家';
+    const finalAddress = store.shopAddress || store.address || '';
+    const takeoutSupported = store.isCashPayEnabled !== false;
+    const paySupported = store.isOnlinePayEnabled !== false;
+    const seatingSupported = store.hasSeating !== false;
+    const logoData = store.shopLogo || '🏪';
+    const sLat = parseFloat(store.shopLat || store.lat);
+    const sLng = parseFloat(store.shopLng || store.lng);
+    // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
+    let distanceHtml = "<span>⚡ 距離未知</span>";
+    if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
+        const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
+        distanceHtml = dist.toFixed(1) + ' km';
     }
-}
-// 台灣邊界座標 (涵蓋澎湖)
-const LAT_MIN = 21.8;  // 最南端
-const LAT_MAX = 25.7;  // 最北端
-const LNG_MIN = 119.3; // 最西端 (澎湖)
-const LNG_MAX = 122.0; // 最東端
-
-const ROW_COUNT = 39;  // 南北切 39 格
-const COL_COUNT = 27;  // 東西切 27 格
-
-/**
- * 給定經緯度，回傳專屬的 zone_id (例如 "zone_15_12")
- */
-function getZoneId(lat, lng) {
-    // 算出百分比並乘上總格數
-    let row = Math.floor(((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * ROW_COUNT);
-    let col = Math.floor(((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * COL_COUNT);
-
-    // 防呆機制：如果使用者的定位稍微飄出台灣邊界外，強制拉回邊緣網格
-    row = Math.max(0, Math.min(ROW_COUNT - 1, row));
-    col = Math.max(0, Math.min(COL_COUNT - 1, col));
-
-    return `zone_${row}_${col}`;
-}
-
-/**
- * 取得使用者周圍的 9 宮格區域陣列
- */
-function getNearbyZones(lat, lng) {
-    const row = Math.floor(((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * ROW_COUNT);
-    const col = Math.floor(((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * COL_COUNT);
-
-    let zones = [];
-    // 抓取中心點與周圍 8 格
-    for (let r = row - 1; r <= row + 1; r++) {
-        for (let c = col - 1; c <= col + 1; c++) {
-            // 確保網格沒有超出 0~38 和 0~26 的範圍
-            if (r >= 0 && r < ROW_COUNT && c >= 0 && c < COL_COUNT) {
-                zones.push(`zone_${r}_${c}`);
-            }
-        }
+    let finalLogoHtml = logoData;
+    if (logoData && (logoData.startsWith('data:image') || logoData.startsWith('http'))) {
+        finalLogoHtml = `<img src="${logoData}" style="width:100%; height:100%; object-fit:cover; border-radius:3cqw;">`;
     }
-    return zones; // 把這個陣列丟給 Firebase 的 where("zone_id", "in", zones) 即可！
-}
+    const card = document.createElement('a');
+    card.href = `store.html?storeId=${store.sellerUid}`;
+    card.className = 'store-card';
+    card.innerHTML = `
+        <div class="store-img">${finalLogoHtml}</div>
+        <div class="store-info">
+                <div class="store-name">${finalName}</div>
+                <div class="store-meta">📍 ${finalAddress} <br>⚡ 距離 ${distanceHtml}</div>
+                <div class="store-tags">
+                    <span class="tag-time ${takeoutSupported ? '' : 'inactive'}">💵 現金付款</span>
+                    <span class="tag-pay ${paySupported ? '' : 'inactive'}">💳 線上支付</span>
+                    <span class="tag-seating ${seatingSupported ? '' : 'inactive'}">🪑 內用</span>
+                </div>
+            </div>`;
+    return card;
+};
+
+
 // 📍 計算兩點經緯度距離 (回傳公里數)
 function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // 地球半徑(公里)
@@ -613,7 +559,6 @@ document.addEventListener('click', async (e) => {
         }
         case 'gpsPinBtn': {
             console.log("[PACE DEBUG] GPS Pin clicked.");
-            getBrowserLocation();
             if (addressDetailLightbox) addressDetailLightbox.style.display = 'flex';
             break;
         }
@@ -1146,16 +1091,31 @@ export function initCartDOMState() {
     });
 }
 
+function initThemeSystem() {
+    // 1. 初始化：網頁載入時套用顏色
+    const savedTheme = localStorage.getItem('pacetake-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (toggleBtn) {
+        toggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        // 2. 綁定事件：只有當按鈕存在時，才註冊點擊事件
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('pacetake-theme', newTheme);
+            toggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        });
+    }
+}
 // 🚀 初始化區塊
 document.addEventListener('DOMContentLoaded', () => {
-    fetchStoresFromFirebase();// 從firebase抓資料
-    initThemeSystem();//網頁載入時套用顏色
+    renderFavoriteStores();
     mouseslide();
     initCitySelect(document.getElementById('citySelect'));// 負責把資料灌入指定的 Select
-    getBrowserLocation();//gpsPinBtn
     /*initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡*/
     initStorePage();// 🎯 PACE 專屬：store.html 
     refreshTotalCartUI();//** * 🛒 購物車管理
     initCartDOMState();//回填當前店家購物車的資料
+    initThemeSystem();//網頁載入時套用顏色
     console.log("系統初始化完成");
 });

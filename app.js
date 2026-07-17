@@ -79,6 +79,7 @@ export const authReady = new Promise((resolve) => {
             console.log("是否為匿名:", user.isAnonymous);
             // 開始進行點餐或載入購物車
             handleUserSyncAndRoleRouting(user);
+            renderFavoriteStores();
         } else {
             // --- 這裡就是「關門」的地方 ---
             console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");
@@ -264,7 +265,7 @@ async function fetchNearbyStores(lat, lng) {
         // 2. 核心優化：只抓這 9 個區內的店家
         const q = query(
             collection(db, "stores"),
-            where("zone_id", "in", searchZones) // 這行是省錢關鍵！
+            where("zoneid", "in", searchZones) // 這行是省錢關鍵！
         );
         const querySnapshot = await getDocs(q);
         // 3. 更新全域資料
@@ -286,7 +287,7 @@ async function fetchNearbyStores(lat, lng) {
 function getNearbyZones(lat, lng) {
     const LAT_MIN = 21.8, LAT_MAX = 25.7;
     const LNG_MIN = 119.3, LNG_MAX = 122.0;
-    const ROW_COUNT = 39, COL_COUNT = 27;
+    const ROW_COUNT = 78, COL_COUNT = 54;
     const row = Math.floor(((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * ROW_COUNT);
     const col = Math.floor(((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * COL_COUNT);
     let zones = [];
@@ -1119,7 +1120,6 @@ function initThemeSystem() {
 }
 // 🚀 初始化區塊
 document.addEventListener('DOMContentLoaded', () => {
-    renderFavoriteStores();
     mouseslide();
     initCitySelect(document.getElementById('citySelect'));// 負責把資料灌入指定的 Select
     /*initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡*/

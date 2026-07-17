@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit, } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 const firebaseConfig = {
     apiKey: "AIzaSyCkAiZCJ6L950KfYJEqubWGi1M8D03OuJI",
     authDomain: "pacetake-c6e1e.firebaseapp.com",
@@ -152,8 +152,9 @@ async function handleUserSyncAndRoleRouting(user) {
 // 從firebase抓資料
 async function fetchStoresFromFirebase() {
     try {
-        console.log("[PACE DEBUG] Fetching stores.");
-        const querySnapshot = await getDocs(collection(db, "stores"));
+        console.log("[PACE DEBUG] Fetching stores (limited).");
+        const q = query(collection(db, "stores"), limit(20));
+        const querySnapshot = await getDocs(q); // 改用 q 查詢
         allStores = [];
         querySnapshot.forEach((doc) => {
             allStores.push({ id: doc.id, ...doc.data() });
@@ -439,6 +440,13 @@ function mouseslide() {
         tabs.scrollLeft = scrollLeft - walk;
     });
 }
+// 3. 【關鍵】監聽滾動事件 (滑到底就觸發)
+storeContainer.addEventListener('scroll', () => {
+    // 當「滑動高度 + 視窗高度」>=「容器總高度 - 100px (預留緩衝)」
+    if (storeContainer.scrollTop + storeContainer.clientHeight >= storeContainer.scrollHeight - 100) {
+        fetchStoresFromFirebase(citySelect.value); // 繼續抓下一頁
+    }
+});
 // Listener'input'
 document.addEventListener('input', (e) => {
     const target = e.target.closest('[data-action-input]');

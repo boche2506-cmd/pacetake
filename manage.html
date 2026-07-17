@@ -533,10 +533,10 @@
                 </div>
                 <div class="finance-stats" id="stats-container">
                     <h3 class="section-title">本週財務統計 (點選柱狀圖查看單日)</h3>
-                    <div class="stat-item"><span>接單數</span> <strong id="stat-orders">55</strong></div>
-                    <div class="stat-item"><span>線上收入</span> <strong id="stat-online">222</strong></div>
-                    <div class="stat-item"><span>現金收入</span> <strong id="stat-cash">1111</strong></div>
-                    <div class="stat-item"><span>合計</span> <strong id="stat-total">1333</strong></div>
+                    <div class="stat-item"><span>接單數</span> <strong id="stat-orders">讀取中...</strong></div>
+                    <div class="stat-item"><span>線上收入</span> <strong id="stat-online">讀取中...</strong></div>
+                    <div class="stat-item"><span>現金收入</span> <strong id="stat-cash">讀取中...</strong></div>
+                    <div class="stat-item"><span>合計</span> <strong id="stat-total">讀取中...</strong></div>
                 </div>
                 <div class="info-section">
                     <div class="time-title">
@@ -687,8 +687,15 @@
                 return;
             }*/
             // 驗證完全過關，執行你的主程式
-            console.log("驗證通過，開始載入管理介面...");
-            await initStatus(storeId);
+            if (user) {
+                // 使用者已經登入！
+                // 從 user 物件中取出 uid
+                const sellerUid = user.uid;
+                // 【關鍵】在這裡呼叫你的函數，並把 sellerUid 餵給它
+                console.log("驗證通過，開始載入管理介面...");
+                await initStatus(storeId);
+                fetchAndRenderChart(sellerUid);
+            }
         }
         async function initStatus(storeId) {
             try {
@@ -885,13 +892,13 @@
                 const row = document.createElement('div');
                 row.className = 'day-row';
                 row.innerHTML = `
-            <label>
-                <input type="checkbox" id="${day}-check" ${dayData.isOpen ? 'checked' : ''}>
-                ${dayNames[index]}
-            </label>
-            <input type="time" id="${day}-open" value="${dayData.open}">
-            <span>至</span>
-            <input type="time" id="${day}-close" value="${dayData.close}">`;
+                        <label>
+                            <input type="checkbox" id="${day}-check" ${dayData.isOpen ? 'checked' : ''}>
+                            ${dayNames[index]}
+                        </label>
+                        <input type="time" id="${day}-open" value="${dayData.open}">
+                        <span>至</span>
+                        <input type="time" id="${day}-close" value="${dayData.close}">`;
                 container.appendChild(row);
             });
         }
@@ -909,41 +916,81 @@
             await updateDoc(doc(db, "stores", storeId), { businessHours });
             alert("已儲存時間設定！(自動排程為每十分鐘更新一次)");
         }
-        const ctx = document.getElementById('incomeChart').getContext('2d');
-        // 範例資料：一週七天
-        const weeklyData = [
-            { day: '週一', orders: 10, online: 50, cash: 200 },
-            { day: '週二', orders: 5, online: 30, cash: 100 },
-            // ... 填入七天資料
-        ];
-        // 計算總和 (預設顯示)
-        const totalStats = weeklyData.reduce((acc, curr) => ({
-            orders: acc.orders + curr.orders,
-            online: acc.online + curr.online,
-            cash: acc.cash + curr.cash,
-            total: acc.total + (curr.online + curr.cash)
-        }), { orders: 0, online: 0, cash: 0, total: 0 });
-        const myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: weeklyData.map(d => d.day),
-                datasets: [{
-                    label: '每日總收入',
-                    data: weeklyData.map(d => d.online + d.cash),
-                    backgroundColor: '#3498db'
-                }]
-            },
-            options: {
-                onClick: (event, elements) => {
-                    if (elements.length > 0) {
-                        const index = elements[0].index;
-                        updateStats(weeklyData[index]); // 顯示該天
-                    } else {
-                        updateStats(totalStats, true); // 點擊空白處回到總和
-                    }
+        async function fetchAndRenderChart(currentstoreId) {
+            // 2. 從 Firebase 抓取近 7 天的資料 (這裡建議用時間戳篩選)
+            const now = new Date();
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7); // 設定七天前的時間
+            const q = query(
+                collection(db, "orders"),
+                where("storeId", "==", currentstoreId), // 篩選店家
+                where("createdAt", ">=", oneWeekAgo)        // 篩選時間
+            );
+            const snapshot = await getDocs(q);
+            // 定義一個全域變數來存這週七天的資料，先預設為 0
+            let weeklyData = Array.from({ length: 7 }, (_, i) => ({
+                day: ['週一', '週二', '週三', '週四', '週五', '週六', '週日'][i],
+                orders: 0,
+                online: 0,
+                cash: 0
+            }));
+            // 歸零資料，避免重複加總
+            weeklyData.forEach(d => {
+                d.orders = 0; d.online = 0; d.cash = 0;
+            });
+            // 3. 把資料歸類進去
+            snapshot.forEach((doc) => {
+                const order = doc.data();
+                const date = order.createdAt.toDate();
+                // 取得週幾 (0-6)
+                const dayIndex = (date.getDay() + 6) % 7;
+                // 確保陣列範圍內才歸類
+                if (dayIndex >= 0 && dayIndex < 7) {
+                    weeklyData[dayIndex].orders += 1;
+                    weeklyData[dayIndex].online += (order.paymentMethod === 'online' ? (order.totalAmount || 0) : 0);
+                    weeklyData[dayIndex].cash += (order.paymentMethod === 'cash' ? (order.totalAmount || 0) : 0);
                 }
-            }
-        });
+            });
+            // 4. 更新圖表與全域變數
+            updateChart(weeklyData);
+        }
+        function updateChart(data) {
+            // 1. 初始化環境
+            const ctx = document.getElementById('incomeChart').getContext('2d');
+            // 2. 【修正這裡】：建立圖表實體 (先用空的資料畫出來)
+            const myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: weeklyData.map(d => d.day),
+                    datasets: [{
+                        label: '每日總收入',
+                        data: weeklyData.map(d => 0), // 初始值設為 0
+                        backgroundColor: '#3498db'
+                    }]
+                },
+                options: { responsive: true }
+            });
+            // 更新圖表資料
+            myChart.data.datasets[0].data = data.map(d => d.online + d.cash);
+            myChart.update();
+            // 2. 計算總和 (供點擊空白處或初始狀態使用)
+            const totalStats = data.reduce((acc, curr) => ({
+                orders: acc.orders + curr.orders,
+                online: acc.online + curr.online,
+                cash: acc.cash + curr.cash,
+                total: acc.total + (curr.online + curr.cash)
+            }), { orders: 0, online: 0, cash: 0, total: 0 });
+            // 3. 綁定點擊事件 (更新全域的 weeklyData 讓點擊可以存取)
+            myChart.options.onClick = (event, elements) => {
+                if (elements.length > 0) {
+                    updateStats(data[elements[0].index]);
+                } else {
+                    updateStats(totalStats, true);
+                }
+            };
+            // 預設顯示總和
+            updateStats(totalStats, true);
+        }
         // 更新 UI 的函式
         function updateStats(data, isTotal = false) {
             document.getElementById('stat-orders').innerText = data.orders;
@@ -953,7 +1000,6 @@
         }
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
-            renderTimeInputs();
             console.log("系統初始化完成");
         });
     </script>

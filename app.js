@@ -79,10 +79,20 @@ export const authReady = new Promise((resolve) => {
             console.log("是否為匿名:", user.isAnonymous);
             // 開始進行點餐或載入購物車
             handleUserSyncAndRoleRouting(user);
+        } else {
+            // --- 這裡就是「關門」的地方 ---
+            console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");
+            signInAnonymously(auth).catch((error) => {
+                showGuestUI();
+            });
         }
     });
 });
-
+// 使用者登出
+function showGuestUI() {
+    if (userNameDisplay) userNameDisplay.innerHTML = "訪客";
+    renderDynamicMenu('guest');
+}
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
     currentUserId = user.uid;

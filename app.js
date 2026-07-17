@@ -372,29 +372,73 @@ function getBrowserLocation() {
     const path = window.location.pathname;
     if (path === '/' || path.includes('index.html')) {
         // 這裡是你的首頁邏輯
-    }
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                buyerLat = position.coords.latitude;
-                buyerLng = position.coords.longitude;
-                const currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
-                if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
-                if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
-                // 確認函數存在再呼叫
-                if (typeof filterAndRenderStores === 'function') {
-                    filterAndRenderStores();
+        console.log("[PACE DEBUG] 獲取GPS...");
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    buyerLat = position.coords.latitude;
+                    buyerLng = position.coords.longitude;
+                    const currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
+                    if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
+                    if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
+                    // 確認函數存在再呼叫
+                    if (typeof filterAndRenderStores === 'function') {
+                        filterAndRenderStores();
+                    }
+                },
+                (error) => {
+                    const errorMsg = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
+                    if (gpsPinBtn) gpsPinBtn.innerText = "📍 無法定位";
+                    if (modalAddressText) modalAddressText.innerText = errorMsg;
                 }
-            },
-            (error) => {
-                const errorMsg = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
-                if (gpsPinBtn) gpsPinBtn.innerText = "📍 無法定位";
-                if (modalAddressText) modalAddressText.innerText = errorMsg;
-            }
-        );
-    } else {
-        if (modalAddressText) modalAddressText.innerText = "您的裝置不支援 GPS 定位裝置。";
+            );
+        } else {
+            if (modalAddressText) modalAddressText.innerText = "您的裝置不支援 GPS 定位裝置。";
+        }
     }
+}
+// 台灣邊界座標 (涵蓋澎湖)
+const LAT_MIN = 21.8;  // 最南端
+const LAT_MAX = 25.7;  // 最北端
+const LNG_MIN = 119.3; // 最西端 (澎湖)
+const LNG_MAX = 122.0; // 最東端
+
+const ROW_COUNT = 39;  // 南北切 39 格
+const COL_COUNT = 27;  // 東西切 27 格
+
+/**
+ * 給定經緯度，回傳專屬的 zone_id (例如 "zone_15_12")
+ */
+function getZoneId(lat, lng) {
+    // 算出百分比並乘上總格數
+    let row = Math.floor(((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * ROW_COUNT);
+    let col = Math.floor(((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * COL_COUNT);
+
+    // 防呆機制：如果使用者的定位稍微飄出台灣邊界外，強制拉回邊緣網格
+    row = Math.max(0, Math.min(ROW_COUNT - 1, row));
+    col = Math.max(0, Math.min(COL_COUNT - 1, col));
+
+    return `zone_${row}_${col}`;
+}
+
+/**
+ * 取得使用者周圍的 9 宮格區域陣列
+ */
+function getNearbyZones(lat, lng) {
+    const row = Math.floor(((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * ROW_COUNT);
+    const col = Math.floor(((lng - LNG_MIN) / (LNG_MAX - LNG_MIN)) * COL_COUNT);
+
+    let zones = [];
+    // 抓取中心點與周圍 8 格
+    for (let r = row - 1; r <= row + 1; r++) {
+        for (let c = col - 1; c <= col + 1; c++) {
+            // 確保網格沒有超出 0~38 和 0~26 的範圍
+            if (r >= 0 && r < ROW_COUNT && c >= 0 && c < COL_COUNT) {
+                zones.push(`zone_${r}_${c}`);
+            }
+        }
+    }
+    return zones; // 把這個陣列丟給 Firebase 的 where("zone_id", "in", zones) 即可！
 }
 // 📍 計算兩點經緯度距離 (回傳公里數)
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -440,13 +484,6 @@ function mouseslide() {
         tabs.scrollLeft = scrollLeft - walk;
     });
 }
-// 3. 【關鍵】監聽滾動事件 (滑到底就觸發)
-storeContainer.addEventListener('scroll', () => {
-    // 當「滑動高度 + 視窗高度」>=「容器總高度 - 100px (預留緩衝)」
-    if (storeContainer.scrollTop + storeContainer.clientHeight >= storeContainer.scrollHeight - 100) {
-        fetchStoresFromFirebase(citySelect.value); // 繼續抓下一頁
-    }
-});
 // Listener'input'
 document.addEventListener('input', (e) => {
     const target = e.target.closest('[data-action-input]');

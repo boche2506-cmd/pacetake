@@ -25,15 +25,20 @@
         }
 
         /* 將所有區塊改成卡片式設計 */
-        .chart-section {
+        #incomeChart {
             height: 30%;
             width: 100%;
             color: var(--text-main);
-            box-shadow: var(--shadow-sm);
-            background-color: var(--card-bg);
-            border: 0.2cqw solid var(--border-color);
+            /*box-shadow: var(--shadow-sm);*/
+            /*background-color: var(--card-bg);*/
+            /*border: 0.2cqw solid var(--border-color);*/
             border: none;
             border-radius: 5cqw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2cqw;
         }
 
         .finance-stats {
@@ -528,9 +533,7 @@
                 </div>
             </header>
             <main class="dashboard-container">
-                <div class="chart-section">
-                    <canvas id="incomeChart"></canvas>
-                </div>
+                <canvas id="incomeChart"></canvas>
                 <div class="finance-stats" id="stats-container">
                     <h3 class="section-title">本週財務統計 (點選柱狀圖查看單日)</h3>
                     <div class="stat-item"><span>接單數</span> <strong id="stat-orders">讀取中...</strong></div>
@@ -640,6 +643,7 @@
         let currentUserId = null;
         let activeDragItem = null;
         let cachedQrCanvas = null;
+        let myChart = null;
         const IS_DEBUG_MODE = true;// 🚩 開發時設為 true，上線前請務必改回 false！
         const MOCK_USER_ID = "56TND0b1QBaj994IUmB9gwtYAWF2";// 🚩 開發時設為 true，上線前請務必改回 false！
         // 取得網址參數 (記得在網址手動加上 ?storeId=你的ID)
@@ -954,40 +958,55 @@
             updateChart(weeklyData);
         }
         function updateChart(data) {
-            // 1. 初始化環境
             const ctx = document.getElementById('incomeChart').getContext('2d');
-            // 2. 【修正這裡】：建立圖表實體 (先用空的資料畫出來)
-            const myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: weeklyData.map(d => d.day),
-                    datasets: [{
-                        label: '每日總收入',
-                        data: weeklyData.map(d => 0), // 初始值設為 0
-                        backgroundColor: '#3498db'
-                    }]
-                },
-                options: { responsive: true }
-            });
-            // 更新圖表資料
-            myChart.data.datasets[0].data = data.map(d => d.online + d.cash);
-            myChart.update();
-            // 2. 計算總和 (供點擊空白處或初始狀態使用)
+            // 準備資料
+            const labels = data.map(d => d.day);
+            const chartValues = data.map(d => d.online + d.cash);
+            if (myChart) {
+                // 如果圖表已經存在，直接更新資料即可
+                myChart.data.labels = labels;
+                myChart.data.datasets[0].data = chartValues;
+                myChart.update();
+            } else {
+                // 如果還沒有圖表，才創建一個新的
+                myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '每日總收入',
+                            data: chartValues,
+                            backgroundColor: '#3498db'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        onClick: (event, elements) => {
+                            // 這裡改用外部的 data 變數，不需要擔心作用域問題
+                            if (elements.length > 0) {
+                                updateStats(data[elements[0].index]);
+                            } else {
+                                // 重新計算總和
+                                const totalStats = data.reduce((acc, curr) => ({
+                                    orders: acc.orders + curr.orders,
+                                    online: acc.online + curr.online,
+                                    cash: acc.cash + curr.cash,
+                                    total: acc.total + (curr.online + curr.cash)
+                                }), { orders: 0, online: 0, cash: 0, total: 0 });
+                                updateStats(totalStats, true);
+                            }
+                        }
+                    }
+                });
+            }
+            // 計算初始總和並顯示 (放在 updateChart 最後)
             const totalStats = data.reduce((acc, curr) => ({
                 orders: acc.orders + curr.orders,
                 online: acc.online + curr.online,
                 cash: acc.cash + curr.cash,
                 total: acc.total + (curr.online + curr.cash)
             }), { orders: 0, online: 0, cash: 0, total: 0 });
-            // 3. 綁定點擊事件 (更新全域的 weeklyData 讓點擊可以存取)
-            myChart.options.onClick = (event, elements) => {
-                if (elements.length > 0) {
-                    updateStats(data[elements[0].index]);
-                } else {
-                    updateStats(totalStats, true);
-                }
-            };
-            // 預設顯示總和
+
             updateStats(totalStats, true);
         }
         // 更新 UI 的函式

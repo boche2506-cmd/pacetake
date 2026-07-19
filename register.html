@@ -1157,7 +1157,6 @@
             document.getElementById('shopAddress').value = data.detailAddress || '';
             document.getElementById('shopLat').value = data.shopLat || '';
             document.getElementById('shopLng').value = data.shopLng || '';
-            document.getElementById('shopInviteCode').value = data.inviteCode || '';
             document.getElementById('zoneid').value = data.zoneid || '';
             document.getElementById('prepareTimeInput').value = data.prepareTime || 15;
             document.getElementById('merchantIdInput').value = data.MerchantID || '';
@@ -1189,7 +1188,6 @@
                 detailAddress: document.getElementById('shopAddress')?.value.trim(),
                 lat: document.getElementById('shopLat')?.value.trim() || '',
                 lng: document.getElementById('shopLng')?.value.trim() || '',
-                inviteCode: document.getElementById('shopInviteCode')?.value.trim() || '',
                 zoneid: document.getElementById('zoneid').value.trim() || '',
                 prepareTime: parseInt(document.getElementById('prepareTimeInput')?.value) || 15,
                 merchantIdValue: document.getElementById('merchantIdInput')?.value.trim() || '',

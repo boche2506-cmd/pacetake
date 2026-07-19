@@ -14,12 +14,6 @@
     <link rel="apple-touch-icon" href="png/logo180.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 👑 頂部全區常駐吸附天花板 (Sticky) */
-
-        * {
-            box-sizing: border-box;
-        }
-
         .sticky-top-group {
             /* 這裡的高度與寬度原本是 15% 和 100%，我們用 cqw 重新定義它們的比例 */
             height: 10%;
@@ -193,27 +187,19 @@
             padding: 0;
         }
 
-        /* ==========================================================================
-   7. 店家列表 (Store List)
-   ========================================================================== */
         /* 店家列表大容器（佔畫面高55%） */
         .store-list {
             height: 63%;
-            max-width: 100%;
+            width: 100%;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             justify-content: start;
             gap: 0.5cqw;
-            /* 卡片與卡片之間的間距改用 cqw */
             padding: 1cqw;
-            /* 微調右邊 padding，留出空間給滾動條，卡片才不會黏在一起 */
             box-sizing: border-box;
-            /* 隱藏 Firefox 的卷軸 */
             scrollbar-width: none;
-            /* 確保內容依然可以滑動 */
             -ms-overflow-style: none;
-            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
         }
 
         .store-list::-webkit-scrollbar {
@@ -363,7 +349,7 @@
             align-items: center;
             height: 12%;
             /* 保留你原本佔外殼的 15% 高度比例 */
-            max-width: 100%;
+            width: 100%;
             background-color: var(--blur-bg);
             border-top: 0.3cqw solid var(--border-color);
             /* 邊框 cqw */

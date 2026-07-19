@@ -948,16 +948,10 @@
             // 監聽選單改變事件
             selector.addEventListener('change', (e) => {
                 const startDate = new Date(e.target.value);
-                // 【修改點】：直接從 body 抓 data-store-id，不再依賴 window.currentStoreInfo
-                const currentStoreId = document.body.getAttribute('data-store-id');
-                if (!currentStoreId) {
-                    console.error("找不到商店ID，請檢查頁面是否初始化完成");
-                    return;
-                }
-                fetchAndRenderChart(currentStoreId, startDate);
+                fetchAndRenderChart(storeId, startDate);
             });
         }
-        async function fetchAndRenderChart(currentstoreId, startDate = null) {
+        async function fetchAndRenderChart(storeId, startDate = null) {
             // 1. 計算該週的範圍
             let startOfWeek, endOfWeek;
             if (startDate) {
@@ -986,7 +980,7 @@
             // 3. 查詢 Firebase
             const q = query(
                 collection(db, "orders"),
-                where("storeId", "==", currentstoreId),
+                where("storeId", "==", storeId),
                 where("createdAt", ">=", startOfWeek),
                 where("createdAt", "<=", endOfWeek)
             );
@@ -1070,7 +1064,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
             initWeekSelector(); // 生成選單
-            fetchAndRenderChart(); // 載入預設本週資料
             console.log("系統初始化完成");
         });
     </script>

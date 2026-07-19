@@ -263,27 +263,30 @@ function getBrowserLocation() {
 }
 // 從firebase抓資料
 async function fetchNearbyStores(lat, lng) {
-    console.log("[PACE] 正在執行區域化精準查詢...");
-    // 1. 取得目標 9 宮格區域 ID
-    const searchZones = getNearbyZones(lat, lng);
-    try {
-        // 2. 核心優化：只抓這 9 個區內的店家
-        const q = query(
-            collection(db, "stores"),
-            where("zoneid", "in", searchZones) // 這行是省錢關鍵！
-        );
-        const querySnapshot = await getDocs(q);
-        // 3. 更新全域資料
-        allStores = [];
-        querySnapshot.forEach((doc) => {
-            allStores.push({ id: doc.id, ...doc.data() });
-        });
-        console.log(`[PACE] 成功獲取附近店家共 ${allStores.length} 間`);
-        // 4. 資料到手後，執行篩選與渲染
-        filterAndRenderStores();
-    } catch (error) {
-        console.error("讀取店家失敗：", error);
-        if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 讀取附近店家失敗</div>';
+    const path = window.location.pathname;
+    if (path === '/' || path.includes('index.html')) {
+        console.log("[PACE] 正在執行區域化精準查詢...");
+        // 1. 取得目標 9 宮格區域 ID
+        const searchZones = getNearbyZones(lat, lng);
+        try {
+            // 2. 核心優化：只抓這 9 個區內的店家
+            const q = query(
+                collection(db, "stores"),
+                where("zoneid", "in", searchZones) // 這行是省錢關鍵！
+            );
+            const querySnapshot = await getDocs(q);
+            // 3. 更新全域資料
+            allStores = [];
+            querySnapshot.forEach((doc) => {
+                allStores.push({ id: doc.id, ...doc.data() });
+            });
+            console.log(`[PACE] 成功獲取附近店家共 ${allStores.length} 間`);
+            // 4. 資料到手後，執行篩選與渲染
+            filterAndRenderStores();
+        } catch (error) {
+            console.error("讀取店家失敗：", error);
+            if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 讀取附近店家失敗</div>';
+        }
     }
 }
 /**

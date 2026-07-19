@@ -14,7 +14,7 @@
     <link rel="apple-touch-icon" href="png/logo180.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        .tabs-container {
+        .order-controls {
             height: 7%;
             width: 100%;
             display: flex;
@@ -23,10 +23,53 @@
             align-items: center;
             overflow-x: auto;
             color: var(--text-main);
-            gap: 1cqw;
+            gap: 0.5cqw;
             cursor: pointer;
             white-space: nowrap;
             border-bottom: 0.3cqw solid var(--border-color);
+        }
+
+        .order-controls input {
+            height: 50%;
+            width: 18%;
+            display: flex;
+            flex-direction: row;
+            justify-content: start;
+            align-items: center;
+            overflow-x: auto;
+            cursor: pointer;
+            white-space: nowrap;
+            text-align: center;
+            border: 0.2cqw solid var(--border-color);
+            border-radius: 10cqw;
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            line-height: 1.1;
+            box-sizing: border-box;
+            object-fit: contain;
+            user-select: text;
+            cursor: text;
+            /* 你原本的灰色 */
+            transition: background-color 0.3s ease;
+        }
+
+        .order-controls input:not(:placeholder-shown) {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        .tabs-container {
+            height: 100%;
+            width: 82%;
+            display: flex;
+            flex-direction: row;
+            justify-content: start;
+            align-items: center;
+            overflow-x: auto;
+            color: var(--text-main);
+            gap: 0.5cqw;
+            cursor: pointer;
+            white-space: nowrap;
         }
 
         .order-tab {
@@ -670,7 +713,10 @@
                     </div>
                 </div>
             </header>
-            <div class="tabs-container" id="orderTabsContainer"></div>
+            <div class="order-controls">
+                <input type="date" id="order-date-picker">
+                <div class="tabs-container" id="orderTabsContainer"></div>
+            </div>
             <div class="workspace-layout">
                 <aside class="lights-sidebar">
                     <div class="lightpay" data-action="lightpay" id="payContainer">
@@ -827,6 +873,7 @@
         let isInitialLoad = true;
         let orders = [];// 存儲從 Firebase 撈回的訂單
         let activeOrderId = null; // 全域變數
+        let unsubscribeOrders = null;
         // 🚩 開發時設為 true，上線前請務必改回 false！
         const IS_DEBUG_MODE = true;// 🚩 開發時設為 true，上線前請務必改回 false！
         const MOCK_USER_ID = "56TND0b1QBaj994IUmB9gwtYAWF2";// 🚩 開發時設為 true，上線前請務必改回 false！
@@ -854,7 +901,6 @@
             }
             console.log("驗證通過，開始載入...");
             listenToStoreStatus(storeId);
-            initOrderListener(storeId);
             /*const user = await authReady;
             if (!user) {
                 alert("尚未登入，請先前往登入頁面。");
@@ -872,8 +918,7 @@
             console.log("驗證通過，開始載入管理介面...");
             // 1. 初始化狀態監聽 (營業/休息)
             listenToStoreStatus(storeId);
-            // 2. 初始化訂單監聽
-            initOrderListener(storeId);*/
+            // 2. 初始化訂單監聽*/
         }
         // 訂單監聽函數
         function listenToStoreStatus(storeId) {
@@ -895,33 +940,60 @@
                 }
             });
         }
-        // 3. 訂單監聽 (資料變更時)
-        function initOrderListener(storeId) {
+        // 1. 初始化日期選擇器 (設為今天)
+        const datePicker = document.getElementById('order-date-picker');
+        const today = new Date().toISOString().split('T')[0];
+        datePicker.value = today;
+        // 監聽日期變更
+        datePicker.addEventListener('change', (e) => {
+            // 變更日期時，重置 isInitialLoad 為 false (因為不是第一次載入)
+            isInitialLoad = false;
+            loadOrdersForDate(storeId, e.target.value);
+        });
+        // 2. 根據選擇的日期重新撈取 Firebase
+        function loadOrdersForDate(storeId, dateString) {
+            // 1. 取消上一個日期的監聽 (非常重要！)
+            if (unsubscribeOrders) {
+                unsubscribeOrders();
+            }
+            // 2. 設定日期範圍
+            const start = new Date(dateString);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(dateString);
+            end.setHours(23, 59, 59, 999);
+            // 3. 建立該日期的 Query
             const q = query(
                 collection(db, "orders"),
                 where("storeId", "==", storeId),
+                where("createdAt", ">=", start),
+                where("createdAt", "<=", end),
                 orderBy("createdAt", "desc")
             );
-            onSnapshot(q, (snapshot) => {
-                // 1. 整理最新資料
+            // 4. 判斷是否為今天 (只有今天是需要播放音效的)
+            const isToday = (dateString === new Date().toISOString().split('T')[0]);
+            // 5. 啟動新的監聽
+            unsubscribeOrders = onSnapshot(q, (snapshot) => {
                 const newOrdersList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const hasNewOrder = !isInitialLoad && snapshot.docChanges().some(change =>
+                // 判斷是否有新訂單 (只在今天是今天的情況下才執行)
+                const hasNewOrder = isToday && !isInitialLoad && snapshot.docChanges().some(change =>
                     change.type === 'added' && isValidOrder(change.doc.data())
                 );
+                // 更新全域陣列
                 orders.length = 0;
                 orders.push(...newOrdersList);
-                // 4. 根據狀態執行 UI 行為
+                // UI 處理
                 if (isInitialLoad) {
                     if (orders.length > 0) updateUI(orders[0].id);
+                    else renderTabs(); // 即使沒訂單也要渲染空的 UI
                     isInitialLoad = false;
                 }
                 else if (hasNewOrder) {
-                    // 情況：有新訂單 -> 播放音效 + 強制跳轉到最新單
                     AudioController.play();
                     if (orders.length > 0) updateUI(orders[0].id);
+                    else renderTabs();
                 }
                 else {
-                    // 情況：沒有新單 (可能是舊單狀態改變) -> 只更新當前活躍的 UI
+                    // 單純的資料更新 (例如舊單狀態變更)
                     const currentOrder = orders.find(o => o.id === activeOrderId);
                     if (currentOrder) renderOrderToWorkspace(currentOrder);
                     renderTabs();

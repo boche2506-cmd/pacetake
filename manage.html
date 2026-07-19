@@ -54,7 +54,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 2cqw 5cqw;
+            padding: 1cqw 5cqw;
 
         }
 
@@ -70,26 +70,20 @@
 
         #week-selector {
             border-radius: 5cqw;
-            /* 圓角改用 cqw */
             border: 0.3cqw solid var(--border-color);
             background-color: var(--bg-global);
             color: var(--text-main);
             font-size: 3.25cqw;
-            /* 字體與按鈕對齊 */
+            text-align: center;
             outline: none;
             height: 100%;
-            width: 35%;
-            padding: 0 1cqw;
-            /* 讓裡面的文字不會太貼邊框 */
+            width: 40%;
             box-sizing: border-box;
             line-height: 1.1;
-            /* 隱藏 Firefox 的卷軸 */
             overflow-y: auto;
             scrollbar-width: none;
-            /* 確保內容依然可以滑動 */
             -ms-overflow-style: none;
             cursor: grab;
-            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
         }
 
         #week-selector::-webkit-scrollbar {
@@ -566,7 +560,7 @@
                 <div class="finance-stats" id="stats-container">
                     <h3 class="section-title">
                         財務統計區間：
-                        <select id="week-selector" style="padding: 5px; border-radius: 5px;">
+                        <select id="week-selector">
                             <!-- 選項會透過 JS 自動生成 -->
                         </select>
                     </h3>

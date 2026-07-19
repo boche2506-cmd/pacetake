@@ -1222,11 +1222,20 @@
                 MerchantID: ShopFormData.merchantIdValue,
                 hasSeating: ShopFormData.hasSeating
             };
-            // 只有在「新增」時才需要寫入這些欄位
-            if (!isEditMode) {
+            // 只有在「新增」時，才建立初始訂閱資料
+            /*if (!isEditMode) {*/
                 data.sellerUid = userUid;
                 data.createdAt = new Date().toISOString();
-            }
+                // 設定 7 天試用期
+                const expiry = new Date();
+                expiry.setDate(expiry.getDate() + 7); // 加 7 天
+                data.subscription = {
+                    status: "trial",
+                    expiryDate: expiry.toISOString() // 轉成字串，跟你的 createdAt 格式統一
+                };
+            /*}*/
+            // 如果是 isEditMode，我們不加入 subscription 欄位，
+            // Firebase 更新時就會保留資料庫原本的訂閱狀態，不會被覆蓋！
             return data;
         }
         // 菜單文件

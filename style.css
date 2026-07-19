@@ -73,7 +73,7 @@ textarea {
     color: var(--text-main);
     line-height: 1.1;
     box-sizing: border-box;
-    max-width: 100%;
+    width: 100%;
     object-fit: contain;
     user-select: text;
     cursor: text;
@@ -256,7 +256,7 @@ img,
 
 .header {
     height: 15%;
-    max-width: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -266,7 +266,7 @@ img,
 
 .pace-logo {
     height: 65%;
-    max-width: 100%;
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -276,7 +276,7 @@ img,
 
 .logo-link {
     height: 100%;
-    max-width: 70%;
+    width: 70%;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -303,7 +303,7 @@ img,
 
 .two {
     height: 35%;
-    max-width: 100%;
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -313,7 +313,7 @@ img,
 
 .pace {
     height: 100%;
-    max-width: 70%;
+    width: 70%;
     font-size: 5.125cqw;
     font-weight: 600;
     color: var(--text-muted);
@@ -352,8 +352,7 @@ img,
 
 .avatarBtnMenu {
     height: 100%;
-    max-width: 28%;
-    min-width: 28%;
+    width: 28%;
     /* 💡 新增：確保按鈕至少能完整塞下內文 */
     padding: 0 1.5cqw;
     /* 調整內襯，讓膠囊兩側有舒服的留白 */
@@ -488,7 +487,7 @@ img,
 /* 左側：訂單狀態訊息區塊 */
 .status-msg {
     height: 65%;
-    max-width: 65%;
+    width: 65%;
 }
 
 .statusText {
@@ -564,7 +563,7 @@ img,
     background-color: var(--bg-Container);
     border: 0.2cqw solid var(--border-color);
     border-radius: 5cqw;
-    max-width: 100%;
+    width: 100%;
     padding: 3cqw;
     box-shadow: var(--shadow-md);
     text-align: center;

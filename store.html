@@ -17,7 +17,7 @@
         .store {
             /* 這裡的高度與寬度原本是 15% 和 100%，我們用 cqw 重新定義它們的比例 */
             height: 13%;
-            max-width: 100%;
+            width: 100%;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
@@ -31,7 +31,7 @@
         .store-logo {
             /* 這裡的高度與寬度原本是 15% 和 100%，我們用 cqw 重新定義它們的比例 */
             height: 100%;
-            max-width: 100%;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-around;
@@ -77,7 +77,7 @@
 
         .store-header-info {
             height: 55%;
-            max-width: 100%;
+            width: 100%;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
@@ -88,12 +88,12 @@
 
         .fav-icon {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             box-sizing: border-box;
             height: 100%;
-            max-width: 100%;
+            width: 15%;
             font-size: 8cqw;
             padding: 1cqw;
             background-color: transparent;
@@ -126,7 +126,7 @@
 
         .store-meta {
             height: 45%;
-            max-width: 100%;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -175,7 +175,7 @@
 
         .menuContainer {
             height: 54%;
-            max-width: 100%;
+            width: 100%;
             overflow-y: auto;
             display: grid;
             flex-direction: row;
@@ -379,7 +379,7 @@
             align-items: center;
             height: 12%;
             /* 保留你原本佔外殼的 15% 高度比例 */
-            max-width: 100%;
+            width: 100%;
             background-color: var(--blur-bg);
             border-top: 0.3cqw solid var(--border-color);
             /* 邊框 cqw */
@@ -449,7 +449,7 @@
                 <div class="store-logo">
                     <div class="store-header-info">
                         <h1 id="storeNameText">載入中...</h1>
-                        <div class="storephone">電話:<span id="storephone">讀取中...</span></div>
+                        <div class="storephone">電話:<br><span id="storephone">讀取中...</span></div>
                         <button data-action="favorite-btn" class="fav-icon" aria-label="加入最愛">
                             <span id="heart-icon">🤍</span>
                         </button>

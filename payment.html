@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PACE 派思 店內價外帶自取/點餐系統</title>
+    <!-- PWA 配置 -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <!-- 一般網頁分頁圖示 -->
+    <link rel="icon" type="image/png" href="png/logo192.png" sizes="192x192">
+    <!-- iPhone 桌面圖示專用（已修改為 180x180 正方形） -->
+    <link rel="apple-touch-icon" href="png/logo180.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container {
+            height: 85%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1cqw;
+            gap: 1cqw;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone-wrapper">
+        <!-- 頂部導覽列 -->
+        <div id="buyerView" style="display: block;">
+            <header class="header">
+                <div class="pace-logo">
+                    <a href="index.html" class="logo-link">
+                        <img src="png/pace3.png" alt="派思 官方網站">
+                    </a>
+                    <div class="avatar-container">
+                        <span id="defaultIcon">👤</span>
+                        <img id="userAvatarImg" src=""
+                            style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"
+                            onerror="this.style.display='none'; document.getElementById('defaultIcon').style.display='block';">
+                    </div>
+                </div>
+                <div class="two">
+                    <div class="pace">
+                        <button class="theme-toggle" id="themeToggleBtn" aria-label="切換主題">🌙</button>
+                        <span>店內價外帶自取/點餐系統</span>
+                    </div>
+                    <div class="avatarBtnMenu" data-action="avatarBtnMenu">
+                        <span class="user-name" id="userNameDisplay"></span>
+                        <div class="dropdown-menu" id="dropdownMenu"></div>
+                    </div>
+                </div>
+            </header>
+            <main class="dashboard-container">
+                <!-- 繳費與客服主區塊 -->
+                <div id="paySection" class="pay-container" style="padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <!-- ================= 上半部：繳費資訊與回報表單 ================= -->
+                    <div class="top-payment-box"
+                        style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                        <h2>💳 系統方案續費</h2>
+                        <p>請掃描下方 QR Code 進行轉帳，並在轉帳後填寫下方表單回報。</p>
+                        <!-- 銀行轉帳 QR Code -->
+                        <img src="請填入你的銀行轉帳QR_Code圖片網址" alt="銀行轉帳QR Code"
+                            style="width: 200px; height: 200px; object-fit: contain; margin: 10px 0;">
+                        <!-- 方案價格說明 -->
+                        <div class="price-list" style="margin: 15px 0; font-weight: bold; color: #333;">
+                            <p>📌 方案選擇：</p>
+                            <p>1. 一年期：$3,600 元</p>
+                            <p>2. 半年期：$2,400 元</p>
+                            <p>3. 一個月：$500 元</p>
+                        </div>
+                        <hr style="margin: 20px 0;">
+                        <!-- 回報表單 -->
+                        <form id="paymentReportForm" style="text-align: left;">
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px;">選擇方案：</label>
+                                <select id="planSelect" style="width: 100%; padding: 8px;" required>
+                                    <option value="" disabled selected>請選擇購買方案</option>
+                                    <option value="year">一年期 ($3,600)</option>
+                                    <option value="halfYear">半年期 ($2,400)</option>
+                                    <option value="month">一個月 ($500)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px;">轉帳後五碼：</label>
+                                <input type="text" id="lastFiveDigits" maxlength="5" placeholder="請輸入您的帳號末五碼"
+                                    style="width: 100%; padding: 8px;" required>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px;">上傳轉帳證明 (截圖/收據)：</label>
+                                <input type="file" id="proofFile" accept="image/*" style="width: 100%;" required>
+                            </div>
+                            <button type="submit" id="submitPaymentBtn"
+                                style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;">
+                                送出繳費回報
+                            </button>
+                        </form>
+                    </div>
+                    <!-- ================= 下半部：LINE 客服聯絡區 ================= -->
+                    <div class="bottom-support-box"
+                        style="background: #f1f8e9; padding: 20px; border-radius: 8px; text-align: center;">
+                        <h3>📞 需要協助嗎？聯繫客服</h3>
+                        <p>如有任何對帳或系統問題，歡迎掃描下方 Line QR Code 與我聯絡！</p>
+                        <!-- LINE QR Code -->
+                        <img src="請填入你的Line客服QR_Code圖片網址" alt="Line QR Code"
+                            style="width: 180px; height: 180px; object-fit: contain; margin: 10px 0;">
+                        <p><a href="你的Line官方帳號或加好友連結" target="_blank"
+                                style="color: #00c300; font-weight: bold; text-decoration: none;">👉 點擊這裡直接加 Line 好友</a>
+                        </p>
+                    </div>
+                </div>
+            </main>
+            <div class="lightbox-modal" id="addressDetailLightbox" style="display: none;">
+                <div class="modal-card">
+                    <div class="modal-title" style="color: var(--brand-blue); font-weight: 700;">📍 目前位置</div>
+                    <div class="modal-desc-address" id="modalAddressText"
+                        style="margin-bottom: 0.5cqw; margin-top: 0.5cqw;">尚未獲取定位，請開啟 GPS。</div>
+                    <button class="close-modal-btn" data-action="closeAddressModalBtn">確認</button>
+                </div>
+            </div>
+            <div class="lightbox-modal" id="loginLightbox" style="display: none;">
+                <div class="modal-card">
+                    <div class="modal-title" style=" font-weight: 600; color: var(--text-main);">加入PACE 派思</div>
+                    <button class="modal-btn google" data-action="googleLogin"
+                        style="box-shadow: 0 0.2cqw 0.125 rgba(0,0,0,0.05);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:0.5cqw;">
+                            <path fill="#4285F4"
+                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path fill="#34A853"
+                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path fill="#FBBC05"
+                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                            <path fill="#EA4335"
+                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                        </svg>
+                        Google 登入
+                    </button>
+                    <button data-action="toggleEmailFormBtn"
+                        style="display: flex; align-items: center; justify-content: center; width: 100%; margin-bottom: 5cqw; background-color: white; border: 0.2cqw solid #e5e7eb; border-radius: 3cqw; padding: 3cqw 0; font-size: 5cqw; font-weight: 600; color: #374151; cursor: pointer; box-shadow: 0 0.5cqw 2cqw rgba(0,0,0,0.05);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.5cqw;">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                            </path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        使用電子郵件登入
+                    </button>
+                    <div id="emailFormSection" class="email-form">
+                        <div style="margin-bottom: 1cqw;">
+                            <label for="loginEmail"
+                                style="display:block; margin-bottom: 5cqw; font-size:5cqw; color:#6b7280; font-weight:700;">電子郵件</label>
+                            <input type="email" id="loginEmail" placeholder="請輸入 Email" autocomplete="username"
+                                style="width: 100%; box-sizing: border-box; padding: 2cqw; border:0.2cqw solid #e5e7eb; border-radius:3cqw; box-sizing:border-box; font-size:5cqw; background-color:#f9fafb; color: #111111;">
+                        </div>
+                        <div style="margin-bottom:10cqw;">
+                            <label for="loginPassword"
+                                style="display:block; margin-bottom:0.25cqw; font-size:5cqw; color:#6b7280; font-weight:500;">密碼</label>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="password" id="loginPassword" placeholder="請輸入密碼"
+                                    autocomplete="current-password"
+                                    style="width: 100%; padding:0.25cqw 0.75cqw; border:0.2cqw solid #e5e7eb; border-radius:2cqw; box-sizing:border-box; font-size:5cqw; background-color:#f9fafb; color: #111111;">
+                                <button type="button" data-action="togglePasswordVisibility"
+                                    style="position: absolute; right: 5cqw; background: none; border: none; cursor: pointer; font-size: 5cqw; padding: 0; color: #6b7280; z-index: 10;">👁️</button>
+                            </div>
+                        </div> <button data-action="emailLogin"
+                            style="background-color: #059669; color: white; border: none; width: 100%; padding: 0.25cqw; border-radius: 0.5cqw; font-size: 5cqw; font-weight: 700; cursor: pointer; box-shadow: 0 0.25cqw 0.5cqw rgba(255, 255, 255, 0.15);">電子郵件登入
+                            / 註冊</button>
+                    </div><span class="modal-close" data-action="customReturnBtn"
+                        style="margin-top: 0.5cqw; text-decoration: underline; cursor: pointer; display: block; text-align: center;">暫時返回</span>
+                </div>
+            </div>
+        </div>
+        <script type="module" src="app.js"></script>
+        <script type="module">
+            import { getStorage, ref, uploadBytes, getDownloadURL, getCartData, modifyCartItemQty, areaData, authReady, app, auth, db, provider, currentStoreInfo, signInAnonymously, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, collection, getDocs, doc, onSnapshot, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit, onAuthStateChanged } from './app.js';
+            let allStores = [];
+            let buyerLat = null;
+            let buyerLng = null;
+            let finalTotalAmount = 0;
+            let cartData = [];
+            let currentPayType = "";
+            let targetStoreId = "";
+            let currentDiningType = "TAKE_OUT";
+            const storage = getStorage();
+            document.getElementById('paymentReportForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('submitPaymentBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerText = '上傳中，請稍候...';
+                try {
+                    const plan = document.getElementById('planSelect').value;
+                    const lastFiveDigits = document.getElementById('lastFiveDigits').value.trim();
+                    const fileInput = document.getElementById('proofFile');
+                    const file = fileInput.files[0];
+                    if (!file) {
+                        alert('請上傳轉帳證明圖片！');
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = '送出繳費回報';
+                        return;
+                    }
+                    // 1. 設定對應金額
+                    let amount = 0;
+                    if (plan === 'year') amount = 3600;
+                    else if (plan === 'halfYear') amount = 2400;
+                    else if (plan === 'month') amount = 500;
+                    // 2. 將圖片上傳到 Firebase Storage (資料夾命名為 payment_proofs)
+                    const filePath = `payment_proofs/${storeId}_${Date.now()}_${file.name}`;
+                    const storageRef = ref(storage, filePath);
+                    await uploadBytes(storageRef, file);
+                    const proofUrl = await getDownloadURL(storageRef);
+                    // 3. 寫入 Firestore 的 payment_requests 集合
+                    await addDoc(collection(db, "payment_requests"), {
+                        storeId: storeId,          // 你的商店 ID
+                        plan: plan,                // 方案
+                        amount: amount,            // 金額
+                        lastFiveDigits: lastFiveDigits, // 後五碼
+                        proofUrl: proofUrl,        // 截圖網址
+                        status: "pending",         // 狀態：審核中
+                        createdAt: new Date().toISOString()
+                    });
+                    alert('繳費回報已成功送出！管理員確認後將會幫您更新到期日，請耐心等候。');
+                    document.getElementById('paymentReportForm').reset();
+                } catch (error) {
+                    console.error("送出繳費回報失敗：", error);
+                    alert('送出失敗，請檢查網路連線或稍後再試。');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = '送出繳費回報';
+                }
+            });
+        </script>
+</body>
+
+</html>

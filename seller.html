@@ -952,24 +952,24 @@
         const datePicker = document.getElementById('order-date-picker');
         const today = new Date().toISOString().split('T')[0];
         datePicker.value = today;
-        // 監聽日期變更
+        // 一開始就用 loadOrdersForDate (它裡面已經包了 onSnapshot)
+        loadOrdersForDate(storeId, today);
+        // 監聽日期選擇器變化 (當你切換日期時，會自動切換監聽器)
         datePicker.addEventListener('change', (e) => {
-            // 變更日期時，重置 isInitialLoad 為 false (因為不是第一次載入)
-            isInitialLoad = false;
             loadOrdersForDate(storeId, e.target.value);
         });
         // 2. 根據選擇的日期重新撈取 Firebase
         function loadOrdersForDate(storeId, dateString) {
-            // 1. 取消上一個日期的監聽 (非常重要！)
+            // 【關鍵步驟】：取消上一個日期的監聽 (避免多重監聽與記憶體洩漏)
             if (unsubscribeOrders) {
                 unsubscribeOrders();
             }
-            // 2. 設定日期範圍
+            // 設定該日期的範圍
             const start = new Date(dateString);
             start.setHours(0, 0, 0, 0);
             const end = new Date(dateString);
             end.setHours(23, 59, 59, 999);
-            // 3. 建立該日期的 Query
+            // 建立監聽 Query (只監聽該日期的訂單)
             const q = query(
                 collection(db, "orders"),
                 where("storeId", "==", storeId),
@@ -977,22 +977,27 @@
                 where("createdAt", "<=", end),
                 orderBy("createdAt", "desc")
             );
-            // 4. 判斷是否為今天 (只有今天是需要播放音效的)
-            const isToday = (dateString === new Date().toISOString().split('T')[0]);
+            // 判斷是否為今天 (只有今天是需要播放音效與強制跳轉的)
+            const todayStr = new Date().toISOString().split('T')[0];
+            const isToday = (dateString === todayStr);
             // 5. 啟動新的監聽
             unsubscribeOrders = onSnapshot(q, (snapshot) => {
                 const newOrdersList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                // 判斷是否有新訂單 (只在今天是今天的情況下才執行)
+                // 判斷是否有「新進」的訂單
                 const hasNewOrder = isToday && !isInitialLoad && snapshot.docChanges().some(change =>
                     change.type === 'added' && isValidOrder(change.doc.data())
                 );
                 // 更新全域陣列
                 orders.length = 0;
                 orders.push(...newOrdersList);
-                // UI 處理
+                // UI 狀態處理
                 if (isInitialLoad) {
-                    if (orders.length > 0) updateUI(orders[0].id);
-                    else renderTabs(); // 即使沒訂單也要渲染空的 UI
+                    // 頁面首次載入
+                    if (orders.length > 0) {
+                        updateUI(orders[0].id);
+                    } else {
+                        renderTabs(); // 即使沒訂單也要清空 Tab
+                    }
                     isInitialLoad = false;
                 }
                 else if (hasNewOrder) {
@@ -1000,8 +1005,13 @@
                     if (orders.length > 0) updateUI(orders[0].id);
                     else renderTabs();
                 }
+                else if (hasNewOrder) {
+                    // 有新單進來 (且在今天)
+                    AudioController.play();
+                    if (orders.length > 0) updateUI(orders[0].id);
+                }
                 else {
-                    // 單純的資料更新 (例如舊單狀態變更)
+                    // 只是狀態更新或舊單變更
                     const currentOrder = orders.find(o => o.id === activeOrderId);
                     if (currentOrder) renderOrderToWorkspace(currentOrder);
                     renderTabs();

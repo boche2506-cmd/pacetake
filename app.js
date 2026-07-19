@@ -228,11 +228,11 @@ function renderDynamicMenu(role, user) {
         <button class="logoutBtn" data-action="logoutBtn" style="color: var(--brand-red); width: 100%; text-align: left; padding: 2cqw; background: none; border: none; cursor: pointer; font-size: 5cqw;">🚪 登出系統</button>`;
     }
     dropdownMenu.innerHTML = personalLinks + registerLink + shopLinks + adminLink + authActionLink;
-    getBrowserLocation();
 }
 function getBrowserLocation() {
     const path = window.location.pathname;
-    if (path === '/' || path.includes('index.html')) {
+    const targetPaths = ['/', 'index.html', 'store.html', 'favorites.html'];
+    if (targetPaths.some(p => path === '/' ? path === '/' : path.includes(p))) {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -240,10 +240,15 @@ function getBrowserLocation() {
                     buyerLng = position.coords.longitude;
                     const currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
                     // 關鍵修改：拿到座標，立刻去抓該區資料
-                    fetchNearbyStores(buyerLat, buyerLng);
                     // UI 更新
                     if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
                     if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
+                    if (window.currentStoreInfo) {
+                        const sLat = parseFloat(window.currentStoreInfo.shopLat || window.currentStoreInfo.lat);
+                        const sLng = parseFloat(window.currentStoreInfo.shopLng || window.currentStoreInfo.lng);
+                        updateDistanceUI(sLat, sLng);
+                    }
+                    fetchNearbyStores(buyerLat, buyerLng);
                 },
                 (error) => {
                     const errorMsg = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
@@ -370,7 +375,7 @@ function createStoreCard(store) {
     const sLat = parseFloat(store.shopLat || store.lat);
     const sLng = parseFloat(store.shopLng || store.lng);
     // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
-    let distanceHtml = "<span>⚡ 距離未知</span>";
+    let distanceHtml = '';
     if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
         const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
         distanceHtml = dist.toFixed(1) + ' km';
@@ -407,6 +412,17 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
+}
+function updateDistanceUI(storeLat, storeLng) {
+    const distElement = document.getElementById('storeDistanceText');
+    if (!distElement) return;
+    // 如果沒有傳入有效的 GPS 座標，維持「距離未知」
+    if (buyerLat === null || buyerLng === null || isNaN(storeLat) || isNaN(storeLng)) {
+        distElement.innerText = '⚡ 距離未知';
+        return;
+    }
+    const dist = calculateDistance(buyerLat, buyerLng, storeLat, storeLng);
+    distElement.innerText = `⚡ ${dist.toFixed(1)} km`;
 }
 function mouseslide() {
     const tabs = document.getElementById('categoryHeader');
@@ -769,25 +785,15 @@ async function initStorePage() {
         const sLat = parseFloat(storeData.shopLat || storeData.lat);
         const sLng = parseFloat(storeData.shopLng || storeData.lng);
         // 2. 計算距離 (如果使用者有定位，且店家有座標，才進行計算)
-        let displayDistance = '距離未知'; // 預設值
-        if (buyerLat !== null && buyerLng !== null && !isNaN(sLat) && !isNaN(sLng)) {
-            const dist = calculateDistance(buyerLat, buyerLng, sLat, sLng);
-            displayDistance = dist.toFixed(1) + ' km';
-        }
+        updateDistanceUI(sLat, sLng);
         const mapUrl = `https://www.google.com/maps/search/?api=1&query=${sLat},${sLng}`;
         // 2. 獲取地址文字 (確保 fallback 機制)
         const address = storeData.shopAddress || storeData.address || '地址未提供';
         // 3. 把算出來的結果填入 HTML
         document.getElementById('storeNameText').innerText = storeData.shopName || storeData.name || '未命名店家';
-        document.getElementById('storephone').innerText = storeData.shopPhone || storeData.Phone || '未提供';
         document.getElementById('storeAddressText').innerHTML = `
         <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
         📍 ${address}</a>`;
-        // 這裡填入我們算好的 displayDistance
-        const distElement = document.getElementById('storeDistanceText');
-        if (distElement) {
-            distElement.innerText = '⚡ ' + displayDistance;
-        }
         const savedLogo = localStorage.getItem('selected_store_logo');
         const target = document.getElementById('logo-wrapper');
         if (!target) return; // 如果找不到盒子就跳出，防止報錯
@@ -902,38 +908,30 @@ async function initStorePage() {
         // --- 滑動切換分類功能 (Swipe to change category) ---
         let touchStartX = 0;
         let touchEndX = 0;
-
         // 1. 綁定在商品卡片的大容器上，偵測手指按下的起始位置
         if (menuContainer) {
             menuContainer.addEventListener('touchstart', (e) => {
                 touchStartX = e.changedTouches[0].screenX;
             }, { passive: true });
-
             // 2. 偵測手指離開的位置，並計算滑動方向
             menuContainer.addEventListener('touchend', (e) => {
                 touchEndX = e.changedTouches[0].screenX;
                 handleSwipeToSwitchCategory();
             }, { passive: true });
         }
-
         // 3. 判斷滑動方向並觸發對應的「假點擊」
         function handleSwipeToSwitchCategory() {
             const swipeThreshold = 50; // 滑動超過 50px 才算數，避免誤觸
             const deltaX = touchStartX - touchEndX;
-
             // 如果滑動距離太短，就不做任何事
             if (Math.abs(deltaX) < swipeThreshold) return;
-
             // 抓出目前畫面上所有的分類按鈕
             const allTabs = Array.from(document.querySelectorAll('.category-tab-btn'));
             if (allTabs.length === 0) return;
-
             // 找出當前是哪一個按鈕亮著 (active)
             const currentIndex = allTabs.findIndex(btn => btn.classList.contains('active'));
             if (currentIndex === -1) return;
-
             let targetIndex = currentIndex;
-
             if (deltaX > 0) {
                 // 向左滑 (deltaX > 0) ➡️ 代表想看「下一個」分類
                 targetIndex = Math.min(currentIndex + 1, allTabs.length - 1);
@@ -941,14 +939,11 @@ async function initStorePage() {
                 // 向右滑 (deltaX < 0) ➡️ 代表想看「上一個」分類
                 targetIndex = Math.max(currentIndex - 1, 0);
             }
-
             // 如果目標分類跟現在不一樣，就觸發點擊！
             if (targetIndex !== currentIndex) {
                 const targetBtn = allTabs[targetIndex];
-
                 // 觸發你原本寫好的點擊事件！(完美連動)
                 targetBtn.click();
-
                 // 🌟 貼心小優化：如果分類很多，上方按鈕列會自動捲動到被選中的按鈕位置
                 targetBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
@@ -1009,7 +1004,6 @@ export function refreshTotalCartUI() {
     const localCartData = getCartData();
     let totalQty = 0;
     let totalPrice = 0;
-
     localCartData.forEach(item => {
         totalQty += item.qty;
         totalPrice += (item.price * item.qty);
@@ -1120,10 +1114,11 @@ function initThemeSystem() {
 }
 // 🚀 初始化區塊
 document.addEventListener('DOMContentLoaded', () => {
+    getBrowserLocation();
     mouseslide();
     initCitySelect(document.getElementById('citySelect'));// 負責把資料灌入指定的 Select
     /*initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡*/
-    initStorePage();// 🎯 PACE 專屬：store.html 
+    initStorePage();
     refreshTotalCartUI();//** * 🛒 購物車管理
     initCartDOMState();//回填當前店家購物車的資料
     initThemeSystem();//網頁載入時套用顏色

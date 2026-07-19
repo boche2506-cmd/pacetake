@@ -68,6 +68,35 @@
             align-items: center;
         }
 
+        #week-selector {
+            border-radius: 5cqw;
+            /* 圓角改用 cqw */
+            border: 0.3cqw solid var(--border-color);
+            background-color: var(--bg-global);
+            color: var(--text-main);
+            font-size: 3.25cqw;
+            /* 字體與按鈕對齊 */
+            outline: none;
+            height: 100%;
+            width: 35%;
+            padding: 0 1cqw;
+            /* 讓裡面的文字不會太貼邊框 */
+            box-sizing: border-box;
+            line-height: 1.1;
+            /* 隱藏 Firefox 的卷軸 */
+            overflow-y: auto;
+            scrollbar-width: none;
+            /* 確保內容依然可以滑動 */
+            -ms-overflow-style: none;
+            cursor: grab;
+            /* 隱藏 Chrome, Safari, Edge 的卷軸 */
+        }
+
+        #week-selector::-webkit-scrollbar {
+            /* Chrome, Safari 隱藏軸線 */
+            display: none;
+        }
+
         .stat-item {
             height: 20%;
             width: 100%;

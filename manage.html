@@ -63,7 +63,7 @@
             width: 100%;
             font-size: 4cqw;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             justify-content: center;
             align-items: center;
         }
@@ -535,7 +535,12 @@
             <main class="dashboard-container">
                 <canvas id="incomeChart"></canvas>
                 <div class="finance-stats" id="stats-container">
-                    <h3 class="section-title">本週財務統計 (點選柱狀圖查看單日)</h3>
+                    <h3 class="section-title">
+                        財務統計區間：
+                        <select id="week-selector" style="padding: 5px; border-radius: 5px;">
+                            <!-- 選項會透過 JS 自動生成 -->
+                        </select>
+                    </h3>
                     <div class="stat-item"><span>接單數</span> <strong id="stat-orders">讀取中...</strong></div>
                     <div class="stat-item"><span>線上收入</span> <strong id="stat-online">讀取中...</strong></div>
                     <div class="stat-item"><span>現金收入</span> <strong id="stat-cash">讀取中...</strong></div>
@@ -919,51 +924,98 @@
             await updateDoc(doc(db, "stores", storeId), { businessHours });
             alert("已儲存時間設定！(自動排程為每十分鐘更新一次)");
         }
-        async function fetchAndRenderChart(currentstoreId) {
-            // 2. 從 Firebase 抓取近 7 天的資料 (這裡建議用時間戳篩選)
+        function initWeekSelector() {
+            const selector = document.getElementById('week-selector');
             const now = new Date();
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7); // 設定七天前的時間
+            // 從本週開始往回推 8 週
+            for (let i = 0; i < 26; i++) {
+                // 計算該週的起始日期 (週一)
+                const dayOfWeek = now.getDay() === 0 ? 6 : now.getDay() - 1;
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - dayOfWeek - (i * 7));
+                startOfWeek.setHours(0, 0, 0, 0);
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+                endOfWeek.setHours(23, 59, 59, 999);
+                // 格式化顯示字串: 2026/7/13 ~ 7/19
+                const label = `${startOfWeek.getFullYear()}/${startOfWeek.getMonth() + 1}/${startOfWeek.getDate()} ~ ${endOfWeek.getMonth() + 1}/${endOfWeek.getDate()}`;
+                // 將起始時間存入 value (使用 ISO 格式方便轉回日期物件)
+                const option = document.createElement('option');
+                option.value = startOfWeek.toISOString();
+                option.text = label;
+                selector.appendChild(option);
+            }
+            // 監聽選單改變事件
+            selector.addEventListener('change', (e) => {
+                const startDate = new Date(e.target.value);
+                // 【修改點】：直接從 body 抓 data-store-id，不再依賴 window.currentStoreInfo
+                const currentStoreId = document.body.getAttribute('data-store-id');
+                if (!currentStoreId) {
+                    console.error("找不到商店ID，請檢查頁面是否初始化完成");
+                    return;
+                }
+                fetchAndRenderChart(currentStoreId, startDate);
+            });
+        }
+        async function fetchAndRenderChart(currentstoreId, startDate = null) {
+            // 1. 計算該週的範圍
+            let startOfWeek, endOfWeek;
+            if (startDate) {
+                startOfWeek = startDate;
+            } else {
+                // 如果沒指定，預設本週一
+                const today = new Date();
+                const dayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1;
+                startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - dayOfWeek);
+                startOfWeek.setHours(0, 0, 0, 0);
+            }
+            endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            endOfWeek.setHours(23, 59, 59, 999);
+            // 2. 準備該週的 7 天資料容器 (這部分保持不變)
+            let weeklyData = Array.from({ length: 7 }, (_, i) => {
+                const d = new Date(startOfWeek);
+                d.setDate(d.getDate() + i);
+                return {
+                    fullDate: d,
+                    label: `${d.getMonth() + 1}/${d.getDate()}`,
+                    orders: 0, online: 0, cash: 0
+                };
+            });
+            // 3. 查詢 Firebase
             const q = query(
                 collection(db, "orders"),
-                where("storeId", "==", currentstoreId), // 篩選店家
-                where("createdAt", ">=", oneWeekAgo)        // 篩選時間
+                where("storeId", "==", currentstoreId),
+                where("createdAt", ">=", startOfWeek),
+                where("createdAt", "<=", endOfWeek)
             );
             const snapshot = await getDocs(q);
-            // 定義一個全域變數來存這週七天的資料，先預設為 0
-            let weeklyData = Array.from({ length: 7 }, (_, i) => ({
-                day: ['週一', '週二', '週三', '週四', '週五', '週六', '週日'][i],
-                orders: 0,
-                online: 0,
-                cash: 0
-            }));
-            // 歸零資料，避免重複加總
-            weeklyData.forEach(d => {
-                d.orders = 0; d.online = 0; d.cash = 0;
-            });
-            // 3. 把資料歸類進去
+            // 4. 統計資料 (統計邏輯維持你原本寫好的，不用動)
             snapshot.forEach((doc) => {
                 const order = doc.data();
-                const date = order.createdAt.toDate();
-                // 取得週幾 (0-6)
-                const dayIndex = (date.getDay() + 6) % 7;
-                // 確保陣列範圍內才歸類
-                if (dayIndex >= 0 && dayIndex < 7) {
-                    weeklyData[dayIndex].orders += 1;
-                    weeklyData[dayIndex].online += (order.paymentMethod === 'online' ? (order.totalAmount || 0) : 0);
-                    weeklyData[dayIndex].cash += (order.paymentMethod === 'cash' ? (order.totalAmount || 0) : 0);
+                if (order.status !== 'COMPLETED' || order.paymentStatus !== 'PAID') return;
+                const orderDate = order.createdAt.toDate();
+                orderDate.setHours(0, 0, 0, 0);
+                const index = weeklyData.findIndex(item =>
+                    item.fullDate.getTime() === orderDate.getTime()
+                );
+                if (index !== -1) {
+                    const amount = parseFloat(order.totalAmount || order.amount || 0);
+                    const method = (order.paymentMethod || '').toUpperCase();
+                    weeklyData[index].orders += 1;
+                    if (method === 'CASH') weeklyData[index].cash += amount;
+                    else if (method === 'CREDIT' || method === 'ONLINE') weeklyData[index].online += amount;
                 }
             });
-            // 4. 更新圖表與全域變數
             updateChart(weeklyData);
         }
         function updateChart(data) {
             const ctx = document.getElementById('incomeChart').getContext('2d');
             // 準備資料
-            const labels = data.map(d => d.day);
+            const labels = data.map(d => d.label);
             const chartValues = data.map(d => d.online + d.cash);
             if (myChart) {
-                // 如果圖表已經存在，直接更新資料即可
                 myChart.data.labels = labels;
                 myChart.data.datasets[0].data = chartValues;
                 myChart.update();
@@ -972,7 +1024,7 @@
                 myChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: labels,
+                        labels: labels, // 這裡確保是用上面的 labels
                         datasets: [{
                             label: '每日總收入',
                             data: chartValues,
@@ -1006,7 +1058,6 @@
                 cash: acc.cash + curr.cash,
                 total: acc.total + (curr.online + curr.cash)
             }), { orders: 0, online: 0, cash: 0, total: 0 });
-
             updateStats(totalStats, true);
         }
         // 更新 UI 的函式
@@ -1018,6 +1069,8 @@
         }
         document.addEventListener('DOMContentLoaded', () => {
             initPage();
+            initWeekSelector(); // 生成選單
+            fetchAndRenderChart(window.currentStoreInfo.id); // 載入預設本週資料
             console.log("系統初始化完成");
         });
     </script>

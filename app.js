@@ -70,6 +70,7 @@ const dropdownMenu = document.getElementById('dropdownMenu');
 const userNameDisplay = document.getElementById('userNameDisplay');
 const loginLightbox = document.getElementById('loginLightbox');
 const emailFormSection = document.getElementById('emailFormSection');
+const modal = document.getElementById('qrModal');
 // 監聽 Firebase 登入狀態
 export const authReady = new Promise((resolve) => {
     onAuthStateChanged(auth, (user) => {
@@ -527,6 +528,10 @@ document.addEventListener('change', async (e) => {
 // Listener'click'
 document.addEventListener('click', async (e) => {
     const target = e.target.closest('[data-action]');
+    if (modal && e.target === modal) {
+        closeloadPaymentAudits();
+        return;
+    }
     if (!target) return;
     const action = target.getAttribute('data-action');
     switch (action) {
@@ -705,6 +710,9 @@ function closeMenuOutside(e) {
         dropdownMenu.classList.remove('active');
         document.removeEventListener('click', closeMenuOutside); // 關閉後立刻移除監聽器
     }
+}
+function closeloadPaymentAudits() {
+    document.getElementById('adminMainContent').style.display = 'none';
 }
 // 1. 載入並渲染待審核清單
 async function loadPaymentAudits() {

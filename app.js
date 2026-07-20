@@ -203,7 +203,7 @@ function renderDynamicMenu(role, user) {
             <div class="menu-header">店舖管理</div>
             <a href="seller.html?storeId=${userId}" class="nav-fast">🧑‍🍳 接單管理</a>
             <a href="manage.html?storeId=${userId}" class="nav-fast">⚙️ 店舖管理</a>
-            <a href="#" class="nav-fast" data-target="pay">💵 繳費</a>
+            <a href="payment.html?storeId=${userId}" class="nav-fast">💵 繳費</a>
         `;
     }
     // 3. 開店連結區塊

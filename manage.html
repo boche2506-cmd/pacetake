@@ -133,6 +133,17 @@
             /* 按下去會有一點點回饋感 */
         }
 
+        #closeWarningBtn {
+            background-color: #007AFF;
+            /* Apple 風格的藍色 */
+            color: whit500;
+            font-size: 3cqw;
+            border-radius: 2cqw;
+            transition: transform 0.2s;
+            /* 按下去會有一點點回饋感 */
+        }
+
+        #closeWarningBtn:active,
         .btn:active {
             transform: scale(0.95);
             /* 按下去變小一點，模擬點擊感 */
@@ -715,16 +726,17 @@
             // 建立內容區塊
             const modalContent = document.createElement('div');
             modalContent.style.backgroundColor = 'white';
-            modalContent.style.padding = '20px';
-            modalContent.style.borderRadius = '10px';
-            modalContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+            modalContent.style.padding = '2cqw';
+            modalContent.style.borderRadius = '2.5cqw';
+            modalContent.style.boxShadow = '0 0.2cqw 2.5cqw rgba(0,0,0,0.3)';
             modalContent.style.textAlign = 'center';
-            modalContent.style.maxWidth = '300px';
+            modalContent.style.maxWidth = '75cqw';;
+            modalContent.style.lineheight = '1.2';
             modalContent.innerHTML = `
-                    <h3>⚠️ 提醒：服務即將到期</h3>
-                    <p>到期日：${expiryDate.toLocaleDateString()}</p>
-                    <p>為了避免中斷，請前往 <a href="#" class="nav-fast" data-target="pay" style="color: blue; text-decoration: underline;">💵 繳費</a></p>
-                    <button id="closeWarningBtn" style="margin-top:10px; padding: 5px 15px;">我知道了</button>
+                    <h2>⚠️ 提醒：服務即將到期</h3>
+                    <h3>到期日：${expiryDate.toLocaleDateString()}</h3>
+                    <h3>為了避免中斷，請前往 <a href="payment.html?storeId=${storeId}" class="nav-fast">💵 繳費</a></h3>
+                    <button id="closeWarningBtn" style="margin-top:2.5cqw; padding: 1cqw 2cqw;">我知道了</button>
                 `;
             overlay.appendChild(modalContent);
             document.body.appendChild(overlay);

@@ -728,16 +728,16 @@ async function loadPaymentAudits() {
         const querySnapshot = await getDocs(q);
         if (querySnapshot.empty) {
             adminMainContent.innerHTML = `
-                <div style="text-align: center; padding: 3cqw;">
+                <div style="text-align: center; color: --text-main; padding: 3cqw;">
                     <h3>🎉 目前沒有需要審核的繳費申請</h3>
-                    <p style="color: #888;">大家都乖乖繳費了！</p>
+                    <p style="color: --text-main;">大家都乖乖繳費了！</p>
                 </div>
             `;
             return;
         }
         let html = `
             <h2>💵 待審核繳費列表</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(75cqw, 1fr)); gap: 1cqw;">
+            <div style="display: grid; color: --text-main; grid-template-columns: repeat(auto-fill, minmax(75cqw, 1fr)); gap: 1cqw;">
         `;
         querySnapshot.forEach((docSnap) => {
             const data = docSnap.data();

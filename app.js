@@ -721,14 +721,14 @@ async function loadPaymentAudits() {
         return;
     }
     adminMainContent.style.display = 'flex';
-    adminMainContent.innerHTML = '<h3 style="text-align: center; color: #666;">載入審核資料中...</h3>';
+    adminMainContent.innerHTML = '<h3 style="text-align: center; color: var(--text-main);">載入審核資料中...</h3>';
     try {
         // 查詢所有 status 爲 pending 的付款請求
         const q = query(collection(db, "payment_requests"), where("status", "==", "pending"));
         const querySnapshot = await getDocs(q);
         if (querySnapshot.empty) {
             adminMainContent.innerHTML = `
-                <div style="text-align: center; color: --text-main; padding: 3cqw;">
+                <div style="text-align: center; color: var(--text-main); padding: 3cqw;">
                     <h3>🎉 目前沒有需要審核的繳費申請</h3>
                     <p style="color: --text-main;">大家都乖乖繳費了！</p>
                 </div>
@@ -737,7 +737,7 @@ async function loadPaymentAudits() {
         }
         let html = `
             <h2>💵 待審核繳費列表</h2>
-            <div style="display: grid; color: --text-main; grid-template-columns: repeat(auto-fill, minmax(75cqw, 1fr)); gap: 1cqw;">
+            <div style="display: grid; color: var(--text-main); grid-template-columns: repeat(auto-fill, minmax(75cqw, 1fr)); gap: 1cqw;">
         `;
         querySnapshot.forEach((docSnap) => {
             const data = docSnap.data();

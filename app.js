@@ -722,78 +722,66 @@ async function loadPaymentAudits() {
     }
     adminMainContent.style.display = 'flex';
     adminMainContent.innerHTML = '<h3 style="text-align: center; color: #666;">載入審核資料中...</h3>';
-
     try {
         // 查詢所有 status 爲 pending 的付款請求
         const q = query(collection(db, "payment_requests"), where("status", "==", "pending"));
         const querySnapshot = await getDocs(q);
-
         if (querySnapshot.empty) {
             adminMainContent.innerHTML = `
-                <div style="text-align: center; padding: 40px;">
+                <div style="text-align: center; padding: 3cqw;">
                     <h3>🎉 目前沒有需要審核的繳費申請</h3>
                     <p style="color: #888;">大家都乖乖繳費了！</p>
                 </div>
             `;
             return;
         }
-
         let html = `
             <h2>💵 待審核繳費列表</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(75cqw, 1fr)); gap: 1cqw;">
         `;
-
         querySnapshot.forEach((docSnap) => {
             const data = docSnap.data();
             const requestId = docSnap.id;
-
             // 轉換方案中文顯示
             let planName = data.plan;
             if (data.plan === 'year') planName = '一年期';
             else if (data.plan === 'halfYear') planName = '半年期';
             else if (data.plan === 'month') planName = '一個月';
-
             html += `
-                <div style="border: 1px solid #ddd; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                    <p style="margin: 5px 0;"><strong>商店 ID：</strong><br><span style="font-size: 12px; color: #555; word-break: break-all;">${data.storeId}</span></p>
-                    <p style="margin: 5px 0;"><strong>購買方案：</strong> ${planName} ($${data.amount})</p>
-                    <p style="margin: 5px 0;"><strong>轉帳後五碼：</strong> <span style="color: #d9534f; font-weight: bold; font-size: 18px;">${data.lastFiveDigits}</span></p>
-                    <p style="margin: 5px 0; font-size: 12px; color: #888;"><strong>申請時間：</strong> ${new Date(data.createdAt).toLocaleString()}</p>
-                    <div style="margin: 15px 0;">
+                <div style="border: 0.2cqw solid #ddd; background: #fff; padding: 3cqw; border-radius: 2cqw; box-shadow: 0 0.2cqw 1.25cqw rgba(0,0,0,0.05);">
+                    <p style="margin: 1cqw 0;"><strong>商店 ID：</strong><br><span style="font-size: 3cqw; color: #555; word-break: break-all;">${data.storeId}</span></p>
+                    <p style="margin: 1cqw 0;"><strong>購買方案：</strong> ${planName} ($${data.amount})</p>
+                    <p style="margin: 1cqw 0;"><strong>轉帳後五碼：</strong> <span style="color: #d9534f; font-weight: bold; font-size: 4cqw;">${data.lastFiveDigits}</span></p>
+                    <p style="margin: 1cqw 0; font-size: 3cqw; color: #888;"><strong>申請時間：</strong> ${new Date(data.createdAt).toLocaleString()}</p>
+                    <div style="margin: 4cqw 0;">
                         <strong>轉帳證明：</strong><br>
-                        <a href="${data.proofUrl}" target="_blank" style="display: inline-block; margin-top: 5px; color: #007bff; text-decoration: underline;">🔍 點擊查看大圖截圖</a>
+                        <a href="${data.proofUrl}" target="_blank" style="display: inline-block; margin-top: 1cqw; color: #007bff; text-decoration: underline;">🔍 點擊查看大圖截圖</a>
                     </div>
-                    <button onclick="approvePayment('${requestId}', '${data.storeId}', '${data.plan}')" style="width: 100%; background: #28a745; color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                    <button onclick="approvePayment('${requestId}', '${data.storeId}', '${data.plan}')" style="width: 100%; background: #28a745; color: white; border: none; padding: 2.5cqw; border-radius: 1.25cqw; font-weight: bold; cursor: pointer;">
                         ✅ 審核通過並延長期限
                     </button>
                 </div>
             `;
         });
-
         html += `</div>`;
         adminMainContent.innerHTML = html;
-
     } catch (error) {
         console.error("載入審核清單失敗：", error);
         adminMainContent.innerHTML = '<p style="color: red; text-align: center;">載入失敗，請檢查網路或權限。</p>';
     }
 }
-
 // 2. 審核通過的執行動作 (必須挂在 window 上才能被 HTML 的 onclick 呼叫)
 window.approvePayment = async function (requestId, storeId, plan) {
     if (!confirm(`確定要通過這筆審核嗎？這將會自動為商店延長對應的訂閱天數。`)) return;
-
     try {
         // 決定要加幾個月
         let monthsToAdd = 1;
         if (plan === 'year') monthsToAdd = 12;
         else if (plan === 'halfYear') monthsToAdd = 6;
         else if (plan === 'month') monthsToAdd = 1;
-
         // 取得該商店目前的資料，用來計算「從哪一天開始延期」
         const storeRef = doc(db, "stores", storeId);
         const storeSnap = await getDoc(storeRef);
-
         let baseDate = new Date(); // 預設從今天開始算
         if (storeSnap.exists()) {
             const storeData = storeSnap.data();
@@ -805,10 +793,8 @@ window.approvePayment = async function (requestId, storeId, plan) {
                 }
             }
         }
-
         // 加上對應的月份
         baseDate.setMonth(baseDate.getMonth() + monthsToAdd);
-
         // A. 更新該商店的訂閱狀態與新到期日
         await updateDoc(storeRef, {
             "subscription.status": "active",
@@ -816,19 +802,15 @@ window.approvePayment = async function (requestId, storeId, plan) {
             "subscription.lastPaymentDate": new Date().toISOString(),
             "subscription.planType": plan
         });
-
         // B. 將這筆 payment_request 的狀態改為 approved (審核完成，下次就不會再顯示了)
         const requestRef = doc(db, "payment_requests", requestId);
         await updateDoc(requestRef, {
             status: "approved",
             approvedAt: new Date().toISOString()
         });
-
         alert('🎉 審核成功！該商店的到期日已自動更新。');
-
         // 重新整理審核列表
         loadPaymentAudits();
-
     } catch (error) {
         console.error("審核處理失敗：", error);
         alert("審核失敗，發生未預期的錯誤。");

@@ -754,7 +754,7 @@ async function loadPaymentAudits() {
             else if (data.plan === 'halfYear') planName = '半年期';
             else if (data.plan === 'month') planName = '一個月';
             html += `
-                <div style="border: 0.2cqw solid #ddd; background: #fff; padding: 3cqw; border-radius: 2cqw; box-shadow: 0 0.2cqw 1.25cqw rgba(0,0,0,0.05);">
+                <div style="color:#111111; border: 0.2cqw solid #ddd; background: #fff; padding: 3cqw; border-radius: 2cqw; box-shadow: 0 0.2cqw 1.25cqw rgba(0,0,0,0.05);">
                     <p style="margin: 1cqw 0;"><strong>商店 ID：</strong><br><span style="font-size: 3cqw; color: #555; word-break: break-all;">${data.storeId}</span></p>
                     <p style="margin: 1cqw 0;"><strong>購買方案：</strong> ${planName} ($${data.amount})</p>
                     <p style="margin: 1cqw 0;"><strong>轉帳後五碼：</strong> <span style="color: #d9534f; font-weight: bold; font-size: 4cqw;">${data.lastFiveDigits}</span></p>

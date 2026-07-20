@@ -151,6 +151,7 @@ function updateUIForUser(user, currentRole) {
     const userAvatarImg = document.getElementById('userAvatarImg');
     const defaultIcon = document.getElementById('defaultIcon');
     const statusContainer = document.getElementById('statusmsg');
+    const userId = currentUserId || 'guest';
     // 1. 角色名稱邏輯 (保留你的防禦性檢查)
     if (userNameDisplay) {
         if (currentRole === "admin") {
@@ -177,7 +178,7 @@ function updateUIForUser(user, currentRole) {
     if (statusContainer) {
         if (!user.isAnonymous) {
             statusContainer.innerHTML = `
-                <a class="statusText" href="orders.html?storeId=${storeId}">
+                <a class="statusText" href="orders.html?storeId=${userId}">
                     <div class="status-indicator"></div>
                     <span>您好 ${user.displayName || 'PACE用戶'} ~<br>請點此查看訂單狀態！</span>
                 </a>`;
@@ -752,7 +753,8 @@ document.addEventListener('click', async (e) => {
             break;
         }
         case 'cartstatus': {
-            window.location.href = `orders.html?storeId=${storeId}`;
+            const userId = currentUserId || 'guest';
+            window.location.href = `orders.html?storeId=${userId}`;
             break;
         }
     }

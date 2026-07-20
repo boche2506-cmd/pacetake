@@ -71,6 +71,12 @@ const userNameDisplay = document.getElementById('userNameDisplay');
 const loginLightbox = document.getElementById('loginLightbox');
 const emailFormSection = document.getElementById('emailFormSection');
 const adminMainContent = document.getElementById('adminMainContent'); // 請換成你放主要內容的容器 ID
+if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+    // 直接把 console.log 覆寫成空函式，讓它印不出任何東西
+    console.log = function () { };
+    console.warn = function () { };
+    // 💡 建議保留 console.error，這樣萬一線上有嚴重 Bug 時，你還是能在 F12 看到錯誤訊息
+}
 // 監聽 Firebase 登入狀態
 export const authReady = new Promise((resolve) => {
     onAuthStateChanged(auth, (user) => {
@@ -816,28 +822,6 @@ window.approvePayment = async function (requestId, storeId, plan) {
         alert("審核失敗，發生未預期的錯誤。");
     }
 };
-// 封裝成一個獨立的初始化函式
-/*function initPullToRefresh() {
-    const topGroup = document.querySelector('.sticky-top-group');
-    let startY = 0;
-    let isReloading = false; // 加入鎖定開關，防止連點
-    if (topGroup) {
-        topGroup.addEventListener('touchstart', (e) => {
-            startY = e.touches[0].pageY;
-            isReloading = false;
-        }, { passive: true });
-        topGroup.addEventListener('touchmove', (e) => {
-            if (isReloading) return;
-            const currentY = e.touches[0].pageY;
-            const pullDistance = currentY - startY;
-            if (pullDistance > 80) {
-                isReloading = true;
-                console.log("[PACE] 偵測到上層下拉，觸發重新整理！");
-                location.reload();
-            }
-        }, { passive: true });
-    }
-}*/
 // ==========================================
 // 🎯 PACE 專屬：store.html 終極完美動態渲染模組 (含首頁卡片替換、加減鍵、備註欄)
 // ==========================================

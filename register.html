@@ -815,7 +815,17 @@
                     <label class="toggle-switch"><input type="checkbox" id="toggleOnline"><span
                             class="slider"></span></label>
                 </div>
-                <div class="input-group newebpay-box" id="newebpayContainer" style="display: none;"></div>
+                <div class="input-group newebpay-box" id="newebpayContainer" style="display: none;">
+                    <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
+                    <div style="display:flex; flex-direction:column; gap:0.5cqw;">
+                        <input type="text" id="merchantIdInput" class="input-style" style="height:8cqw;"
+                            placeholder="請輸入 商店代號 (MerchantID)">
+                        <input type="text" id="hashKeyInput" class="input-style" style="height:8cqw;"
+                            placeholder="請輸入 HashKey">
+                        <input type="text" id="hashIvInput" class="input-style" style="height:8cqw;"
+                            placeholder="請輸入 HashIV">
+                    </div>
+                </div>
                 <div class="switch-row">
                     <div class="input-group"><label>現場付現</label><small>開啟現場付款，需自行承擔未取貨風險</small>
                     </div>
@@ -972,92 +982,82 @@
         const warningConfirmBtn = document.getElementById('warningConfirmBtn');
         const warningCancelBtn = document.getElementById('warningCancelBtn');
         const toggleOnline = document.getElementById('toggleOnline');
+        if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+            // 直接把 console.log 覆寫成空函式，讓它印不出任何東西
+            console.log = function () { };
+            console.warn = function () { };
+            // 💡 建議保留 console.error，這樣萬一線上有嚴重 Bug 時，你還是能在 F12 看到錯誤訊息
+        }
         let categoryCounter = 0;
         // 確保只有在 register.html 才執行這段檢查
         async function initRegisterPage() {
-            /*if (!window.location.pathname.includes('register.html')) return;*/
+            if (!window.location.pathname.includes('register.html')) return;
             const user = await authReady;
-            /*if (user.isAnonymous) {
+            if (user.isAnonymous) {
                 alert("尚未登入，請先前往登入頁面。");
                 window.location.href = "index.html";
-                return;*/
-            // . 頁面路徑安全檢查
-            // 1. 從網址取得 storeId (例如: register.html?storeId=123)
-            const urlParams = new URLSearchParams(window.location.search);
-            const storeId = urlParams.get('storeId');
-            console.log("[PACE] Initializing Register Page Logic...");// . 現金警告邏輯 (事件委派)
-            if (newebpayContainer) {
-                // 1. 渲染 HTML 內容
-                newebpayContainer.innerHTML = `
-                <label style="display:block; font-size:4cqw; font-weight:600;">🔒 藍新金流 API 開發參數設定</label>
-                <div style="display:flex; flex-direction:column; gap:0.5cqw;">
-                    <input type="text" id="merchantIdInput" class="input-style" style="height:8cqw;" placeholder="請輸入 商店代號 (MerchantID)">
-                    <input type="text" id="hashKeyInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashKey">
-                    <input type="text" id="hashIvInput" class="input-style" style="height:8cqw;" placeholder="請輸入 HashIV">
-                </div>`;
-                // 2. 綁定開關監聽器（因為在 if 裡面，這裡不需要再重複檢查 newebpayContainer 了）
-                toggleOnline?.addEventListener('change', (e) => {
-                    newebpayContainer.style.display = e.target.checked ? 'block' : 'none';
-                });
-                // 3. 【防呆同步】一進畫面時，自動根據開關目前的狀態決定要顯示還是隱藏
-                newebpayContainer.style.display = toggleOnline?.checked ? 'block' : 'none';
-            }
-            if (storeId) {
-                console.log("偵測到 storeId，進入編輯模式:", storeId);
-                try {
-                    // 2. 從 Firebase 讀取該店家的資料
-                    // 1. 同時讀取「商店資料」與「菜單子集合」
-                    const [storeDoc, menuSnapshot] = await Promise.all([
-                        getDoc(doc(db, "stores", storeId)),
-                        getDocs(collection(db, "stores", storeId, "menu"))
-                    ]);
-                    if (storeDoc.exists()) {
-                        const storeData = storeDoc.data();
-                        const citySelect = document.getElementById('citySelect');
-                        citySelect.value = storeData.city;
-                        updateDistrictOptions(storeData.city, storeData.district);
-                        // 3. 監聽縣市切換（以後使用者自己手動改縣市時才會用到）
-                        citySelect.addEventListener('change', (e) => {
-                            updateDistrictOptions(e.target.value);
-                        });
-                        // --- 【關鍵修正】補上這段擁有者檢查 ---
-                        // 檢查資料庫裡的 sellerUid 是不是當前登入者的 UID
-                        // 注意：請確保你的資料庫 store 文件裡有存 sellerUid 欄位
-                        if (storeData.sellerUid !== user.uid) {
-                            alert("權限不足，您無法修改別人的商店資料！");
-                            window.location.href = "index.html";
+                return;
+                // 1. 從網址取得 storeId (例如: register.html?storeId=123)
+                const urlParams = new URLSearchParams(window.location.search);
+                const storeId = urlParams.get('storeId');
+                console.log("[PACE] Initializing Register Page Logic...");// . 現金警告邏輯 (事件委派)
+                if (storeId) {
+                    console.log("偵測到 storeId，進入編輯模式:", storeId);
+                    try {
+                        // 2. 從 Firebase 讀取該店家的資料
+                        // 1. 同時讀取「商店資料」與「菜單子集合」
+                        const [storeDoc, menuSnapshot] = await Promise.all([
+                            getDoc(doc(db, "stores", storeId)),
+                            getDocs(collection(db, "stores", storeId, "menu"))
+                        ]);
+                        if (storeDoc.exists()) {
+                            const storeData = storeDoc.data();
+                            const citySelect = document.getElementById('citySelect');
+                            citySelect.value = storeData.city;
+                            updateDistrictOptions(storeData.city, storeData.district);
+                            // 3. 監聽縣市切換（以後使用者自己手動改縣市時才會用到）
+                            citySelect.addEventListener('change', (e) => {
+                                updateDistrictOptions(e.target.value);
+                            });
+                            // --- 【關鍵修正】補上這段擁有者檢查 ---
+                            // 檢查資料庫裡的 sellerUid 是不是當前登入者的 UID
+                            // 注意：請確保你的資料庫 store 文件裡有存 sellerUid 欄位
+                            if (storeData.sellerUid !== user.uid) {
+                                alert("權限不足，您無法修改別人的商店資料！");
+                                window.location.href = "index.html";
+                                return;
+                            }
+                            fillShopFormData(storeDoc.data());// 這裡填入欄位
+                            submitBtn.dataset.mode = 'edit';
+                            submitBtn.dataset.storeId = storeId;
+                            submitBtn.innerText = "儲存修改";
+                        } else {
+                            alert("找不到該店鋪資料！");
                             return;
                         }
-                        fillShopFormData(storeDoc.data());// 這裡填入欄位
-                        submitBtn.dataset.mode = 'edit';
-                        submitBtn.dataset.storeId = storeId;
-                        submitBtn.innerText = "儲存修改";
-                    } else {
-                        alert("找不到該店鋪資料！");
-                        return;
+                        // 3. 處理菜單資料 (這裡就是你要抓的 menu)
+                        const menuItems = menuSnapshot.docs.map(doc => ({
+                            id: doc.id,
+                            ...doc.data()
+                        }));
+                        console.log("撈到的菜單資料:", menuItems);
+                        // 這裡你需要一個函式把 menuItems 渲染到畫面上
+                        if (menuItems.length > 0) {
+                            renderMenuToUI(menuItems);
+                        } else {
+                            // 如果舊資料沒有菜單，給他一個空白的輸入列
+                            createNewItemRow();
+                        }
+                    } catch (error) {
+                        console.error("編輯模式讀取失敗:", error);
+                        alert("讀取資料失敗，請檢查網路連線。");
                     }
-                    // 3. 處理菜單資料 (這裡就是你要抓的 menu)
-                    const menuItems = menuSnapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    console.log("撈到的菜單資料:", menuItems);
-                    // 這裡你需要一個函式把 menuItems 渲染到畫面上
-                    if (menuItems.length > 0) {
-                        renderMenuToUI(menuItems);
-                    } else {
-                        // 如果舊資料沒有菜單，給他一個空白的輸入列
-                        createNewItemRow();
-                    }
-                } catch (error) {
-                    console.error("編輯模式讀取失敗:", error);
-                    alert("讀取資料失敗，請檢查網路連線。");
+                } else {
+                    console.log("未偵測到 storeId，進入新增模式");
+                    // 明確設定為 create
+                    submitBtn.dataset.mode = 'create';
+                    submitBtn.innerText = "建立店鋪";
                 }
-            } else {
-                console.log("未偵測到 storeId，進入新增模式");
-                // 明確設定為 create
-                submitBtn.dataset.mode = 'create';
-                submitBtn.innerText = "建立店鋪";
             }
         }
         function renderMenuToUI(categories) {
@@ -1094,9 +1094,9 @@
                 newTabBtn.setAttribute('data-action', 'switchcategory');
                 newTabBtn.setAttribute('data-target', uniqueStoredId); // 🎯 精準對齊
                 newTabBtn.innerHTML = `
-            <span>${catObj.category}</span>
-            <span class="tab-del-x" data-action="deletecategory" style="margin-left: 2cqw; cursor: pointer; color: #ff4d4d;">❌</span>
-        `;
+                                    <span>${catObj.category}</span>
+                                    <span class="tab-del-x" data-action="deletecategory" style="margin-left: 2cqw; cursor: pointer; color: #ff4d4d;">❌</span>
+                                    `;
                 if (addCategoryBox) {
                     header.insertBefore(newTabBtn, addCategoryBox);
                 } else {
@@ -1301,7 +1301,6 @@
             } else {
                 console.error("塞入商品列時，找不到任何可以依附的大盒子！");
             }
-
             // 🎯 3. 賦予這行新商品靈魂（啟動拖曳功能）
             makeItemDraggable(newRow);
             // --- 👇 新增：判斷如果是「編輯回填」，就把資料塞入剛剛建立的 DOM 裡面 ---
@@ -1579,6 +1578,9 @@
                 const row = e.target.closest('.menu-item-row');
                 if (row) row.classList.toggle('sold-out', !e.target.checked);
             }
+        });
+        toggleOnline?.addEventListener('change', (e) => {
+            newebpayContainer.style.display = e.target.checked ? 'block' : 'none';
         });
         // 🎯 1. 全域雙擊監聽：雙擊任何分類標籤，直接開啟編輯模式
         document.addEventListener('dblclick', (e) => {
@@ -1858,21 +1860,17 @@
                     const targetListId = tabBtn.getAttribute('data-target');
                     const list = document.getElementById(targetListId);
                     if (!list) return;
-
                     const menuRows = list.querySelectorAll('.menu-item-row');
-
                     // 🧠 貼心修正：就算分類裡面暫時沒有商品，我們也該把這個「分類小火車」的順序記下來！
                     // 這樣才不會因為裡面沒商品，導致後面其他分類的 index 錯亂。
                     const textSpan = tabBtn.querySelector('span');
                     const categoryName = textSpan ? textSpan.textContent.trim() : tabBtn.textContent.trim();
                     const menuItems = [];
-
                     menuRows.forEach((row) => {
                         const toggle = row.querySelector('.menu-soldout-toggle');
                         const supply = toggle ? toggle.checked : true;
                         const nameVal = row.querySelector('.item-name input').value.trim();
                         if (!nameVal) return;
-
                         menuItems.push({
                             name: nameVal,
                             supply: supply,
@@ -1880,7 +1878,6 @@
                             price: parseInt(row.querySelector('.item-price input').value) || 0
                         });
                     });
-
                     // 🌟 不管裡面有沒有商品，只要這個「標籤」存在，它就配擁有自己當前的 sortIndex！
                     categorizedMenu.push({
                         category: categoryName,

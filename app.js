@@ -209,7 +209,7 @@ function renderDynamicMenu(role, user) {
     // 3. 開店連結區塊
     let registerLink = '';
     if (role === 'admin' || role === 'buyer') {
-        registerLink = `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店</a>(試用七天)`;
+        registerLink = `<a href="register.html" class="nav-fast" style="color: var(--brand-blue); font-weight: 700;">💼 月費開店(試用七天)</a>`;
     }
     // 最終組合
     let adminLink = '';
@@ -217,7 +217,7 @@ function renderDynamicMenu(role, user) {
         adminLink = `
         <div class="menu-divider"></div>
         <a href="javascript:void(0)" data-action="issuePromo" class="nav-fast" style="color: var(--brand-green);">🎟️ 邀請碼發行</a>
-        <a href="javascript:void(0)" data-action="payment" class="nav-fast" style="color: var(--brand-green);">繳費審核</a>`;
+        <a href="javascript:void(0)" data-action="payment" class="nav-fast" style="color: var(--brand-green);">💳 繳費審核</a>`;
     }
     let authActionLink = '';
     if (user.isAnonymous) {

@@ -1200,7 +1200,7 @@
             };
         }
         // 這個函式負責把表單資料變成要存入資料庫的格式
-        function getShopDataForDatabase(ShopFormData, userUid, inviteCode, shopLogoData, isEditMode = false) {
+        function getShopDataForDatabase(ShopFormData, userUid, inviteCode, shopLogoData, isEditMode = false, customExpiryDate = null) {
             const data = {
                 shopName: ShopFormData.name,
                 shopPhone: ShopFormData.phone,
@@ -1223,20 +1223,27 @@
                 MerchantID: ShopFormData.merchantIdValue,
                 hasSeating: ShopFormData.hasSeating
             };
-            // 只有在「新增」時，才建立初始訂閱資料
-            if (!isEditMode) {
-                data.sellerUid = userUid;
-                data.createdAt = new Date().toISOString();
-                // 設定 7 天試用期
-                const expiry = new Date();
-                expiry.setDate(expiry.getDate() + 7); // 加 7 天
+            // 1. 如果有帶入透過邀請碼算好的有效期限 (不管是新增或編輯)
+            if (customExpiryDate) {
                 data.subscription = {
-                    status: "trial",
-                    expiryDate: expiry.toISOString() // 轉成字串，跟你的 createdAt 格式統一
+                    status: "active", // 有邀請碼直接升級為 active (使用中)
+                    expiryDate: customExpiryDate,
+                    planType: "promo_code"
                 };
             }
-            // 如果是 isEditMode，我們不加入 subscription 欄位，
-            // Firebase 更新時就會保留資料庫原本的訂閱狀態，不會被覆蓋！
+            // 2. 如果是「全新註冊」且「沒有填邀請碼」-> 給予預設 7 天試用期
+            else if (!isEditMode) {
+                data.sellerUid = userUid;
+                data.createdAt = new Date().toISOString();
+                const expiry = new Date();
+                expiry.setDate(expiry.getDate() + 7); // 加 7 天試用
+                data.subscription = {
+                    status: "trial",
+                    expiryDate: expiry.toISOString(),
+                    planType: "free_trial"
+                };
+            }
+            // 3. 如果是「一般編輯模式」且「沒有填邀請碼」-> 保持原本邏輯，不帶入 subscription，資料庫的不會被覆蓋
             return data;
         }
         // 菜單文件

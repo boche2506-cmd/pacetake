@@ -752,11 +752,6 @@ document.addEventListener('click', async (e) => {
             loadPaymentAudits(); // 👈 點擊「繳費審核」時就會呼叫這支程式！
             break;
         }
-        case 'cartstatus': {
-            const userId = currentUserId || 'guest';
-            window.location.href = `orders.html?userId=${userId}`;
-            break;
-        }
     }
 });
 // 定義一個獨立的函式，方便隨時新增或移除監聽

@@ -245,10 +245,9 @@ function getBrowserLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    buyerLat = position.coords.latitude;
-                    buyerLng = position.coords.longitude;
+                    buyerLat = position.coords.latitude;  // 存入全域變數
+                    buyerLng = position.coords.longitude; // 存入全域變數
                     const currentBuyerAddress = `經度: ${buyerLng.toFixed(4)}, 緯度: ${buyerLat.toFixed(4)} (GPS 衛星精準定位)`;
-                    // 關鍵修改：拿到座標，立刻去抓該區資料
                     // UI 更新
                     if (gpsPinBtn) gpsPinBtn.innerText = "📍 已獲取定位";
                     if (modalAddressText) modalAddressText.innerText = currentBuyerAddress;
@@ -257,7 +256,14 @@ function getBrowserLocation() {
                         const sLng = parseFloat(window.currentStoreInfo.shopLng || window.currentStoreInfo.lng);
                         updateDistanceUI(sLat, sLng);
                     }
-                    fetchNearbyStores(buyerLat, buyerLng);
+                    // 🌟 關鍵修改：檢查使用者是否已經手動選了下拉選單
+                    const selectedCity = citySelect ? citySelect.value : '';
+                    if (!selectedCity) {
+                        // 只有在「沒有選下拉選單」的預設情況下，才執行 GPS 附近搜尋
+                        fetchNearbyStores(buyerLat, buyerLng);
+                    } else {
+                        console.log("[PACE] 用戶已手動選擇下拉選單，略過 GPS 自動搜尋");
+                    }
                 },
                 (error) => {
                     const errorMsg = "瀏覽器定位遭拒，請手動選擇下拉選單縣市。";
@@ -514,23 +520,62 @@ document.addEventListener('change', async (e) => {
                 });
             }
         }
-        // 分流執行：只有在 index.html 才篩選商店
+        // 分流執行：只有在 index.html 才根據下拉選單抓取並篩選商店
         if (path.includes('index.html') || path === '/') {
-            filterAndRenderStores();
+            await fetchStoresBasedOnSelection();
         }
     }
-    // 處理「區域選擇」的邏輯
+    // 2. 處理「區域選擇」的邏輯
     else if (action === 'districtSelect') {
-        // 分流執行：只有在 index.html 才篩選商店
         if (path.includes('index.html') || path === '/') {
-            filterAndRenderStores();
+            await fetchStoresBasedOnSelection();
         }
     }
-    // 3. 其他處理
     else {
         console.log('未知的 action:', action);
     }
 });
+async function fetchStoresBasedOnSelection() {
+    const selectedCity = citySelect ? citySelect.value : '';
+    const selectedDist = districtSelect ? districtSelect.value : '';
+    // 優先權 1：如果使用者有選擇縣市下拉選單
+    if (selectedCity) {
+        console.log(`[PACE] 優先使用下拉選單查詢：${selectedCity} ${selectedDist || '全區'}`);
+        try {
+            let q;
+            // 根據有沒有選區域來決定 Firebase 查詢條件
+            if (selectedDist) {
+                q = query(
+                    collection(db, "stores"),
+                    where("city", "==", selectedCity),
+                    where("district", "==", selectedDist)
+                );
+            } else {
+                q = query(
+                    collection(db, "stores"),
+                    where("city", "==", selectedCity)
+                );
+            }
+            const querySnapshot = await getDocs(q);
+            allStores = [];
+            querySnapshot.forEach((doc) => {
+                allStores.push({ id: doc.id, ...doc.data() });
+            });
+            console.log(`[PACE] 依下拉選單成功獲取店家共 ${allStores.length} 間`);
+            filterAndRenderStores(); // 直接渲染
+        } catch (error) {
+            console.error("依下拉選單讀取店家失敗：", error);
+            if (storeContainer) storeContainer.innerHTML = '<div class="loading-Spinner" style="color:var(--brand-red);">❌ 讀取店家失敗</div>';
+        }
+    }
+    // 優先權 2：如果沒有選下拉選單，但有快取或記錄到 GPS 座標，就走原本的 9 宮格附近搜尋
+    else if (buyerLat !== null && buyerLng !== null) {
+        fetchNearbyStores(buyerLat, buyerLng);
+    }
+    else {
+        console.log("[PACE] 尚未選擇縣市且尚未取得 GPS 定位");
+    }
+}
 // Listener'click'
 document.addEventListener('click', async (e) => {
     const target = e.target.closest('[data-action]');

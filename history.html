@@ -237,6 +237,12 @@
             HashKey: "",
             HashIV: ""
         };
+        if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+            // 直接把 console.log 覆寫成空函式，讓它印不出任何東西
+            console.log = function () { };
+            console.warn = function () { };
+            // 💡 建議保留 console.error，這樣萬一線上有嚴重 Bug 時，你還是能在 F12 看到錯誤訊息
+        }
         async function renderHistoryOrders() {
             const user = await authReady;
             if (!historylist) return;

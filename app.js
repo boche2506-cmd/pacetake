@@ -70,7 +70,7 @@ const dropdownMenu = document.getElementById('dropdownMenu');
 const userNameDisplay = document.getElementById('userNameDisplay');
 const loginLightbox = document.getElementById('loginLightbox');
 const emailFormSection = document.getElementById('emailFormSection');
-const modal = document.getElementById('qrModal');
+const adminMainContent = document.getElementById('adminMainContent'); // 請換成你放主要內容的容器 ID
 // 監聽 Firebase 登入狀態
 export const authReady = new Promise((resolve) => {
     onAuthStateChanged(auth, (user) => {
@@ -528,7 +528,7 @@ document.addEventListener('change', async (e) => {
 // Listener'click'
 document.addEventListener('click', async (e) => {
     const target = e.target.closest('[data-action]');
-    if (modal && e.target === modal) {
+    if (adminMainContent && e.target === adminMainContent) {
         closeloadPaymentAudits();
         return;
     }
@@ -716,13 +716,12 @@ function closeloadPaymentAudits() {
 }
 // 1. 載入並渲染待審核清單
 async function loadPaymentAudits() {
-    const container = document.getElementById('adminMainContent'); // 請換成你放主要內容的容器 ID
-    if (!container) {
+    if (!adminMainContent) {
         alert("找不到顯示內容的容器！");
         return;
     }
-
-    container.innerHTML = '<h3 style="text-align: center; color: #666;">載入審核資料中...</h3>';
+    adminMainContent.style.display = 'flex';
+    adminMainContent.innerHTML = '<h3 style="text-align: center; color: #666;">載入審核資料中...</h3>';
 
     try {
         // 查詢所有 status 爲 pending 的付款請求
@@ -730,7 +729,7 @@ async function loadPaymentAudits() {
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
-            container.innerHTML = `
+            adminMainContent.innerHTML = `
                 <div style="text-align: center; padding: 40px;">
                     <h3>🎉 目前沒有需要審核的繳費申請</h3>
                     <p style="color: #888;">大家都乖乖繳費了！</p>
@@ -772,11 +771,11 @@ async function loadPaymentAudits() {
         });
 
         html += `</div>`;
-        container.innerHTML = html;
+        adminMainContent.innerHTML = html;
 
     } catch (error) {
         console.error("載入審核清單失敗：", error);
-        container.innerHTML = '<p style="color: red; text-align: center;">載入失敗，請檢查網路或權限。</p>';
+        adminMainContent.innerHTML = '<p style="color: red; text-align: center;">載入失敗，請檢查網路或權限。</p>';
     }
 }
 

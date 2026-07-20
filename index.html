@@ -446,6 +446,21 @@
             padding: 1.25cqw 3.75cqw;
             border-radius: 1.25cqw;
         }
+
+        .adminMainContent {
+            position: fixed;
+            top: 0;
+            aspect-ratio: 9 / 16;
+            height: 100%;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 999;
+            padding: 8cqw 0;
+        }
     </style>
 </head>
 
@@ -533,7 +548,7 @@
                 </a>
             </footer>
         </div>
-        <div class="adminMainContent" id="adminMainContent" style="position: fixed; z-index: 999;"></div>
+        <div class="adminMainContent" id="adminMainContent" style="display: none;"></div>
         <div class="lightbox-modal" id="addressDetailLightbox" style="display: none;">
             <div class="modal-card">
                 <div class="modal-title" style="color: var(--brand-blue); font-weight: 700;">📍 目前位置</div>

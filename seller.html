@@ -930,11 +930,18 @@
         }
         // 1. 初始化日期選擇器 (設為今天)
         const datePicker = document.getElementById('order-date-picker');
-        const today = new Date().toISOString().split('T')[0];
+        const getLocalDateString = () => {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+        const today = getLocalDateString();
         datePicker.value = today;
-        // 一開始就用 loadOrdersForDate (它裡面已經包了 onSnapshot)
+        // 一開始就用 loadOrdersForDate
         loadOrdersForDate(storeId, today);
-        // 監聽日期選擇器變化 (當你切換日期時，會自動切換監聽器)
+        // 監聽日期選擇器變化
         datePicker.addEventListener('change', (e) => {
             loadOrdersForDate(storeId, e.target.value);
         });
@@ -950,6 +957,7 @@
             const end = new Date(dateString);
             end.setHours(23, 59, 59, 999);
             // 建立監聽 Query (只監聽該日期的訂單)
+            // 建立監聽 Query
             const q = query(
                 collection(db, "orders"),
                 where("storeId", "==", storeId),
@@ -957,8 +965,8 @@
                 where("createdAt", "<=", end),
                 orderBy("createdAt", "desc")
             );
-            // 判斷是否為今天 (只有今天是需要播放音效與強制跳轉的)
-            const todayStr = new Date().toISOString().split('T')[0];
+            // 🛠️ 這裡也同步改用本地時間的 today 進行比對
+            const todayStr = getLocalDateString();
             const isToday = (dateString === todayStr);
             // 5. 啟動新的監聽
             unsubscribeOrders = onSnapshot(q, (snapshot) => {
@@ -972,11 +980,10 @@
                 orders.push(...newOrdersList);
                 // UI 狀態處理
                 if (isInitialLoad) {
-                    // 頁面首次載入
                     if (orders.length > 0) {
                         updateUI(orders[0].id);
                     } else {
-                        renderTabs(); // 即使沒訂單也要清空 Tab
+                        renderTabs();
                     }
                     isInitialLoad = false;
                 }
@@ -985,13 +992,7 @@
                     if (orders.length > 0) updateUI(orders[0].id);
                     else renderTabs();
                 }
-                else if (hasNewOrder) {
-                    // 有新單進來 (且在今天)
-                    AudioController.play();
-                    if (orders.length > 0) updateUI(orders[0].id);
-                }
                 else {
-                    // 只是狀態更新或舊單變更
                     const currentOrder = orders.find(o => o.id === activeOrderId);
                     if (currentOrder) renderOrderToWorkspace(currentOrder);
                     renderTabs();

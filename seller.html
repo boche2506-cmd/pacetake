@@ -882,51 +882,31 @@
         let orders = [];// 存儲從 Firebase 撈回的訂單
         let activeOrderId = null; // 全域變數
         let unsubscribeOrders = null;
-        // 🚩 開發時設為 true，上線前請務必改回 false！
-        const IS_DEBUG_MODE = true;// 🚩 開發時設為 true，上線前請務必改回 false！
-        const MOCK_USER_ID = "56TND0b1QBaj994IUmB9gwtYAWF2";// 🚩 開發時設為 true，上線前請務必改回 false！
         // 取得網址參數 (記得在網址手動加上 ?storeId=你的ID)
         const params = new URLSearchParams(window.location.search);
-        const storeId = params.get('storeId') || MOCK_USER_ID;
+        const storeId = params.get('storeId');
+        if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+            // 直接把 console.log 覆寫成空函式，讓它印不出任何東西
+            console.log = function () { };
+            console.warn = function () { };
+            // 💡 建議保留 console.error，這樣萬一線上有嚴重 Bug 時，你還是能在 F12 看到錯誤訊息
+        }
         async function initPage() {
-            let user;
-            if (IS_DEBUG_MODE) {
-                console.warn("⚠️ 目前處於開發模式，已自動模擬登入");
-                user = { uid: MOCK_USER_ID }; // 偽造一個使用者物件
-            } else {
-                user = await authReady; // 真實登入檢查
-                if (!user) {
-                    alert("尚未登入，請先前往登入頁面。");
-                    window.location.href = "index.html";
-                    return;
-                }
+            const user = await authReady;
+            if (!user) {
+                alert("尚未登入，請先前往登入頁面。");
+                window.location.href = "index.html";
+                return;
             }
+
             // 權限檢查 (開發模式下我們可以直接跳過，或者也讓他跑)
-            if (!IS_DEBUG_MODE && storeId !== user.uid) {
+            if (storeId !== user.uid) {
                 alert("存取權限不足！");
                 window.location.href = "index.html";
                 return;
             }
             console.log("驗證通過，開始載入...");
             listenToStoreStatus(storeId);
-            /*const user = await authReady;
-            if (!user) {
-                alert("尚未登入，請先前往登入頁面。");
-                window.location.href = "index.html";
-                return;
-            }
-            const params = new URLSearchParams(window.location.search);
-            const storeId = params.get('storeId');
-            // 權限檢查 (取消註解)
-            if (storeId !== user.uid) {
-                alert("存取權限不足！您無權管理此商店。");
-                window.location.href = "index.html";
-                return;
-            }
-            console.log("驗證通過，開始載入管理介面...");
-            // 1. 初始化狀態監聽 (營業/休息)
-            listenToStoreStatus(storeId);
-            // 2. 初始化訂單監聽*/
         }
         // 訂單監聽函數
         function listenToStoreStatus(storeId) {

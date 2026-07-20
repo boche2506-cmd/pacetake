@@ -490,6 +490,12 @@
         };
         const buyerNameInput = document.getElementById('buyerNameInput');
         const buyerPhoneInput = document.getElementById('buyerPhoneInput');
+        if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+            // 直接把 console.log 覆寫成空函式，讓它印不出任何東西
+            console.log = function () { };
+            console.warn = function () { };
+            // 💡 建議保留 console.error，這樣萬一線上有嚴重 Bug 時，你還是能在 F12 看到錯誤訊息
+        }
         // 🧠 1. 頁面初始化
         async function initCartPage() {
             // 🎯 卡住等待 Firebase 身份確認 (支援無登入無痛購物 / 匿名登入)

@@ -177,7 +177,7 @@ function updateUIForUser(user, currentRole) {
     if (statusContainer) {
         if (!user.isAnonymous) {
             statusContainer.innerHTML = `
-                <a class="statusText" href="orders.html">
+                <a class="statusText" href="orders.html?storeId=${storeId}">
                     <div class="status-indicator"></div>
                     <span>您好 ${user.displayName || 'PACE用戶'} ~<br>請點此查看訂單狀態！</span>
                 </a>`;
@@ -749,6 +749,10 @@ document.addEventListener('click', async (e) => {
         }
         case 'payment': {
             loadPaymentAudits(); // 👈 點擊「繳費審核」時就會呼叫這支程式！
+            break;
+        }
+        case 'cartstatus': {
+            window.location.href = `orders.html?storeId=${storeId}`;
             break;
         }
     }

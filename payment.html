@@ -28,13 +28,18 @@
             color: var(--text-main);
         }
 
-        .payment-container h1 {
+        .payment-container span {
+            height: 5%;
+            width: 100%;
+            font-size: 8cqw;
+            font-weight: 700;
+            line-height: 1.2;
             letter-spacing: 1cqw;
         }
 
         .top-payment-box {
             color: var(--text-main);
-            height: 50%;
+            height: 47.5%;
             width: 100%;
             padding: 2cqw 1cqw;
             border-radius: 2cqw;
@@ -47,7 +52,7 @@
 
         .bottom-support-box {
             color: var(--text-main);
-            height: 50%;
+            height: 47.5%;
             width: 100%;
             padding: 1cqw;
             border-radius: 2cqw;
@@ -67,11 +72,19 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            line-height: 1.2;
         }
 
-        .top-payment-box img {
+        .price-list span {
+            height: 10%;
             width: 100%;
+            font-size: 3.5cqw;
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: 0.2cqw;
+        }
+
+        .price-list img {
+            width: 95%;
             aspect-ratio: 1 / 1;
             display: flex;
             flex-direction: column;
@@ -90,6 +103,12 @@
             align-items: center;
             line-height: 1.2;
             color: var(--text-main);
+        }
+
+        #paymentReportForm label {
+            font-size: 3.5cqw;
+            font-weight: 600;
+            line-height: 1.2;
         }
 
         .form-group {
@@ -145,9 +164,16 @@
             font-size: 4cqw;
             cursor: pointer;
         }
-
+.bottom-support-box span {
+            height: 10%;
+            width: 100%;
+            font-size: 3.5cqw;
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: 0.2cqw;
+        }
         .bottom-support-box img {
-            width: 50%;
+            height: 70%;
             aspect-ratio: 1 / 1;
             display: flex;
             flex-direction: column;
@@ -185,14 +211,14 @@
                 </div>
             </header>
             <main class="payment-container" id="paySection">
-                <h1>💳 系統繳費</h1>
+                <span>💳 系統繳費</span>
                 <!-- ================= 上半部：繳費資訊與回報表單 ================= -->
                 <div class="top-payment-box">
                     <div class="price-list">
-                        <h3>國泰世華APP可掃描下方<br> QR Code 進行轉帳。</h3>
+                        <span>國泰世華APP可掃描下方<br> QR Code 進行轉帳。</span>
                         <!-- 銀行轉帳 QR Code -->
                         <img src="png/bankQRCode.png" alt="銀行轉帳QR Code">
-                        <h3>轉帳帳號:<br>(013)042506106341</h3>
+                        <span>轉帳帳號:<br>(013)042506106341</span>
                     </div>
                     <!-- 方案價格說明 -->
                     <form id="paymentReportForm">
@@ -220,12 +246,12 @@
                 <!-- ================= 下半部：LINE 客服聯絡區 ================= -->
                 <div class="bottom-support-box"
                     style="background: #f1f8e9; padding: 1cqw; border-radius: 2cqw; text-align: center;">
-                    <h3>📞 需要協助嗎？聯繫客服<br>(使用LINE Pay繳費請加LINE)</h3>
+                    <span>📞 需要協助嗎？聯繫客服<br>(使用LINE Pay繳費請加LINE)</span>
                     <!-- LINE QR Code -->
                     <img src="png/lineQRCode.png" alt="Line QR Code">
-                    <p><a href="https://line.me/ti/p/ZJwry9syCe" target="_blank"
+                    <span><a href="https://line.me/ti/p/ZJwry9syCe" target="_blank"
                             style="color: #00c300; font-weight: bold; text-decoration: none;">👉 點擊這裡直接加 Line 好友(阿凱)</a>
-                    </p>
+                    </span>
                 </div>
             </main>
             <div class="lightbox-modal" id="addressDetailLightbox" style="display: none;">

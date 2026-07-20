@@ -178,7 +178,7 @@ function updateUIForUser(user, currentRole) {
     if (statusContainer) {
         if (!user.isAnonymous) {
             statusContainer.innerHTML = `
-                <a class="statusText" href="orders.html?storeId=${userId}">
+                <a class="statusText" href="orders.html?userId=${userId}">
                     <div class="status-indicator"></div>
                     <span>您好 ${user.displayName || 'PACE用戶'} ~<br>請點此查看訂單狀態！</span>
                 </a>`;
@@ -754,7 +754,7 @@ document.addEventListener('click', async (e) => {
         }
         case 'cartstatus': {
             const userId = currentUserId || 'guest';
-            window.location.href = `orders.html?storeId=${userId}`;
+            window.location.href = `orders.html?userId=${userId}`;
             break;
         }
     }

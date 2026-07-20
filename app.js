@@ -104,7 +104,8 @@ function showGuestUI() {
 }
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
-    currentUserId = user.uid;
+    const user = await authReady;
+    window.currentUserUid = user.uid;
     // 確保這裡使用 user.isAnonymous
     console.log("[PACE DEBUG] User synced. Is Anonymous:", user.isAnonymous);
     try {
@@ -959,7 +960,7 @@ async function initStorePage() {
             target.innerText = '🏪';
         }
         // 1. 抓取購物車與分頁標籤容器
-        const cartData = JSON.parse(localStorage.getItem('pacetake_cart')) || [];
+        const cartData = JSON.parse(localStorage.getItem(getCartKey())) || [];
         // 🎯【修改點 1】：拿掉 tabsWrapper，直接抓取分類大外層容器
         const categoryHeader = document.querySelector('.category-header');
         const menuQuery = collection(db, "stores", currentStoreId, "menu");
@@ -1122,7 +1123,7 @@ async function initStorePage() {
         // --- 在 initStorePage 最底部的購物車回填（維持原樣不變） ---
         setTimeout(() => {
             const currentStoreId = document.body.getAttribute('data-store-id');
-            const latestCartData = JSON.parse(localStorage.getItem('pacetake_cart')) || [];
+            const latestCartData = JSON.parse(localStorage.getItem(getCartKey())) || [];
             latestCartData.forEach(cartItem => {
                 const qtyDisplay = document.getElementById(`qty_${cartItem.id}`);
                 if (qtyDisplay) {
@@ -1138,10 +1139,15 @@ async function initStorePage() {
     }
 }
 /** * 🛒 購物車管理核心 */
+function getCartKey() {
+    // 優先抓取全域紀錄的 UID，如果沒有則退回 guest
+    const uid = window.currentUserUid || (window.auth && window.auth.currentUser ? window.auth.currentUser.uid : null);
+    return uid ? `pacetake_cart_${uid}` : 'pacetake_cart_guest';
+}
 // --- 1. 資料處理區 ---
 export function getCartData() {
     try {
-        const raw = localStorage.getItem('pacetake_cart');
+        const raw = localStorage.getItem(getCartKey()); // 👈 改用動態 Key
         if (!raw) return [];
         const data = JSON.parse(raw);
         return Array.isArray(data) ? data : [];
@@ -1178,7 +1184,7 @@ export async function checkoutToFirebase(buyerPhone, sellerUid) {
             status: 'pending',
             createdAt: serverTimestamp()
         });
-        localStorage.removeItem('pacetake_cart');
+        localStorage.removeItem(getCartKey()); // 👈 結帳後清空該用戶專屬的購物車
         refreshTotalCartUI();
         alert("訂單已送出！");
     } catch (e) {
@@ -1189,17 +1195,16 @@ export async function checkoutToFirebase(buyerPhone, sellerUid) {
 export function updateLocalStorageData(itemId, itemName, itemPrice, currentStoreId, qtyDisplay, card) {
     let localCartData = getCartData();
     const currentQty = parseInt(qtyDisplay.innerText, 10);
-    // 1. 店家檢查邏輯
+
     if (localCartData.length > 0 && String(localCartData[0].storeId).trim() !== String(currentStoreId).trim()) {
         if (confirm("⚠️ 購物車內已有其他店家的商品，加入此商品將會清空前店清單，確定繼續嗎？")) {
             localCartData = [];
         } else {
-            // --- 修正點：取消時，必須將畫面上的數字改回 0 (因為沒加入購物車) ---
             qtyDisplay.innerText = "0";
             return;
         }
     }
-    // 2. 其餘邏輯保持不變...
+
     localCartData = localCartData.filter(i => i.id !== itemId);
     if (currentQty > 0) {
         localCartData.push({
@@ -1210,23 +1215,19 @@ export function updateLocalStorageData(itemId, itemName, itemPrice, currentStore
             storeId: currentStoreId
         });
     }
-    localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
+    localStorage.setItem(getCartKey(), JSON.stringify(localCartData)); // 👈 存入該用戶專屬 Key
     refreshTotalCartUI();
 }
 // app.js 裡新增這段：專門給購物車列表使用的「純資料修改器」
 export function modifyCartItemQty(itemId, delta) {
-    let localCartData = getCartData(); // 使用你原本寫好的 getCartData
+    let localCartData = getCartData();
     const itemIndex = localCartData.findIndex(i => i.id === itemId);
     if (itemIndex > -1) {
-        // 更新數量
         localCartData[itemIndex].qty += delta;
-        // 如果數量扣到 0 或以下，就把這項商品從陣列中刪除
         if (localCartData[itemIndex].qty <= 0) {
             localCartData.splice(itemIndex, 1);
         }
-        // 存回 localStorage
-        localStorage.setItem('pacetake_cart', JSON.stringify(localCartData));
-        // 統一更新底部的 Badge (沿用你原本寫好的函式)
+        localStorage.setItem(getCartKey(), JSON.stringify(localCartData)); // 👈 存入該用戶專屬 Key
         refreshTotalCartUI();
     }
 }
@@ -1236,10 +1237,8 @@ export function initCartDOMState() {
     const currentStoreId = document.body.getAttribute('data-store-id');
     if (!cartItems || cartItems.length === 0) return;
     cartItems.forEach(item => {
-        // 確保只回填當前店家的資料
         if (String(item.storeId || "").trim() !== String(currentStoreId || "").trim()) return;
-        // 直接透過 ID 找到對應的 span，例如 qty_storeId|||item_0_large
-        const qtyDisplay = document.getElementById(`qty_${item.id} `);
+        const qtyDisplay = document.getElementById(`qty_${item.id}`);
         if (qtyDisplay) {
             qtyDisplay.innerText = item.qty;
         }

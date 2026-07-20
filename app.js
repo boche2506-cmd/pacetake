@@ -104,7 +104,6 @@ function showGuestUI() {
 }
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
-    const user = await authReady;
     window.currentUserUid = user.uid;
     // 確保這裡使用 user.isAnonymous
     console.log("[PACE DEBUG] User synced. Is Anonymous:", user.isAnonymous);

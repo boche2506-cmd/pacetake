@@ -328,6 +328,12 @@
         let orders = [];// 存儲從 Firebase 撈回的訂單
         let activeOrderId = null; // 全域變數
         let currentOrderData = null;
+        if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+            // 直接把 console.log 覆寫成空函式，讓它印不出任何東西
+            console.log = function () { };
+            console.warn = function () { };
+            // 💡 建議保留 console.error，這樣萬一線上有嚴重 Bug 時，你還是能在 F12 看到錯誤訊息
+        }
         // 假設你已經有 auth 和 db 的設定
         async function initPage() {
             const user = await authReady;

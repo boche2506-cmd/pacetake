@@ -964,6 +964,7 @@
         let activeDragTab = null;   // 🎯 新增：專門給標籤用的全域變數
         let dragStartX = 0;
         let dragStartY = 0;
+        let expiryDateToAdd = null; // 用來記錄這次要給多少時間
         const submitBtn = document.getElementById('submitBtn');
         const newebpayContainer = document.getElementById('newebpayContainer');
         const toggleCash = document.getElementById('toggleCash');
@@ -1953,17 +1954,32 @@
                         return;
                     }
                     const promoDoc = querySnapshot.docs[0];
+                    // 先把邀請碼標記為已使用
                     await updateDoc(promoDoc.ref, { isActive: false, usedBy: user.uid });
+                    // 🔥 驗證通過！計算要加 1 年的時間
+                    // 如果是編輯模式，我們去抓他原本的到期日來疊加；如果是新註冊，從今天開始算
+                    let baseDate = new Date();
+                    if (mode === 'edit') {
+                        const storeSnap = await getDoc(doc(db, "stores", storeId));
+                        if (storeSnap.exists() && storeSnap.data().subscription?.expiryDate) {
+                            const currentExpiry = new Date(storeSnap.data().subscription.expiryDate);
+                            if (currentExpiry > baseDate) {
+                                baseDate = currentExpiry; // 還沒過期，從原本到期日往後疊加 1 年
+                            }
+                        }
+                    }
+                    baseDate.setFullYear(baseDate.getFullYear() + 1); // 加上 1 年
+                    expiryDateToAdd = baseDate.toISOString();
                 }
-                btn.disabled = true; // 這裡鎖定按鈕，防止使用者連按
+                btn.disabled = true; // 鎖定按鈕防止連按
                 try {
                     if (mode === 'edit') {
-                        // 模式 A：更新既有資料
-                        const shopData = getShopDataForDatabase(ShopFormData, user.uid, inviteCode, shopLogoData, true);
+                        // 模式 A：更新既有資料 (把算好的 expiryDateToAdd 傳進去)
+                        const shopData = getShopDataForDatabase(ShopFormData, user.uid, inviteCode, shopLogoData, true, expiryDateToAdd);
                         await updateDoc(doc(db, "stores", storeId), shopData);
                     } else {
-                        // 模式 B：新增
-                        const shopData = getShopDataForDatabase(ShopFormData, user.uid, inviteCode, shopLogoData, false);
+                        // 模式 B：新增 (如果是新註冊且沒填 inviteCode，就給 7 天試用)
+                        const shopData = getShopDataForDatabase(ShopFormData, user.uid, inviteCode, shopLogoData, false, expiryDateToAdd);
                         await setDoc(doc(db, "stores", user.uid), shopData);
                     }
                     // 1. 處理菜單資料 (這裡會將我們剛算好 sortIndex 的 categorizedMenu 餵進去)

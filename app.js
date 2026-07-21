@@ -78,7 +78,7 @@ if (window.location.hostname !== "localhost" && window.location.hostname !== "12
 }
 // 監聽 Firebase 登入狀態
 export const authReady = new Promise((resolve) => {
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, (user) => {
         resolve(user); // 當狀態確認後，resolve 這個 user
         if (user) {
             // 使用者已經登入 (可能是匿名，也可能是正式會員)
@@ -95,7 +95,7 @@ export const authReady = new Promise((resolve) => {
                 showGuestUI();
             });
         }
-        await refreshTotalCartUI();//** * 🛒 購物車管理
+        refreshTotalCartUI();//** * 🛒 購物車管理
     });
 });
 // 使用者登出

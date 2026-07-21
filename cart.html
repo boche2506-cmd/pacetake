@@ -524,8 +524,8 @@
                 console.log("買家尚未進入 Firebase Auth 狀態");
             }
             // 萬一完全沒資料，去撈臨時封存區備份
-            if (!buyerNameInput.value) buyerNameInput.value = localStorage.getItem('temp_buyer_name') || '';
-            if (!buyerPhoneInput.value) buyerPhoneInput.value = localStorage.getItem('temp_buyer_phone') || '';
+            if (!buyerNameInput.value) buyerNameInput.value = localStorage.getItem('pace_buyer_name') || '';
+            if (!buyerPhoneInput.value) buyerPhoneInput.value = localStorage.getItem('pace_buyer_phone') || '';
             // 載入購物車與金流設定
             loadCartFromStorage();
             // 🎨 【UI 強制視覺雙校正】確保外帶自取預設亮起藍色
@@ -908,8 +908,8 @@
                                 // 清空購物車
                                 localStorage.removeItem('cart');
                                 localStorage.removeItem('pacetake_cart');
-                                localStorage.removeItem('temp_buyer_name');
-                                localStorage.removeItem('temp_buyer_phone');
+                                localStorage.removeItem('pace_buyer_name');
+                                localStorage.removeItem('pace_buyer_phone');
                                 // 跳轉頁面
                                 window.location.href = "orders.html";
                             }
@@ -970,8 +970,8 @@
                         // 清空購物車
                         localStorage.removeItem('cart');
                         localStorage.removeItem('pacetake_cart');
-                        localStorage.removeItem('temp_buyer_name');
-                        localStorage.removeItem('temp_buyer_phone');
+                        localStorage.removeItem('pace_buyer_name');
+                        localStorage.removeItem('pace_buyer_phone');
                         // 執行藍新雙重高階加密演算法
                         const tradeInfo = encryptAES(
                             originalParameters,

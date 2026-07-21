@@ -65,6 +65,7 @@ const toggleBtn = document.getElementById('themeToggleBtn');
 const heartIcon = document.getElementById('heart-icon');
 const menuContainer = document.getElementById('menuContainer');
 const storeDistanceText = document.getElementById('storeDistanceText');
+const orderbadgecount = document.querySelector('orderbadgecount');
 const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
 const dropdownMenu = document.getElementById('dropdownMenu');
 const userNameDisplay = document.getElementById('userNameDisplay');
@@ -1122,6 +1123,7 @@ async function initStorePage() {
         // --- 在 initStorePage 最底部的購物車回填（維持原樣不變） ---
         setTimeout(() => {
             const currentStoreId = document.body.getAttribute('data-store-id');
+            // 🛠️ 修正：必須使用專屬的 getCartKey() 去 localStorage 撈資料，不能用 HTML ID！
             const latestCartData = JSON.parse(localStorage.getItem(getCartKey())) || [];
             latestCartData.forEach(cartItem => {
                 const qtyDisplay = document.getElementById(`qty_${cartItem.id}`);
@@ -1156,15 +1158,20 @@ export function getCartData() {
 }
 // --- 2. UI 渲染區 ---
 export function refreshTotalCartUI() {
-    const localCartData = getCartData();
+    const localCartData = getCartData(); // 內部會自動呼叫 getCartKey()
     let totalQty = 0;
     let totalPrice = 0;
     localCartData.forEach(item => {
         totalQty += item.qty;
         totalPrice += (item.price * item.qty);
     });
-    const badge = document.querySelector('.order-badge-count');
-    if (badge) badge.innerText = `($${totalPrice})`;
+    // 🛠️ 修正：直接精準對應你 HTML 裡的 id="orderbadgecount"
+    const badge = document.getElementById('orderbadgecount');
+    if (badge) {
+        badge.innerText = `($${totalPrice})`;
+    }
+    // 如果還有其他摘要文字容器也可以一併更新
+    const cartSummaryText = document.getElementById('cartSummaryText'); // 確保變數存在
     if (cartSummaryText) {
         cartSummaryText.innerHTML = `🛒 已加入 ${totalQty} 項 · 總計 $${totalPrice} `;
     }

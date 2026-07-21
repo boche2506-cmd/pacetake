@@ -87,7 +87,7 @@ export const authReady = new Promise((resolve) => {
             // 開始進行點餐或載入購物車
             handleUserSyncAndRoleRouting(user);
             renderFavoriteStores();
-            window.currentUserUid = user.uid;
+            window.currentUserId = user.uid;
         } else {
             // --- 這裡就是「關門」的地方 ---
             console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");
@@ -105,7 +105,7 @@ function showGuestUI() {
 }
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
-    window.currentUserUid = user.uid;
+    window.currentUserId = user.uid;
     // 確保這裡使用 user.isAnonymous
     console.log("[PACE DEBUG] User synced. Is Anonymous:", user.isAnonymous);
     try {
@@ -1142,7 +1142,7 @@ async function initStorePage() {
 /** * 🛒 購物車管理核心 */
 function getCartKey() {
     // 1. 優先抓取你寫的全域變數
-    let uid = window.currentUserUid;
+    let uid = window.currentUserId;
     // 2. 如果全域變數還沒好，直接向 Firebase Auth 拿當前登入者
     if (!uid && window.auth && window.auth.currentUser) {
         uid = window.auth.currentUser.uid;

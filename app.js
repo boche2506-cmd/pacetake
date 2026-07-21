@@ -78,7 +78,7 @@ if (window.location.hostname !== "localhost" && window.location.hostname !== "12
 }
 // 監聽 Firebase 登入狀態
 export const authReady = new Promise((resolve) => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         resolve(user); // 當狀態確認後，resolve 這個 user
         if (user) {
             // 使用者已經登入 (可能是匿名，也可能是正式會員)
@@ -87,6 +87,7 @@ export const authReady = new Promise((resolve) => {
             // 開始進行點餐或載入購物車
             handleUserSyncAndRoleRouting(user);
             renderFavoriteStores();
+            window.currentUserUid = user.uid;
         } else {
             // --- 這裡就是「關門」的地方 ---
             console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");
@@ -94,6 +95,7 @@ export const authReady = new Promise((resolve) => {
                 showGuestUI();
             });
         }
+        await refreshTotalCartUI();//** * 🛒 購物車管理
     });
 });
 // 使用者登出
@@ -103,7 +105,7 @@ function showGuestUI() {
 }
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
-    window.currentUserUid = user.uid;
+
     // 確保這裡使用 user.isAnonymous
     console.log("[PACE DEBUG] User synced. Is Anonymous:", user.isAnonymous);
     try {
@@ -1165,10 +1167,8 @@ export function refreshTotalCartUI() {
     let totalQty = 0;
     let totalPrice = 0;
     localCartData.forEach(item => {
-        const q = Number(item.qty) || 0;
-        const p = Number(item.price) || 0;
-        totalQty += q;
-        totalPrice += (p * q); // 這樣寫就 100% 安全，不需要額外定義
+        totalQty += item.qty;
+        totalPrice += (item.price * item.qty);
     });
     // 🛠️ 修正：直接精準對應你 HTML 裡的 id="orderbadgecount"
     const badge = document.getElementById('orderbadgecount');
@@ -1281,7 +1281,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initCitySelect(document.getElementById('citySelect'));// 負責把資料灌入指定的 Select
     /*initPullToRefresh(); // 把那個下拉刷新的功能也包在這裡*/
     initStorePage();
-    refreshTotalCartUI();//** * 🛒 購物車管理
     initCartDOMState();//回填當前店家購物車的資料
     initThemeSystem();//網頁載入時套用顏色
     console.log("系統初始化完成");

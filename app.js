@@ -87,7 +87,6 @@ export const authReady = new Promise((resolve) => {
             // 開始進行點餐或載入購物車
             handleUserSyncAndRoleRouting(user);
             renderFavoriteStores();
-            window.currentUserId = user.uid;
         } else {
             // --- 這裡就是「關門」的地方 ---
             console.log("[PACE DEBUG] 未登入，正在觸發匿名登入...");
@@ -105,7 +104,7 @@ function showGuestUI() {
 }
 async function handleUserSyncAndRoleRouting(user) {
     if (!user) return;
-    window.currentUserId = user.uid;
+    currentUserId = user.uid;
     // 確保這裡使用 user.isAnonymous
     console.log("[PACE DEBUG] User synced. Is Anonymous:", user.isAnonymous);
     try {

@@ -541,7 +541,7 @@
         }
         // 🛒 2. 從 localStorage 載入資料
         function loadCartFromStorage() {
-            cartData = (typeof getCartData === 'function') ? getCartData() : (JSON.parse(localStorage.getItem('cart')) || JSON.parse(localStorage.getItem('orderbadgecount')) || []);
+            cartData = (typeof getCartData === 'function') ? getCartData() : (JSON.parse(localStorage.getItem('cart')) || JSON.parse(localStorage.getItem('pacetake_cart')) || []);
             if (cartData.length > 0) {
                 targetStoreId = cartData[0].storeId || "";
             }
@@ -907,7 +907,7 @@
                             if (result.isConfirmed) {
                                 // 清空購物車
                                 localStorage.removeItem('cart');
-                                localStorage.removeItem('orderbadgecount');
+                                localStorage.removeItem('pacetake_cart');
                                 localStorage.removeItem('temp_buyer_name');
                                 localStorage.removeItem('temp_buyer_phone');
                                 // 跳轉頁面
@@ -969,7 +969,7 @@
                         });
                         // 清空購物車
                         localStorage.removeItem('cart');
-                        localStorage.removeItem('orderbadgecount');
+                        localStorage.removeItem('pacetake_cart');
                         localStorage.removeItem('temp_buyer_name');
                         localStorage.removeItem('temp_buyer_phone');
                         // 執行藍新雙重高階加密演算法

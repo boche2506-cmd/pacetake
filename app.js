@@ -65,8 +65,6 @@ const toggleBtn = document.getElementById('themeToggleBtn');
 const heartIcon = document.getElementById('heart-icon');
 const menuContainer = document.getElementById('menuContainer');
 const storeDistanceText = document.getElementById('storeDistanceText');
-const orderbadgecount = document.querySelector('orderbadgecount');
-const cartSummaryText = document.querySelector('.cart-summary-text') || document.getElementById('cartSummaryText');
 const dropdownMenu = document.getElementById('dropdownMenu');
 const userNameDisplay = document.getElementById('userNameDisplay');
 const loginLightbox = document.getElementById('loginLightbox');
@@ -1123,7 +1121,7 @@ async function initStorePage() {
         // --- 在 initStorePage 最底部的購物車回填（維持原樣不變） ---
         setTimeout(() => {
             const currentStoreId = document.body.getAttribute('data-store-id');
-            // 🛠️ 修正：必須使用專屬的 getCartKey() 去 localStorage 撈資料，不能用 HTML ID！
+            // 🎯【修正這裡】：改用動態的 getCartKey() 抓取該用戶專屬的購物車資料
             const latestCartData = JSON.parse(localStorage.getItem(getCartKey())) || [];
             latestCartData.forEach(cartItem => {
                 const qtyDisplay = document.getElementById(`qty_${cartItem.id}`);
@@ -1167,8 +1165,10 @@ export function refreshTotalCartUI() {
     let totalQty = 0;
     let totalPrice = 0;
     localCartData.forEach(item => {
-        totalQty += item.qty;
-        totalPrice += (item.price * item.qty);
+        const q = Number(item.qty) || 0;
+        const p = Number(item.price) || 0;
+        totalQty += q;
+        totalPrice += (p * q); // 這樣寫就 100% 安全，不需要額外定義
     });
     // 🛠️ 修正：直接精準對應你 HTML 裡的 id="orderbadgecount"
     const badge = document.getElementById('orderbadgecount');

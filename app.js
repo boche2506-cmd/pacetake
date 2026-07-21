@@ -1141,8 +1141,13 @@ async function initStorePage() {
 }
 /** * 🛒 購物車管理核心 */
 function getCartKey() {
-    // 優先抓取全域紀錄的 UID，如果沒有則退回 guest
-    const uid = window.currentUserUid || (window.auth && window.auth.currentUser ? window.auth.currentUser.uid : null);
+    // 1. 優先抓取你寫的全域變數
+    let uid = window.currentUserUid;
+    // 2. 如果全域變數還沒好，直接向 Firebase Auth 拿當前登入者
+    if (!uid && window.auth && window.auth.currentUser) {
+        uid = window.auth.currentUser.uid;
+    }
+    // 3. 如果連 Firebase Auth 都還沒初始化完，嘗試從 sessionStorage 或 localStorage 的快取找，或退回 guest
     return uid ? `pacetake_cart_${uid}` : 'pacetake_cart_guest';
 }
 // --- 1. 資料處理區 ---
@@ -1158,7 +1163,7 @@ export function getCartData() {
 }
 // --- 2. UI 渲染區 ---
 export function refreshTotalCartUI() {
-    const localCartData = getCartData(); // 內部會自動呼叫 getCartKey()
+    const localCartData = getCartData();
     let totalQty = 0;
     let totalPrice = 0;
     localCartData.forEach(item => {
@@ -1168,7 +1173,9 @@ export function refreshTotalCartUI() {
     // 🛠️ 修正：直接精準對應你 HTML 裡的 id="orderbadgecount"
     const badge = document.getElementById('orderbadgecount');
     if (badge) {
-        badge.innerText = `($${totalPrice})`;
+        badge.innerText = `($${totalPrice})`; // 更新金額
+    } else {
+        console.warn("[PACE] 找不到 id='orderbadgecount' 的標籤！");
     }
     // 如果還有其他摘要文字容器也可以一併更新
     const cartSummaryText = document.getElementById('cartSummaryText'); // 確保變數存在

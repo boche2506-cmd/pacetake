@@ -462,7 +462,7 @@
             </div>
         </div>
     </div>
-    <form id="newebpayForm" method="post" action="https://core.newebpay.com/MPG/mpg_gateway" style="display:none;">
+    <form id="newebpayForm" method="post" action="https://ccore.newebpay.com/MPG/mpg_gateway" style="display:none;">
         <input type="text" name="MerchantID" id="formMerchantID">
         <input type="text" name="TradeInfo" id="formTradeInfo">
         <input type="text" name="TradeSha" id="formTradeSha">
@@ -477,6 +477,7 @@
         let buyerLat = null;
         let buyerLng = null;
         let currentBuyerAddress = "正在獲取定位中...";
+        let currentUserId = null;
         let finalTotalAmount = 0;
         let cartData = [];
         let currentPayType = "";
@@ -524,8 +525,8 @@
                 console.log("買家尚未進入 Firebase Auth 狀態");
             }
             // 萬一完全沒資料，去撈臨時封存區備份
-            if (!buyerNameInput.value) buyerNameInput.value = localStorage.getItem('pace_buyer_name') || '';
-            if (!buyerPhoneInput.value) buyerPhoneInput.value = localStorage.getItem('pace_buyer_phone') || '';
+            if (!buyerNameInput.value) buyerNameInput.value = localStorage.getItem('temp_buyer_name') || '';
+            if (!buyerPhoneInput.value) buyerPhoneInput.value = localStorage.getItem('temp_buyer_phone') || '';
             // 載入購物車與金流設定
             loadCartFromStorage();
             // 🎨 【UI 強制視覺雙校正】確保外帶自取預設亮起藍色
@@ -538,6 +539,16 @@
             if (payOptCredit && payOptCredit.classList.contains('selected') && creditCheckDot) {
                 creditCheckDot.style.backgroundColor = "var(--brand-blue)";
             }
+        }
+        function getCartKey() {
+            // 1. 優先抓取你寫的全域變數
+            let uid = window.currentUserUid;
+            // 2. 如果全域變數還沒好，直接向 Firebase Auth 拿當前登入者
+            if (!uid && window.auth && window.auth.currentUser) {
+                uid = window.auth.currentUser.uid;
+            }
+            // 3. 如果連 Firebase Auth 都還沒初始化完，嘗試從 sessionStorage 或 localStorage 的快取找，或退回 guest
+            return uid ? `pacetake_cart_${uid}` : 'pacetake_cart_guest';
         }
         // 🛒 2. 從 localStorage 載入資料
         function loadCartFromStorage() {
@@ -815,6 +826,7 @@
         if (submitOrderBtn) {
             submitOrderBtn.addEventListener('click', async () => {
                 // 1. 基本資料與購物車驗證 (保留你的原貌)
+                const userId = currentUserId || 'guest';
                 const freshCartData = getCartData();
                 const buyerName = buyerNameInput.value.trim();
                 const buyerPhone = buyerPhoneInput.value.trim();
@@ -906,12 +918,11 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 // 清空購物車
-                                localStorage.removeItem('cart');
-                                localStorage.removeItem('pacetake_cart');
-                                localStorage.removeItem('pace_buyer_name');
-                                localStorage.removeItem('pace_buyer_phone');
+                                localStorage.removeItem(getCartKey());
+                                localStorage.removeItem('temp_buyer_name');
+                                localStorage.removeItem('temp_buyer_phone');
                                 // 跳轉頁面
-                                window.location.href = "orders.html";
+                                window.location.href = `orders.html?userId=${user.uid}`;
                             }
                         });
                     } catch (cashErr) {
@@ -968,10 +979,9 @@
                             createdAt: serverTimestamp()
                         });
                         // 清空購物車
-                        localStorage.removeItem('cart');
-                        localStorage.removeItem('pacetake_cart');
-                        localStorage.removeItem('pace_buyer_name');
-                        localStorage.removeItem('pace_buyer_phone');
+                        localStorage.removeItem(getCartKey());
+                        localStorage.removeItem('temp_buyer_name');
+                        localStorage.removeItem('temp_buyer_phone');
                         // 執行藍新雙重高階加密演算法
                         const tradeInfo = encryptAES(
                             originalParameters,

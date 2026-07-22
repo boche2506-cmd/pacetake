@@ -1455,9 +1455,6 @@
                 closePrintmodal();
             }
         });
-        function closePrintmodal() {
-            document.getElementById('Printout').style.display = 'none';
-        }
         async function handleRequestPhone(order) {
             const orderRef = doc(db, "orders", order.id);
             // 透過 Firebase 修改該筆訂單的狀態為 'requested'

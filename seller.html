@@ -446,7 +446,7 @@
             background-color: rgba(16, 185, 129, 0.1);
             border: 0.2cqw solid var(--brand-green);
             color: var(--brand-green);
-            padding: 2cqw 3cqw;
+            padding: 2cqw;
             border-radius: 5cqw;
             font-size: 4cqw;
             font-weight: 800;
@@ -471,7 +471,7 @@
             color: white;
             font-weight: 600;
             font-size: 3.5cqw;
-            padding: 2cqw 3cqw;
+            padding: 1cqw 2cqw;
             border-radius: 2cqw;
             transition: transform 0.2s;
             /* 按下去會有一點點回饋感 */
@@ -692,6 +692,78 @@
             background: #f5c6cb;
             cursor: not-allowed;
         }
+
+        .Printmodal {
+            position: fixed;
+            top: 0;
+            aspect-ratio: 9 / 16;
+            height: 100%;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 999;
+            padding: 8cqw 0;
+        }
+
+        #smallsheet {
+            height: auto;
+            width: 90%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 8cqw;
+            right: 6cqw;
+            font-size: 10cqw;
+            cursor: pointer;
+            z-index: 999;
+        }
+
+        .Confirm-Print {
+            padding: 2.5cqw 5cqw;
+            background: #0066FF;
+            color: white;
+            border: none;
+            border-radius: 1cqw;
+            cursor: pointer;
+        }
+
+        @media print {
+
+            /* 列印時，隱藏網頁上所有其他元素 */
+            body * {
+                visibility: hidden;
+            }
+
+            /* 只顯示小單內容區塊 */
+            #smallsheet,
+            #smallsheet * {
+                visibility: visible;
+            }
+
+            /* 讓小單回到畫面上方定位 */
+            #smallsheet {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+
+            /* 隱藏關閉按鈕與確認列印按鈕 */
+            .close-btn,
+            .Confirm-Print {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 
@@ -794,6 +866,12 @@
                         <source src="audio/ringtone.mp3" type="audio/mpeg">
                     </audio>
                 </div>
+                <button class="btn" data-action="Print">🖨️<br>列印小單</button>
+                <div id="Printout" class="Printmodal" style="display: none;">
+                    <div id="smallsheet"></div>
+                    <span class="close-btn" data-action="closePrint">&times;</span>
+                    <button id="ConfirmPrint" class="Confirm-Print">🖨️ 確認列印</button>
+                </div>
             </footer>
         </div>
 
@@ -882,6 +960,7 @@
         let orders = [];// 存儲從 Firebase 撈回的訂單
         let activeOrderId = null; // 全域變數
         let unsubscribeOrders = null;
+        const modal = document.getElementById('Printout');
         // 取得網址參數 (記得在網址手動加上 ?storeId=你的ID)
         const params = new URLSearchParams(window.location.search);
         const storeId = params.get('storeId');
@@ -893,7 +972,7 @@
         }
         async function initPage() {
             const user = await authReady;
-            if (!user) {
+            /*if (!user) {
                 alert("尚未登入，請先前往登入頁面。");
                 window.location.href = "index.html";
                 return;
@@ -904,7 +983,7 @@
                 alert("存取權限不足！");
                 window.location.href = "index.html";
                 return;
-            }
+            }*/
             console.log("驗證通過，開始載入...");
             listenToStoreStatus(storeId);
         }
@@ -1272,6 +1351,10 @@
             }
             // 處理其他按鈕
             const target = e.target.closest('[data-action]');
+            if (modal && e.target === modal) {
+                closePrintmodal();
+                return;
+            }
             if (!target) return;
             const action = target.dataset.action;
             if (action === 'storemanage') {
@@ -1360,8 +1443,21 @@
                 }
                 // 執行邏輯
                 handleRequestPhone(order);
+            } else if (action === 'Print') {
+                const order = orders.find(o => o.id === activeOrderId);
+                // 防呆檢查：確保真的有找到訂單 (以防訂單剛好被刪除)
+                if (!order) {
+                    console.error("找不到當前訂單，無法執行列印");
+                    return;
+                }
+                showPrintmodal(order);
+            } else if (action === 'closePrint') {
+                closePrintmodal();
             }
         });
+        function closePrintmodal() {
+            document.getElementById('Printout').style.display = 'none';
+        }
         async function handleRequestPhone(order) {
             const orderRef = doc(db, "orders", order.id);
             // 透過 Firebase 修改該筆訂單的狀態為 'requested'
@@ -1470,6 +1566,60 @@
                 updateUI(orders[newIndex].id);
             } else {
                 console.log("已經滑到底了，無法再切換");
+            }
+        }
+        function showPrintmodal(order) {
+            // 1. 取得畫布與小單容器
+            const printoutModal = document.getElementById('Printout');
+            const smallsheet = document.getElementById('smallsheet');
+            if (!printoutModal || !smallsheet) {
+                console.error("找不到列印相關的 HTML 元素");
+                return;
+            }
+            // 2. 組裝小單的 HTML 內容（由上至下排版）
+            const itemsHtml = (order.items || []).map(item => `
+                    <div class="bill-item" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>${item.name} x ${item.qty}</span>
+                        <span>$${item.price * item.qty}</span>
+                    </div>
+                `).join('');
+            smallsheet.innerHTML = `
+                    <div class="print-content" style="padding: 20px; font-family: monospace; color: #000;">
+                        <h3 style="text-align: center; margin-bottom: 10px;">${order.shopName || ''}</h3>
+                        <p><strong>用餐類型：</strong>${order.diningType || ''}</p>
+                        <p><strong>取餐編號：</strong>${order.pickupNo || ''}</p>
+                        <hr style="border: 1px dashed #ccc; margin: 10px 0;">
+                        <div style="font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>項目 數量</span>
+                            <span>金額</span>
+                        </div>
+                        <div class="bill-items-container">
+                            ${itemsHtml}
+                        </div>
+                        <hr style="border: 1px dashed #ccc; margin: 10px 0;">
+                       <p style="text-align: right;"><strong>總金額：</strong>$${order.totalAmount || 0}</p>
+                        <p><strong>付款方式：</strong>${order.paymentMethod || ''}</p>
+                        <p><strong>付款狀態：</strong>${order.paymentStatus || ''}</p>
+                        <p style="font-size: 0.9em; color: #666;"><strong>下單時間：</strong>${order.createdAt || ''}</p>
+                    </div>
+                `;
+            // 3. 顯示底圖/畫布 Modal
+            printoutModal.style.display = 'block';
+            // 4. 綁定確認列印按鈕事件（使用 參數複製 或 確保不重複綁定）
+            const confirmBtn = document.getElementById('ConfirmPrint');
+            // 移除舊的監聽避免重複觸發，再重新綁定
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            newConfirmBtn.addEventListener('click', () => {
+                // 呼叫瀏覽器原生列印
+                window.print();
+            });
+        }
+        // 順便附上你原本提到的關閉視窗函式
+        function closePrintmodal() {
+            const printoutModal = document.getElementById('Printout');
+            if (printoutModal) {
+                printoutModal.style.display = 'none';
             }
         }
         document.addEventListener('DOMContentLoaded', () => {

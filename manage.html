@@ -861,7 +861,7 @@
                 return;
             }
             // 6. 處理其他按鈕
-            else if (!target) return;
+            if (!target) return;
             const action = target.dataset.action; // 使用 dataset 簡寫
             if (action === 'storesettings') {
                 window.location.href = `register.html?storeId=${auth.currentUser.uid}`;

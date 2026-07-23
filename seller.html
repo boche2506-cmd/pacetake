@@ -1630,8 +1630,8 @@
                         </div>
                         <hr style="border: 1px dashed #ccc; margin: 2.5cqw 0;">
                        <p style="text-align: right;"><strong>總金額：</strong>$${order.totalAmount || 0}</p>
-                        <p><strong>付款方式：</strong>${order.paymentMethod || ''}</p>
-                        <p><strong>付款狀態：</strong>${order.paymentStatus || ''}</p>
+                        <span class="light-badge badge-green" id="light_pay">讀取中...</span>
+                        <span class="light-badge" id="paymentStatus">讀取中...</span>
                         <p style="font-size: 0.9em; color: #666;"><strong>下單時間：</strong>${dateObj || ''}</p>
                     </div>
                 `;

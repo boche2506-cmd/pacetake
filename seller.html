@@ -1573,6 +1573,14 @@
                 console.error("找不到列印相關的 HTML 元素");
                 return;
             }
+            const dateObj = order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt);
+            // 2. 自動轉成你要的「時:分:秒」 (24小時制，例如：17:57:10)
+            timeString = dateObj.toLocaleTimeString('zh-TW', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
             // 2. 組裝小單的 HTML 內容（由上至下排版）
             const itemsHtml = (order.items || []).map(item => `
                     <div class="bill-item" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -1583,7 +1591,7 @@
             smallsheet.innerHTML = `
                     <div class="print-content" style="padding: 20px; font-family: monospace; color: #000;">
                         <h3 style="text-align: center; margin-bottom: 10px;">${order.shopName || ''}</h3>
-                        <p><strong>用餐類型：id="light_type"</p>
+                        <p><strong>用餐類型：</strong>${order.diningType || ''}</p>
                         <p><strong>取餐編號：</strong>${order.pickupNo || ''}</p>
                         <hr style="border: 1px dashed #ccc; margin: 10px 0;">
                         <div style="font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -1597,7 +1605,7 @@
                        <p style="text-align: right;"><strong>總金額：</strong>$${order.totalAmount || 0}</p>
                         <p><strong>付款方式：</strong>${order.paymentMethod || ''}</p>
                         <p><strong>付款狀態：</strong>${order.paymentStatus || ''}</p>
-                        <p style="font-size: 0.9em; color: #666;"><strong>下單時間：</strong>${order.createdAt || ''}</p>
+                        <p style="font-size: 0.9em; color: #666;"><strong>下單時間：</strong>${itemsHtml || ''}</p>
                     </div>
                 `;
             // 3. 顯示底圖/畫布 Modal

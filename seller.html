@@ -1596,7 +1596,22 @@
             const paymentMethod = (order.paymentMethod === 'CREDIT')
                 ? '線上支付'
                 : '現場付款';
+            const payContainer = document.getElementById('payContainer');
             const paymentStatusEl = document.getElementById('paymentStatus');
+            payContainer.classList.remove('pending');
+            if (order.paymentStatus === 'UNPAID' && order.confirmedBy === 'newebpay') {
+                payContainer.classList.add('pending');
+                paymentStatusEl.innerText = '已退款\n(藍新金流)';
+                // 付款狀態顯示（加強藍新金流辨識）
+            } else if
+                (order.paymentStatus === 'UNPAID') {
+                payContainer.classList.add('pending');
+                paymentStatusEl.innerText = '未付款';
+            } else if (order.confirmedBy === 'newebpay') {
+                paymentStatusEl.innerText = '已付款\n(藍新金流)';
+            } else {
+                paymentStatusEl.innerText = '已付款';
+            }
             // 2. 組裝小單的 HTML 內容（由上至下排版）
             const itemsHtml = (order.items || []).map(item => `
                     <div class="bill-item" style="display: flex; justify-content: space-between; margin-bottom: 5px;">

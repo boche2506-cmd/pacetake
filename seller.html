@@ -699,7 +699,7 @@
             aspect-ratio: 9 / 16;
             height: 100%;
             margin: 0 auto;
-            background: rgba(0, 0, 0, 0.7);
+            background: white;
             display: flex;
             flex-direction: column;
             justify-content: space-around;
@@ -763,6 +763,9 @@
             .Confirm-Print {
                 display: none !important;
             }
+        }
+        .print-content{
+            color: #111111;
         }
     </style>
 </head>
@@ -1582,6 +1585,25 @@
                 minute: '2-digit',
                 second: '2-digit'
             });
+            const displayType = (order.diningType === 'DINE_IN')
+                ? `內用桌號:\n(${order.table})`
+                : '外帶自取';
+            const payContainer = document.getElementById('payContainer');
+            const paymentStatusEl = document.getElementById('paymentStatus');
+            payContainer.classList.remove('pending');
+            if (order.paymentStatus === 'UNPAID' && order.confirmedBy === 'newebpay') {
+                payContainer.classList.add('pending');
+                paymentStatusEl.innerText = '已退款\n(藍新金流)';
+                // 付款狀態顯示（加強藍新金流辨識）
+            } else if
+                (order.paymentStatus === 'UNPAID') {
+                payContainer.classList.add('pending');
+                paymentStatusEl.innerText = '未付款';
+            } else if (order.confirmedBy === 'newebpay') {
+                paymentStatusEl.innerText = '已付款\n(藍新金流)';
+            } else {
+                paymentStatusEl.innerText = '已付款';
+            }
             // 2. 組裝小單的 HTML 內容（由上至下排版）
             const itemsHtml = (order.items || []).map(item => `
                     <div class="bill-item" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -1592,7 +1614,7 @@
             smallsheet.innerHTML = `
                     <div class="print-content" style="padding: 20px; font-family: monospace; color: #000;">
                         <h3 style="text-align: center; margin-bottom: 10px;">${order.shopName || ''}</h3>
-                        <p><strong>用餐類型：</strong>${order.diningType || ''}</p>
+                        <p><strong>用餐類型：</strong>${displayType || ''}</p>
                         <p><strong>取餐編號：</strong>${order.pickupNo || ''}</p>
                         <hr style="border: 1px dashed #ccc; margin: 10px 0;">
                         <div style="font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 5px;">

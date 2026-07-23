@@ -764,7 +764,8 @@
                 display: none !important;
             }
         }
-        .print-content{
+
+        .print-content {
             display: flex;
             flex-direction: column;
             justify-content: space-around;
@@ -1592,22 +1593,10 @@
             const displayType = (order.diningType === 'DINE_IN')
                 ? `內用桌號:\n(${order.table})`
                 : '外帶自取';
-            const payContainer = document.getElementById('payContainer');
+            const paymentMethod = (order.paymentMethod === 'CREDIT')
+                ? '線上支付'
+                : '現場付款';
             const paymentStatusEl = document.getElementById('paymentStatus');
-            payContainer.classList.remove('pending');
-            if (order.paymentStatus === 'UNPAID' && order.confirmedBy === 'newebpay') {
-                payContainer.classList.add('pending');
-                paymentStatusEl.innerText = '已退款\n(藍新金流)';
-                // 付款狀態顯示（加強藍新金流辨識）
-            } else if
-                (order.paymentStatus === 'UNPAID') {
-                payContainer.classList.add('pending');
-                paymentStatusEl.innerText = '未付款';
-            } else if (order.confirmedBy === 'newebpay') {
-                paymentStatusEl.innerText = '已付款\n(藍新金流)';
-            } else {
-                paymentStatusEl.innerText = '已付款';
-            }
             // 2. 組裝小單的 HTML 內容（由上至下排版）
             const itemsHtml = (order.items || []).map(item => `
                     <div class="bill-item" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -1630,8 +1619,8 @@
                         </div>
                         <hr style="border: 1px dashed #ccc; margin: 2.5cqw 0;">
                        <p style="text-align: right;"><strong>總金額：</strong>$${order.totalAmount || 0}</p>
-                        <span class="light-badge badge-green" id="light_pay">讀取中...</span>
-                        <span class="light-badge" id="paymentStatus">讀取中...</span>
+                        <p><strong>付款方式：</strong>${paymentMethod || ''}</p>
+                        <p><strong>付款狀態：</strong>${paymentStatusEl || ''}</p>
                         <p style="font-size: 0.9em; color: #666;"><strong>下單時間：</strong>${dateObj || ''}</p>
                     </div>
                 `;

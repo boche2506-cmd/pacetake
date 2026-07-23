@@ -705,7 +705,7 @@
             justify-content: space-around;
             align-items: center;
             z-index: 999;
-            padding: 8cqw 0;
+            padding: 2cqw;
         }
 
         #smallsheet {
@@ -1596,35 +1596,22 @@
             const paymentMethod = (order.paymentMethod === 'CREDIT')
                 ? '線上支付'
                 : '現場付款';
-            const payContainer = document.getElementById('payContainer');
-            const paymentStatusEl = document.getElementById('paymentStatus');
-            payContainer.classList.remove('pending');
-            if (order.paymentStatus === 'UNPAID' && order.confirmedBy === 'newebpay') {
-                payContainer.classList.add('pending');
-                paymentStatusEl.innerText = '已退款\n(藍新金流)';
-                // 付款狀態顯示（加強藍新金流辨識）
-            } else if
-                (order.paymentStatus === 'UNPAID') {
-                payContainer.classList.add('pending');
-                paymentStatusEl.innerText = '未付款';
-            } else if (order.confirmedBy === 'newebpay') {
-                paymentStatusEl.innerText = '已付款\n(藍新金流)';
-            } else {
-                paymentStatusEl.innerText = '已付款';
-            }
+            const paymentStatus = (order.paymentStatus === 'UNPAID')
+                ? '未付款'
+                : '已付款';
             // 2. 組裝小單的 HTML 內容（由上至下排版）
             const itemsHtml = (order.items || []).map(item => `
-                    <div class="bill-item" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <div class="bill-item" style="display: flex; justify-content: space-between; margin-bottom: 1cqw;">
                         <span>${item.name} x ${item.qty}</span>
                         <span>$${item.price * item.qty}</span>
                     </div>
                 `).join('');
             smallsheet.innerHTML = `
-                    <div class="print-content" style="padding: 5cqw; font-family: monospace;">
-                        <h3 style="text-align: center; margin-bottom: 2.5cqw;">${order.shopName || ''}</h3>
+                    <div class="print-content" style="padding: 2cqw; font-family: monospace;">
+                        <h3 style="text-align: center; margin-bottom: 1cqw;">${order.shopName || ''}</h3>
                         <p><strong>用餐類型：</strong>${displayType || ''}</p>
                         <p><strong>取餐編號：</strong>${order.pickupNo || ''}</p>
-                        <hr style="border: 1px dashed #ccc; margin: 2.5cqw 0;">
+                        <hr style="border: 1px dashed #ccc; margin: 1cqw 0;">
                         <div style="font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 1cqw;">
                             <span>項目 數量</span>
                             <span>金額</span>
@@ -1632,15 +1619,15 @@
                         <div class="bill-items-container">
                             ${itemsHtml}
                         </div>
-                        <hr style="border: 1px dashed #ccc; margin: 2.5cqw 0;">
+                        <hr style="border: 1px dashed #ccc; margin: 1cqw 0;">
                        <p style="text-align: right;"><strong>總金額：</strong>$${order.totalAmount || 0}</p>
                         <p><strong>付款方式：</strong>${paymentMethod || ''}</p>
-                        <p><strong>付款狀態：</strong>${paymentStatusEl || ''}</p>
+                        <p><strong>付款狀態：</strong>${paymentStatus || ''}</p>
                         <p style="font-size: 0.9em; color: #666;"><strong>下單時間：</strong>${dateObj || ''}</p>
                     </div>
                 `;
             // 3. 顯示底圖/畫布 Modal
-            printoutModal.style.display = 'block';
+            printoutModal.style.display = 'flex';
             // 4. 綁定確認列印按鈕事件（使用 參數複製 或 確保不重複綁定）
             const confirmBtn = document.getElementById('ConfirmPrint');
             // 移除舊的監聽避免重複觸發，再重新綁定

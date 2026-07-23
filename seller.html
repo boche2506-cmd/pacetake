@@ -1573,6 +1573,7 @@
                 console.error("找不到列印相關的 HTML 元素");
                 return;
             }
+            let timeString = "";
             const dateObj = order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt);
             // 2. 自動轉成你要的「時:分:秒」 (24小時制，例如：17:57:10)
             timeString = dateObj.toLocaleTimeString('zh-TW', {

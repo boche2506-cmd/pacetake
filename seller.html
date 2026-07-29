@@ -992,8 +992,84 @@
                 window.location.href = "index.html";
                 return;
             }
-            console.log("驗證通過，開始載入...");
-            listenToStoreStatus(storeId);
+            // --- 【新增：取得商店資料並檢查訂閱狀態】 ---
+            if (user) {
+                try {
+                    const storeRef = doc(db, "stores", storeId);
+                    const storeSnap = await getDoc(storeRef);
+                    if (!storeSnap.exists()) {
+                        alert("找不到商店資料");
+                        return;
+                    }
+                    const storeData = storeSnap.data();
+                    const sub = storeData.subscription;
+                    // 檢查訂閱邏輯
+                    if (!checkSubscriptionStatus(sub)) {
+                        return; // 訂閱已過期，中斷執行，不進入後台
+                    }
+                    console.log("驗證通過，開始載入...");
+                    listenToStoreStatus(storeId);
+                } catch (error) {
+                    console.error("檢查訂閱失敗:", error);
+                    alert("系統檢查發生錯誤，請稍後再試。");
+                }
+            }
+        }
+        function checkSubscriptionStatus(sub) {
+            if (!sub || !sub.expiryDate) {
+                alert("請聯絡管理員設定您的訂閱方案。");
+                return false;
+            }
+            const now = new Date();
+            const expiry = new Date(sub.expiryDate);
+            const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
+            // 1. 已過期：完全鎖住並導向首頁
+            if (now > expiry) {
+                alert("您的服務已過期，無法使用管理後台。請盡速繳費！");
+                window.location.href = "index.html";
+                return false;
+            }
+            // 2. 快到期 (3天內)：跳出提示
+            if ((expiry - now) < threeDaysInMs) {
+                showDynamicSubscriptionWarning(expiry);
+            }
+            return true;
+        }
+        // 動態建立提示視窗，不影響你的 qrModal
+        function showDynamicSubscriptionWarning(expiryDate) {
+            // 建立一個覆蓋全螢幕的容器
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            overlay.style.zIndex = '9999'; // 確保在最上層
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+            // 建立內容區塊
+            const modalContent = document.createElement('div');
+            modalContent.style.backgroundColor = 'white';
+            modalContent.style.padding = '2cqw';
+            modalContent.style.borderRadius = '2.5cqw';
+            modalContent.style.boxShadow = '0 0.2cqw 2.5cqw rgba(0,0,0,0.3)';
+            modalContent.style.textAlign = 'center';
+            modalContent.style.maxWidth = '75cqw';;
+            modalContent.style.lineheight = '1.2';
+            modalContent.innerHTML = `
+                    <h2>⚠️ 提醒：服務即將到期</h3>
+                    <h3>到期日：${expiryDate.toLocaleDateString()}</h3>
+                    <h3>為了避免中斷，請前往 <a href="payment.html?storeId=${storeId}" class="nav-fast">💵 繳費</a></h3>
+                    <button id="closeWarningBtn" style="margin-top:2.5cqw; padding: 1cqw 2cqw;">我知道了</button>
+                `;
+            overlay.appendChild(modalContent);
+            document.body.appendChild(overlay);
+            // 綁定關閉按鈕事件
+            document.getElementById('closeWarningBtn').onclick = () => {
+                document.body.removeChild(overlay);
+            };
         }
         // 訂單監聽函數
         function listenToStoreStatus(storeId) {

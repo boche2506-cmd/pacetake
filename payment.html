@@ -229,9 +229,9 @@
                             <label>選擇方案：</label>
                             <select id="planSelect" required>
                                 <option value="" disabled selected>請選擇購買方案</option>
-                                <option value="year">一年期 ($3,600)</option>
-                                <option value="halfYear">半年期 ($2,400)</option>
-                                <option value="month">一個月 ($500)</option>
+                                <option value="year" style="color: var(--text-main);">一年期 ($2,400)</option>
+                                <option value="halfYear" style="color: var(--text-main);">半年期 ($1,200)</option>
+                                <option value="month" style="color: var(--text-main);">一個月 ($200)</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -353,9 +353,9 @@
                     }
                     // 1. 設定對應金額
                     let amount = 0;
-                    if (plan === 'year') amount = 3600;
-                    else if (plan === 'halfYear') amount = 2400;
-                    else if (plan === 'month') amount = 500;
+                    if (plan === 'year') amount = 2400;
+                    else if (plan === 'halfYear') amount = 1200;
+                    else if (plan === 'month') amount = 200;
                     // 2. 將圖片上傳到 Firebase Storage (資料夾命名為 payment_proofs)
                     const filePath = `payment_proofs/${storeId}_${Date.now()}_${file.name}`;
                     const storageRef = ref(storage, filePath);
